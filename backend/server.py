@@ -451,17 +451,30 @@ async def get_scan_history():
 
 @api_router.put("/update-filename")
 async def update_filename(request: UpdateFilenameRequest):
-    """Update the short code for a scan result"""
+    """Update the short code for a scan result - allows duplicate names"""
     try:
+        # Validate input
+        if not request.new_short_code or not request.new_short_code.strip():
+            raise HTTPException(status_code=400, detail="Short code cannot be empty")
+        
+        # Check if document exists first
+        existing = await db.scan_results.find_one({"id": request.id})
+        if not existing:
+            raise HTTPException(status_code=404, detail=f"Document with id {request.id} not found")
+        
+        # Update the short code (duplicates are allowed)
         result = await db.scan_results.update_one(
             {"id": request.id},
-            {"$set": {"short_code": request.new_short_code}}
+            {"$set": {"short_code": request.new_short_code.strip()}}
         )
         
-        if result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="Scan result not found")
+        logger.info(f"Updated filename for {request.id}: {existing.get('short_code')} -> {request.new_short_code}")
         
-        return {"message": "Filename updated successfully"}
+        return {
+            "message": "Filename updated successfully",
+            "old_code": existing.get('short_code'),
+            "new_code": request.new_short_code.strip()
+        }
         
     except HTTPException:
         raise

@@ -720,8 +720,8 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     # Create FULL image for preview
                     full_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=False)
                     
-                    # OPTIMIZED: Single-pass with fixed 60% crop
-                    cropped_image_base64 = resize_image_for_api(content, max_size=1024, crop_top_only=True, crop_percentage=0.60)
+                    # OPTIMIZED: Single-pass with 50% crop + smaller size
+                    cropped_image_base64 = resize_image_for_api(content, max_size=800, crop_top_only=True, crop_percentage=0.50)
                     analysis_result = await analyze_document_with_vision(cropped_image_base64)
                     
                     # Create scan result with FULL image for display

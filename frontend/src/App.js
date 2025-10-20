@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast, Toaster } from 'sonner';
-import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2 } from 'lucide-react';
+import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

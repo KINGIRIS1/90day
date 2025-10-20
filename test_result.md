@@ -101,3 +101,160 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Document scanning application for Vietnamese land documents with automatic naming using short codes.
+  Recent changes: Reduced crop area to 20% (targeting title lines 5-7), implemented strict matching logic 
+  where unconfident matches default to "CONTINUATION", and updated smart grouping to handle continuation 
+  pages with preceding documents.
+
+backend:
+  - task: "Image cropping optimization (20% top crop)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented 20% crop to capture title lines 5-7. Function resize_image_for_api at line 293 uses crop_top_only parameter to crop top 20% of image."
+  
+  - task: "Strict matching logic with CONTINUATION fallback"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "LLM prompt updated to return 'CONTINUATION' for unconfident matches. Prompt at lines 200-242 instructs strict matching with CONTINUATION fallback."
+  
+  - task: "Smart grouping for multi-page documents"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Function apply_smart_grouping at line 461 handles continuation pages. Logic checks if short_code=='CONTINUATION' or confidence < 0.2, then groups with previous valid document."
+  
+  - task: "Batch scan endpoint with parallel processing"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint /batch-scan uses asyncio.gather for parallel processing. Should test with multiple files."
+  
+  - task: "Scan history endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint /scan-history retrieves documents from MongoDB. Should verify database connectivity and data retrieval."
+  
+  - task: "PDF export endpoints (single and merged)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoints /export-pdf-single, /export-pdf-merged, and /export-single-document handle PDF generation. Should test export functionality."
+  
+  - task: "Retry scan endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint /retry-scan allows retrying failed scans. Should test error handling and retry logic."
+
+frontend:
+  - task: "File upload interface with preview"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "UI allows file upload with image preview. Testing will be done after backend validation."
+  
+  - task: "Scan results display with progress indicators"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Results display with checkmarks for completed scans. Frontend testing pending backend validation."
+  
+  - task: "Search and filter functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Search input and filter dropdown implemented. Frontend testing pending backend validation."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Image cropping optimization (20% top crop)"
+    - "Strict matching logic with CONTINUATION fallback"
+    - "Smart grouping for multi-page documents"
+    - "Batch scan endpoint with parallel processing"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      Updated test_result.md with current implementation status. All backend tasks marked as needs_retesting.
+      Priority tasks:
+      1. Test image cropping (20% crop capturing title lines 5-7)
+      2. Test strict matching logic (CONTINUATION fallback for unconfident matches)
+      3. Test smart grouping (multi-page document grouping with continuation pages)
+      4. Test batch scanning with multiple files
+      
+      Backend is running. MongoDB is accessible. Emergent LLM Key is configured.
+      Please test backend endpoints first before frontend testing.

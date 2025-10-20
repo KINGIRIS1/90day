@@ -339,6 +339,62 @@ def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
         raise
 
 
+@api_router.post("/retry-scan")
+async def retry_scan(scan_id: str):
+    """Retry scanning a failed document"""
+    try:
+        # Get the failed scan from database
+        failed_scan = await db.scan_results.find_one({"id": scan_id})
+        
+        if not failed_scan:
+            raise HTTPException(status_code=404, detail="Scan not found")
+        
+        if failed_scan.get('short_code') != 'ERROR':
+            raise HTTPException(status_code=400, detail="Document is not in error state")
+        
+        # Check if we have the image
+        image_base64 = failed_scan.get('image_base64')
+        if not image_base64:
+            raise HTTPException(status_code=400, detail="No image data to retry")
+        
+        # Decode image and retry scan
+        import base64
+        image_bytes = base64.b64decode(image_base64)
+        
+        # Create cropped image for OCR
+        cropped_image_base64 = resize_image_for_api(image_bytes, crop_top_only=True, max_size=1024)
+        
+        # Retry analysis with Vision API
+        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+        
+        # Update database with new result
+        update_result = await db.scan_results.update_one(
+            {"id": scan_id},
+            {"$set": {
+                "detected_type": analysis_result["detected_full_name"],
+                "detected_full_name": analysis_result["detected_full_name"],
+                "short_code": analysis_result["short_code"],
+                "confidence_score": analysis_result["confidence"]
+            }}
+        )
+        
+        if update_result.modified_count == 0:
+            raise HTTPException(status_code=500, detail="Failed to update scan result")
+        
+        return {
+            "message": "Retry successful",
+            "detected_type": analysis_result["detected_full_name"],
+            "short_code": analysis_result["short_code"],
+            "confidence": analysis_result["confidence"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error retrying scan {scan_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/scan-document", response_model=ScanResult)
 async def scan_document(file: UploadFile = File(...)):
     """Scan a single document and detect type"""

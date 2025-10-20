@@ -1083,21 +1083,15 @@ async def create_rule(request: CreateRuleRequest):
 
 @api_router.put("/rules/{rule_id}", response_model=DocumentRule)
 async def update_rule(rule_id: str, request: UpdateRuleRequest):
-    """Update an existing document rule"""
+    """Update an existing document rule - ALLOWS DUPLICATE short_codes"""
     try:
         # Find existing rule
         existing_rule = await db.document_rules.find_one({"id": rule_id})
         if not existing_rule:
             raise HTTPException(status_code=404, detail="Không tìm thấy quy tắc")
         
-        # Check if new short_code conflicts with another rule
-        if request.short_code:
-            conflict = await db.document_rules.find_one({
-                "short_code": request.short_code,
-                "id": {"$ne": rule_id}
-            })
-            if conflict:
-                raise HTTPException(status_code=400, detail=f"Mã '{request.short_code}' đã tồn tại")
+        # REMOVED: No longer check for duplicate short_code
+        # Multiple document types can have the same short code
         
         # Prepare update data
         update_data = {"updated_at": datetime.now(timezone.utc)}

@@ -579,11 +579,16 @@ def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
 async def retry_scan(scan_id: str):
     """Retry scanning a failed document"""
     try:
+        # DEBUG: Log query
+        logger.info(f"Retry scan for id: {scan_id}")
+        
         # Get the failed scan from database
         failed_scan = await db.scan_results.find_one({"id": scan_id})
         
         if not failed_scan:
-            raise HTTPException(status_code=404, detail="Scan not found")
+            total_docs = await db.scan_results.count_documents({})
+            logger.error(f"Scan not found. Total docs: {total_docs}")
+            raise HTTPException(status_code=404, detail=f"Scan not found (searched in {total_docs} documents)")
         
         if failed_scan.get('short_code') != 'ERROR':
             raise HTTPException(status_code=400, detail="Document is not in error state")

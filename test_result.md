@@ -329,6 +329,33 @@ agent_communication:
       - 35% crop effectiveness for old GCN documents
       - Quốc huy detection accuracy
       - Performance improvement with 1024px images
+  - agent: "main"
+    message: |
+      🎯 NEW FEATURE: RULES MANAGEMENT SYSTEM IMPLEMENTED
+      
+      BACKEND APIs:
+      1. ✅ GET /api/rules - Get all document rules
+      2. ✅ POST /api/rules - Create new rule
+      3. ✅ PUT /api/rules/{rule_id} - Update existing rule
+      4. ✅ DELETE /api/rules/{rule_id} - Delete rule
+      5. ✅ Auto-initialization from DOCUMENT_TYPES to database on first run
+      6. ✅ Dynamic rules loading in analyze_document_with_vision function
+      
+      FRONTEND UI:
+      1. ✅ New "Quy Tắc" tab in navigation (3 tabs now: Quét, Lịch Sử, Quy Tắc)
+      2. ✅ RulesManager component with full CRUD operations
+      3. ✅ Search functionality for rules
+      4. ✅ Add new rule form with validation
+      5. ✅ Inline edit/delete buttons
+      6. ✅ Duplicate short_code validation
+      7. ✅ Toast notifications for all operations
+      
+      BENEFITS:
+      - Users can add/edit/delete document types without touching code
+      - Rules stored in MongoDB, dynamically loaded during scanning
+      - Clean UI with search and table display
+      
+      Ready for testing of rules management APIs and UI functionality.
   - agent: "testing"
     message: |
       🎉 NEW IMPROVEMENTS TESTING COMPLETE - ALL CRITICAL FEATURES WORKING PERFECTLY!

@@ -198,23 +198,35 @@ class UpdateRuleRequest(BaseModel):
 async def get_document_rules() -> dict:
     """Get all document rules from database or initialize from DOCUMENT_TYPES"""
     try:
+        # Create unique index on short_code to prevent duplicates
+        try:
+            await db.document_rules.create_index("short_code", unique=True)
+        except:
+            pass  # Index already exists
+        
         # Check if rules exist in database
         rules_count = await db.document_rules.count_documents({})
         
         if rules_count == 0:
             # First time: migrate from DOCUMENT_TYPES to database
             logger.info("Initializing document rules from DOCUMENT_TYPES")
-            rules_to_insert = []
             for full_name, short_code in DOCUMENT_TYPES.items():
-                rule = DocumentRule(
-                    full_name=full_name,
-                    short_code=short_code
-                )
-                rules_to_insert.append(rule.model_dump())
+                try:
+                    rule = DocumentRule(
+                        full_name=full_name,
+                        short_code=short_code
+                    )
+                    # Use insert_one with error handling to prevent duplicates
+                    await db.document_rules.insert_one(rule.model_dump())
+                except Exception as e:
+                    # Skip if already exists (duplicate key error)
+                    if "duplicate" in str(e).lower():
+                        logger.debug(f"Rule {short_code} already exists, skipping")
+                    else:
+                        logger.error(f"Error inserting rule {short_code}: {e}")
             
-            if rules_to_insert:
-                await db.document_rules.insert_many(rules_to_insert)
-                logger.info(f"Initialized {len(rules_to_insert)} document rules")
+            final_count = await db.document_rules.count_documents({})
+            logger.info(f"Initialized {final_count} document rules")
         
         # Fetch all rules from database
         rules_cursor = db.document_rules.find({})

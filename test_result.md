@@ -104,22 +104,25 @@
 
 user_problem_statement: |
   Document scanning application for Vietnamese land documents with automatic naming using short codes.
-  Recent changes: Reduced crop area to 20% (targeting title lines 5-7), implemented strict matching logic 
-  where unconfident matches default to "CONTINUATION", and updated smart grouping to handle continuation 
-  pages with preceding documents.
+  NEW UPDATE: Increased crop to 35% (covering quốc huy at top + title in middle for old GCN documents).
+  Added quốc huy (Vietnam coat of arms) detection to improve GCN identification.
+  Optimized image size from 1280px to 1024px for faster processing while maintaining accuracy.
 
 backend:
-  - task: "Image cropping optimization (20% top crop)"
+  - task: "Image cropping optimization (35% top crop + quốc huy detection)"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implemented 20% crop to capture title lines 5-7. Function resize_image_for_api at line 293 uses crop_top_only parameter to crop top 20% of image."
+        comment: "Updated to 35% crop to capture quốc huy (coat of arms) at top and title in middle section. This fixes GCN cũ (old GCN) where title is in the middle. Function resize_image_for_api at line 303."
+      - working: true
+        agent: "testing"
+        comment: "Previous 20% crop tested and working"
       - working: true
         agent: "testing"
         comment: "✅ TESTED: 20% image cropping working correctly. Processed 3/3 test images successfully. Cropping from full height to top 20% (e.g., 3496px to 699px) as logged. Fast processing indicates optimization is effective."

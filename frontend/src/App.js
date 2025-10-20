@@ -542,14 +542,35 @@ const DocumentScanner = () => {
             )}
             
             {isError && showActions && (
-              <Button 
-                size="sm" 
-                className="w-full"
-                variant="destructive"
-                disabled
-              >
-                ❌ Không thể xuất
-              </Button>
+              <>
+                <Button 
+                  size="sm" 
+                  className="w-full mb-2"
+                  variant="outline"
+                  onClick={() => handleRetry(result.id)}
+                  disabled={isRetrying}
+                  data-testid={`retry-btn-${result.id}`}
+                >
+                  {isRetrying ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang quét lại...
+                    </>
+                  ) : (
+                    <>
+                      🔄 Quét lại
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="w-full"
+                  variant="destructive"
+                  disabled
+                >
+                  ❌ Không thể xuất
+                </Button>
+              </>
             )}
           </div>
         )}

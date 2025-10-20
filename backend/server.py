@@ -388,8 +388,8 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     # Read file content
                     content = await file.read()
                     
-                    # Resize and convert to base64 (smaller size = faster)
-                    image_base64 = resize_image_for_api(content, max_size=1024)  # Reduced from 1536
+                    # Resize and CROP top 20% only (MUCH FASTER!)
+                    image_base64 = resize_image_for_api(content, max_size=1024, crop_top_only=True)
                     
                     # Analyze with Vision API
                     analysis_result = await analyze_document_with_vision(image_base64)

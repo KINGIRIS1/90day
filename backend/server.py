@@ -192,36 +192,42 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         image_content = ImageContent(image_base64=image_base64)
         
         # Create user message with OPTIMIZED prompt - focus on title only
-        prompt = f"""CHỈ ĐỌC TIÊU ĐỀ CHÍNH của tài liệu (phần đầu, in đậm, cỡ chữ lớn) và xác định loại:
+        prompt = f"""Đọc CHÍNH XÁC tiêu đề tài liệu và xác định loại. CHÚ Ý: Nhiều loại tài liệu rất giống nhau!
 
-DANH SÁCH LOẠI TÀI LIỆU PHỔ BIẾN:
-- "GIẤY CHỨNG NHẬN" → GCNM
-- "TRÍCH LỤC" / "TRÍCH ĐO" / "PHIẾU ĐO ĐẠC" / "BẢN VẼ TÁCH THỬA" → HSKT
-- "ĐƠN ĐĂNG KÝ" → DDK
-- "HỢP ĐỒNG CHUYỂN NHƯỢNG" → HDCQ
-- "BIÊN NHẬN" / "GIẤY TIẾP NHẬN" → BN
-- "PHIẾU CHUYỂN THÔNG TIN" → PCT
-- "QUYẾT ĐỊNH" → QD*
-- "VĂN BẢN" → VB*
+⚠️ CẶP DỄ NHẦM - ĐỌC KỸ TỪNG TỪ:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (có "BIẾN ĐỘNG")
+   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
 
-{doc_types_list[:500]}... (xem thêm nếu không khớp)
+2. "Giấy chứng nhận quyền sử dụng đất" → GCNM (bản chính)
+   "Giấy chứng nhận kết hôn" → GKH (hoàn toàn khác)
 
-QUY TẮC:
-1. CHỈ đọc 2-3 từ TIÊU ĐỀ CHÍNH (không đọc hết văn bản)
-2. Nếu KHÔNG CÓ TIÊU ĐỀ RÕ RÀNG (trang tiếp theo của tài liệu) → Trả về:
+3. "Quyết định cho phép chuyển mục đích" → QDCMD (có "CHO PHÉP")
+   "Quyết định chuyển hình thức giao đất" → QDCHTGD (khác)
+
+4. "Hợp đồng chuyển nhượng" → HDCQ (chuyển nhượng)
+   "Hợp đồng thuê đất" → HDTD (thuê)
+   "Hợp đồng thế chấp" → HDTHC (thế chấp)
+
+5. "Biên bản bàn giao đất" → BBGD (bàn giao)
+   "Biên bản kiểm tra" → BBKT* (kiểm tra)
+
+DANH SÁCH ĐẦY ĐỦ:
+{doc_types_list[:800]}
+
+QUY TẮC PHÂN TÍCH:
+━━━━━━━━━━━━━━━━
+1. ĐỌC KỸ TỪNG TỪ trong tiêu đề - KHÔNG BỎ SÓT!
+2. Chú ý TỪ PHÂN BIỆT: "biến động", "cho phép", "chuyển nhượng", "thuê", v.v.
+3. Nếu KHÔNG CÓ TIÊU ĐỀ (trang tiếp theo) → "CONTINUATION"
+4. Trả về JSON:
 {{
-  "detected_full_name": "Không có tiêu đề",
-  "short_code": "CONTINUATION",
-  "confidence": 0.1
-}}
-3. Nếu CÓ TIÊU ĐỀ → Trả về JSON:
-{{
-  "detected_full_name": "Tên loại tài liệu",
-  "short_code": "MÃ",
+  "detected_full_name": "Tên CHÍNH XÁC từ danh sách",
+  "short_code": "MÃ CHÍNH XÁC",
   "confidence": 0.9
 }}
 
-NHANH LÊN - CHỈ ĐỌC TIÊU ĐỀ!"""
+❗ QUAN TRỌNG: So khớp CHÍNH XÁC với danh sách, đừng đoán!"""
         
         user_message = UserMessage(
             text=prompt,

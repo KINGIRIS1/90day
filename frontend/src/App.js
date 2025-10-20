@@ -202,6 +202,28 @@ const DocumentScanner = () => {
     setEditValue('');
   };
 
+  const handleExportSingleFile = async (scanId, shortCode) => {
+    try {
+      const response = await axios.post(`${API}/export-single-document`, 
+        { scan_ids: [scanId] },
+        { responseType: 'blob' }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${shortCode}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      toast.success(`Đã xuất file ${shortCode}.pdf`);
+    } catch (error) {
+      console.error('Error exporting single file:', error);
+      toast.error('Lỗi khi xuất file');
+    }
+  };
+
   const ResultCard = ({ result, showActions = true }) => (
     <Card className="overflow-hidden hover-card" data-testid={`result-card-${result.id}`}>
       <div className="relative aspect-[3/4] bg-muted">

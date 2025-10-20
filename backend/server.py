@@ -227,12 +227,27 @@ Lưu ý: confidence từ 0.0 đến 1.0 thể hiện độ tin cậy của kết
         import json
         # Extract JSON from response (handle markdown code blocks)
         response_text = response.strip()
+        
+        # Log raw response for debugging
+        logger.info(f"OpenAI Vision raw response: {response_text[:200]}")
+        
         if "```json" in response_text:
             response_text = response_text.split("```json")[1].split("```")[0].strip()
         elif "```" in response_text:
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
-        result = json.loads(response_text)
+        # Try to parse JSON
+        try:
+            result = json.loads(response_text)
+        except json.JSONDecodeError as je:
+            logger.error(f"JSON parse error. Raw response: {response_text}")
+            # Try to extract JSON manually if it's embedded in text
+            import re
+            json_match = re.search(r'\{[^}]+\}', response_text)
+            if json_match:
+                result = json.loads(json_match.group())
+            else:
+                raise je
         
         return {
             "detected_full_name": result.get("detected_full_name", "Không xác định"),

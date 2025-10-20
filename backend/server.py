@@ -253,14 +253,14 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
         # PASS 2: Smart cropping based on emblem detection
         if has_emblem:
             # Emblem found in 30% crop → Could be GCN mới OR GCN cũ
-            # Use 50% to be safe (covers both cases)
-            logger.info("✅ Emblem detected in top 30% → Using 50% crop (safe for both GCN types)")
-            optimal_crop_percentage = 0.50
+            # Use 65% to be safe (covers single page + 2-page spread cases)
+            logger.info("✅ Emblem detected in top 30% → Using 65% crop (safe for all GCN types)")
+            optimal_crop_percentage = 0.65
         else:
             # No emblem in 30% → Very rare, maybe not GCN or image issue
-            # Use 60% as maximum safe crop
-            logger.info("⚠️  Emblem NOT detected in top 30% → Using 60% crop (maximum coverage)")
-            optimal_crop_percentage = 0.60
+            # Use 70% as maximum safe crop
+            logger.info("⚠️  Emblem NOT detected in top 30% → Using 70% crop (maximum coverage)")
+            optimal_crop_percentage = 0.70
         
         # Create optimal crop for final analysis
         cropped_image_base64 = resize_image_for_api(

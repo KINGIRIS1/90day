@@ -275,6 +275,9 @@ const DocumentScanner = () => {
         toast.success(`Quét thành công ${allResults.length} tài liệu!`);
       }
       
+      // CLEAR uploaded files after successful scan to prevent re-scanning
+      setUploadedFiles([]);
+      
       fetchScanHistory();
     } catch (error) {
       console.error('Error scanning documents:', error);

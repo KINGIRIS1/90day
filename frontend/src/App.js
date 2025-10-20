@@ -892,10 +892,16 @@ const DocumentScanner = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {scanResults.map(result => (
-                      <ResultCard key={result.id} result={result} />
+                    {getFilteredResults(scanResults).map(result => (
+                      <ResultCard key={result.id} result={result} showCheckbox={true} />
                     ))}
                   </div>
+                  {getFilteredResults(scanResults).length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>Không tìm thấy tài liệu phù hợp với bộ lọc</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}

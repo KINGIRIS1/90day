@@ -383,7 +383,7 @@ const DocumentScanner = () => {
               )}
             </div>
             
-            {showActions && (
+            {showActions && !isError && (
               <Button 
                 size="sm" 
                 className="w-full"
@@ -393,6 +393,17 @@ const DocumentScanner = () => {
               >
                 <Download className="h-4 w-4 mr-2" />
                 Xuất file này
+              </Button>
+            )}
+            
+            {isError && showActions && (
+              <Button 
+                size="sm" 
+                className="w-full"
+                variant="destructive"
+                disabled
+              >
+                ❌ Không thể xuất
               </Button>
             )}
           </div>

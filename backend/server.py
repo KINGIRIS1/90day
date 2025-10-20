@@ -293,7 +293,7 @@ TRẢ VỀ JSON:
 
 
 def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only: bool = True) -> str:
-    """Resize image and convert to base64 - PRECISION: 35% crop for better context"""
+    """Resize image and convert to base64 - OPTIMAL: 20% crop for lines 5-7"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -301,22 +301,22 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # CROP: Take top 35% of image (more context for precise detection)
+        # CROP: Take top 20% (lines 5-7 where title usually is)
         if crop_top_only:
             width, height = img.size
-            crop_height = int(height * 0.35)  # Increased from 30% to 35%
+            crop_height = int(height * 0.20)  # Back to 20% - optimal for title only
             img = img.crop((0, 0, width, crop_height))
-            logger.info(f"Cropped image from {height}px to {crop_height}px (top 35%)")
+            logger.info(f"Cropped image from {height}px to {crop_height}px (top 20%, lines 5-7)")
         
-        # Balanced resize (1280px)
+        # High quality resize for better OCR
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
-            img = img.resize(new_size, Image.Resampling.LANCZOS)  # Better quality
+            img = img.resize(new_size, Image.Resampling.LANCZOS)
         
-        # Better quality (75%)
+        # High quality
         buffered = BytesIO()
-        img.save(buffered, format="JPEG", quality=75, optimize=True)
+        img.save(buffered, format="JPEG", quality=80, optimize=True)  # Increased to 80%
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return img_base64

@@ -470,21 +470,32 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     return scan_result
                 except Exception as e:
                     error_msg = str(e)
+                    
+                    # Auto retry for timeout/connection errors
+                    is_retryable = ("timeout" in error_msg.lower() or 
+                                   "connection" in error_msg.lower() or
+                                   "rate limit" in error_msg.lower())
+                    
+                    if is_retryable and retry_count < max_retries:
+                        logger.warning(f"Retrying {file.filename} (attempt {retry_count + 1}/{max_retries})")
+                        await asyncio.sleep(2 ** retry_count)  # Exponential backoff
+                        return await process_file(file, retry_count + 1)
+                    
                     logger.error(f"Error processing {file.filename}: {error_msg}", exc_info=True)
                     
                     # Categorize error
                     if "rate limit" in error_msg.lower():
                         error_type = "Rate Limit"
-                        error_detail = "Quá nhiều request. Vui lòng đợi vài giây."
+                        error_detail = "Quá nhiều request. Đã thử retry."
                     elif "timeout" in error_msg.lower():
                         error_type = "Timeout"
-                        error_detail = "API phản hồi quá lâu. Thử lại."
+                        error_detail = f"API phản hồi quá lâu. Đã thử {retry_count + 1} lần."
                     elif "json" in error_msg.lower():
                         error_type = "JSON Parse Error"
                         error_detail = "AI trả về dữ liệu không đúng format."
                     elif "connection" in error_msg.lower():
                         error_type = "Connection Error"
-                        error_detail = "Mất kết nối mạng."
+                        error_detail = f"Mất kết nối mạng. Đã thử {retry_count + 1} lần."
                     elif "api_key" in error_msg.lower() or "unauthorized" in error_msg.lower():
                         error_type = "API Key Error"
                         error_detail = "Lỗi xác thực API key."

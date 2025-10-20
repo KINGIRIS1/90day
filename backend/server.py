@@ -522,8 +522,12 @@ async def batch_scan(files: List[UploadFile] = File(...)):
         tasks = [process_file(file) for file in files]
         results = await asyncio.gather(*tasks, return_exceptions=False)
         
+        # SMART GROUPING: Apply continuation logic
+        logger.info("Applying smart grouping for multi-page documents...")
+        grouped_results = apply_smart_grouping(results)
+        
         # Filter out error results and save valid ones
-        valid_results = [r for r in results if r.short_code != "ERROR"]
+        valid_results = [r for r in grouped_results if r.short_code != "ERROR"]
         
         # Save to database in batch
         if valid_results:
@@ -535,7 +539,7 @@ async def batch_scan(files: List[UploadFile] = File(...)):
             
             await db.scan_results.insert_many(docs)
         
-        return results
+        return grouped_results
         
     except Exception as e:
         logger.error(f"Error in batch scan: {e}")

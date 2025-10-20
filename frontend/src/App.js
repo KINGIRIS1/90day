@@ -44,6 +44,129 @@ const DocumentScanner = () => {
     }
   };
 
+  // NEW FEATURE 1: RETRY FAILED FILES
+  const handleRetry = async (scanId) => {
+    setRetryingIds(prev => new Set([...prev, scanId]));
+    try {
+      const response = await axios.post(`${API}/retry-scan?scan_id=${scanId}`);
+      
+      // Update results in state
+      setScanResults(results => 
+        results.map(r => r.id === scanId ? {
+          ...r,
+          detected_type: response.data.detected_type,
+          detected_full_name: response.data.detected_type,
+          short_code: response.data.short_code,
+          confidence_score: response.data.confidence
+        } : r)
+      );
+      
+      fetchScanHistory();
+      toast.success('✅ Quét lại thành công!');
+    } catch (error) {
+      console.error('Error retrying scan:', error);
+      const errorMsg = error.response?.data?.detail || error.message;
+      toast.error(`❌ Lỗi khi quét lại: ${errorMsg}`);
+    } finally {
+      setRetryingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(scanId);
+        return newSet;
+      });
+    }
+  };
+
+  // NEW FEATURE 2: SEARCH & FILTER
+  const getFilteredResults = (results) => {
+    return results.filter(r => {
+      const matchSearch = !searchTerm || 
+        r.original_filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.detected_full_name.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchType = filterType === 'all' || 
+        (filterType === 'error' && r.short_code === 'ERROR') ||
+        (filterType === 'success' && r.short_code !== 'ERROR');
+      
+      const matchCode = filterCode === 'all' || r.short_code === filterCode;
+      
+      return matchSearch && matchType && matchCode;
+    });
+  };
+
+  // NEW FEATURE 3: BULK OPERATIONS
+  const handleSelectAll = () => {
+    const filtered = getFilteredResults(scanResults);
+    setSelectedIds(new Set(filtered.map(r => r.id)));
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    
+    if (!window.confirm(`Xóa ${selectedIds.size} file đã chọn?`)) return;
+    
+    try {
+      // Delete from results
+      setScanResults(results => results.filter(r => !selectedIds.has(r.id)));
+      
+      // Delete from backend (batch)
+      await Promise.all(
+        Array.from(selectedIds).map(id => 
+          axios.delete(`${API}/scan-result/${id}`).catch(() => {})
+        )
+      );
+      
+      setSelectedIds(new Set());
+      fetchScanHistory();
+      toast.success(`Đã xóa ${selectedIds.size} file`);
+    } catch (error) {
+      console.error('Error bulk deleting:', error);
+      toast.error('Lỗi khi xóa file');
+    }
+  };
+
+  const handleBulkExport = async () => {
+    if (selectedIds.size === 0) return;
+    
+    setExporting(true);
+    try {
+      const response = await axios.post(`${API}/export-pdf-single`, 
+        { scan_ids: Array.from(selectedIds) },
+        { responseType: 'blob' }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `selected_${selectedIds.size}_files.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      toast.success(`Đã xuất ${selectedIds.size} file`);
+    } catch (error) {
+      console.error('Error bulk exporting:', error);
+      toast.error('Lỗi khi xuất file');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     const fileWithPreviews = files.map(file => ({

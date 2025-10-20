@@ -300,3 +300,24 @@ agent_communication:
       Minor: Some BytesIO reuse errors in batch testing (test artifact, not affecting production).
       
       RECOMMENDATION: Backend is production-ready. All recent improvements working as designed.
+  - agent: "main"
+    message: |
+      🎯 NEW IMPROVEMENTS IMPLEMENTED (Based on user feedback about old GCN documents):
+      
+      CHANGES MADE:
+      1. ✅ Increased crop from 20% → 35% (covers quốc huy at top + title in middle for old GCN)
+      2. ✅ Added quốc huy (Vietnam coat of arms) detection logic in prompt
+         - If quốc huy detected → identifies as official document (GCN/GCNM)
+         - Distinguishes GCNM (new) vs GCN (old) based on title text
+      3. ✅ Optimized image size: 1280px → 1024px for faster processing
+      4. ✅ Kept JPEG quality at 80% for accurate Vietnamese OCR
+      
+      BENEFITS:
+      - Better recognition for old GCN documents (title in middle of page)
+      - Faster scanning speed (reduced image data transfer ~20%)
+      - More accurate GCN identification using visual quốc huy recognition
+      
+      Backend restarted successfully. Ready for retesting to validate:
+      - 35% crop effectiveness for old GCN documents
+      - Quốc huy detection accuracy
+      - Performance improvement with 1024px images

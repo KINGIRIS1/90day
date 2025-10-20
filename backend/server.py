@@ -458,11 +458,11 @@ async def scan_document(file: UploadFile = File(...)):
 
 def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
     """
-    Smart grouping: Trang không có tiêu đề sẽ được gán cùng tên với trang trước đó
+    Smart grouping: STRICT mode - chỉ nhóm khi không có tiêu đề rõ ràng
     
-    Quy tắc:
-    - File có tiêu đề rõ (confidence > 0.7) → Giữ nguyên
-    - File không có tiêu đề (CONTINUATION hoặc confidence < 0.3) → Copy tên file trước
+    Quy tắc NGHIÊM NGẶT:
+    - File có tiêu đề CHÍNH XÁC (confidence > 0.8) → Tài liệu mới
+    - File KHÔNG có tiêu đề (CONTINUATION hoặc confidence < 0.2) → Trang tiếp theo
     - File lỗi (ERROR) → Giữ nguyên
     """
     if not results:
@@ -480,10 +480,10 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
             continuation_count = 0
             continue
         
-        # Check if this is a continuation page
+        # STRICT: Only treat as continuation if very low confidence
         is_continuation = (
             result.short_code == "CONTINUATION" or 
-            result.confidence_score < 0.3 or
+            result.confidence_score < 0.2 or  # Increased threshold from 0.3 to 0.2
             "không có tiêu đề" in result.detected_full_name.lower()
         )
         

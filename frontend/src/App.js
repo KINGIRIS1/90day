@@ -950,6 +950,10 @@ const DocumentScanner = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="rules" className="space-y-4">
+            <RulesManager />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

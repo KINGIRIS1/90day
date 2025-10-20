@@ -185,6 +185,20 @@ const DocumentScanner = () => {
       return;
     }
 
+    // CHECK DUPLICATES: Warn if files already exist in scan history
+    const uploadedFilenames = uploadedFiles.map(f => f.file.name);
+    const historyFilenames = new Set(scanHistory.map(h => h.original_filename));
+    const duplicates = uploadedFilenames.filter(name => historyFilenames.has(name));
+    
+    if (duplicates.length > 0) {
+      const proceed = window.confirm(
+        `⚠️ Phát hiện ${duplicates.length} file đã được quét trước đó:\n\n${duplicates.slice(0, 5).join('\n')}${duplicates.length > 5 ? '\n...' : ''}\n\nBạn có muốn quét lại không?`
+      );
+      if (!proceed) {
+        return;
+      }
+    }
+
     setLoading(true);
     setScanProgress({ current: 0, total: uploadedFiles.length });
     setProcessedFiles(new Set());

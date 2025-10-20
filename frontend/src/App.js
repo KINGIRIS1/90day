@@ -52,6 +52,14 @@ const DocumentScanner = () => {
     }
 
     setLoading(true);
+    
+    // Show info for large batches
+    if (uploadedFiles.length > 20) {
+      toast.info(`Đang xử lý ${uploadedFiles.length} file... Vui lòng đợi (có thể mất 1-2 phút)`, {
+        duration: 5000
+      });
+    }
+    
     try {
       const formData = new FormData();
       uploadedFiles.forEach(({ file }) => {
@@ -59,11 +67,22 @@ const DocumentScanner = () => {
       });
 
       const response = await axios.post(`${API}/batch-scan`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 180000  // 3 minutes timeout for large batches
       });
 
       setScanResults(response.data);
-      toast.success(`Quét thành công ${response.data.length} tài liệu!`);
+      
+      // Count successful scans
+      const successCount = response.data.filter(r => r.short_code !== 'ERROR').length;
+      const errorCount = response.data.length - successCount;
+      
+      if (errorCount > 0) {
+        toast.warning(`Quét thành công ${successCount}/${response.data.length} tài liệu`);
+      } else {
+        toast.success(`Quét thành công ${response.data.length} tài liệu!`);
+      }
+      
       fetchScanHistory();
     } catch (error) {
       console.error('Error scanning documents:', error);

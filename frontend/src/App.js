@@ -610,7 +610,7 @@ const DocumentScanner = () => {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {scanHistory.map(result => (
-                      <ResultCard key={result.id} result={result} showActions={false} />
+                      <ResultCard key={result.id} result={result} showActions={true} />
                     ))}
                   </div>
                 )}

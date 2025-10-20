@@ -208,8 +208,13 @@ DANH SÁCH LOẠI TÀI LIỆU PHỔ BIẾN:
 
 QUY TẮC:
 1. CHỈ đọc 2-3 từ TIÊU ĐỀ CHÍNH (không đọc hết văn bản)
-2. So khớp nhanh với danh sách
-3. Trả về JSON ngay:
+2. Nếu KHÔNG CÓ TIÊU ĐỀ RÕ RÀNG (trang tiếp theo của tài liệu) → Trả về:
+{{
+  "detected_full_name": "Không có tiêu đề",
+  "short_code": "CONTINUATION",
+  "confidence": 0.1
+}}
+3. Nếu CÓ TIÊU ĐỀ → Trả về JSON:
 {{
   "detected_full_name": "Tên loại tài liệu",
   "short_code": "MÃ",

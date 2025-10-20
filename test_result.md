@@ -271,7 +271,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All high priority backend tasks completed and tested"
+    - "NEW IMPROVEMENTS TESTED: 35% crop + quốc huy detection working perfectly"
+    - "Performance optimization with 1024px images confirmed"
+    - "All backend features validated and working"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

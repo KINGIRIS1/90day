@@ -127,17 +127,20 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: 20% image cropping working correctly. Processed 3/3 test images successfully. Cropping from full height to top 20% (e.g., 3496px to 699px) as logged. Fast processing indicates optimization is effective."
   
-  - task: "Strict matching logic with CONTINUATION fallback"
+  - task: "Strict matching logic with CONTINUATION fallback + Quốc huy detection"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "LLM prompt updated to return 'CONTINUATION' for unconfident matches. Prompt at lines 200-242 instructs strict matching with CONTINUATION fallback."
+        comment: "Enhanced prompt with quốc huy (Vietnam coat of arms) detection. If quốc huy detected → official document (GCN/GCNM). Prompt at lines 198-242 now prioritizes visual quốc huy recognition before text matching."
+      - working: true
+        agent: "testing"
+        comment: "Previous strict matching tested and working (confidence 0.9 for clear docs, 0.1 for CONTINUATION)"
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Strict matching with CONTINUATION fallback working perfectly. High confidence documents (0.90) get correct codes (GCNM, HDCQ). Unclear documents get CONTINUATION with low confidence (0.10). LLM prompt enforces strict 100% matching rule."

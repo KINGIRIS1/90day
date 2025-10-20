@@ -605,9 +605,9 @@ async def scan_document(file: UploadFile = File(...)):
         # Create FULL image for preview/storage
         full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1280)
         
-        # OPTIMIZED: Single-pass with fixed 60% crop (covers all GCN types)
-        # 60% is optimal: covers GCN mới (title at 15-25%) and GCN cũ (title at 55-65%)
-        cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=1024, crop_percentage=0.60)
+        # OPTIMIZED: Single-pass with 50% crop + smaller size for speed
+        # 50% crop: covers most GCN types, 800px for faster API
+        cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=800, crop_percentage=0.50)
         analysis_result = await analyze_document_with_vision(cropped_image_base64)
         
         # Create scan result with FULL image for preview

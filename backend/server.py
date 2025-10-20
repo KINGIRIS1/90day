@@ -267,8 +267,8 @@ NHANH LÊN - CHỈ ĐỌC TIÊU ĐỀ!"""
         }
 
 
-def resize_image_for_api(image_bytes: bytes, max_size: int = 1024) -> str:
-    """Resize image and convert to base64 - OPTIMIZED for speed (smaller = faster)"""
+def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only: bool = True) -> str:
+    """Resize image and convert to base64 - CROP TOP 20% for title only (MUCH FASTER!)"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -276,15 +276,22 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1024) -> str:
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
+        # CROP: Only take top 20% of image (where title is)
+        if crop_top_only:
+            width, height = img.size
+            crop_height = int(height * 0.2)  # Top 20% (about 10 lines)
+            img = img.crop((0, 0, width, crop_height))
+            logger.info(f"Cropped image from {height}px to {crop_height}px (top 20%)")
+        
         # Aggressive resize for speed (1024px is enough for title OCR)
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
-            img = img.resize(new_size, Image.Resampling.BILINEAR)  # Faster than LANCZOS
+            img = img.resize(new_size, Image.Resampling.BILINEAR)
         
         # Convert to base64 with lower quality for speed
         buffered = BytesIO()
-        img.save(buffered, format="JPEG", quality=70, optimize=True)  # Further reduced
+        img.save(buffered, format="JPEG", quality=65, optimize=True)  # Lower quality
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return img_base64

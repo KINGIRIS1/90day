@@ -501,7 +501,7 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only
 
 
 def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
-    """Create a PDF file from base64 image"""
+    """Create a PDF file from base64 image - AUTO-DETECT A3/A4 and orientation"""
     try:
         # Decode base64 image
         image_data = base64.b64decode(image_base64)
@@ -511,28 +511,64 @@ def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # Create PDF
-        c = canvas.Canvas(output_path, pagesize=A4)
-        
-        # Calculate dimensions to fit A4
-        a4_width, a4_height = A4
         img_width, img_height = img.size
         
-        # Calculate scaling to fit A4 while maintaining aspect ratio
-        scale = min(a4_width / img_width, a4_height / img_height) * 0.9
+        # SMART PAGE SIZE DETECTION
+        # A3 = 297mm x 420mm = 842pt x 1191pt
+        # A4 = 210mm x 297mm = 595pt x 842pt
+        
+        # Determine if landscape or portrait
+        is_landscape = img_width > img_height
+        
+        # Calculate aspect ratio to detect A3 vs A4
+        aspect_ratio = max(img_width, img_height) / min(img_width, img_height)
+        
+        # A3 aspect ratio ≈ 1.414 (√2)
+        # A4 aspect ratio ≈ 1.414 (√2) - same!
+        # But A3 is larger in pixels
+        
+        # Detect paper size based on image dimensions
+        # If image is very large (> 3000px on long side), likely A3
+        long_side = max(img_width, img_height)
+        
+        if long_side > 3000 or (img_width > 3000 and img_height > 2000):
+            # A3 size
+            if is_landscape:
+                page_size = landscape(A3)
+                logger.info(f"Detected A3 Landscape: {img_width}x{img_height}")
+            else:
+                page_size = portrait(A3)
+                logger.info(f"Detected A3 Portrait: {img_width}x{img_height}")
+        else:
+            # A4 size (default)
+            if is_landscape:
+                page_size = landscape(A4)
+                logger.info(f"Detected A4 Landscape: {img_width}x{img_height}")
+            else:
+                page_size = portrait(A4)
+                logger.info(f"Detected A4 Portrait: {img_width}x{img_height}")
+        
+        # Create PDF with detected page size
+        c = canvas.Canvas(output_path, pagesize=page_size)
+        
+        page_width, page_height = page_size
+        
+        # Calculate scaling to fit page while maintaining aspect ratio
+        scale = min(page_width / img_width, page_height / img_height) * 0.95  # 95% to leave margin
         
         new_width = img_width * scale
         new_height = img_height * scale
         
         # Center the image
-        x = (a4_width - new_width) / 2
-        y = (a4_height - new_height) / 2
+        x = (page_width - new_width) / 2
+        y = (page_height - new_height) / 2
         
         # Draw image
         img_reader = ImageReader(BytesIO(image_data))
         c.drawImage(img_reader, x, y, width=new_width, height=new_height)
         
         c.save()
+        logger.info(f"Created PDF: {output_path} with page size {page_width:.0f}x{page_height:.0f}pt")
         
     except Exception as e:
         logger.error(f"Error creating PDF: {e}")

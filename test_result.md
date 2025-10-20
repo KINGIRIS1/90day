@@ -225,6 +225,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Retry scan endpoint working correctly. Properly handles retry requests and validates document state. Returns appropriate HTTP 400 when document is not in error state (expected behavior). Error handling logic functioning as designed."
+  
+  - task: "Rules Management API (GET/POST/PUT/DELETE)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: CRUD APIs for document rules management. GET /api/rules, POST /api/rules, PUT /api/rules/{id}, DELETE /api/rules/{id}. Auto-initializes from DOCUMENT_TYPES. Dynamic loading in scan function."
 
 frontend:
   - task: "File upload interface with preview"

@@ -367,7 +367,7 @@ async def retry_scan(scan_id: str):
         image_bytes = base64.b64decode(image_base64)
         
         # Create cropped image for OCR
-        cropped_image_base64 = resize_image_for_api(image_bytes, crop_top_only=True, max_size=1024)
+        cropped_image_base64 = resize_image_for_api(image_bytes, crop_top_only=True, max_size=1280)
         
         # Retry analysis with Vision API
         analysis_result = await analyze_document_with_vision(cropped_image_base64)
@@ -411,7 +411,7 @@ async def scan_document(file: UploadFile = File(...)):
         full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1536)
         
         # Create CROPPED image for OCR (faster!)
-        cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=1024)
+        cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=1280)
         
         # Analyze with Vision API using CROPPED image
         analysis_result = await analyze_document_with_vision(cropped_image_base64)
@@ -527,7 +527,7 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     full_image_base64 = resize_image_for_api(content, max_size=1536, crop_top_only=False)
                     
                     # Create CROPPED image for OCR (only top 20% - MUCH FASTER!)
-                    cropped_image_base64 = resize_image_for_api(content, max_size=1024, crop_top_only=True)
+                    cropped_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=True)
                     
                     # Analyze with Vision API using CROPPED image
                     analysis_result = await analyze_document_with_vision(cropped_image_base64)

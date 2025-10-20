@@ -195,53 +195,51 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         image_content = ImageContent(image_base64=image_base64)
         
         # Create user message with OPTIMIZED prompt - focus on title only
-        prompt = f"""Đọc CHÍNH XÁC TỪNG TỪ trong tiêu đề tài liệu và xác định loại.
+        prompt = f"""Đọc tiêu đề tài liệu (thường ở dòng 5-7) và xác định CHÍNH XÁC loại.
 
-⚠️ CỰC KỲ QUAN TRỌNG - CÁC CẶP DỄ NHẦM:
+⚠️ QUY TẮC NGHIÊM NGẶT: CHỈ CHẤP NHẬN KHI KHỚP 100% CHÍNH XÁC!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. "Đơn đăng ký BIẾN ĐỘNG đất đai" (CÓ chữ "BIẾN ĐỘNG") → DDKBD
-   "Đơn đăng ký đất đai" (KHÔNG có "BIẾN ĐỘNG") → DDK
-   ⚡ Kiểm tra: Có chữ "BIẾN ĐỘNG" hay không?
 
-2. "Giấy chứng nhận quyền sử dụng đất" → GCNM
-   "Giấy chứng nhận kết hôn" → GKH  
-   ⚡ Kiểm tra: "đất" hay "kết hôn"?
+❌ KHÔNG được đoán hoặc chọn "gần giống"
+❌ KHÔNG được bỏ qua từ khóa phân biệt
+✅ CHỈ chọn khi khớp CHÍNH XÁC 100% với danh sách
 
-3. "Quyết định cho phép chuyển mục đích" (CÓ "cho phép") → QDCMD
-   "Quyết định chuyển hình thức" (KHÔNG có "cho phép") → QDCHTGD
-   ⚡ Kiểm tra: Có "cho phép" không?
+NẾU KHÔNG CHẮC CHẮN 100% → Trả về "CONTINUATION" (trang tiếp theo của tài liệu trước)
 
-4. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ
-   "Hợp đồng THUÊ đất" → HDTD
-   "Hợp đồng THẾ CHẤP" → HDTHC
-   ⚡ Kiểm tra: "chuyển nhượng", "thuê", hay "thế chấp"?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. "Biên bản BÀN GIAO đất" → BBGD
-   "Biên bản KIỂM TRA" → BBKT*
-   ⚡ Kiểm tra: "bàn giao" hay "kiểm tra"?
+CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
+   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
+   Nếu không rõ có "BIẾN ĐỘNG" không → "CONTINUATION"
 
-PHƯƠNG PHÁP PHÂN TÍCH:
-━━━━━━━━━━━━━━━━━━━━
-Bước 1: Đọc TOÀN BỘ tiêu đề, không bỏ sót từ nào
-Bước 2: Xác định TỪ KHÓA PHÂN BIỆT (biến động, cho phép, chuyển nhượng...)
-Bước 3: So khớp CHÍNH XÁC với danh sách dưới đây
-Bước 4: NẾU KHÔNG CHẮC CHẮN → đọc lại lần 2
+2. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
+   "Hợp đồng THUÊ" → HDTD (PHẢI có "THUÊ")
+   "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
+   Nếu không rõ loại nào → "CONTINUATION"
 
-DANH SÁCH ĐẦY ĐỦ (80+ loại):
+3. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP")
+   Nếu không thấy "CHO PHÉP" rõ ràng → "CONTINUATION"
+
+DANH SÁCH ĐẦY ĐỦ (khớp chính xác):
 {doc_types_list}
 
-TRƯỜNG HỢP ĐẶC BIỆT:
-- Nếu KHÔNG CÓ TIÊU ĐỀ (trang tiếp theo) → "CONTINUATION"
-- Nếu KHÔNG KHỚP danh sách → chọn gần nhất + confidence thấp
+QUY TRÌNH KIỂM TRA:
+━━━━━━━━━━━━━━━━━━
+1. Đọc tiêu đề đầy đủ
+2. Tìm trong danh sách có tên CHÍNH XÁC 100%?
+3. NẾU CÓ → Trả về tên + mã chính xác, confidence: 0.9
+4. NẾU KHÔNG → Trả về "CONTINUATION", confidence: 0.1
 
 TRẢ VỀ JSON:
 {{
-  "detected_full_name": "Tên CHÍNH XÁC từ danh sách (bao gồm TẤT CẢ từ phân biệt)",
-  "short_code": "MÃ CHÍNH XÁC",
-  "confidence": 0.9
+  "detected_full_name": "Tên CHÍNH XÁC từ danh sách HOẶC 'Không có tiêu đề'",
+  "short_code": "MÃ CHÍNH XÁC HOẶC 'CONTINUATION'",
+  "confidence": 0.9 hoặc 0.1
 }}
 
-❗ NHỚ: "Đơn đăng ký biến động" ≠ "Đơn đăng ký" - 2 loại KHÁC NHAU!"""
+❗ NHỚ: Thà trả về "CONTINUATION" còn hơn đoán sai!"""
         
         user_message = UserMessage(
             text=prompt,

@@ -300,14 +300,6 @@ const DocumentScanner = () => {
               </Button>
             )}
           </div>
-        )} 
-                onClick={() => startEdit(result.id, result.short_code)}
-                data-testid={`edit-btn-${result.id}`}
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
         )}
         
         <p className="text-xs text-muted-foreground">

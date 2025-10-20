@@ -111,87 +111,108 @@ user_problem_statement: |
 backend:
   - task: "Image cropping optimization (20% top crop)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented 20% crop to capture title lines 5-7. Function resize_image_for_api at line 293 uses crop_top_only parameter to crop top 20% of image."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: 20% image cropping working correctly. Processed 3/3 test images successfully. Cropping from full height to top 20% (e.g., 3496px to 699px) as logged. Fast processing indicates optimization is effective."
   
   - task: "Strict matching logic with CONTINUATION fallback"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "LLM prompt updated to return 'CONTINUATION' for unconfident matches. Prompt at lines 200-242 instructs strict matching with CONTINUATION fallback."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Strict matching with CONTINUATION fallback working perfectly. High confidence documents (0.90) get correct codes (GCNM, HDCQ). Unclear documents get CONTINUATION with low confidence (0.10). LLM prompt enforces strict 100% matching rule."
   
   - task: "Smart grouping for multi-page documents"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Function apply_smart_grouping at line 461 handles continuation pages. Logic checks if short_code=='CONTINUATION' or confidence < 0.2, then groups with previous valid document."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Smart grouping working correctly. Batch scan shows proper page numbering: 'Document Name (trang 1)', 'Document Name (trang 2)'. Continuation pages grouped with previous valid document. Confidence boosted to 0.95 for grouped pages."
   
   - task: "Batch scan endpoint with parallel processing"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint /batch-scan uses asyncio.gather for parallel processing. Should test with multiple files."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Batch processing working with parallel execution. Processed multiple files successfully. Minor: Some BytesIO reuse errors in test (not affecting core functionality). Average 1.78s per file processing time. Semaphore controls concurrency properly."
   
   - task: "Scan history endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint /scan-history retrieves documents from MongoDB. Should verify database connectivity and data retrieval."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Scan history endpoint working perfectly. MongoDB connectivity confirmed. Successfully retrieves and returns scan results with proper timestamp sorting. Database operations functioning correctly."
   
   - task: "PDF export endpoints (single and merged)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoints /export-pdf-single, /export-pdf-merged, and /export-single-document handle PDF generation. Should test export functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: PDF export endpoints working correctly. /export-pdf-single generates ZIP with individual PDFs (761KB output). /export-pdf-merged creates single merged PDF (760KB output). Both endpoints handle file generation and return proper responses."
   
   - task: "Retry scan endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint /retry-scan allows retrying failed scans. Should test error handling and retry logic."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Retry scan endpoint working correctly. Properly handles retry requests and validates document state. Returns appropriate HTTP 400 when document is not in error state (expected behavior). Error handling logic functioning as designed."
 
 frontend:
   - task: "File upload interface with preview"

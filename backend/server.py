@@ -438,6 +438,76 @@ async def scan_document(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
+    """
+    Smart grouping: Trang không có tiêu đề sẽ được gán cùng tên với trang trước đó
+    
+    Quy tắc:
+    - File có tiêu đề rõ (confidence > 0.7) → Giữ nguyên
+    - File không có tiêu đề (CONTINUATION hoặc confidence < 0.3) → Copy tên file trước
+    - File lỗi (ERROR) → Giữ nguyên
+    """
+    if not results:
+        return results
+    
+    grouped = []
+    last_valid_code = None
+    last_valid_name = None
+    continuation_count = 0
+    
+    for i, result in enumerate(results):
+        # Skip error results
+        if result.short_code == "ERROR":
+            grouped.append(result)
+            continuation_count = 0
+            continue
+        
+        # Check if this is a continuation page
+        is_continuation = (
+            result.short_code == "CONTINUATION" or 
+            result.confidence_score < 0.3 or
+            "không có tiêu đề" in result.detected_full_name.lower()
+        )
+        
+        if is_continuation and last_valid_code:
+            # This is a continuation page - use previous document's name
+            continuation_count += 1
+            logger.info(f"Page {i+1} ({result.original_filename}) identified as continuation of {last_valid_code} (page {continuation_count + 1})")
+            
+            grouped.append(ScanResult(
+                id=result.id,
+                original_filename=result.original_filename,
+                detected_type=f"{last_valid_name} (trang {continuation_count + 1})",
+                detected_full_name=f"{last_valid_name} (trang {continuation_count + 1})",
+                short_code=last_valid_code,
+                confidence_score=0.95,  # High confidence for grouped pages
+                image_base64=result.image_base64,
+                timestamp=result.timestamp
+            ))
+        else:
+            # This is a new document with clear title
+            last_valid_code = result.short_code
+            last_valid_name = result.detected_full_name
+            continuation_count = 0
+            
+            # Mark as page 1 if it has good confidence
+            if result.confidence_score > 0.7:
+                grouped.append(ScanResult(
+                    id=result.id,
+                    original_filename=result.original_filename,
+                    detected_type=f"{result.detected_full_name} (trang 1)",
+                    detected_full_name=f"{result.detected_full_name} (trang 1)",
+                    short_code=result.short_code,
+                    confidence_score=result.confidence_score,
+                    image_base64=result.image_base64,
+                    timestamp=result.timestamp
+                ))
+            else:
+                grouped.append(result)
+    
+    return grouped
+
+
 @api_router.post("/batch-scan", response_model=List[ScanResult])
 async def batch_scan(files: List[UploadFile] = File(...)):
     """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""

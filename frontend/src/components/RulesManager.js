@@ -96,6 +96,25 @@ const RulesManager = () => {
     }
   };
 
+  const handleCleanupDuplicates = async () => {
+    if (!window.confirm(`Phát hiện ${rules.length} quy tắc. Có thể có trùng lặp.\n\nBạn có muốn xóa các quy tắc trùng lặp không?\n\n(Sẽ giữ lại 1 quy tắc duy nhất cho mỗi mã ngắn)`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${API}/rules/cleanup-duplicates`);
+      toast.success(`✅ ${response.data.message}`);
+      // Refresh rules list
+      await fetchRules();
+    } catch (error) {
+      const errorMsg = error.response?.data?.detail || error.message;
+      toast.error(`❌ ${errorMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredRules = rules.filter(r => 
     !searchTerm || 
     r.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -701,11 +701,8 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     # Create FULL image for preview
                     full_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=False)
                     
-                    # Create CROPPED image for OCR (35% crop + quốc huy detection)
-                    cropped_image_base64 = resize_image_for_api(content, max_size=1024, crop_top_only=True)
-                    
-                    # Analyze with Vision API using CROPPED image
-                    analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                    # SMART CROPPING: Two-pass AI scanning
+                    cropped_image_base64, analysis_result = await smart_crop_and_analyze(content)
                     
                     # Create scan result with FULL image for display
                     scan_result = ScanResult(

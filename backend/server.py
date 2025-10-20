@@ -230,6 +230,56 @@ async def get_document_rules() -> dict:
         return DOCUMENT_TYPES
 
 
+async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
+    """
+    Two-Pass Smart Cropping:
+    Pass 1: Crop 30% and detect emblem
+    - If emblem found → Use 35% crop (GCN mới - quốc huy ở đầu)
+    - If no emblem → Use 50% crop (GCN cũ - quốc huy ở giữa)
+    Pass 2: Analyze with optimal crop
+    
+    Returns: (cropped_image_base64, analysis_result)
+    """
+    try:
+        # PASS 1: Quick emblem detection with 30% crop
+        logger.info("🔍 PASS 1: Detecting emblem with 30% crop...")
+        quick_crop_base64 = resize_image_for_api(image_bytes, max_size=800, crop_top_only=True, crop_percentage=0.30)
+        
+        has_emblem = await detect_emblem_in_image(quick_crop_base64)
+        
+        # PASS 2: Smart cropping based on emblem detection
+        if has_emblem:
+            # GCN mới: quốc huy ở đầu (10-15%), crop 35% là đủ
+            logger.info("✅ Emblem detected at top → Using 35% crop (GCN mới)")
+            optimal_crop_percentage = 0.35
+        else:
+            # GCN cũ: quốc huy có thể ở giữa (30-35%), crop 50% an toàn hơn
+            logger.info("⚠️  Emblem not detected at top → Using 50% crop (GCN cũ)")
+            optimal_crop_percentage = 0.50
+        
+        # Create optimal crop for final analysis
+        cropped_image_base64 = resize_image_for_api(
+            image_bytes, 
+            max_size=1024, 
+            crop_top_only=True, 
+            crop_percentage=optimal_crop_percentage
+        )
+        
+        # Analyze with optimal crop
+        logger.info(f"📊 PASS 2: Analyzing document with {int(optimal_crop_percentage*100)}% crop...")
+        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+        
+        return cropped_image_base64, analysis_result
+        
+    except Exception as e:
+        logger.error(f"Error in smart crop and analyze: {e}")
+        # Fallback: use 45% crop (middle ground)
+        logger.info("⚠️  Fallback to 45% crop due to error")
+        fallback_crop = resize_image_for_api(image_bytes, max_size=1024, crop_top_only=True, crop_percentage=0.45)
+        analysis = await analyze_document_with_vision(fallback_crop)
+        return fallback_crop, analysis
+
+
 async def detect_emblem_in_image(image_base64: str) -> bool:
     """Quick check to detect Vietnamese national emblem in image - for smart cropping"""
     try:

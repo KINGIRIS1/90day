@@ -23,6 +23,13 @@ const DocumentScanner = () => {
   const [exporting, setExporting] = useState(false);
   const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
   const [processedFiles, setProcessedFiles] = useState(new Set());
+  
+  // NEW: States for new features
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all'); // all, success, error
+  const [filterCode, setFilterCode] = useState('all'); // all, GCNM, HSKT, etc
+  const [retryingIds, setRetryingIds] = useState(new Set());
 
   useEffect(() => {
     fetchScanHistory();

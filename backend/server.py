@@ -425,7 +425,7 @@ async def update_filename(request: UpdateFilenameRequest):
 
 @api_router.post("/export-pdf-single")
 async def export_pdf_single(request: ExportPDFRequest):
-    """Export each scan as individual PDF"""
+    """Export scans as PDFs, automatically grouping by short_code"""
     try:
         # Get scan results
         results = await db.scan_results.find(
@@ -436,21 +436,55 @@ async def export_pdf_single(request: ExportPDFRequest):
         if not results:
             raise HTTPException(status_code=404, detail="No scan results found")
         
+        # Group results by short_code
+        grouped_results = {}
+        for result in results:
+            short_code = result.get('short_code', 'UNKNOWN')
+            if short_code not in grouped_results:
+                grouped_results[short_code] = []
+            grouped_results[short_code].append(result)
+        
         # Create temp directory for PDFs
         temp_dir = tempfile.mkdtemp()
         pdf_files = []
         
-        for result in results:
-            short_code = result.get('short_code', 'UNKNOWN')
-            output_path = os.path.join(temp_dir, f"{short_code}.pdf")
-            
-            # Create PDF
-            create_pdf_from_image(
-                result['image_base64'],
-                output_path,
-                short_code
-            )
-            pdf_files.append(output_path)
+        # Process each group
+        for short_code, group in grouped_results.items():
+            if len(group) == 1:
+                # Single document - create one PDF
+                output_path = os.path.join(temp_dir, f"{short_code}.pdf")
+                create_pdf_from_image(
+                    group[0]['image_base64'],
+                    output_path,
+                    short_code
+                )
+                pdf_files.append(output_path)
+            else:
+                # Multiple documents with same code - merge into one PDF
+                temp_pdfs = []
+                for idx, result in enumerate(group):
+                    temp_path = os.path.join(temp_dir, f"temp_{short_code}_{idx}.pdf")
+                    create_pdf_from_image(
+                        result['image_base64'],
+                        temp_path,
+                        f"{short_code}_{idx}"
+                    )
+                    temp_pdfs.append(temp_path)
+                
+                # Merge PDFs with same short_code
+                merger = PdfMerger()
+                for temp_pdf in temp_pdfs:
+                    merger.append(temp_pdf)
+                
+                merged_path = os.path.join(temp_dir, f"{short_code}.pdf")
+                merger.write(merged_path)
+                merger.close()
+                
+                # Clean up temp files
+                for temp_pdf in temp_pdfs:
+                    os.remove(temp_pdf)
+                
+                pdf_files.append(merged_path)
         
         # Create a zip file with all PDFs
         zip_path = os.path.join(temp_dir, "documents_single.zip")

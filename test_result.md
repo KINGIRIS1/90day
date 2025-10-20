@@ -228,15 +228,18 @@ backend:
   
   - task: "Rules Management API (GET/POST/PUT/DELETE)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "NEW FEATURE: CRUD APIs for document rules management. GET /api/rules, POST /api/rules, PUT /api/rules/{id}, DELETE /api/rules/{id}. Auto-initializes from DOCUMENT_TYPES. Dynamic loading in scan function."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE TESTED: Rules Management API working perfectly! All 13/13 tests passed. GET /api/rules auto-initializes 105 rules from DOCUMENT_TYPES. POST creates new rules with duplicate validation (returns 400 for duplicates). PUT updates rules with partial support and duplicate validation. DELETE removes rules with 404 for non-existent IDs. Vietnamese error messages working. Dynamic loading confirmed - new rules immediately available for scanning. Rules persist correctly across API calls. All CRUD operations validated with proper HTTP status codes."
 
 frontend:
   - task: "File upload interface with preview"

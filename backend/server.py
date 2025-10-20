@@ -181,12 +181,12 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         # Create a mapping list for the prompt
         doc_types_list = "\n".join([f"- {full_name}: {code}" for full_name, code in DOCUMENT_TYPES.items()])
         
-        # Initialize LlmChat with faster model
+        # Initialize LlmChat with balanced model (gpt-4o for better accuracy)
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"doc_scan_{uuid.uuid4()}",
-            system_message="Bạn là AI chuyên đọc TIÊU ĐỀ tài liệu. Chỉ đọc tiêu đề chính, không đọc hết văn bản. Trả JSON nhanh."
-        ).with_model("openai", "gpt-4o-mini")  # Faster & cheaper than gpt-4o
+            system_message="Bạn là AI chuyên đọc TIÊU ĐỀ tài liệu đất đai Việt Nam. Đọc 30% phần trên, xác định chính xác loại tài liệu. Trả JSON."
+        ).with_model("openai", "gpt-4o")  # Back to gpt-4o for accuracy
         
         # Create image content
         image_content = ImageContent(image_base64=image_base64)

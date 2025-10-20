@@ -119,25 +119,31 @@ const DocumentScanner = () => {
   };
 
   const handleUpdateFilename = async (id, newCode) => {
+    if (!newCode || newCode.trim() === '') {
+      toast.error('Tên file không được để trống');
+      return;
+    }
+    
     try {
       await axios.put(`${API}/update-filename`, {
         id,
-        new_short_code: newCode
+        new_short_code: newCode.trim()
       });
       
-      // Update local state
+      // Update local state - allow duplicates
       setScanResults(results => 
-        results.map(r => r.id === id ? { ...r, short_code: newCode } : r)
+        results.map(r => r.id === id ? { ...r, short_code: newCode.trim() } : r)
       );
-      setScanHistory(history => 
-        history.map(h => h.id === id ? { ...h, short_code: newCode } : h)
-      );
+      
+      // Refresh scan history to reflect changes
+      fetchScanHistory();
       
       toast.success('Đã cập nhật tên file');
       setEditingId(null);
+      setEditValue('');
     } catch (error) {
       console.error('Error updating filename:', error);
-      toast.error('Lỗi khi cập nhật tên file');
+      toast.error('Lỗi khi cập nhật tên file: ' + (error.response?.data?.detail || error.message));
     }
   };
 

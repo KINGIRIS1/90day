@@ -269,8 +269,8 @@ NHANH LÊN - CHỈ ĐỌC TIÊU ĐỀ!"""
         }
 
 
-def resize_image_for_api(image_bytes: bytes, max_size: int = 1536) -> str:
-    """Resize image and convert to base64 - OPTIMIZED for speed"""
+def resize_image_for_api(image_bytes: bytes, max_size: int = 1024) -> str:
+    """Resize image and convert to base64 - OPTIMIZED for speed (smaller = faster)"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -278,7 +278,7 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1536) -> str:
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # Aggressive resize for speed (1536px is enough for OCR)
+        # Aggressive resize for speed (1024px is enough for title OCR)
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
@@ -286,7 +286,7 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1536) -> str:
         
         # Convert to base64 with lower quality for speed
         buffered = BytesIO()
-        img.save(buffered, format="JPEG", quality=75, optimize=True)  # Reduced quality
+        img.save(buffered, format="JPEG", quality=70, optimize=True)  # Further reduced
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return img_base64

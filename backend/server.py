@@ -394,8 +394,8 @@ async def retry_scan(scan_id: str):
         import base64
         image_bytes = base64.b64decode(image_base64)
         
-        # Create cropped image for OCR
-        cropped_image_base64 = resize_image_for_api(image_bytes, crop_top_only=True, max_size=1280)
+        # Create cropped image for OCR (35% crop, 1024px)
+        cropped_image_base64 = resize_image_for_api(image_bytes, crop_top_only=True, max_size=1024)
         
         # Retry analysis with Vision API
         analysis_result = await analyze_document_with_vision(cropped_image_base64)

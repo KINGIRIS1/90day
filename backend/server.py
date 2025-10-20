@@ -194,8 +194,17 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         # Create image content
         image_content = ImageContent(image_base64=image_base64)
         
-        # Create user message with OPTIMIZED prompt - focus on title only
-        prompt = f"""Đọc tiêu đề tài liệu (thường ở dòng 5-7) và xác định CHÍNH XÁC loại.
+        # Create user message with OPTIMIZED prompt - focus on quốc huy + title
+        prompt = f"""Nhận diện tài liệu dựa vào QUỐC HUY và TIÊU ĐỀ.
+
+🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
+
+🔍 Sau đó kiểm tra tiêu đề:
+  • "Giấy chứng nhận quyền sử dụng đất" → GCNM (GCN mới)
+  • "Giấy chứng nhận" + thông tin đất đai → GCN (GCN cũ)
+  • Các loại khác theo danh sách bên dưới
 
 ⚠️ QUY TẮC NGHIÊM NGẶT: CHỈ CHẤP NHẬN KHI KHỚP 100% CHÍNH XÁC!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -227,10 +236,11 @@ DANH SÁCH ĐẦY ĐỦ (khớp chính xác):
 
 QUY TRÌNH KIỂM TRA:
 ━━━━━━━━━━━━━━━━━━
-1. Đọc tiêu đề đầy đủ
-2. Tìm trong danh sách có tên CHÍNH XÁC 100%?
-3. NẾU CÓ → Trả về tên + mã chính xác, confidence: 0.9
-4. NẾU KHÔNG → Trả về "CONTINUATION", confidence: 0.1
+1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
+2. Đọc tiêu đề đầy đủ
+3. Tìm trong danh sách có tên CHÍNH XÁC 100%?
+4. NẾU CÓ → Trả về tên + mã chính xác, confidence: 0.9
+5. NẾU KHÔNG → Trả về "CONTINUATION", confidence: 0.1
 
 TRẢ VỀ JSON:
 {{

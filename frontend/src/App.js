@@ -10,6 +10,7 @@ import { toast, Toaster } from 'sonner';
 import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, CheckCircle2, Settings } from 'lucide-react';
 import axios from 'axios';
 import RulesManager from '@/components/RulesManager';
+import { compressImages } from '@/utils/imageCompression';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

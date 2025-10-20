@@ -189,22 +189,36 @@ const DocumentScanner = () => {
     setScanProgress({ current: 0, total: uploadedFiles.length });
     setProcessedFiles(new Set());
     
-    // Show info for large batches
-    if (uploadedFiles.length > 20) {
-      toast.info(`Đang xử lý ${uploadedFiles.length} file... Theo dõi tiến trình bên dưới`, {
-        duration: 5000
+    // Show compression notification for large batches
+    if (uploadedFiles.length > 5) {
+      toast.info(`🗜️ Đang nén ${uploadedFiles.length} ảnh để tăng tốc upload...`, {
+        duration: 3000
       });
     }
     
     try {
+      // CLIENT-SIDE COMPRESSION: Compress all images first
+      const filesToCompress = uploadedFiles.map(f => f.file);
+      const compressedFiles = await compressImages(filesToCompress, (current, total, fileName) => {
+        // Optional: Show compression progress
+        console.log(`Compressing ${current}/${total}: ${fileName}`);
+      });
+      
+      // Show compression complete notification
+      if (uploadedFiles.length > 5) {
+        toast.success(`✅ Đã nén ${uploadedFiles.length} ảnh! Đang upload...`, {
+          duration: 2000
+        });
+      }
+      
       // Process files in smaller chunks with progress updates
       const CHUNK_SIZE = 10;
       const allResults = [];
       
-      for (let i = 0; i < uploadedFiles.length; i += CHUNK_SIZE) {
-        const chunk = uploadedFiles.slice(i, i + CHUNK_SIZE);
+      for (let i = 0; i < compressedFiles.length; i += CHUNK_SIZE) {
+        const chunk = compressedFiles.slice(i, i + CHUNK_SIZE);
         const formData = new FormData();
-        chunk.forEach(({ file }) => {
+        chunk.forEach((file) => {
           formData.append('files', file);
         });
 

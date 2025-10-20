@@ -346,20 +346,23 @@ async def scan_document(file: UploadFile = File(...)):
         # Read file content
         content = await file.read()
         
-        # Resize and CROP top 20% only
-        image_base64 = resize_image_for_api(content, crop_top_only=True)
+        # Create FULL image for preview/storage
+        full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1536)
         
-        # Analyze with Vision API
-        analysis_result = await analyze_document_with_vision(image_base64)
+        # Create CROPPED image for OCR (faster!)
+        cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=1024)
         
-        # Create scan result
+        # Analyze with Vision API using CROPPED image
+        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+        
+        # Create scan result with FULL image for preview
         scan_result = ScanResult(
             original_filename=file.filename,
             detected_type=analysis_result["detected_full_name"],
             detected_full_name=analysis_result["detected_full_name"],
             short_code=analysis_result["short_code"],
             confidence_score=analysis_result["confidence"],
-            image_base64=image_base64
+            image_base64=full_image_base64  # Store full image
         )
         
         # Save to database

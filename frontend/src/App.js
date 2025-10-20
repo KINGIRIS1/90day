@@ -297,7 +297,7 @@ const DocumentScanner = () => {
           }, 2000);
         }
       } else {
-        toast.success(`Quét thành công ${allResults.length} tài liệu!`);
+        toast.success(`✅ Quét thành công ${allResults.length} tài liệu! (${duration}s - ${(allResults.length / parseFloat(duration)).toFixed(1)} file/s)`);
       }
       
       // SMART CLEAR: Only keep failed files for retry

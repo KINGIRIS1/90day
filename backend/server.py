@@ -1152,6 +1152,42 @@ async def delete_rule(rule_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.post("/rules/cleanup-duplicates")
+async def cleanup_duplicate_rules():
+    """Remove duplicate rules, keep only unique short_codes"""
+    try:
+        all_rules = await db.document_rules.find({}).to_list(length=None)
+        
+        # Group by short_code
+        seen_codes = {}
+        duplicates_to_delete = []
+        
+        for rule in all_rules:
+            code = rule['short_code']
+            if code in seen_codes:
+                # Duplicate found, mark for deletion
+                duplicates_to_delete.append(rule['id'])
+            else:
+                # First occurrence, keep it
+                seen_codes[code] = rule['id']
+        
+        # Delete duplicates
+        if duplicates_to_delete:
+            result = await db.document_rules.delete_many({"id": {"$in": duplicates_to_delete}})
+            logger.info(f"Cleaned up {result.deleted_count} duplicate rules")
+            return {
+                "message": f"Đã xóa {result.deleted_count} quy tắc trùng lặp",
+                "remaining": len(seen_codes),
+                "deleted": result.deleted_count
+            }
+        else:
+            return {"message": "Không có quy tắc trùng lặp", "remaining": len(all_rules)}
+            
+    except Exception as e:
+        logger.error(f"Error cleaning duplicates: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Document Scanner API"}

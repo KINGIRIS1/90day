@@ -46,6 +46,11 @@ EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 DOCUMENT_TYPES = {
     "Bản mô tả ranh giới, mốc giới thửa đất": "BMT",
     "Bản vẽ (Trích lục, đo tách, chỉnh lý)": "HSKT",
+    "Trích lục": "HSKT",
+    "Trích đo": "HSKT",
+    "Phiếu đo đạc chỉnh lý": "HSKT",
+    "Bản vẽ tách thửa": "HSKT",
+    "Bản vẽ hợp thửa": "HSKT",
     "Bản vẽ hoàn công": "BVHC",
     "Bản vẽ nhà": "BVN",
     "Bảng kê khai diện tích đang sử dụng": "BKKDT",

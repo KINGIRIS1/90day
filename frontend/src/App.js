@@ -337,8 +337,9 @@ const DocumentScanner = () => {
           </div>
         ) : (
           <p className="text-xs text-muted-foreground truncate" title={result.detected_full_name}>
-          {result.detected_full_name}
-        </p>
+            {result.detected_full_name}
+          </p>
+        )}
         
         {editingId === result.id ? (
           <div className="flex gap-2" data-testid={`edit-mode-${result.id}`}>

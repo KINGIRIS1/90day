@@ -231,10 +231,13 @@ async def get_document_rules() -> dict:
 
 
 async def analyze_document_with_vision(image_base64: str) -> dict:
-    """Analyze document using OpenAI Vision API"""
+    """Analyze document using OpenAI Vision API with dynamic rules from database"""
     try:
+        # Get document rules from database
+        document_rules = await get_document_rules()
+        
         # Create a mapping list for the prompt
-        doc_types_list = "\n".join([f"- {full_name}: {code}" for full_name, code in DOCUMENT_TYPES.items()])
+        doc_types_list = "\n".join([f"- {full_name}: {code}" for full_name, code in document_rules.items()])
         
         # Initialize LlmChat with precision focus
         chat = LlmChat(

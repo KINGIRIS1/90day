@@ -270,14 +270,37 @@ const DocumentScanner = () => {
             </Button>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
-            <p className="font-semibold text-lg" data-testid={`short-code-${result.id}`}>
-              {result.short_code}.pdf
-            </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="font-semibold text-lg" data-testid={`short-code-${result.id}`}>
+                {result.short_code}.pdf
+              </p>
+              {showActions && (
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={() => startEdit(result.id, result.short_code)}
+                  data-testid={`edit-btn-${result.id}`}
+                >
+                  <Edit2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            
             {showActions && (
               <Button 
                 size="sm" 
-                variant="ghost" 
+                className="w-full"
+                variant="outline"
+                onClick={() => handleExportSingleFile(result.id, result.short_code)}
+                data-testid={`export-single-btn-${result.id}`}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Xuất file này
+              </Button>
+            )}
+          </div>
+        )} 
                 onClick={() => startEdit(result.id, result.short_code)}
                 data-testid={`edit-btn-${result.id}`}
               >

@@ -290,8 +290,8 @@ TRẢ VỀ JSON:
         }
 
 
-def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only: bool = True) -> str:
-    """Resize image and convert to base64 - OPTIMAL: 20% crop for lines 5-7"""
+def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only: bool = True) -> str:
+    """Resize image and convert to base64 - OPTIMAL: 35% crop for title + quốc huy"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -299,22 +299,22 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # CROP: Take top 20% (lines 5-7 where title usually is)
+        # CROP: Take top 35% (bao phủm quốc huy ở đầu + tiêu đề ở giữa, phù hợp GCN cũ)
         if crop_top_only:
             width, height = img.size
-            crop_height = int(height * 0.20)  # Back to 20% - optimal for title only
+            crop_height = int(height * 0.35)  # 35% - bao phủm cả quốc huy và tiêu đề
             img = img.crop((0, 0, width, crop_height))
-            logger.info(f"Cropped image from {height}px to {crop_height}px (top 20%, lines 5-7)")
+            logger.info(f"Cropped image from {height}px to {crop_height}px (top 35%, quốc huy + tiêu đề)")
         
-        # High quality resize for better OCR
+        # Optimized resize for speed + quality balance
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
             img = img.resize(new_size, Image.Resampling.LANCZOS)
         
-        # High quality
+        # High quality for Vietnamese OCR
         buffered = BytesIO()
-        img.save(buffered, format="JPEG", quality=80, optimize=True)  # Increased to 80%
+        img.save(buffered, format="JPEG", quality=80, optimize=True)
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return img_base64

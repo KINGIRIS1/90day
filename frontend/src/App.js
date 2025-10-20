@@ -445,6 +445,9 @@ const DocumentScanner = () => {
                       <CardDescription>
                         {scanResults.length} tài liệu đã được nhận diện
                       </CardDescription>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        💡 Mẹo: Bật "Hỏi nơi lưu" trong cài đặt trình duyệt để chọn thư mục
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Button 

@@ -175,6 +175,61 @@ class ExportPDFRequest(BaseModel):
     scan_ids: List[str]
 
 
+class DocumentRule(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    full_name: str
+    short_code: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class CreateRuleRequest(BaseModel):
+    full_name: str
+    short_code: str
+
+
+class UpdateRuleRequest(BaseModel):
+    full_name: Optional[str] = None
+    short_code: Optional[str] = None
+
+
+async def get_document_rules() -> dict:
+    """Get all document rules from database or initialize from DOCUMENT_TYPES"""
+    try:
+        # Check if rules exist in database
+        rules_count = await db.document_rules.count_documents({})
+        
+        if rules_count == 0:
+            # First time: migrate from DOCUMENT_TYPES to database
+            logger.info("Initializing document rules from DOCUMENT_TYPES")
+            rules_to_insert = []
+            for full_name, short_code in DOCUMENT_TYPES.items():
+                rule = DocumentRule(
+                    full_name=full_name,
+                    short_code=short_code
+                )
+                rules_to_insert.append(rule.model_dump())
+            
+            if rules_to_insert:
+                await db.document_rules.insert_many(rules_to_insert)
+                logger.info(f"Initialized {len(rules_to_insert)} document rules")
+        
+        # Fetch all rules from database
+        rules_cursor = db.document_rules.find({})
+        rules = await rules_cursor.to_list(length=None)
+        
+        # Convert to dict format {full_name: short_code}
+        rules_dict = {rule['full_name']: rule['short_code'] for rule in rules}
+        
+        return rules_dict
+    except Exception as e:
+        logger.error(f"Error getting document rules: {e}")
+        # Fallback to hardcoded DOCUMENT_TYPES
+        return DOCUMENT_TYPES
+
+
 async def analyze_document_with_vision(image_base64: str) -> dict:
     """Analyze document using OpenAI Vision API"""
     try:

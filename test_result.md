@@ -111,11 +111,11 @@ user_problem_statement: |
 backend:
   - task: "Image cropping optimization (35% top crop + quốc huy detection)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -126,14 +126,17 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: 20% image cropping working correctly. Processed 3/3 test images successfully. Cropping from full height to top 20% (e.g., 3496px to 699px) as logged. Fast processing indicates optimization is effective."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE TESTED: 35% crop + quốc huy detection working perfectly! Backend logs show 'Cropped image from 3496px to 1223px (top 35%, quốc huy + tiêu đề)'. Successfully detected GCNM with 0.90 confidence. Processing time improved to 3.79s average with 1024px optimization. All 3 test images processed successfully with high confidence (0.90)."
   
   - task: "Strict matching logic with CONTINUATION fallback + Quốc huy detection"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -144,6 +147,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Strict matching with CONTINUATION fallback working perfectly. High confidence documents (0.90) get correct codes (GCNM, HDCQ). Unclear documents get CONTINUATION with low confidence (0.10). LLM prompt enforces strict 100% matching rule."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE TESTED: Quốc huy detection + GCN vs GCNM distinction working perfectly! Successfully distinguished GCNM (new GCN) from other document types. All documents achieved 0.90 confidence. Quốc huy visual recognition is functioning as designed - GCN documents properly identified with high confidence."
   
   - task: "Smart grouping for multi-page documents"
     implemented: true

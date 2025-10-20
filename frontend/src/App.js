@@ -271,8 +271,12 @@ const DocumentScanner = () => {
       const errorCount = allResults.length - successCount;
       const errors = allResults.filter(r => r.short_code === 'ERROR');
       
+      // Calculate duration
+      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      setScanDuration(duration);
+      
       if (errorCount > 0) {
-        toast.warning(`Quét thành công ${successCount}/${allResults.length} tài liệu`, {
+        toast.warning(`Quét thành công ${successCount}/${allResults.length} tài liệu (${duration}s)`, {
           duration: 4000
         });
         

@@ -441,8 +441,9 @@ async def batch_scan(files: List[UploadFile] = File(...)):
         MAX_CONCURRENT = 10  # Process max 10 files at once
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        async def process_file(file):
+        async def process_file(file, retry_count=0):
             async with semaphore:  # Control concurrency
+                max_retries = 2
                 try:
                     # Read file content
                     content = await file.read()

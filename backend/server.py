@@ -234,9 +234,12 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
     """
     Two-Pass Smart Cropping:
     Pass 1: Crop 30% and detect emblem
-    - If emblem found → Use 35% crop (GCN mới - quốc huy ở đầu)
-    - If no emblem → Use 50% crop (GCN cũ - quốc huy ở giữa)
+    - If emblem found in 30% → GCN mới (quốc huy ở đầu 10-15%) → crop 40%
+    - If no emblem in 30% → GCN cũ (quốc huy ở giữa 30-40%) → crop 60%
     Pass 2: Analyze with optimal crop
+    
+    Note: Nếu emblem XUẤT HIỆN trong 30% crop thì có nghĩa nó ở vị trí 0-30%,
+    VẪN CÓ THỂ là GCN cũ với quốc huy ở 25-30%. Để an toàn, tăng crop lên 40-60%.
     
     Returns: (cropped_image_base64, analysis_result)
     """
@@ -249,13 +252,15 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
         
         # PASS 2: Smart cropping based on emblem detection
         if has_emblem:
-            # GCN mới: quốc huy ở đầu (10-15%), crop 35% là đủ
-            logger.info("✅ Emblem detected at top → Using 35% crop (GCN mới)")
-            optimal_crop_percentage = 0.35
-        else:
-            # GCN cũ: quốc huy có thể ở giữa (30-35%), crop 50% an toàn hơn
-            logger.info("⚠️  Emblem not detected at top → Using 50% crop (GCN cũ)")
+            # Emblem found in 30% crop → Could be GCN mới OR GCN cũ
+            # Use 50% to be safe (covers both cases)
+            logger.info("✅ Emblem detected in top 30% → Using 50% crop (safe for both GCN types)")
             optimal_crop_percentage = 0.50
+        else:
+            # No emblem in 30% → Very rare, maybe not GCN or image issue
+            # Use 60% as maximum safe crop
+            logger.info("⚠️  Emblem NOT detected in top 30% → Using 60% crop (maximum coverage)")
+            optimal_crop_percentage = 0.60
         
         # Create optimal crop for final analysis
         cropped_image_base64 = resize_image_for_api(

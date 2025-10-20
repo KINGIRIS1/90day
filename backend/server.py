@@ -400,8 +400,8 @@ TRẢ VỀ JSON:
         }
 
 
-def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only: bool = True) -> str:
-    """Resize image and convert to base64 - OPTIMAL: 35% crop for title + quốc huy"""
+def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only: bool = True, crop_percentage: float = 0.35) -> str:
+    """Resize image and convert to base64 - SMART CROP: adaptive based on emblem detection"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -409,12 +409,12 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # CROP: Take top 35% (bao phủm quốc huy ở đầu + tiêu đề ở giữa, phù hợp GCN cũ)
+        # SMART CROP: Dynamic crop based on crop_percentage parameter
         if crop_top_only:
             width, height = img.size
-            crop_height = int(height * 0.35)  # 35% - bao phủm cả quốc huy và tiêu đề
+            crop_height = int(height * crop_percentage)
             img = img.crop((0, 0, width, crop_height))
-            logger.info(f"Cropped image from {height}px to {crop_height}px (top 35%, quốc huy + tiêu đề)")
+            logger.info(f"Smart cropped: {height}px → {crop_height}px ({int(crop_percentage*100)}% crop)")
         
         # Optimized resize for speed + quality balance
         if max(img.size) > max_size:

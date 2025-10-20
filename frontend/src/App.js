@@ -428,11 +428,26 @@ const DocumentScanner = () => {
     }
   };
 
-  const ResultCard = ({ result, showActions = true }) => {
+  const ResultCard = ({ result, showActions = true, showCheckbox = false }) => {
     const isError = result.short_code === 'ERROR';
+    const isRetrying = retryingIds.has(result.id);
+    const isSelected = selectedIds.has(result.id);
     
     return (
-    <Card className={`overflow-hidden hover-card ${isError ? 'border-red-500 border-2' : ''}`} data-testid={`result-card-${result.id}`}>
+    <Card className={`overflow-hidden hover-card ${isError ? 'border-red-500 border-2' : ''} ${isSelected ? 'ring-2 ring-blue-500' : ''}`} data-testid={`result-card-${result.id}`}>
+      {/* Checkbox for bulk selection */}
+      {showCheckbox && (
+        <div className="absolute top-2 left-2 z-10">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => toggleSelect(result.id)}
+            className="w-5 h-5 cursor-pointer"
+            data-testid={`checkbox-${result.id}`}
+          />
+        </div>
+      )}
+      
       <div className="relative aspect-[3/4] bg-muted">
         {result.image_base64 ? (
           <img 

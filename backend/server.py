@@ -351,43 +351,62 @@ async def scan_document(file: UploadFile = File(...)):
 
 @api_router.post("/batch-scan", response_model=List[ScanResult])
 async def batch_scan(files: List[UploadFile] = File(...)):
-    """Scan multiple documents at once - PARALLEL PROCESSING for speed"""
+    """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
     try:
-        # Process all files in parallel
+        # Semaphore to limit concurrent API calls (avoid rate limits)
+        MAX_CONCURRENT = 10  # Process max 10 files at once
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+        
         async def process_file(file):
-            # Read file content
-            content = await file.read()
-            
-            # Resize and convert to base64
-            image_base64 = resize_image_for_api(content)
-            
-            # Analyze with Vision API
-            analysis_result = await analyze_document_with_vision(image_base64)
-            
-            # Create scan result
-            scan_result = ScanResult(
-                original_filename=file.filename,
-                detected_type=analysis_result["detected_full_name"],
-                detected_full_name=analysis_result["detected_full_name"],
-                short_code=analysis_result["short_code"],
-                confidence_score=analysis_result["confidence"],
-                image_base64=image_base64
-            )
-            
-            return scan_result
+            async with semaphore:  # Control concurrency
+                try:
+                    # Read file content
+                    content = await file.read()
+                    
+                    # Resize and convert to base64 (smaller size = faster)
+                    image_base64 = resize_image_for_api(content, max_size=1536)  # Reduced from 2048
+                    
+                    # Analyze with Vision API
+                    analysis_result = await analyze_document_with_vision(image_base64)
+                    
+                    # Create scan result
+                    scan_result = ScanResult(
+                        original_filename=file.filename,
+                        detected_type=analysis_result["detected_full_name"],
+                        detected_full_name=analysis_result["detected_full_name"],
+                        short_code=analysis_result["short_code"],
+                        confidence_score=analysis_result["confidence"],
+                        image_base64=image_base64
+                    )
+                    
+                    return scan_result
+                except Exception as e:
+                    logger.error(f"Error processing {file.filename}: {e}")
+                    # Return error result instead of failing entire batch
+                    return ScanResult(
+                        original_filename=file.filename,
+                        detected_type="Lỗi quét",
+                        detected_full_name=f"Lỗi: {str(e)[:50]}",
+                        short_code="ERROR",
+                        confidence_score=0.0,
+                        image_base64=""
+                    )
         
-        # Process all files concurrently (PARALLEL)
+        # Process files with controlled concurrency
         tasks = [process_file(file) for file in files]
-        results = await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=False)
         
-        # Save all to database in batch
-        docs = []
-        for result in results:
-            doc = result.model_dump()
-            doc['timestamp'] = doc['timestamp'].isoformat()
-            docs.append(doc)
+        # Filter out error results and save valid ones
+        valid_results = [r for r in results if r.short_code != "ERROR"]
         
-        if docs:
+        # Save to database in batch
+        if valid_results:
+            docs = []
+            for result in valid_results:
+                doc = result.model_dump()
+                doc['timestamp'] = doc['timestamp'].isoformat()
+                docs.append(doc)
+            
             await db.scan_results.insert_many(docs)
         
         return results

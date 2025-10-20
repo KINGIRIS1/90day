@@ -204,6 +204,11 @@ const DocumentScanner = () => {
     setLoading(true);
     setScanProgress({ current: 0, total: uploadedFiles.length });
     setProcessedFiles(new Set());
+    setScanDuration(null);
+    
+    // Start timer
+    const startTime = Date.now();
+    setScanStartTime(startTime);
     
     // Show compression notification for large batches
     if (uploadedFiles.length > 5) {

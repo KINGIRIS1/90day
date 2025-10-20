@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 import base64
 from io import BytesIO
 from PIL import Image
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, A3, landscape, portrait
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 try:

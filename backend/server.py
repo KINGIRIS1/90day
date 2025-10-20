@@ -198,6 +198,11 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
 
 {doc_types_list}
 
+LƯU Ý QUAN TRỌNG:
+- Nếu tài liệu là "Trích lục", "Trích đo", "Phiếu đo đạc chỉnh lý", "Bản vẽ tách thửa", "Bản vẽ hợp thửa" → Mã: HSKT
+- Nếu tài liệu là "Phiếu chuyển thông tin để xác định nghĩa vụ tài chính" → Mã: PCT
+- Nếu tài liệu là "Giấy tiếp nhận hồ sơ và hẹn trả kết quả" hoặc "Biên nhận hồ sơ" → Mã: BN
+
 Yêu cầu:
 1. Đọc kỹ nội dung tiêu đề, tiêu đề chính của tài liệu
 2. So sánh với danh sách trên và tìm loại tài liệu khớp nhất

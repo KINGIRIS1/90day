@@ -321,13 +321,22 @@ const DocumentScanner = () => {
         <Badge 
           className="absolute top-2 right-2" 
           variant={isError ? 'destructive' : (result.confidence_score > 0.8 ? 'default' : 'secondary')}
-          data-testid={`confidence-badge-${result.id}`}
         >
-          {Math.round(result.confidence_score * 100)}%
+          {isError ? '❌' : `${Math.round(result.confidence_score * 100)}%`}
         </Badge>
       </div>
       <CardContent className="p-4 space-y-2">
-        <p className="text-xs text-muted-foreground truncate" title={result.detected_full_name}>
+        {isError ? (
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-red-600" title={result.detected_type}>
+              {result.detected_type}
+            </p>
+            <p className="text-xs text-red-500 break-words" title={result.detected_full_name}>
+              {result.detected_full_name}
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground truncate" title={result.detected_full_name}>
           {result.detected_full_name}
         </p>
         

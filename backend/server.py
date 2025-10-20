@@ -1060,12 +1060,10 @@ async def get_rules():
 
 @api_router.post("/rules", response_model=DocumentRule)
 async def create_rule(request: CreateRuleRequest):
-    """Create a new document rule"""
+    """Create a new document rule - ALLOWS DUPLICATE short_codes"""
     try:
-        # Check if short_code already exists
-        existing_rule = await db.document_rules.find_one({"short_code": request.short_code})
-        if existing_rule:
-            raise HTTPException(status_code=400, detail=f"Mã '{request.short_code}' đã tồn tại")
+        # REMOVED: No longer check for duplicate short_code
+        # Multiple document types can have the same short code
         
         # Create new rule
         new_rule = DocumentRule(
@@ -1078,8 +1076,6 @@ async def create_rule(request: CreateRuleRequest):
         
         logger.info(f"Created new rule: {request.full_name} -> {request.short_code}")
         return new_rule
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Error creating rule: {e}")
         raise HTTPException(status_code=500, detail=str(e))

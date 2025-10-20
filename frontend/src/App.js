@@ -432,20 +432,59 @@ const DocumentScanner = () => {
                       </Button>
                     </div>
                     
+                    {/* Progress Bar */}
+                    {loading && scanProgress.total > 0 && (
+                      <div className="space-y-2 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800" data-testid="progress-section">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            Đang quét tài liệu...
+                          </span>
+                          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                            {scanProgress.current}/{scanProgress.total}
+                          </span>
+                        </div>
+                        <div className="w-full bg-blue-200 dark:bg-blue-900 rounded-full h-3 overflow-hidden">
+                          <div 
+                            className="bg-blue-600 dark:bg-blue-400 h-3 rounded-full transition-all duration-300 flex items-center justify-end pr-1"
+                            style={{ width: `${(scanProgress.current / scanProgress.total) * 100}%` }}
+                          >
+                            <span className="text-xs font-bold text-white">
+                              {Math.round((scanProgress.current / scanProgress.total) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {uploadedFiles.map(({ id, preview, file }) => (
                         <div key={id} className="relative group" data-testid={`uploaded-file-${id}`}>
-                          <img 
-                            src={preview} 
-                            alt={file.name}
-                            className="w-full h-32 object-cover rounded-lg"
-                          />
+                          <div className="relative">
+                            <img 
+                              src={preview} 
+                              alt={file.name}
+                              className={`w-full h-32 object-cover rounded-lg ${processedFiles.has(id) ? 'ring-2 ring-green-500' : ''}`}
+                            />
+                            {/* Checkmark overlay when processed */}
+                            {processedFiles.has(id) && (
+                              <div className="absolute inset-0 bg-green-500/20 rounded-lg flex items-center justify-center">
+                                <CheckCircle2 className="h-12 w-12 text-green-600 drop-shadow-lg" strokeWidth={3} />
+                              </div>
+                            )}
+                            {/* Loading spinner */}
+                            {loading && !processedFiles.has(id) && scanProgress.total > 0 && (
+                              <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                                <Loader2 className="h-8 w-8 text-white animate-spin" />
+                              </div>
+                            )}
+                          </div>
                           <Button
                             size="sm"
                             variant="destructive"
-                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 z-10"
                             onClick={() => handleRemoveFile(id)}
                             data-testid={`remove-file-btn-${id}`}
+                            disabled={loading}
                           >
                             <X className="h-4 w-4" />
                           </Button>

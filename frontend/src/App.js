@@ -21,6 +21,8 @@ const DocumentScanner = () => {
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [scanProgress, setScanProgress] = useState({ current: 0, total: 0 });
+  const [processedFiles, setProcessedFiles] = useState(new Set());
 
   useEffect(() => {
     fetchScanHistory();

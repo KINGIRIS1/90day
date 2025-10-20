@@ -274,6 +274,18 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Search input and filter dropdown implemented. Frontend testing pending backend validation."
+  
+  - task: "Rules Management UI (CRUD interface)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/RulesManager.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Full CRUD UI for managing document rules. New 'Quy Tắc' tab added. Features: table display, search, add new form, inline edit, delete with confirmation, duplicate validation, toast notifications. Screenshot confirmed UI working."
 
 metadata:
   created_by: "main_agent"

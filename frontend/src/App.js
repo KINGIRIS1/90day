@@ -275,8 +275,18 @@ const DocumentScanner = () => {
         toast.success(`Quét thành công ${allResults.length} tài liệu!`);
       }
       
-      // CLEAR uploaded files after successful scan to prevent re-scanning
-      setUploadedFiles([]);
+      // SMART CLEAR: Only keep failed files for retry
+      if (errorCount > 0) {
+        // Keep only files that resulted in errors (for retry)
+        const errorFilenames = new Set(errors.map(e => e.original_filename));
+        setUploadedFiles(uploadedFiles.filter(f => errorFilenames.has(f.file.name)));
+        toast.info(`Giữ lại ${errorCount} file lỗi để retry. Xóa ${successCount} file đã quét thành công.`, {
+          duration: 4000
+        });
+      } else {
+        // Clear all files if all successful
+        setUploadedFiles([]);
+      }
       
       fetchScanHistory();
     } catch (error) {

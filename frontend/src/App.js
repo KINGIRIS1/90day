@@ -298,17 +298,29 @@ const DocumentScanner = () => {
     }
   };
 
-  const ResultCard = ({ result, showActions = true }) => (
-    <Card className="overflow-hidden hover-card" data-testid={`result-card-${result.id}`}>
+  const ResultCard = ({ result, showActions = true }) => {
+    const isError = result.short_code === 'ERROR';
+    
+    return (
+    <Card className={`overflow-hidden hover-card ${isError ? 'border-red-500 border-2' : ''}`} data-testid={`result-card-${result.id}`}>
       <div className="relative aspect-[3/4] bg-muted">
-        <img 
-          src={`data:image/jpeg;base64,${result.image_base64}`} 
-          alt={result.detected_type}
-          className="w-full h-full object-cover"
-        />
+        {result.image_base64 ? (
+          <img 
+            src={`data:image/jpeg;base64,${result.image_base64}`} 
+            alt={result.detected_type}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-red-50">
+            <div className="text-center p-4">
+              <span className="text-6xl">❌</span>
+              <p className="text-sm text-red-600 mt-2 font-semibold">Lỗi quét</p>
+            </div>
+          </div>
+        )}
         <Badge 
           className="absolute top-2 right-2" 
-          variant={result.confidence_score > 0.8 ? 'default' : 'secondary'}
+          variant={isError ? 'destructive' : (result.confidence_score > 0.8 ? 'default' : 'secondary')}
           data-testid={`confidence-badge-${result.id}`}
         >
           {Math.round(result.confidence_score * 100)}%

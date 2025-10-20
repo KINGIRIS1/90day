@@ -16,7 +16,10 @@ from PIL import Image
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
-from pypdf import PdfMerger
+try:
+    from pypdf import PdfMerger
+except ImportError:
+    from pypdf import PdfWriter as PdfMerger
 import tempfile
 import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent

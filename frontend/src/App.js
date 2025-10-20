@@ -645,7 +645,7 @@ const DocumentScanner = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{fontFamily: 'Space Grotesk, sans-serif'}}>
-            Quét & Phân Loại Tài Liệu Đất Đai
+            Scan Hồ Sơ
           </h1>
           <p className="text-muted-foreground text-lg">
             Tự động nhận diện và đặt tên tài liệu bằng AI

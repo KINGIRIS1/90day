@@ -124,10 +124,21 @@ const RulesManager = () => {
                 Thêm, sửa, xóa các loại tài liệu và mã ngắn
               </CardDescription>
             </div>
-            <Button onClick={() => setShowAddForm(!showAddForm)} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Thêm Mới
-            </Button>
+            <div className="flex gap-2">
+              {rules.length > 200 && (
+                <Button 
+                  onClick={handleCleanupDuplicates} 
+                  variant="outline"
+                  className="gap-2"
+                >
+                  🧹 Xóa Trùng Lặp
+                </Button>
+              )}
+              <Button onClick={() => setShowAddForm(!showAddForm)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Thêm Mới
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

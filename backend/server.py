@@ -346,8 +346,8 @@ async def scan_document(file: UploadFile = File(...)):
         # Read file content
         content = await file.read()
         
-        # Resize and convert to base64
-        image_base64 = resize_image_for_api(content)
+        # Resize and CROP top 20% only
+        image_base64 = resize_image_for_api(content, crop_top_only=True)
         
         # Analyze with Vision API
         analysis_result = await analyze_document_with_vision(image_base64)

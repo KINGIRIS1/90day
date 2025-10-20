@@ -600,7 +600,7 @@ const DocumentScanner = () => {
         </div>
 
         <Tabs defaultValue="scan" className="w-full" data-testid="main-tabs">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
             <TabsTrigger value="scan" data-testid="scan-tab">
               <FileText className="h-4 w-4 mr-2" />
               Quét Tài Liệu
@@ -608,6 +608,10 @@ const DocumentScanner = () => {
             <TabsTrigger value="history" data-testid="history-tab">
               <History className="h-4 w-4 mr-2" />
               Lịch Sử
+            </TabsTrigger>
+            <TabsTrigger value="rules" data-testid="rules-tab">
+              <Settings className="h-4 w-4 mr-2" />
+              Quy Tắc
             </TabsTrigger>
           </TabsList>
 

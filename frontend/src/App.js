@@ -644,8 +644,8 @@ const DocumentScanner = () => {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{fontFamily: 'Space Grotesk, sans-serif'}}>
-            Scan Hồ Sơ
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent" style={{fontFamily: 'Space Grotesk, sans-serif'}}>
+            Convert images to PDF and Auto Name
           </h1>
           <p className="text-muted-foreground text-lg">
             Tự động nhận diện và đặt tên tài liệu bằng AI

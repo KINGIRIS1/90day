@@ -752,42 +752,141 @@ const DocumentScanner = () => {
             {scanResults.length > 0 && (
               <Card data-testid="results-section">
                 <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>Kết Quả Quét</CardTitle>
-                      <CardDescription>
-                        {scanResults.length} tài liệu đã được nhận diện
-                      </CardDescription>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        💡 Mẹo: Bật "Hỏi nơi lưu" trong cài đặt trình duyệt để chọn thư mục
-                      </p>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <CardTitle>Kết Quả Quét</CardTitle>
+                        <CardDescription>
+                          {getFilteredResults(scanResults).length}/{scanResults.length} tài liệu
+                          {selectedIds.size > 0 && ` (${selectedIds.size} đã chọn)`}
+                        </CardDescription>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          💡 Mẹo: Bật "Hỏi nơi lưu" trong cài đặt trình duyệt để chọn thư mục
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={handleExportSingle}
+                          disabled={exporting}
+                          variant="outline"
+                          data-testid="export-single-btn"
+                        >
+                          {exporting ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4 mr-2" />
+                          )}
+                          Xuất PDF Riêng
+                        </Button>
+                        <Button 
+                          onClick={handleExportMerged}
+                          disabled={exporting}
+                          data-testid="export-merged-btn"
+                        >
+                          {exporting ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Download className="h-4 w-4 mr-2" />
+                          )}
+                          Xuất PDF Gộp
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={handleExportSingle}
-                        disabled={exporting}
-                        variant="outline"
-                        data-testid="export-single-btn"
+
+                    {/* SEARCH & FILTER UI */}
+                    <div className="flex flex-wrap gap-3 p-4 bg-muted/30 rounded-lg">
+                      {/* Search */}
+                      <div className="flex-1 min-w-[200px]">
+                        <Input
+                          placeholder="🔍 Tìm kiếm theo tên file..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full"
+                          data-testid="search-input"
+                        />
+                      </div>
+
+                      {/* Filter by Type */}
+                      <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                        className="px-3 py-2 border rounded-md bg-background"
+                        data-testid="filter-type"
                       >
-                        {exporting ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4 mr-2" />
-                        )}
-                        Xuất PDF Riêng
-                      </Button>
-                      <Button 
-                        onClick={handleExportMerged}
-                        disabled={exporting}
-                        data-testid="export-merged-btn"
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="success">✅ Thành công</option>
+                        <option value="error">❌ Lỗi</option>
+                      </select>
+
+                      {/* Filter by Code */}
+                      <select
+                        value={filterCode}
+                        onChange={(e) => setFilterCode(e.target.value)}
+                        className="px-3 py-2 border rounded-md bg-background"
+                        data-testid="filter-code"
                       >
-                        {exporting ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Download className="h-4 w-4 mr-2" />
+                        <option value="all">Tất cả loại</option>
+                        <option value="GCNM">GCNM</option>
+                        <option value="HSKT">HSKT</option>
+                        <option value="DDK">DDK</option>
+                        <option value="HDCQ">HDCQ</option>
+                        <option value="BN">BN</option>
+                        <option value="PCT">PCT</option>
+                      </select>
+
+                      {/* Clear Filters */}
+                      {(searchTerm || filterType !== 'all' || filterCode !== 'all') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSearchTerm('');
+                            setFilterType('all');
+                            setFilterCode('all');
+                          }}
+                        >
+                          ✕ Xóa bộ lọc
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* BULK OPERATIONS BAR */}
+                    <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200">
+                      <div className="flex gap-2 items-center">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={selectedIds.size === getFilteredResults(scanResults).length ? handleDeselectAll : handleSelectAll}
+                        >
+                          {selectedIds.size === getFilteredResults(scanResults).length ? '☐ Bỏ chọn tất cả' : '☑ Chọn tất cả'}
+                        </Button>
+                        {selectedIds.size > 0 && (
+                          <span className="text-sm font-medium">
+                            {selectedIds.size} file đã chọn
+                          </span>
                         )}
-                        Xuất PDF Gộp
-                      </Button>
+                      </div>
+                      {selectedIds.size > 0 && (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleBulkExport}
+                            disabled={exporting}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            Xuất đã chọn
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={handleBulkDelete}
+                          >
+                            <Trash2 className="h-4 w-4 mr-1" />
+                            Xóa đã chọn
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardHeader>

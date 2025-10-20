@@ -105,6 +105,18 @@ const DocumentScanner = () => {
     setExporting(true);
     try {
       const scanIds = scanResults.map(r => r.id);
+      
+      // Check for duplicate short codes
+      const shortCodes = scanResults.map(r => r.short_code);
+      const duplicates = shortCodes.filter((code, idx) => shortCodes.indexOf(code) !== idx);
+      const uniqueDuplicates = [...new Set(duplicates)];
+      
+      if (uniqueDuplicates.length > 0) {
+        toast.info(`Các file cùng loại (${uniqueDuplicates.join(', ')}) sẽ được gộp tự động vào 1 PDF`, {
+          duration: 3000
+        });
+      }
+      
       const response = await axios.post(`${API}/export-pdf-single`, 
         { scan_ids: scanIds },
         { responseType: 'blob' }
@@ -118,7 +130,7 @@ const DocumentScanner = () => {
       link.click();
       link.remove();
 
-      toast.success('Đã xuất các file PDF riêng lẻ');
+      toast.success('Đã xuất các file PDF (tự động gộp các file cùng loại)');
     } catch (error) {
       console.error('Error exporting single PDFs:', error);
       toast.error('Lỗi khi xuất PDF');

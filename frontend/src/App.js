@@ -99,12 +99,32 @@ const DocumentScanner = () => {
         setScanResults([...allResults]);
       }
 
-      // Count successful scans
+      // Count successful scans and collect error details
       const successCount = allResults.filter(r => r.short_code !== 'ERROR').length;
       const errorCount = allResults.length - successCount;
+      const errors = allResults.filter(r => r.short_code === 'ERROR');
       
       if (errorCount > 0) {
-        toast.warning(`Quét thành công ${successCount}/${allResults.length} tài liệu`);
+        toast.warning(`Quét thành công ${successCount}/${allResults.length} tài liệu`, {
+          duration: 4000
+        });
+        
+        // Show detailed error messages
+        errors.slice(0, 3).forEach((err, idx) => {
+          setTimeout(() => {
+            toast.error(`❌ ${err.original_filename}: ${err.detected_full_name}`, {
+              duration: 6000
+            });
+          }, (idx + 1) * 500);
+        });
+        
+        if (errors.length > 3) {
+          setTimeout(() => {
+            toast.info(`Và ${errors.length - 3} lỗi khác. Xem chi tiết trong danh sách.`, {
+              duration: 5000
+            });
+          }, 2000);
+        }
       } else {
         toast.success(`Quét thành công ${allResults.length} tài liệu!`);
       }
@@ -112,7 +132,10 @@ const DocumentScanner = () => {
       fetchScanHistory();
     } catch (error) {
       console.error('Error scanning documents:', error);
-      toast.error('Lỗi khi quét tài liệu');
+      const errorMsg = error.response?.data?.detail || error.message || 'Lỗi không xác định';
+      toast.error(`Lỗi khi quét tài liệu: ${errorMsg}`, {
+        duration: 6000
+      });
     } finally {
       setLoading(false);
     }

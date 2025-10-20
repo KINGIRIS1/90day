@@ -193,27 +193,32 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         # Create image content
         image_content = ImageContent(image_base64=image_base64)
         
-        # Create user message with detailed prompt
-        prompt = f"""Phân tích hình ảnh tài liệu này và xác định loại tài liệu từ danh sách sau:
+        # Create user message with OPTIMIZED prompt - focus on title only
+        prompt = f"""CHỈ ĐỌC TIÊU ĐỀ CHÍNH của tài liệu (phần đầu, in đậm, cỡ chữ lớn) và xác định loại:
 
-{doc_types_list}
+DANH SÁCH LOẠI TÀI LIỆU PHỔ BIẾN:
+- "GIẤY CHỨNG NHẬN" → GCNM
+- "TRÍCH LỤC" / "TRÍCH ĐO" / "PHIẾU ĐO ĐẠC" / "BẢN VẼ TÁCH THỬA" → HSKT
+- "ĐƠN ĐĂNG KÝ" → DDK
+- "HỢP ĐỒNG CHUYỂN NHƯỢNG" → HDCQ
+- "BIÊN NHẬN" / "GIẤY TIẾP NHẬN" → BN
+- "PHIẾU CHUYỂN THÔNG TIN" → PCT
+- "QUYẾT ĐỊNH" → QD*
+- "VĂN BẢN" → VB*
 
-LƯU Ý QUAN TRỌNG:
-- Nếu tài liệu là "Trích lục", "Trích đo", "Phiếu đo đạc chỉnh lý", "Bản vẽ tách thửa", "Bản vẽ hợp thửa" → Mã: HSKT
-- Nếu tài liệu là "Phiếu chuyển thông tin để xác định nghĩa vụ tài chính" → Mã: PCT
-- Nếu tài liệu là "Giấy tiếp nhận hồ sơ và hẹn trả kết quả" hoặc "Biên nhận hồ sơ" → Mã: BN
+{doc_types_list[:500]}... (xem thêm nếu không khớp)
 
-Yêu cầu:
-1. Đọc kỹ nội dung tiêu đề, tiêu đề chính của tài liệu
-2. So sánh với danh sách trên và tìm loại tài liệu khớp nhất
-3. Trả lời CHỈ dưới dạng JSON với format:
+QUY TẮC:
+1. CHỈ đọc 2-3 từ TIÊU ĐỀ CHÍNH (không đọc hết văn bản)
+2. So khớp nhanh với danh sách
+3. Trả về JSON ngay:
 {{
-  "detected_full_name": "Tên đầy đủ loại tài liệu",
-  "short_code": "Mã viết tắt",
-  "confidence": 0.95
+  "detected_full_name": "Tên loại tài liệu",
+  "short_code": "MÃ",
+  "confidence": 0.9
 }}
 
-Lưu ý: confidence từ 0.0 đến 1.0 thể hiện độ tin cậy của kết quả."""
+NHANH LÊN - CHỈ ĐỌC TIÊU ĐỀ!"""
         
         user_message = UserMessage(
             text=prompt,

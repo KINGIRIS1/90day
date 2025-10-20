@@ -870,10 +870,22 @@ async def update_filename(request: UpdateFilenameRequest):
         if not request.new_short_code or not request.new_short_code.strip():
             raise HTTPException(status_code=400, detail="Short code cannot be empty")
         
-        # Check if document exists first
+        # DEBUG: Log query
+        logger.info(f"Searching for document with id: {request.id}")
+        
+        # Check if document exists first - also log count
+        total_docs = await db.scan_results.count_documents({})
+        logger.info(f"Total documents in collection: {total_docs}")
+        
         existing = await db.scan_results.find_one({"id": request.id})
+        
         if not existing:
-            raise HTTPException(status_code=404, detail=f"Document with id {request.id} not found")
+            # DEBUG: Try to find by any field containing this id
+            logger.error(f"Document not found. Searching all docs...")
+            sample = await db.scan_results.find({}).limit(2).to_list(2)
+            if sample:
+                logger.error(f"Sample doc keys: {list(sample[0].keys())}")
+            raise HTTPException(status_code=404, detail=f"Document with id {request.id} not found in {total_docs} documents")
         
         # Update the short code (duplicates are allowed)
         result = await db.scan_results.update_one(

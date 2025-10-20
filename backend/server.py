@@ -351,11 +351,10 @@ async def scan_document(file: UploadFile = File(...)):
 
 @api_router.post("/batch-scan", response_model=List[ScanResult])
 async def batch_scan(files: List[UploadFile] = File(...)):
-    """Scan multiple documents at once"""
+    """Scan multiple documents at once - PARALLEL PROCESSING for speed"""
     try:
-        results = []
-        
-        for file in files:
+        # Process all files in parallel
+        async def process_file(file):
             # Read file content
             content = await file.read()
             
@@ -375,12 +374,21 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                 image_base64=image_base64
             )
             
-            # Save to database
-            doc = scan_result.model_dump()
+            return scan_result
+        
+        # Process all files concurrently (PARALLEL)
+        tasks = [process_file(file) for file in files]
+        results = await asyncio.gather(*tasks)
+        
+        # Save all to database in batch
+        docs = []
+        for result in results:
+            doc = result.model_dump()
             doc['timestamp'] = doc['timestamp'].isoformat()
-            await db.scan_results.insert_one(doc)
-            
-            results.append(scan_result)
+            docs.append(doc)
+        
+        if docs:
+            await db.scan_results.insert_many(docs)
         
         return results
         

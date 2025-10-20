@@ -230,6 +230,48 @@ async def get_document_rules() -> dict:
         return DOCUMENT_TYPES
 
 
+async def detect_emblem_in_image(image_base64: str) -> bool:
+    """Quick check to detect Vietnamese national emblem in image - for smart cropping"""
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"emblem_detect_{uuid.uuid4()}",
+            system_message="You are a visual recognition expert. Answer with simple YES or NO only."
+        ).with_model("openai", "gpt-4o")
+        
+        image_content = ImageContent(image_base64=image_base64)
+        
+        prompt = """Look at this image carefully.
+        
+Do you see the Vietnamese national emblem (QUỐC HUY VIỆT NAM)?
+The emblem has these features:
+- Golden/yellow star with 5 points
+- Red circular background
+- Hammer and sickle symbols
+- Usually at the top of official documents
+
+Answer with ONLY ONE WORD:
+- "YES" if you clearly see the Vietnamese national emblem
+- "NO" if you don't see it or unsure
+
+Your answer:"""
+        
+        user_message = UserMessage(text=prompt, file_contents=[image_content])
+        response = await chat.send_message(user_message)
+        
+        # Parse response
+        answer = response.strip().upper()
+        has_emblem = "YES" in answer
+        
+        logger.info(f"Emblem detection result: {answer} → {has_emblem}")
+        return has_emblem
+        
+    except Exception as e:
+        logger.error(f"Error detecting emblem: {e}")
+        # Fallback: assume emblem exists (use safer crop)
+        return False
+
+
 async def analyze_document_with_vision(image_base64: str) -> dict:
     """Analyze document using OpenAI Vision API with dynamic rules from database"""
     try:

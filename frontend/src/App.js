@@ -1009,6 +1009,16 @@ const DocumentScanner = () => {
             <RulesManager />
           </TabsContent>
         </Tabs>
+
+        {/* Footer Credit */}
+        <footer className="mt-12 pb-8 text-center text-sm text-gray-600 border-t pt-6">
+          <p className="font-medium">
+            Ứng dụng được lên ý tưởng bởi <span className="text-blue-600 font-semibold">Nguyễn Thìn Trung</span>
+          </p>
+          <p className="text-xs mt-1">
+            Văn phòng Đăng ký Đất đai tỉnh Đồng Nai - Chi nhánh Chơn Thành
+          </p>
+        </footer>
       </div>
     </div>
   );

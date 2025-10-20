@@ -32,6 +32,8 @@ const DocumentScanner = () => {
   const [filterType, setFilterType] = useState('all'); // all, success, error
   const [filterCode, setFilterCode] = useState('all'); // all, GCNM, HSKT, etc
   const [retryingIds, setRetryingIds] = useState(new Set());
+  const [scanDuration, setScanDuration] = useState(null); // Track scan time
+  const [scanStartTime, setScanStartTime] = useState(null);
 
   useEffect(() => {
     fetchScanHistory();

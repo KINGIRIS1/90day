@@ -450,13 +450,29 @@ TRẢ VỀ JSON:
             result = json.loads(response_text)
         except json.JSONDecodeError as je:
             logger.error(f"JSON parse error. Raw response: {response_text}")
+            
+            # Check if OpenAI refused due to content policy
+            if "can't help" in response_text.lower() or "sorry" in response_text.lower():
+                logger.warning("OpenAI refused to analyze - likely due to face detection. Returning CONTINUATION.")
+                return {
+                    "detected_full_name": "Không có tiêu đề",
+                    "short_code": "CONTINUATION",
+                    "confidence": 0.1
+                }
+            
             # Try to extract JSON manually if it's embedded in text
             import re
             json_match = re.search(r'\{[^}]+\}', response_text)
             if json_match:
                 result = json.loads(json_match.group())
             else:
-                raise je
+                # If all fails, return CONTINUATION instead of ERROR
+                logger.error("Cannot parse response, returning CONTINUATION")
+                return {
+                    "detected_full_name": "Không có tiêu đề",
+                    "short_code": "CONTINUATION",
+                    "confidence": 0.1
+                }
         
         return {
             "detected_full_name": result.get("detected_full_name", "Không xác định"),

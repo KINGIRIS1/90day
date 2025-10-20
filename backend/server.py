@@ -428,6 +428,44 @@ async def update_filename(request: UpdateFilenameRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.post("/export-single-document")
+async def export_single_document(request: ExportPDFRequest):
+    """Export a single document as PDF"""
+    try:
+        # Get scan result
+        result = await db.scan_results.find_one(
+            {"id": {"$in": request.scan_ids}},
+            {"_id": 0}
+        )
+        
+        if not result:
+            raise HTTPException(status_code=404, detail="Scan result not found")
+        
+        # Create temp directory
+        temp_dir = tempfile.mkdtemp()
+        short_code = result.get('short_code', 'UNKNOWN')
+        pdf_path = os.path.join(temp_dir, f"{short_code}.pdf")
+        
+        # Create PDF
+        create_pdf_from_image(
+            result['image_base64'],
+            pdf_path,
+            short_code
+        )
+        
+        return FileResponse(
+            pdf_path,
+            media_type="application/pdf",
+            filename=f"{short_code}.pdf"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error exporting single document: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/export-pdf-single")
 async def export_pdf_single(request: ExportPDFRequest):
     """Export scans as PDFs, automatically grouping by short_code"""

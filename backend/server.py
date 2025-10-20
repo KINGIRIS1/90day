@@ -1154,34 +1154,58 @@ async def delete_rule(rule_id: str):
 
 @api_router.post("/rules/cleanup-duplicates")
 async def cleanup_duplicate_rules():
-    """Remove duplicate rules, keep only unique short_codes"""
+    """Remove duplicate rules, keep only unique short_codes - OPTIMIZED"""
     try:
-        all_rules = await db.document_rules.find({}).to_list(length=None)
-        
-        # Group by short_code
-        seen_codes = {}
-        duplicates_to_delete = []
-        
-        for rule in all_rules:
-            code = rule['short_code']
-            if code in seen_codes:
-                # Duplicate found, mark for deletion
-                duplicates_to_delete.append(rule['id'])
-            else:
-                # First occurrence, keep it
-                seen_codes[code] = rule['id']
-        
-        # Delete duplicates
-        if duplicates_to_delete:
-            result = await db.document_rules.delete_many({"id": {"$in": duplicates_to_delete}})
-            logger.info(f"Cleaned up {result.deleted_count} duplicate rules")
-            return {
-                "message": f"Đã xóa {result.deleted_count} quy tắc trùng lặp",
-                "remaining": len(seen_codes),
-                "deleted": result.deleted_count
+        # Use aggregation pipeline for better performance with large datasets
+        pipeline = [
+            {
+                "$group": {
+                    "_id": "$short_code",
+                    "ids": {"$push": "$id"},
+                    "count": {"$sum": 1}
+                }
+            },
+            {
+                "$match": {
+                    "count": {"$gt": 1}  # Only groups with duplicates
+                }
             }
-        else:
-            return {"message": "Không có quy tắc trùng lặp", "remaining": len(all_rules)}
+        ]
+        
+        duplicates_groups = await db.document_rules.aggregate(pipeline).to_list(length=None)
+        
+        if not duplicates_groups:
+            total_count = await db.document_rules.count_documents({})
+            return {
+                "message": "Không có quy tắc trùng lặp", 
+                "remaining": total_count,
+                "deleted": 0
+            }
+        
+        # Collect IDs to delete (keep first, delete rest)
+        ids_to_delete = []
+        for group in duplicates_groups:
+            # Keep first ID, delete the rest
+            ids_to_delete.extend(group['ids'][1:])
+        
+        # Delete in batches to avoid timeout
+        BATCH_SIZE = 100
+        total_deleted = 0
+        
+        for i in range(0, len(ids_to_delete), BATCH_SIZE):
+            batch = ids_to_delete[i:i+BATCH_SIZE]
+            result = await db.document_rules.delete_many({"id": {"$in": batch}})
+            total_deleted += result.deleted_count
+            logger.info(f"Deleted batch {i//BATCH_SIZE + 1}: {result.deleted_count} rules")
+        
+        remaining_count = await db.document_rules.count_documents({})
+        logger.info(f"Cleanup complete: deleted {total_deleted} duplicates, {remaining_count} remaining")
+        
+        return {
+            "message": f"Đã xóa {total_deleted} quy tắc trùng lặp",
+            "remaining": remaining_count,
+            "deleted": total_deleted
+        }
             
     except Exception as e:
         logger.error(f"Error cleaning duplicates: {e}")

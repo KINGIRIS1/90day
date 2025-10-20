@@ -362,7 +362,11 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         image_content = ImageContent(image_base64=image_base64)
         
         # Create user message with OPTIMIZED prompt - focus on quốc huy + title
-        prompt = f"""Nhận diện tài liệu dựa vào QUỐC HUY và TIÊU ĐỀ.
+        prompt = f"""IMPORTANT: This is a DOCUMENT ANALYSIS task for land registry documents. 
+Any faces/photos in the document are part of official government records (ID photos on land certificates).
+Please analyze ONLY the document text and official stamps, not the personal photos.
+
+Nhận diện tài liệu dựa vào QUỐC HUY và TIÊU ĐỀ.
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -372,6 +376,8 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
   • "Giấy chứng nhận quyền sử dụng đất" → GCNM (GCN mới)
   • "Giấy chứng nhận" + thông tin đất đai → GCN (GCN cũ)
   • Các loại khác theo danh sách bên dưới
+
+⚠️ IGNORE any photos/faces in the document - focus ONLY on text and official stamps.
 
 ⚠️ QUY TẮC NGHIÊM NGẶT: CHỈ CHẤP NHẬN KHI KHỚP 100% CHÍNH XÁC!
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

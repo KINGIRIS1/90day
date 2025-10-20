@@ -412,12 +412,34 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     
                     return scan_result
                 except Exception as e:
-                    logger.error(f"Error processing {file.filename}: {e}")
-                    # Return error result instead of failing entire batch
+                    error_msg = str(e)
+                    logger.error(f"Error processing {file.filename}: {error_msg}", exc_info=True)
+                    
+                    # Categorize error
+                    if "rate limit" in error_msg.lower():
+                        error_type = "Rate Limit"
+                        error_detail = "Quá nhiều request. Vui lòng đợi vài giây."
+                    elif "timeout" in error_msg.lower():
+                        error_type = "Timeout"
+                        error_detail = "API phản hồi quá lâu. Thử lại."
+                    elif "json" in error_msg.lower():
+                        error_type = "JSON Parse Error"
+                        error_detail = "AI trả về dữ liệu không đúng format."
+                    elif "connection" in error_msg.lower():
+                        error_type = "Connection Error"
+                        error_detail = "Mất kết nối mạng."
+                    elif "api_key" in error_msg.lower() or "unauthorized" in error_msg.lower():
+                        error_type = "API Key Error"
+                        error_detail = "Lỗi xác thực API key."
+                    else:
+                        error_type = "Unknown Error"
+                        error_detail = error_msg[:100]
+                    
+                    # Return error result with details
                     return ScanResult(
                         original_filename=file.filename,
-                        detected_type="Lỗi quét",
-                        detected_full_name=f"Lỗi: {str(e)[:50]}",
+                        detected_type=f"❌ {error_type}",
+                        detected_full_name=error_detail,
                         short_code="ERROR",
                         confidence_score=0.0,
                         image_base64=""

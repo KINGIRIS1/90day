@@ -936,6 +936,119 @@ async def clear_history():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.get("/rules", response_model=List[DocumentRule])
+async def get_rules():
+    """Get all document rules"""
+    try:
+        rules_cursor = db.document_rules.find({})
+        rules = await rules_cursor.to_list(length=None)
+        
+        # Initialize if empty
+        if not rules:
+            await get_document_rules()  # This will initialize from DOCUMENT_TYPES
+            rules_cursor = db.document_rules.find({})
+            rules = await rules_cursor.to_list(length=None)
+        
+        return [DocumentRule(**rule) for rule in rules]
+    except Exception as e:
+        logger.error(f"Error getting rules: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/rules", response_model=DocumentRule)
+async def create_rule(request: CreateRuleRequest):
+    """Create a new document rule"""
+    try:
+        # Check if short_code already exists
+        existing_rule = await db.document_rules.find_one({"short_code": request.short_code})
+        if existing_rule:
+            raise HTTPException(status_code=400, detail=f"Mã '{request.short_code}' đã tồn tại")
+        
+        # Create new rule
+        new_rule = DocumentRule(
+            full_name=request.full_name,
+            short_code=request.short_code
+        )
+        
+        # Insert to database
+        await db.document_rules.insert_one(new_rule.model_dump())
+        
+        logger.info(f"Created new rule: {request.full_name} -> {request.short_code}")
+        return new_rule
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating rule: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.put("/rules/{rule_id}", response_model=DocumentRule)
+async def update_rule(rule_id: str, request: UpdateRuleRequest):
+    """Update an existing document rule"""
+    try:
+        # Find existing rule
+        existing_rule = await db.document_rules.find_one({"id": rule_id})
+        if not existing_rule:
+            raise HTTPException(status_code=404, detail="Không tìm thấy quy tắc")
+        
+        # Check if new short_code conflicts with another rule
+        if request.short_code:
+            conflict = await db.document_rules.find_one({
+                "short_code": request.short_code,
+                "id": {"$ne": rule_id}
+            })
+            if conflict:
+                raise HTTPException(status_code=400, detail=f"Mã '{request.short_code}' đã tồn tại")
+        
+        # Prepare update data
+        update_data = {"updated_at": datetime.now(timezone.utc)}
+        if request.full_name:
+            update_data["full_name"] = request.full_name
+        if request.short_code:
+            update_data["short_code"] = request.short_code
+        
+        # Update in database
+        await db.document_rules.update_one(
+            {"id": rule_id},
+            {"$set": update_data}
+        )
+        
+        # Get updated rule
+        updated_rule = await db.document_rules.find_one({"id": rule_id})
+        
+        logger.info(f"Updated rule {rule_id}: {update_data}")
+        return DocumentRule(**updated_rule)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating rule: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.delete("/rules/{rule_id}")
+async def delete_rule(rule_id: str):
+    """Delete a document rule"""
+    try:
+        # Find existing rule
+        existing_rule = await db.document_rules.find_one({"id": rule_id})
+        if not existing_rule:
+            raise HTTPException(status_code=404, detail="Không tìm thấy quy tắc")
+        
+        # Delete from database
+        result = await db.document_rules.delete_one({"id": rule_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Không thể xóa quy tắc")
+        
+        logger.info(f"Deleted rule {rule_id}: {existing_rule['full_name']}")
+        return {"message": "Đã xóa quy tắc thành công", "deleted_rule": existing_rule['full_name']}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting rule: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/")
 async def root():
     return {"message": "Document Scanner API"}

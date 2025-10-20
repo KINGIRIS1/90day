@@ -272,8 +272,8 @@ NHANH LÊN - CHỈ ĐỌC TIÊU ĐỀ!"""
         }
 
 
-def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only: bool = True) -> str:
-    """Resize image and convert to base64 - CROP TOP 20% for title only (MUCH FASTER!)"""
+def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only: bool = True) -> str:
+    """Resize image and convert to base64 - BALANCED: 30% crop + better quality"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -281,22 +281,22 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1024, crop_top_only
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # CROP: Only take top 20% of image (where title is)
+        # CROP: Take top 30% of image (more coverage for title detection)
         if crop_top_only:
             width, height = img.size
-            crop_height = int(height * 0.2)  # Top 20% (about 10 lines)
+            crop_height = int(height * 0.30)  # Increased from 20% to 30%
             img = img.crop((0, 0, width, crop_height))
-            logger.info(f"Cropped image from {height}px to {crop_height}px (top 20%)")
+            logger.info(f"Cropped image from {height}px to {crop_height}px (top 30%)")
         
-        # Aggressive resize for speed (1024px is enough for title OCR)
+        # Balanced resize (1280px instead of 1024px)
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
-            img = img.resize(new_size, Image.Resampling.BILINEAR)
+            img = img.resize(new_size, Image.Resampling.LANCZOS)  # Better quality
         
-        # Convert to base64 with lower quality for speed
+        # Better quality (75% instead of 65%)
         buffered = BytesIO()
-        img.save(buffered, format="JPEG", quality=65, optimize=True)  # Lower quality
+        img.save(buffered, format="JPEG", quality=75, optimize=True)
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
         return img_base64

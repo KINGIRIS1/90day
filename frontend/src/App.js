@@ -54,35 +54,59 @@ const DocumentScanner = () => {
     }
 
     setLoading(true);
+    setScanProgress({ current: 0, total: uploadedFiles.length });
+    setProcessedFiles(new Set());
     
     // Show info for large batches
     if (uploadedFiles.length > 20) {
-      toast.info(`Đang xử lý ${uploadedFiles.length} file... Vui lòng đợi (có thể mất 1-2 phút)`, {
+      toast.info(`Đang xử lý ${uploadedFiles.length} file... Theo dõi tiến trình bên dưới`, {
         duration: 5000
       });
     }
     
     try {
-      const formData = new FormData();
-      uploadedFiles.forEach(({ file }) => {
-        formData.append('files', file);
-      });
-
-      const response = await axios.post(`${API}/batch-scan`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 180000  // 3 minutes timeout for large batches
-      });
-
-      setScanResults(response.data);
+      // Process files in smaller chunks with progress updates
+      const CHUNK_SIZE = 10;
+      const allResults = [];
       
+      for (let i = 0; i < uploadedFiles.length; i += CHUNK_SIZE) {
+        const chunk = uploadedFiles.slice(i, i + CHUNK_SIZE);
+        const formData = new FormData();
+        chunk.forEach(({ file }) => {
+          formData.append('files', file);
+        });
+
+        const response = await axios.post(`${API}/batch-scan`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 180000
+        });
+
+        // Update progress
+        allResults.push(...response.data);
+        setScanProgress({ 
+          current: Math.min(i + CHUNK_SIZE, uploadedFiles.length), 
+          total: uploadedFiles.length 
+        });
+        
+        // Mark these files as processed
+        setProcessedFiles(prev => {
+          const newSet = new Set(prev);
+          chunk.forEach(({id}) => newSet.add(id));
+          return newSet;
+        });
+        
+        // Update results incrementally
+        setScanResults([...allResults]);
+      }
+
       // Count successful scans
-      const successCount = response.data.filter(r => r.short_code !== 'ERROR').length;
-      const errorCount = response.data.length - successCount;
+      const successCount = allResults.filter(r => r.short_code !== 'ERROR').length;
+      const errorCount = allResults.length - successCount;
       
       if (errorCount > 0) {
-        toast.warning(`Quét thành công ${successCount}/${response.data.length} tài liệu`);
+        toast.warning(`Quét thành công ${successCount}/${allResults.length} tài liệu`);
       } else {
-        toast.success(`Quét thành công ${response.data.length} tài liệu!`);
+        toast.success(`Quét thành công ${allResults.length} tài liệu!`);
       }
       
       fetchScanHistory();

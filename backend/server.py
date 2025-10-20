@@ -279,7 +279,7 @@ QUY TẮC PHÂN TÍCH:
 
 
 def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only: bool = True) -> str:
-    """Resize image and convert to base64 - BALANCED: 30% crop + better quality"""
+    """Resize image and convert to base64 - PRECISION: 35% crop for better context"""
     try:
         img = Image.open(BytesIO(image_bytes))
         
@@ -287,20 +287,20 @@ def resize_image_for_api(image_bytes: bytes, max_size: int = 1280, crop_top_only
         if img.mode in ('RGBA', 'LA', 'P'):
             img = img.convert('RGB')
         
-        # CROP: Take top 30% of image (more coverage for title detection)
+        # CROP: Take top 35% of image (more context for precise detection)
         if crop_top_only:
             width, height = img.size
-            crop_height = int(height * 0.30)  # Increased from 20% to 30%
+            crop_height = int(height * 0.35)  # Increased from 30% to 35%
             img = img.crop((0, 0, width, crop_height))
-            logger.info(f"Cropped image from {height}px to {crop_height}px (top 30%)")
+            logger.info(f"Cropped image from {height}px to {crop_height}px (top 35%)")
         
-        # Balanced resize (1280px instead of 1024px)
+        # Balanced resize (1280px)
         if max(img.size) > max_size:
             ratio = max_size / max(img.size)
             new_size = tuple(int(dim * ratio) for dim in img.size)
             img = img.resize(new_size, Image.Resampling.LANCZOS)  # Better quality
         
-        # Better quality (75% instead of 65%)
+        # Better quality (75%)
         buffered = BytesIO()
         img.save(buffered, format="JPEG", quality=75, optimize=True)
         img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')

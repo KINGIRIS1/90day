@@ -719,6 +719,27 @@ const DocumentScanner = () => {
                       </Button>
                     </div>
                     
+                    {/* Scan Button - MOVED TO TOP for easy access */}
+                    <Button 
+                      onClick={handleScanDocuments} 
+                      disabled={loading}
+                      className="w-full"
+                      size="lg"
+                      data-testid="scan-btn"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                          Đang quét...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-5 w-5 mr-2" />
+                          Quét Tài Liệu
+                        </>
+                      )}
+                    </Button>
+
                     {/* Progress Bar */}
                     {loading && scanProgress.total > 0 && (
                       <div className="space-y-2 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800" data-testid="progress-section">
@@ -781,26 +802,6 @@ const DocumentScanner = () => {
                         </div>
                       ))}
                     </div>
-
-                    <Button 
-                      onClick={handleScanDocuments} 
-                      disabled={loading}
-                      className="w-full"
-                      size="lg"
-                      data-testid="scan-btn"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Đang quét...
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="h-5 w-5 mr-2" />
-                          Quét Tài Liệu
-                        </>
-                      )}
-                    </Button>
                   </div>
                 )}
               </CardContent>

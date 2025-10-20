@@ -817,6 +817,7 @@ const DocumentScanner = () => {
                         <CardDescription>
                           {getFilteredResults(scanResults).length}/{scanResults.length} tài liệu
                           {selectedIds.size > 0 && ` (${selectedIds.size} đã chọn)`}
+                          {scanDuration && ` • ⏱️ ${scanDuration}s (${(scanResults.length / parseFloat(scanDuration)).toFixed(1)} file/s)`}
                         </CardDescription>
                         <p className="text-xs text-muted-foreground mt-1">
                           💡 Mẹo: Bật "Hỏi nơi lưu" trong cài đặt trình duyệt để chọn thư mục

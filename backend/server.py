@@ -1448,12 +1448,15 @@ def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
 def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str, output_zip_path: str):
     """
     Create result ZIP with PDFs maintaining folder structure
+    OPTIMIZED: Use ZIP_STORED (no compression) for faster creation and download
     """
     try:
         # Track PDF names to avoid duplicates
         pdf_name_counter = {}
         
-        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_out:
+        # Use ZIP_STORED for faster zip creation (no compression)
+        # PDFs are already compressed, so this doesn't increase size much
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_STORED) as zip_out:
             for file_result in file_results:
                 if file_result.status == "success":
                     # Create unique PDF filename to avoid duplicates
@@ -1503,7 +1506,7 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
                         if os.path.exists(temp_pdf.name):
                             os.unlink(temp_pdf.name)
         
-        logger.info(f"Created result ZIP with {len([f for f in file_results if f.status == 'success'])} PDFs")
+        logger.info(f"Created result ZIP with {len([f for f in file_results if f.status == 'success'])} PDFs (no compression for faster download)")
         
     except Exception as e:
         logger.error(f"Error creating result ZIP: {e}")

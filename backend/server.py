@@ -1252,6 +1252,28 @@ async def delete_rule(rule_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@api_router.post("/rules/drop-unique-index")
+async def drop_unique_index():
+    """Drop unique index on short_code to allow duplicate codes"""
+    try:
+        # Drop the unique index
+        result = await db.document_rules.drop_index("short_code_1")
+        logger.info("Successfully dropped unique index on short_code")
+        return {
+            "message": "Đã xóa unique index, giờ có thể thêm mã trùng lặp",
+            "index_dropped": "short_code_1"
+        }
+    except Exception as e:
+        error_msg = str(e)
+        if "index not found" in error_msg.lower():
+            return {
+                "message": "Index không tồn tại hoặc đã được xóa rồi",
+                "status": "ok"
+            }
+        logger.error(f"Error dropping index: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/rules/cleanup-duplicates")
 async def cleanup_duplicate_rules():
     """Remove duplicate rules, keep only unique short_codes - OPTIMIZED"""

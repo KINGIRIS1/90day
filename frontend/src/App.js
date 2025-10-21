@@ -1238,79 +1238,83 @@ const DocumentScanner = () => {
             {folderScanResult && (
               <Card data-testid="folder-result-section">
                 <CardHeader>
-                  <CardTitle>Kết Quả Quét</CardTitle>
+                  <CardTitle>Kết Quả Quét - {folderScanResult.total_folders} Thư Mục</CardTitle>
                   <CardDescription>
-                    Tổng quan về quá trình quét thư mục
+                    Đã xử lý {folderScanResult.total_folders} thư mục với {folderScanResult.total_files} files
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Summary Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-4 bg-blue-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-blue-600">{folderScanResult.total_files}</p>
+                      <p className="text-2xl font-bold text-blue-600">{folderScanResult.total_folders}</p>
+                      <p className="text-xs text-muted-foreground">Thư mục</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-purple-600">{folderScanResult.total_files}</p>
                       <p className="text-xs text-muted-foreground">Tổng files</p>
                     </div>
                     <div className="p-4 bg-green-50 rounded-lg text-center">
                       <p className="text-2xl font-bold text-green-600">{folderScanResult.success_count}</p>
                       <p className="text-xs text-muted-foreground">Thành công</p>
                     </div>
-                    <div className="p-4 bg-red-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-red-600">{folderScanResult.error_count}</p>
-                      <p className="text-xs text-muted-foreground">Lỗi</p>
-                    </div>
-                    <div className="p-4 bg-purple-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-purple-600">
+                    <div className="p-4 bg-amber-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-amber-600">
                         {folderScanResult.processing_time_seconds.toFixed(1)}s
                       </p>
                       <p className="text-xs text-muted-foreground">Thời gian</p>
                     </div>
                   </div>
 
-                  {/* Download Button */}
-                  <Button
-                    onClick={handleDownloadResult}
-                    className="w-full"
-                    size="lg"
-                    data-testid="download-result-btn"
-                  >
-                    <Download className="h-5 w-5 mr-2" />
-                    Tải Xuống ZIP Kết Quả ({folderScanResult.success_count} PDFs)
-                  </Button>
-
-                  {/* File List */}
-                  <div className="border rounded-lg">
-                    <div className="p-3 bg-muted font-medium text-sm">
-                      Chi tiết files ({folderScanResult.files.length})
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                      {folderScanResult.files.map((file, idx) => (
-                        <div 
-                          key={idx} 
-                          className={`p-3 border-b last:border-b-0 flex items-center justify-between ${
-                            file.status === 'error' ? 'bg-red-50' : ''
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-mono truncate" title={file.relative_path}>
-                              📁 {file.relative_path}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {file.detected_full_name}
-                            </p>
+                  {/* Folder Results - Each folder has its own download button */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-lg">Kết Quả Từng Thư Mục:</h3>
+                    {folderScanResult.folder_results.map((folder, idx) => (
+                      <Card key={idx} className="bg-slate-50">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex-1">
+                              <h4 className="font-bold text-md">📁 {folder.folder_name}</h4>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {folder.success_count}/{folder.total_files} files thành công • {folder.processing_time_seconds.toFixed(1)}s
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = `${BACKEND_URL}${folder.download_url}`;
+                                link.download = `${folder.folder_name}.zip`;
+                                link.style.display = 'none';
+                                document.body.appendChild(link);
+                                link.click();
+                                setTimeout(() => document.body.removeChild(link), 100);
+                                toast.success(`✅ Đang tải ${folder.folder_name}.zip`);
+                              }}
+                              variant="default"
+                              size="sm"
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Tải ZIP
+                            </Button>
                           </div>
-                          <div className="flex items-center gap-2 ml-4">
-                            <Badge variant={file.status === 'success' ? 'default' : 'destructive'}>
-                              {file.short_code}
-                            </Badge>
-                            {file.status === 'success' ? (
-                              <CheckCircle2 className="h-5 w-5 text-green-600" />
-                            ) : (
-                              <X className="h-5 w-5 text-red-600" />
-                            )}
+                          
+                          {/* Progress bar */}
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-green-600 h-2 rounded-full"
+                              style={{ width: `${(folder.success_count / folder.total_files * 100)}%` }}
+                            />
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                          
+                          {/* Show errors if any */}
+                          {folder.error_count > 0 && (
+                            <p className="text-xs text-red-600 mt-2">
+                              ⚠️ {folder.error_count} files lỗi
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
 
                   {/* New Scan Button */}

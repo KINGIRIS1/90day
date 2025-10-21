@@ -1133,6 +1133,10 @@ const DocumentScanner = () => {
                 <CardTitle>Quét Thư Mục ZIP</CardTitle>
                 <CardDescription>
                   Upload file ZIP chứa nhiều thư mục và file ảnh. Hệ thống sẽ quét tất cả và giữ nguyên cấu trúc thư mục.
+                  <br/>
+                  <span className="text-amber-600 font-medium mt-2 block">
+                    ⚠️ Khuyến nghị: 50-100 files/ZIP để tránh timeout. Files lớn có thể mất 10-20 phút.
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">

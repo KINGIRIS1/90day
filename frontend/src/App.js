@@ -550,56 +550,106 @@ const DocumentScanner = () => {
 
     setFolderScanLoading(true);
     setUploadProgress(0);
-    
-    const startTime = Date.now();
+    setFolderScanResult(null);
     
     try {
       const formData = new FormData();
       formData.append('file', zipFile);
 
-      toast.info('Đang upload và xử lý ZIP...', { duration: 3000 });
+      toast.info('Đang upload ZIP...', { duration: 3000 });
 
+      // Start scan job
       const response = await axios.post(`${API}/scan-folder`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 3600000, // 60 minutes for large batches
+        timeout: 120000, // 2 minutes for upload only
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percentCompleted);
         },
       });
 
-      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      setFolderScanResult(response.data);
-
-      toast.success(
-        `✅ Hoàn thành! Quét ${response.data.success_count}/${response.data.total_files} files (${duration}s)`,
-        { duration: 5000 }
-      );
-
-      if (response.data.error_count > 0) {
-        toast.warning(`⚠️ ${response.data.error_count} file lỗi`, { duration: 4000 });
-      }
+      const jobId = response.data.job_id;
+      setScanJobId(jobId);
+      
+      toast.success(`✅ Đã bắt đầu quét ${response.data.total_folders} thư mục!`, { duration: 4000 });
+      
+      // Start polling for results
+      pollFolderScanStatus(jobId);
 
     } catch (error) {
       console.error('Error scanning folder:', error);
       
       let errorMsg = error.response?.data?.detail || error.message || 'Lỗi không xác định';
       
-      // Better error messages
       if (error.code === 'ECONNABORTED' || errorMsg.includes('timeout')) {
-        errorMsg = 'Timeout: File quá lớn hoặc quá nhiều files. Khuyến nghị: Chia nhỏ thành các ZIP 50-100 files.';
-      } else if (error.response?.status === 504) {
-        errorMsg = 'Gateway Timeout: Xử lý quá lâu. Vui lòng chia nhỏ ZIP thành các batch 50-100 files.';
+        errorMsg = 'Timeout khi upload. File quá lớn. Vui lòng thử lại.';
       }
       
       toast.error(`Lỗi: ${errorMsg}`, { duration: 8000 });
-    } finally {
       setFolderScanLoading(false);
-      setUploadProgress(0);
     }
   };
+
+  const pollFolderScanStatus = (jobId) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await axios.get(`${API}/folder-scan-status/${jobId}`);
+        const status = response.data;
+        
+        // Update result state (progressive)
+        setFolderScanResult(status);
+        
+        // Show toast for each completed folder
+        if (status.folder_results.length > (folderScanResult?.folder_results?.length || 0)) {
+          const latestFolder = status.folder_results[status.folder_results.length - 1];
+          toast.success(`✅ ${latestFolder.folder_name}: ${latestFolder.success_count}/${latestFolder.total_files} files`, {
+            duration: 3000
+          });
+        }
+        
+        // Check if completed or error
+        if (status.status === 'completed') {
+          clearInterval(interval);
+          setPollingInterval(null);
+          setFolderScanLoading(false);
+          setScanJobId(null);
+          
+          const totalSuccess = status.folder_results.reduce((sum, f) => sum + f.success_count, 0);
+          const totalFiles = status.folder_results.reduce((sum, f) => sum + f.total_files, 0);
+          
+          toast.success(`🎉 Hoàn thành! ${totalSuccess}/${totalFiles} files quét thành công!`, {
+            duration: 5000
+          });
+        } else if (status.status === 'error') {
+          clearInterval(interval);
+          setPollingInterval(null);
+          setFolderScanLoading(false);
+          setScanJobId(null);
+          
+          toast.error(`❌ Lỗi: ${status.error_message}`, { duration: 8000 });
+        }
+        
+      } catch (error) {
+        console.error('Error polling status:', error);
+        clearInterval(interval);
+        setPollingInterval(null);
+        setFolderScanLoading(false);
+      }
+    }, 3000); // Poll every 3 seconds
+    
+    setPollingInterval(interval);
+  };
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
 
   const handleDownloadResult = async () => {
     if (!folderScanResult || !folderScanResult.download_url) {

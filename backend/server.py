@@ -240,17 +240,6 @@ class FolderScanStartResponse(BaseModel):
     total_folders: int
     total_files: int
     status_url: str
-    """Result for entire folder scan"""
-    scan_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    total_folders: int
-    total_files: int
-    processed_files: int
-    success_count: int
-    error_count: int
-    skipped_count: int
-    processing_time_seconds: float
-    folder_results: List[FolderBatchResult]  # One per folder
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 async def get_document_rules() -> dict:

@@ -1311,49 +1311,53 @@ const DocumentScanner = () => {
               </CardContent>
             </Card>
 
-            {/* Results Section */}
-            {folderScanResult && (
+            {/* Results Section - Shows progressively as folders complete */}
+            {folderScanResult && folderScanResult.folder_results.length > 0 && (
               <Card data-testid="folder-result-section">
                 <CardHeader>
-                  <CardTitle>Kết Quả Quét - {folderScanResult.total_folders} Thư Mục</CardTitle>
+                  <CardTitle>
+                    Kết Quả Quét {folderScanResult.status === 'completed' ? '✅' : '⏳'}
+                  </CardTitle>
                   <CardDescription>
-                    Đã xử lý {folderScanResult.total_folders} thư mục với {folderScanResult.total_files} files
+                    {folderScanResult.completed_folders}/{folderScanResult.total_folders} thư mục đã hoàn thành
+                    {folderScanResult.status === 'processing' && ' (Đang quét...)'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Summary Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div className="p-4 bg-blue-50 rounded-lg text-center">
                       <p className="text-2xl font-bold text-blue-600">{folderScanResult.total_folders}</p>
-                      <p className="text-xs text-muted-foreground">Thư mục</p>
-                    </div>
-                    <div className="p-4 bg-purple-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-purple-600">{folderScanResult.total_files}</p>
-                      <p className="text-xs text-muted-foreground">Tổng files</p>
+                      <p className="text-xs text-muted-foreground">Tổng thư mục</p>
                     </div>
                     <div className="p-4 bg-green-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-green-600">{folderScanResult.success_count}</p>
-                      <p className="text-xs text-muted-foreground">Thành công</p>
+                      <p className="text-2xl font-bold text-green-600">{folderScanResult.completed_folders}</p>
+                      <p className="text-xs text-muted-foreground">Đã hoàn thành</p>
                     </div>
-                    <div className="p-4 bg-amber-50 rounded-lg text-center">
-                      <p className="text-2xl font-bold text-amber-600">
-                        {folderScanResult.processing_time_seconds.toFixed(1)}s
+                    <div className="p-4 bg-purple-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-purple-600">
+                        {folderScanResult.folder_results.reduce((sum, f) => sum + f.success_count, 0)}
                       </p>
-                      <p className="text-xs text-muted-foreground">Thời gian</p>
+                      <p className="text-xs text-muted-foreground">Files thành công</p>
                     </div>
                   </div>
 
-                  {/* Folder Results - Each folder has its own download button */}
+                  {/* Folder Results - Each folder with download button */}
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-lg">Kết Quả Từng Thư Mục:</h3>
+                    <h3 className="font-semibold text-lg">
+                      Tải Xuống Từng Thư Mục: {folderScanLoading && '(Đang cập nhật...)'}
+                    </h3>
                     {folderScanResult.folder_results.map((folder, idx) => (
-                      <Card key={idx} className="bg-slate-50">
+                      <Card key={idx} className="bg-slate-50 border-2 border-green-200">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex-1">
-                              <h4 className="font-bold text-md">📁 {folder.folder_name}</h4>
+                              <h4 className="font-bold text-md flex items-center gap-2">
+                                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                📁 {folder.folder_name}
+                              </h4>
                               <p className="text-sm text-muted-foreground mt-1">
-                                {folder.success_count}/{folder.total_files} files thành công • {folder.processing_time_seconds.toFixed(1)}s
+                                {folder.success_count}/{folder.total_files} files • {folder.processing_time_seconds.toFixed(1)}s
                               </p>
                             </div>
                             <Button
@@ -1383,7 +1387,6 @@ const DocumentScanner = () => {
                             />
                           </div>
                           
-                          {/* Show errors if any */}
                           {folder.error_count > 0 && (
                             <p className="text-xs text-red-600 mt-2">
                               ⚠️ {folder.error_count} files lỗi
@@ -1394,15 +1397,17 @@ const DocumentScanner = () => {
                     ))}
                   </div>
 
-                  {/* New Scan Button */}
-                  <Button
-                    onClick={handleClearFolder}
-                    variant="outline"
-                    className="w-full"
-                    data-testid="new-scan-btn"
-                  >
-                    Quét Thư Mục Mới
-                  </Button>
+                  {/* New Scan Button - only show when completed */}
+                  {folderScanResult.status === 'completed' && (
+                    <Button
+                      onClick={handleClearFolder}
+                      variant="outline"
+                      className="w-full"
+                      data-testid="new-scan-btn"
+                    >
+                      Quét Thư Mục Mới
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

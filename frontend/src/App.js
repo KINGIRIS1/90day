@@ -1265,11 +1265,11 @@ const DocumentScanner = () => {
                 )}
 
                 {/* Upload Progress */}
-                {folderScanLoading && uploadProgress > 0 && (
+                {folderScanLoading && uploadProgress > 0 && uploadProgress < 100 && (
                   <div className="space-y-2 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                        {uploadProgress < 100 ? 'Đang upload...' : 'Đang quét tài liệu...'}
+                        Đang upload...
                       </span>
                       <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                         {uploadProgress}%
@@ -1281,6 +1281,31 @@ const DocumentScanner = () => {
                         style={{ width: `${uploadProgress}%` }}
                       />
                     </div>
+                  </div>
+                )}
+                
+                {/* Scanning Progress */}
+                {folderScanLoading && uploadProgress >= 100 && folderScanResult && (
+                  <div className="space-y-2 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-green-900 dark:text-green-100">
+                        {folderScanResult.current_folder 
+                          ? `Đang quét: ${folderScanResult.current_folder}` 
+                          : 'Đang xử lý...'}
+                      </span>
+                      <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                        {folderScanResult.completed_folders}/{folderScanResult.total_folders} thư mục
+                      </span>
+                    </div>
+                    <div className="w-full bg-green-200 dark:bg-green-900 rounded-full h-2.5">
+                      <div 
+                        className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+                        style={{ width: `${(folderScanResult.completed_folders / folderScanResult.total_folders * 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-green-700 dark:text-green-300 mt-2">
+                      💡 Các thư mục đã quét xong có thể tải xuống ngay bên dưới
+                    </p>
                   </div>
                 )}
               </CardContent>

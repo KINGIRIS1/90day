@@ -1402,6 +1402,9 @@ SUPPORTED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'
 MAX_FILES_PER_ZIP = 500
 MAX_ZIP_SIZE_MB = 500
 
+# Store active job statuses (in-memory, could use Redis for production)
+active_jobs = {}
+
 
 def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
     """

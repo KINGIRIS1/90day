@@ -1114,6 +1114,203 @@ const DocumentScanner = () => {
             )}
           </TabsContent>
 
+          {/* NEW TAB: FOLDER SCANNING */}
+          <TabsContent value="folder" className="space-y-6">
+            <Card data-testid="folder-upload-section">
+              <CardHeader>
+                <CardTitle>Quét Thư Mục ZIP</CardTitle>
+                <CardDescription>
+                  Upload file ZIP chứa nhiều thư mục và file ảnh. Hệ thống sẽ quét tất cả và giữ nguyên cấu trúc thư mục.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* ZIP Upload Zone */}
+                <label 
+                  htmlFor="zip-upload" 
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-primary/30 rounded-xl cursor-pointer bg-primary/5 hover:bg-primary/10 transition-all"
+                  data-testid="zip-upload-zone"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="h-12 w-12 text-primary mb-3" />
+                    <p className="mb-2 text-sm font-medium">
+                      Click để chọn file ZIP
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Giới hạn: 500MB, tối đa 500 files
+                    </p>
+                  </div>
+                  <input 
+                    id="zip-upload" 
+                    type="file" 
+                    className="hidden" 
+                    accept=".zip"
+                    onChange={handleZipUpload}
+                    data-testid="zip-input"
+                  />
+                </label>
+
+                {/* ZIP File Info */}
+                {zipFile && (
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">📦 {zipFile.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Kích thước: {(zipFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleClearFolder}
+                          disabled={folderScanLoading}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Scan Button */}
+                {zipFile && !folderScanResult && (
+                  <Button 
+                    onClick={handleScanFolder} 
+                    disabled={folderScanLoading}
+                    className="w-full"
+                    size="lg"
+                    data-testid="scan-folder-btn"
+                  >
+                    {folderScanLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="h-5 w-5 mr-2" />
+                        Quét Thư Mục
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Upload Progress */}
+                {folderScanLoading && uploadProgress > 0 && (
+                  <div className="space-y-2 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                        {uploadProgress < 100 ? 'Đang upload...' : 'Đang quét tài liệu...'}
+                      </span>
+                      <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                        {uploadProgress}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-blue-200 dark:bg-blue-900 rounded-full h-2.5">
+                      <div 
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Results Section */}
+            {folderScanResult && (
+              <Card data-testid="folder-result-section">
+                <CardHeader>
+                  <CardTitle>Kết Quả Quét</CardTitle>
+                  <CardDescription>
+                    Tổng quan về quá trình quét thư mục
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-blue-600">{folderScanResult.total_files}</p>
+                      <p className="text-xs text-muted-foreground">Tổng files</p>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-green-600">{folderScanResult.success_count}</p>
+                      <p className="text-xs text-muted-foreground">Thành công</p>
+                    </div>
+                    <div className="p-4 bg-red-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-red-600">{folderScanResult.error_count}</p>
+                      <p className="text-xs text-muted-foreground">Lỗi</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-purple-600">
+                        {folderScanResult.processing_time_seconds.toFixed(1)}s
+                      </p>
+                      <p className="text-xs text-muted-foreground">Thời gian</p>
+                    </div>
+                  </div>
+
+                  {/* Download Button */}
+                  <Button
+                    onClick={handleDownloadResult}
+                    className="w-full"
+                    size="lg"
+                    data-testid="download-result-btn"
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    Tải Xuống ZIP Kết Quả ({folderScanResult.success_count} PDFs)
+                  </Button>
+
+                  {/* File List */}
+                  <div className="border rounded-lg">
+                    <div className="p-3 bg-muted font-medium text-sm">
+                      Chi tiết files ({folderScanResult.files.length})
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {folderScanResult.files.map((file, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`p-3 border-b last:border-b-0 flex items-center justify-between ${
+                            file.status === 'error' ? 'bg-red-50' : ''
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-mono truncate" title={file.relative_path}>
+                              📁 {file.relative_path}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {file.detected_full_name}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <Badge variant={file.status === 'success' ? 'default' : 'destructive'}>
+                              {file.short_code}
+                            </Badge>
+                            {file.status === 'success' ? (
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <X className="h-5 w-5 text-red-600" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* New Scan Button */}
+                  <Button
+                    onClick={handleClearFolder}
+                    variant="outline"
+                    className="w-full"
+                    data-testid="new-scan-btn"
+                  >
+                    Quét Thư Mục Mới
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           <TabsContent value="history" className="space-y-4">
             <Card data-testid="history-section">
               <CardHeader>

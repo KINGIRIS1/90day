@@ -1604,7 +1604,7 @@ async def scan_folder(file: UploadFile = File(...)):
         
         # Process all images in parallel
         logger.info(f"Starting parallel processing of {len(image_files)} images...")
-        tasks = [process_single_image(rel_path, abs_path) for rel_path, abs_path in image_files]
+        tasks = [process_single_image(rel_path, abs_path, MAX_SIZE) for rel_path, abs_path in image_files]
         file_results = await asyncio.gather(*tasks)
         
         # Count results

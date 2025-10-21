@@ -802,16 +802,16 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     # Read file content
                     content = await file.read()
                     
-                    # Create FULL image for preview
-                    full_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=False)
-                    
-                    # SMART CROP: Detect 2-page spread
-                    img_temp = Image.open(BytesIO(content))
-                    img_width, img_height = img_temp.size
+                    # DETECT ASPECT RATIO FROM ORIGINAL IMAGE FIRST
+                    img_original = Image.open(BytesIO(content))
+                    img_width, img_height = img_original.size
                     aspect_ratio = img_width / img_height
                     
                     # 2-page spread (like GCN cũ) needs more crop
                     crop_percent = 0.65 if aspect_ratio > 1.5 else 0.50
+                    
+                    # Create FULL image for preview (AFTER detection)
+                    full_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=False)
                     
                     cropped_image_base64 = resize_image_for_api(content, max_size=800, crop_top_only=True, crop_percentage=crop_percent)
                     analysis_result = await analyze_document_with_vision(cropped_image_base64)

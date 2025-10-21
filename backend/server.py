@@ -1399,14 +1399,14 @@ def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
     """
     Extract ZIP and find all image files recursively
     Returns: Dict of {folder_name: [(relative_path, absolute_path)]}
-    Groups files by their first-level folder
+    Groups files by their direct parent folder (or second-level if first is wrapper)
     """
     try:
         # Extract ZIP
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
         
-        # Find all images recursively and group by first-level folder
+        # Find all images recursively and group by parent folder
         folder_groups = {}
         
         for root, dirs, files in os.walk(extract_to):
@@ -1416,10 +1416,11 @@ def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
                     # Calculate relative path from extract_to
                     relative_path = file_path.relative_to(extract_to)
                     
-                    # Get first-level folder name
+                    # Get folder name - use the DIRECT parent folder of the image
                     parts = relative_path.parts
                     if len(parts) > 1:
-                        folder_name = parts[0]  # First level folder
+                        # Use the direct parent folder (last folder before file)
+                        folder_name = parts[-2] if len(parts) > 1 else parts[0]
                     else:
                         folder_name = "root"  # Files in root
                     
@@ -1430,6 +1431,10 @@ def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
         
         total_images = sum(len(files) for files in folder_groups.values())
         logger.info(f"Found {total_images} images in {len(folder_groups)} folders")
+        
+        # Log folder structure for debugging
+        for folder_name, files in folder_groups.items():
+            logger.info(f"  Folder '{folder_name}': {len(files)} files")
         
         return folder_groups
         

@@ -796,10 +796,14 @@ const DocumentScanner = () => {
         </div>
 
         <Tabs defaultValue="scan" className="w-full" data-testid="main-tabs">
-          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8">
             <TabsTrigger value="scan" data-testid="scan-tab">
               <FileText className="h-4 w-4 mr-2" />
               Quét Tài Liệu
+            </TabsTrigger>
+            <TabsTrigger value="folder" data-testid="folder-tab">
+              <Upload className="h-4 w-4 mr-2" />
+              Quét Thư Mục
             </TabsTrigger>
             <TabsTrigger value="history" data-testid="history-tab">
               <History className="h-4 w-4 mr-2" />

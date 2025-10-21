@@ -22,6 +22,8 @@ except ImportError:
     from pypdf import PdfWriter as PdfMerger
 import tempfile
 import asyncio
+import zipfile
+import shutil
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
 

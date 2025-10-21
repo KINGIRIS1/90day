@@ -808,8 +808,8 @@ async def batch_scan(files: List[UploadFile] = File(...)):
                     img_width, img_height = img_original.size
                     aspect_ratio = img_width / img_height
                     
-                    # 2-page spread (like GCN cũ) needs more crop
-                    crop_percent = 0.65 if aspect_ratio > 1.5 else 0.50
+                    # 2-page spread or wide format needs more crop (lowered threshold to 1.35)
+                    crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
                     
                     # Create FULL image for preview (AFTER detection)
                     full_image_base64 = resize_image_for_api(content, max_size=1280, crop_top_only=False)

@@ -1527,11 +1527,21 @@ async def scan_folder(file: UploadFile = File(...)):
         error_count = 0
         
         # Use semaphore for concurrency control
-        # Reduce concurrency for large batches to avoid rate limits
-        MAX_CONCURRENT = 3 if len(image_files) > 50 else 5
+        # Balance between speed and rate limits
+        # For large batches: reduce concurrency but increase speed per file
+        if len(image_files) > 100:
+            MAX_CONCURRENT = 2  # Very conservative for 100+ files
+            MAX_SIZE = 600  # Smaller images = faster upload
+        elif len(image_files) > 50:
+            MAX_CONCURRENT = 3
+            MAX_SIZE = 700
+        else:
+            MAX_CONCURRENT = 5
+            MAX_SIZE = 800
+        
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        logger.info(f"Processing {len(image_files)} files with MAX_CONCURRENT={MAX_CONCURRENT}")
+        logger.info(f"Processing {len(image_files)} files with MAX_CONCURRENT={MAX_CONCURRENT}, MAX_SIZE={MAX_SIZE}")
         
         async def process_single_image(relative_path: str, absolute_path: str, retry_count=0):
             async with semaphore:

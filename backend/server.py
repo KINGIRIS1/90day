@@ -199,11 +199,13 @@ class UpdateRuleRequest(BaseModel):
 async def get_document_rules() -> dict:
     """Get all document rules from database or initialize from DOCUMENT_TYPES"""
     try:
-        # Create unique index on short_code to prevent duplicates
+        # DROP unique index if exists (we now allow duplicate short_codes)
         try:
-            await db.document_rules.create_index("short_code", unique=True)
-        except:
-            pass  # Index already exists
+            await db.document_rules.drop_index("short_code_1")
+            logger.info("Dropped unique index on short_code to allow duplicates")
+        except Exception as e:
+            # Index doesn't exist or already dropped
+            pass
         
         # Check if rules exist in database
         rules_count = await db.document_rules.count_documents({})

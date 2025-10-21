@@ -1516,7 +1516,219 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
         raise HTTPException(status_code=500, detail=f"Lỗi tạo ZIP kết quả: {str(e)}")
 
 
-@api_router.post("/scan-folder", response_model=FolderScanResult)
+@api_router.post("/scan-folder", response_model=FolderScanStartResponse)
+async def scan_folder(file: UploadFile = File(...)):
+    """
+    Start folder scan job (returns immediately with job_id)
+    - Client polls /api/folder-scan-status/{job_id} for progress
+    - Each folder available for download as soon as it completes
+    """
+    try:
+        # Validate file is ZIP
+        if not file.filename.endswith('.zip'):
+            raise HTTPException(status_code=400, detail="Chỉ chấp nhận file ZIP")
+        
+        # Create temp directory for processing
+        temp_dir = tempfile.mkdtemp(prefix='folder_scan_')
+        upload_dir = os.path.join(temp_dir, 'upload')
+        extract_dir = os.path.join(temp_dir, 'extracted')
+        os.makedirs(upload_dir, exist_ok=True)
+        os.makedirs(extract_dir, exist_ok=True)
+        
+        # Save uploaded ZIP
+        zip_path = os.path.join(upload_dir, file.filename)
+        content = await file.read()
+        
+        # Check file size
+        file_size_mb = len(content) / (1024 * 1024)
+        if file_size_mb > MAX_ZIP_SIZE_MB:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"File quá lớn ({file_size_mb:.1f}MB). Giới hạn: {MAX_ZIP_SIZE_MB}MB"
+            )
+        
+        with open(zip_path, 'wb') as f:
+            f.write(content)
+        
+        logger.info(f"Processing ZIP file: {file.filename} ({file_size_mb:.1f}MB)")
+        
+        # Extract ZIP and group by folders
+        folder_groups = extract_zip_and_find_images(zip_path, extract_dir)
+        
+        if len(folder_groups) == 0:
+            raise HTTPException(status_code=400, detail="Không tìm thấy thư mục nào chứa ảnh")
+        
+        total_files = sum(len(files) for files in folder_groups.values())
+        if total_files > MAX_FILES_PER_ZIP:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Quá nhiều files ({total_files}). Giới hạn: {MAX_FILES_PER_ZIP} files"
+            )
+        
+        # Create job
+        job_id = str(uuid.uuid4())
+        job_status = FolderScanJobStatus(
+            job_id=job_id,
+            status="processing",
+            total_folders=len(folder_groups),
+            completed_folders=0,
+            current_folder=None,
+            folder_results=[],
+            started_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        
+        active_jobs[job_id] = job_status
+        
+        # Start background task
+        asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir))
+        
+        return FolderScanStartResponse(
+            job_id=job_id,
+            message="Đã bắt đầu quét. Sử dụng status_url để theo dõi tiến trình.",
+            total_folders=len(folder_groups),
+            total_files=total_files,
+            status_url=f"/api/folder-scan-status/{job_id}"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error starting folder scan: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
+
+
+async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str):
+    """Background task to process folder scan"""
+    try:
+        job_status = active_jobs[job_id]
+        
+        for folder_idx, (folder_name, image_files) in enumerate(folder_groups.items(), 1):
+            folder_start = datetime.now(timezone.utc)
+            
+            # Update job status
+            job_status.current_folder = folder_name
+            job_status.updated_at = datetime.now(timezone.utc)
+            
+            logger.info(f"[Job {job_id}] Processing folder {folder_idx}/{len(folder_groups)}: {folder_name} ({len(image_files)} files)")
+            
+            # Determine concurrency
+            MAX_CONCURRENT = 3 if len(image_files) > 50 else 5
+            MAX_SIZE = 700 if len(image_files) > 50 else 800
+            semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+            
+            async def process_single_image(relative_path: str, absolute_path: str, max_size: int, retry_count=0):
+                async with semaphore:
+                    max_retries = 2
+                    try:
+                        with open(absolute_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                        
+                        img_original = Image.open(BytesIO(image_bytes))
+                        img_width, img_height = img_original.size
+                        aspect_ratio = img_width / img_height
+                        crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
+                        
+                        cropped_image_base64 = resize_image_for_api(
+                            image_bytes, max_size=max_size, crop_top_only=True, crop_percentage=crop_percent
+                        )
+                        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                        
+                        return FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name=analysis_result["detected_full_name"],
+                            short_code=analysis_result["short_code"],
+                            confidence_score=analysis_result["confidence"],
+                            status="success"
+                        )
+                    except Exception as e:
+                        error_msg = str(e)
+                        is_retryable = ("timeout" in error_msg.lower() or "connection" in error_msg.lower() or
+                                       "rate limit" in error_msg.lower() or "429" in error_msg)
+                        
+                        if is_retryable and retry_count < max_retries:
+                            await asyncio.sleep(2 ** retry_count)
+                            return await process_single_image(relative_path, absolute_path, max_size, retry_count + 1)
+                        
+                        logger.error(f"Error processing {relative_path}: {e}")
+                        return FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name="Lỗi",
+                            short_code="ERROR",
+                            confidence_score=0.0,
+                            status="error",
+                            error_message=str(e)[:200]
+                        )
+            
+            # Process all images in this folder
+            tasks = [process_single_image(rel_path, abs_path, MAX_SIZE) for rel_path, abs_path in image_files]
+            file_results = await asyncio.gather(*tasks)
+            
+            # Count results
+            folder_success = len([r for r in file_results if r.status == "success"])
+            folder_error = len([r for r in file_results if r.status == "error"])
+            
+            # Create result ZIP for this folder IMMEDIATELY
+            result_zip_filename = f"{folder_name}.zip"
+            result_zip_path = os.path.join(temp_dir, result_zip_filename)
+            create_result_zip(file_results, extract_dir, result_zip_path)
+            
+            # Save to permanent location
+            permanent_result_path = os.path.join(ROOT_DIR, 'temp_results', f"{folder_name}_{uuid.uuid4().hex[:8]}.zip")
+            os.makedirs(os.path.dirname(permanent_result_path), exist_ok=True)
+            shutil.copy(result_zip_path, permanent_result_path)
+            
+            folder_end = datetime.now(timezone.utc)
+            folder_time = (folder_end - folder_start).total_seconds()
+            
+            # Add to job results IMMEDIATELY (available for download)
+            folder_result = FolderBatchResult(
+                folder_name=folder_name,
+                total_files=len(image_files),
+                success_count=folder_success,
+                error_count=folder_error,
+                processing_time_seconds=folder_time,
+                download_url=f"/api/download-folder-result/{os.path.basename(permanent_result_path)}",
+                files=file_results
+            )
+            
+            job_status.folder_results.append(folder_result)
+            job_status.completed_folders += 1
+            job_status.updated_at = datetime.now(timezone.utc)
+            
+            logger.info(f"[Job {job_id}] Folder {folder_name} complete: {folder_success}/{len(image_files)} success. ZIP ready for download!")
+        
+        # Mark job as completed
+        job_status.status = "completed"
+        job_status.current_folder = None
+        job_status.updated_at = datetime.now(timezone.utc)
+        
+        logger.info(f"[Job {job_id}] All folders completed!")
+        
+        # Cleanup temp dir
+        try:
+            shutil.rmtree(temp_dir)
+        except Exception as e:
+            logger.warning(f"Could not clean up temp dir: {e}")
+            
+    except Exception as e:
+        logger.error(f"[Job {job_id}] Error processing job: {e}", exc_info=True)
+        job_status = active_jobs.get(job_id)
+        if job_status:
+            job_status.status = "error"
+            job_status.error_message = str(e)
+            job_status.updated_at = datetime.now(timezone.utc)
+
+
+@api_router.get("/folder-scan-status/{job_id}", response_model=FolderScanJobStatus)
+async def get_folder_scan_status(job_id: str):
+    """Get status of folder scan job (poll this endpoint)"""
+    if job_id not in active_jobs:
+        raise HTTPException(status_code=404, detail="Job không tồn tại")
+    
+    return active_jobs[job_id]
 async def scan_folder(file: UploadFile = File(...)):
     """
     Scan an entire folder structure from ZIP file

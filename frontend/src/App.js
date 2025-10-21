@@ -516,6 +516,115 @@ const DocumentScanner = () => {
     }
   };
 
+  // ============= FOLDER SCANNING HANDLERS =============
+  
+  const handleZipUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.name.endsWith('.zip')) {
+      toast.error('Chỉ chấp nhận file ZIP');
+      return;
+    }
+    
+    // Validate file size (500MB)
+    const maxSize = 500 * 1024 * 1024; // 500MB
+    if (file.size > maxSize) {
+      toast.error(`File quá lớn (${(file.size / 1024 / 1024).toFixed(1)}MB). Giới hạn: 500MB`);
+      return;
+    }
+    
+    setZipFile(file);
+    setFolderScanResult(null);
+    toast.success(`Đã chọn file: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+  };
+
+  const handleScanFolder = async () => {
+    if (!zipFile) {
+      toast.error('Vui lòng chọn file ZIP');
+      return;
+    }
+
+    setFolderScanLoading(true);
+    setUploadProgress(0);
+    
+    const startTime = Date.now();
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', zipFile);
+
+      toast.info('Đang upload và xử lý ZIP...', { duration: 3000 });
+
+      const response = await axios.post(`${API}/scan-folder`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 1800000, // 30 minutes
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        },
+      });
+
+      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      setFolderScanResult(response.data);
+
+      toast.success(
+        `✅ Hoàn thành! Quét ${response.data.success_count}/${response.data.total_files} files (${duration}s)`,
+        { duration: 5000 }
+      );
+
+      if (response.data.error_count > 0) {
+        toast.warning(`⚠️ ${response.data.error_count} file lỗi`, { duration: 4000 });
+      }
+
+    } catch (error) {
+      console.error('Error scanning folder:', error);
+      const errorMsg = error.response?.data?.detail || error.message || 'Lỗi không xác định';
+      toast.error(`Lỗi: ${errorMsg}`, { duration: 6000 });
+    } finally {
+      setFolderScanLoading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const handleDownloadResult = async () => {
+    if (!folderScanResult || !folderScanResult.download_url) {
+      toast.error('Không có kết quả để tải');
+      return;
+    }
+
+    try {
+      toast.info('Đang chuẩn bị tải xuống...', { duration: 2000 });
+      
+      const response = await axios.get(`${BACKEND_URL}${folderScanResult.download_url}`, {
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'scanned_documents.zip');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('✅ Đã tải xuống ZIP kết quả');
+    } catch (error) {
+      console.error('Error downloading result:', error);
+      toast.error('Lỗi khi tải xuống kết quả');
+    }
+  };
+
+  const handleClearFolder = () => {
+    setZipFile(null);
+    setFolderScanResult(null);
+    setUploadProgress(0);
+  };
+
   const ResultCard = ({ result, showActions = true, showCheckbox = false }) => {
     const isError = result.short_code === 'ERROR';
     const isRetrying = retryingIds.has(result.id);

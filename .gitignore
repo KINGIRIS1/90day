@@ -97,3 +97,5 @@ android-sdk/ -e
 # Environment files
 *.env
 *.env.*
+backend/temp_results/scan_result_0cc1330c.zip
+backend/temp_results/scan_result_d4cd8091.zip

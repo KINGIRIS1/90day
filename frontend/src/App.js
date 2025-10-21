@@ -599,20 +599,23 @@ const DocumentScanner = () => {
     try {
       toast.info('Đang chuẩn bị tải xuống...', { duration: 2000 });
       
-      const response = await axios.get(`${BACKEND_URL}${folderScanResult.download_url}`, {
-        responseType: 'blob',
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Use direct link approach instead of axios to avoid CORS/blob issues
+      const downloadUrl = `${BACKEND_URL}${folderScanResult.download_url}`;
+      
+      // Create temporary link and trigger download
       const link = document.createElement('a');
-      link.href = url;
+      link.href = downloadUrl;
       link.setAttribute('download', 'scanned_documents.zip');
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
 
-      toast.success('✅ Đã tải xuống ZIP kết quả');
+      toast.success('✅ Đã bắt đầu tải xuống ZIP kết quả');
     } catch (error) {
       console.error('Error downloading result:', error);
       toast.error('Lỗi khi tải xuống kết quả');

@@ -40,6 +40,8 @@ const DocumentScanner = () => {
   const [folderScanLoading, setFolderScanLoading] = useState(false);
   const [folderScanResult, setFolderScanResult] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [scanJobId, setScanJobId] = useState(null);
+  const [pollingInterval, setPollingInterval] = useState(null);
 
   useEffect(() => {
     fetchScanHistory();

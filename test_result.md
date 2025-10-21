@@ -104,9 +104,8 @@
 
 user_problem_statement: |
   Document scanning application for Vietnamese land documents with automatic naming using short codes.
-  NEW UPDATE: Increased crop to 35% (covering quốc huy at top + title in middle for old GCN documents).
-  Added quốc huy (Vietnam coat of arms) detection to improve GCN identification.
-  Optimized image size from 1280px to 1024px for faster processing while maintaining accuracy.
+  NEW FEATURE: Folder scanning - Upload ZIP file with folder structure, scan all images, return ZIP with PDFs maintaining folder structure.
+  Previous features: 35% crop + quốc huy detection, optimized image size 1024px, rules management UI.
 
 backend:
   - task: "Image cropping optimization (35% top crop + quốc huy detection)"

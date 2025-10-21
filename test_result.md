@@ -314,6 +314,7 @@ test_plan:
     - "NEW IMPROVEMENTS TESTED: 35% crop + quốc huy detection working perfectly"
     - "Performance optimization with 1024px images confirmed"
     - "Rules Management API TESTED: All CRUD operations working perfectly"
+    - "Folder Scanning Feature TESTED: ZIP upload with structure preservation working perfectly"
     - "All backend features validated and working"
   stuck_tasks: []
   test_all: false

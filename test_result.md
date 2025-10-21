@@ -255,6 +255,17 @@ backend:
         comment: "✅ CRITICAL NEW FEATURE TESTED: Rules Management API working perfectly! All 13/13 tests passed. GET /api/rules auto-initializes 105 rules from DOCUMENT_TYPES. POST creates new rules with duplicate validation (returns 400 for duplicates). PUT updates rules with partial support and duplicate validation. DELETE removes rules with 404 for non-existent IDs. Vietnamese error messages working. Dynamic loading confirmed - new rules immediately available for scanning. Rules persist correctly across API calls. All CRUD operations validated with proper HTTP status codes."
 
 frontend:
+  - task: "Folder scanning tab UI (ZIP upload interface)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Added 'Quét Thư Mục' tab (4th tab). Features: ZIP file upload, file size validation (500MB), upload progress bar, folder scan results display with summary stats (total/success/error), download result ZIP button, detailed file list with folder paths. Added handlers: handleZipUpload, handleScanFolder, handleDownloadResult, handleClearFolder. UI screenshot confirmed tab visible and working."
   - task: "File upload interface with preview"
     implemented: true
     working: "NA"

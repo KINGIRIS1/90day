@@ -243,15 +243,38 @@ const DocumentScanner = () => {
           formData.append('files', file);
         });
 
-        const response = await axios.post(`${API}/batch-scan`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          timeout: 300000, // Increase to 5 minutes for large batches
-          onUploadProgress: (progressEvent) => {
-            // Show upload progress
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload progress: ${percentCompleted}%`);
+        // Retry logic with exponential backoff
+        let retries = 0;
+        let success = false;
+        let response;
+        
+        while (retries < 3 && !success) {
+          try {
+            response = await axios.post(`${API}/batch-scan`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              timeout: 300000, // 5 minutes
+              onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                console.log(`Upload progress: ${percentCompleted}%`);
+              }
+            });
+            success = true;
+          } catch (error) {
+            retries++;
+            if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+              console.log(`Timeout on attempt ${retries}, retrying...`);
+              if (retries < 3) {
+                // Wait before retry (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, retries * 2000));
+                toast.info(`⏱️ Timeout - đang thử lại lần ${retries}/3...`);
+              } else {
+                throw new Error(`Timeout sau 3 lần thử. Vui lòng giảm số lượng file hoặc thử lại sau.`);
+              }
+            } else {
+              throw error;
+            }
           }
-        });
+        }
 
         // Update progress
         allResults.push(...response.data);

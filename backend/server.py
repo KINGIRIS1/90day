@@ -1530,8 +1530,9 @@ async def scan_folder(file: UploadFile = File(...)):
         MAX_CONCURRENT = 5
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        async def process_single_image(relative_path: str, absolute_path: str):
+        async def process_single_image(relative_path: str, absolute_path: str, retry_count=0):
             async with semaphore:
+                max_retries = 2
                 try:
                     # Read image
                     with open(absolute_path, 'rb') as img_file:
@@ -1564,6 +1565,19 @@ async def scan_folder(file: UploadFile = File(...)):
                     )
                     
                 except Exception as e:
+                    error_msg = str(e)
+                    
+                    # Auto retry for timeout/connection/rate limit errors
+                    is_retryable = ("timeout" in error_msg.lower() or 
+                                   "connection" in error_msg.lower() or
+                                   "rate limit" in error_msg.lower() or
+                                   "429" in error_msg)
+                    
+                    if is_retryable and retry_count < max_retries:
+                        logger.warning(f"Retrying {relative_path} (attempt {retry_count + 1}/{max_retries}): {error_msg[:100]}")
+                        await asyncio.sleep(2 ** retry_count)  # Exponential backoff
+                        return await process_single_image(relative_path, absolute_path, retry_count + 1)
+                    
                     logger.error(f"Error processing {relative_path}: {e}")
                     return FolderScanFileResult(
                         relative_path=relative_path,

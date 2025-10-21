@@ -1384,28 +1384,43 @@ MAX_FILES_PER_ZIP = 500
 MAX_ZIP_SIZE_MB = 500
 
 
-def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> List[tuple]:
+def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
     """
     Extract ZIP and find all image files recursively
-    Returns: List of tuples (relative_path, absolute_path)
+    Returns: Dict of {folder_name: [(relative_path, absolute_path)]}
+    Groups files by their first-level folder
     """
     try:
         # Extract ZIP
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             zip_ref.extractall(extract_to)
         
-        # Find all images recursively
-        image_files = []
+        # Find all images recursively and group by first-level folder
+        folder_groups = {}
+        
         for root, dirs, files in os.walk(extract_to):
             for file in files:
                 file_path = Path(root) / file
                 if file_path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS:
                     # Calculate relative path from extract_to
                     relative_path = file_path.relative_to(extract_to)
-                    image_files.append((str(relative_path), str(file_path)))
+                    
+                    # Get first-level folder name
+                    parts = relative_path.parts
+                    if len(parts) > 1:
+                        folder_name = parts[0]  # First level folder
+                    else:
+                        folder_name = "root"  # Files in root
+                    
+                    if folder_name not in folder_groups:
+                        folder_groups[folder_name] = []
+                    
+                    folder_groups[folder_name].append((str(relative_path), str(file_path)))
         
-        logger.info(f"Found {len(image_files)} images in ZIP")
-        return image_files
+        total_images = sum(len(files) for files in folder_groups.values())
+        logger.info(f"Found {total_images} images in {len(folder_groups)} folders")
+        
+        return folder_groups
         
     except zipfile.BadZipFile:
         raise HTTPException(status_code=400, detail="File không phải là ZIP hợp lệ")

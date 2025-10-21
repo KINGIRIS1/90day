@@ -1408,16 +1408,32 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
     Create result ZIP with PDFs maintaining folder structure
     """
     try:
+        # Track PDF names to avoid duplicates
+        pdf_name_counter = {}
+        
         with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_out:
             for file_result in file_results:
                 if file_result.status == "success":
-                    # Create PDF in temp location
-                    pdf_filename = f"{file_result.short_code}.pdf"
+                    # Create unique PDF filename to avoid duplicates
+                    base_name = file_result.short_code
                     
                     # Get folder path from relative_path
                     relative_dir = str(Path(file_result.relative_path).parent)
                     if relative_dir == '.':
                         relative_dir = ''
+                    
+                    # Generate unique filename in this directory
+                    dir_key = relative_dir
+                    if dir_key not in pdf_name_counter:
+                        pdf_name_counter[dir_key] = {}
+                    
+                    if base_name not in pdf_name_counter[dir_key]:
+                        pdf_name_counter[dir_key][base_name] = 1
+                        pdf_filename = f"{base_name}.pdf"
+                    else:
+                        count = pdf_name_counter[dir_key][base_name]
+                        pdf_filename = f"{base_name}_{count}.pdf"
+                        pdf_name_counter[dir_key][base_name] = count + 1
                     
                     # PDF path in ZIP (maintain folder structure)
                     pdf_path_in_zip = str(Path(relative_dir) / pdf_filename) if relative_dir else pdf_filename

@@ -1499,12 +1499,11 @@ async def scan_folder(file: UploadFile = File(...)):
     """
     Scan an entire folder structure from ZIP file
     - Accepts ZIP file with folder structure
-    - Scans all images recursively
-    - Returns ZIP with PDFs maintaining same structure
+    - Scans folders SEQUENTIALLY (one by one)
+    - Returns separate ZIP for each first-level folder
     """
     start_time = datetime.now(timezone.utc)
     temp_dir = None
-    result_zip_path = None
     
     try:
         # Validate file is ZIP
@@ -1535,134 +1534,135 @@ async def scan_folder(file: UploadFile = File(...)):
         
         logger.info(f"Processing ZIP file: {file.filename} ({file_size_mb:.1f}MB)")
         
-        # Extract ZIP and find images
-        image_files = extract_zip_and_find_images(zip_path, extract_dir)
+        # Extract ZIP and group by folders
+        folder_groups = extract_zip_and_find_images(zip_path, extract_dir)
         
-        if len(image_files) == 0:
-            raise HTTPException(status_code=400, detail="Không tìm thấy file ảnh nào trong ZIP")
+        if len(folder_groups) == 0:
+            raise HTTPException(status_code=400, detail="Không tìm thấy thư mục nào chứa ảnh")
         
-        if len(image_files) > MAX_FILES_PER_ZIP:
+        total_files = sum(len(files) for files in folder_groups.values())
+        if total_files > MAX_FILES_PER_ZIP:
             raise HTTPException(
                 status_code=400,
-                detail=f"Quá nhiều files ({len(image_files)}). Giới hạn: {MAX_FILES_PER_ZIP} files"
+                detail=f"Quá nhiều files ({total_files}). Giới hạn: {MAX_FILES_PER_ZIP} files"
             )
         
-        # Process each image
-        file_results = []
-        success_count = 0
-        error_count = 0
+        logger.info(f"Found {len(folder_groups)} folders with {total_files} total files")
         
-        # Use semaphore for concurrency control
-        # Balance between speed and rate limits
-        # For large batches: reduce concurrency but increase speed per file
-        if len(image_files) > 100:
-            MAX_CONCURRENT = 2  # Very conservative for 100+ files
-            MAX_SIZE = 600  # Smaller images = faster upload
-        elif len(image_files) > 50:
-            MAX_CONCURRENT = 3
-            MAX_SIZE = 700
-        else:
-            MAX_CONCURRENT = 5
-            MAX_SIZE = 800
+        # Process each folder SEQUENTIALLY
+        folder_results = []
+        total_success = 0
+        total_error = 0
         
-        semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+        for folder_idx, (folder_name, image_files) in enumerate(folder_groups.items(), 1):
+            folder_start = datetime.now(timezone.utc)
+            logger.info(f"Processing folder {folder_idx}/{len(folder_groups)}: {folder_name} ({len(image_files)} files)")
+            
+            # Determine concurrency based on folder size
+            if len(image_files) > 50:
+                MAX_CONCURRENT = 3
+                MAX_SIZE = 700
+            else:
+                MAX_CONCURRENT = 5
+                MAX_SIZE = 800
+            
+            semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+            
+            async def process_single_image(relative_path: str, absolute_path: str, max_size: int, retry_count=0):
+                async with semaphore:
+                    max_retries = 2
+                    try:
+                        with open(absolute_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                        
+                        img_original = Image.open(BytesIO(image_bytes))
+                        img_width, img_height = img_original.size
+                        aspect_ratio = img_width / img_height
+                        crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
+                        
+                        cropped_image_base64 = resize_image_for_api(
+                            image_bytes, max_size=max_size, crop_top_only=True, crop_percentage=crop_percent
+                        )
+                        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                        
+                        return FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name=analysis_result["detected_full_name"],
+                            short_code=analysis_result["short_code"],
+                            confidence_score=analysis_result["confidence"],
+                            status="success"
+                        )
+                    except Exception as e:
+                        error_msg = str(e)
+                        is_retryable = ("timeout" in error_msg.lower() or "connection" in error_msg.lower() or
+                                       "rate limit" in error_msg.lower() or "429" in error_msg)
+                        
+                        if is_retryable and retry_count < max_retries:
+                            logger.warning(f"Retrying {relative_path} (attempt {retry_count + 1})")
+                            await asyncio.sleep(2 ** retry_count)
+                            return await process_single_image(relative_path, absolute_path, max_size, retry_count + 1)
+                        
+                        logger.error(f"Error processing {relative_path}: {e}")
+                        return FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name="Lỗi",
+                            short_code="ERROR",
+                            confidence_score=0.0,
+                            status="error",
+                            error_message=str(e)[:200]
+                        )
+            
+            # Process all images in this folder
+            tasks = [process_single_image(rel_path, abs_path, MAX_SIZE) for rel_path, abs_path in image_files]
+            file_results = await asyncio.gather(*tasks)
+            
+            # Count results
+            folder_success = len([r for r in file_results if r.status == "success"])
+            folder_error = len([r for r in file_results if r.status == "error"])
+            
+            # Create result ZIP for this folder
+            result_zip_filename = f"{folder_name}.zip"
+            result_zip_path = os.path.join(temp_dir, result_zip_filename)
+            create_result_zip(file_results, extract_dir, result_zip_path)
+            
+            # Save to permanent location
+            permanent_result_path = os.path.join(ROOT_DIR, 'temp_results', f"{folder_name}_{uuid.uuid4().hex[:8]}.zip")
+            os.makedirs(os.path.dirname(permanent_result_path), exist_ok=True)
+            shutil.copy(result_zip_path, permanent_result_path)
+            
+            folder_end = datetime.now(timezone.utc)
+            folder_time = (folder_end - folder_start).total_seconds()
+            
+            folder_results.append(FolderBatchResult(
+                folder_name=folder_name,
+                total_files=len(image_files),
+                success_count=folder_success,
+                error_count=folder_error,
+                processing_time_seconds=folder_time,
+                download_url=f"/api/download-folder-result/{os.path.basename(permanent_result_path)}",
+                files=file_results
+            ))
+            
+            total_success += folder_success
+            total_error += folder_error
+            
+            logger.info(f"Folder {folder_name} complete: {folder_success}/{len(image_files)} success in {folder_time:.1f}s")
         
-        logger.info(f"Processing {len(image_files)} files with MAX_CONCURRENT={MAX_CONCURRENT}, MAX_SIZE={MAX_SIZE}")
-        
-        async def process_single_image(relative_path: str, absolute_path: str, max_size: int, retry_count=0):
-            async with semaphore:
-                max_retries = 2
-                try:
-                    # Read image
-                    with open(absolute_path, 'rb') as img_file:
-                        image_bytes = img_file.read()
-                    
-                    # Detect aspect ratio
-                    img_original = Image.open(BytesIO(image_bytes))
-                    img_width, img_height = img_original.size
-                    aspect_ratio = img_width / img_height
-                    
-                    # Determine crop percentage
-                    crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
-                    
-                    # Analyze document - use max_size passed from parent
-                    cropped_image_base64 = resize_image_for_api(
-                        image_bytes, 
-                        max_size=max_size,  # Dynamic size based on batch
-                        crop_top_only=True, 
-                        crop_percentage=crop_percent
-                    )
-                    analysis_result = await analyze_document_with_vision(cropped_image_base64)
-                    
-                    return FolderScanFileResult(
-                        relative_path=relative_path,
-                        original_filename=Path(relative_path).name,
-                        detected_full_name=analysis_result["detected_full_name"],
-                        short_code=analysis_result["short_code"],
-                        confidence_score=analysis_result["confidence"],
-                        status="success"
-                    )
-                    
-                except Exception as e:
-                    error_msg = str(e)
-                    
-                    # Auto retry for timeout/connection/rate limit errors
-                    is_retryable = ("timeout" in error_msg.lower() or 
-                                   "connection" in error_msg.lower() or
-                                   "rate limit" in error_msg.lower() or
-                                   "429" in error_msg)
-                    
-                    if is_retryable and retry_count < max_retries:
-                        logger.warning(f"Retrying {relative_path} (attempt {retry_count + 1}/{max_retries}): {error_msg[:100]}")
-                        await asyncio.sleep(2 ** retry_count)  # Exponential backoff
-                        return await process_single_image(relative_path, absolute_path, max_size, retry_count + 1)
-                    
-                    logger.error(f"Error processing {relative_path}: {e}")
-                    return FolderScanFileResult(
-                        relative_path=relative_path,
-                        original_filename=Path(relative_path).name,
-                        detected_full_name="Lỗi",
-                        short_code="ERROR",
-                        confidence_score=0.0,
-                        status="error",
-                        error_message=str(e)[:200]
-                    )
-        
-        # Process all images in parallel
-        logger.info(f"Starting parallel processing of {len(image_files)} images...")
-        tasks = [process_single_image(rel_path, abs_path, MAX_SIZE) for rel_path, abs_path in image_files]
-        file_results = await asyncio.gather(*tasks)
-        
-        # Count results
-        success_count = len([r for r in file_results if r.status == "success"])
-        error_count = len([r for r in file_results if r.status == "error"])
-        
-        logger.info(f"Processing complete: {success_count} success, {error_count} errors")
-        
-        # Create result ZIP with PDFs
-        result_zip_path = os.path.join(temp_dir, 'result.zip')
-        create_result_zip(file_results, extract_dir, result_zip_path)
-        
-        # Calculate processing time
+        # Calculate total processing time
         end_time = datetime.now(timezone.utc)
         processing_time = (end_time - start_time).total_seconds()
         
-        # Save result ZIP to a permanent location for download
-        result_filename = f"scan_result_{uuid.uuid4().hex[:8]}.zip"
-        permanent_result_path = os.path.join(ROOT_DIR, 'temp_results', result_filename)
-        os.makedirs(os.path.dirname(permanent_result_path), exist_ok=True)
-        shutil.copy(result_zip_path, permanent_result_path)
-        
-        # Return result
         return FolderScanResult(
-            total_files=len(image_files),
-            processed_files=len(file_results),
-            success_count=success_count,
-            error_count=error_count,
+            total_folders=len(folder_groups),
+            total_files=total_files,
+            processed_files=total_files,
+            success_count=total_success,
+            error_count=total_error,
             skipped_count=0,
             processing_time_seconds=processing_time,
-            files=file_results,
-            download_url=f"/api/download-folder-result/{result_filename}"
+            folder_results=folder_results
         )
         
     except HTTPException:
@@ -1672,7 +1672,7 @@ async def scan_folder(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Lỗi xử lý: {str(e)}")
     
     finally:
-        # Cleanup temp directory (but keep result zip for download)
+        # Cleanup temp directory
         if temp_dir and os.path.exists(temp_dir):
             try:
                 shutil.rmtree(temp_dir)

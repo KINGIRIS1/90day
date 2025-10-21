@@ -1366,6 +1366,273 @@ async def root():
     return {"message": "Document Scanner API"}
 
 
+# ==================== FOLDER SCANNING FEATURE ====================
+
+SUPPORTED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'}
+MAX_FILES_PER_ZIP = 500
+MAX_ZIP_SIZE_MB = 500
+
+
+def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> List[tuple]:
+    """
+    Extract ZIP and find all image files recursively
+    Returns: List of tuples (relative_path, absolute_path)
+    """
+    try:
+        # Extract ZIP
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+        
+        # Find all images recursively
+        image_files = []
+        for root, dirs, files in os.walk(extract_to):
+            for file in files:
+                file_path = Path(root) / file
+                if file_path.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS:
+                    # Calculate relative path from extract_to
+                    relative_path = file_path.relative_to(extract_to)
+                    image_files.append((str(relative_path), str(file_path)))
+        
+        logger.info(f"Found {len(image_files)} images in ZIP")
+        return image_files
+        
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="File không phải là ZIP hợp lệ")
+    except Exception as e:
+        logger.error(f"Error extracting ZIP: {e}")
+        raise HTTPException(status_code=500, detail=f"Lỗi giải nén ZIP: {str(e)}")
+
+
+def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str, output_zip_path: str):
+    """
+    Create result ZIP with PDFs maintaining folder structure
+    """
+    try:
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_out:
+            for file_result in file_results:
+                if file_result.status == "success":
+                    # Create PDF in temp location
+                    pdf_filename = f"{file_result.short_code}.pdf"
+                    
+                    # Get folder path from relative_path
+                    relative_dir = str(Path(file_result.relative_path).parent)
+                    if relative_dir == '.':
+                        relative_dir = ''
+                    
+                    # PDF path in ZIP (maintain folder structure)
+                    pdf_path_in_zip = str(Path(relative_dir) / pdf_filename) if relative_dir else pdf_filename
+                    
+                    # Create PDF in temp file
+                    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+                    
+                    try:
+                        # We need to read the original image to create PDF
+                        original_image_path = Path(source_dir) / file_result.relative_path
+                        
+                        with open(original_image_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                            # Convert to base64 for create_pdf_from_image
+                            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                        
+                        create_pdf_from_image(image_base64, temp_pdf.name, file_result.short_code)
+                        
+                        # Add PDF to result ZIP
+                        zip_out.write(temp_pdf.name, pdf_path_in_zip)
+                        
+                    finally:
+                        # Clean up temp PDF
+                        temp_pdf.close()
+                        if os.path.exists(temp_pdf.name):
+                            os.unlink(temp_pdf.name)
+        
+        logger.info(f"Created result ZIP with {len([f for f in file_results if f.status == 'success'])} PDFs")
+        
+    except Exception as e:
+        logger.error(f"Error creating result ZIP: {e}")
+        raise HTTPException(status_code=500, detail=f"Lỗi tạo ZIP kết quả: {str(e)}")
+
+
+@api_router.post("/scan-folder", response_model=FolderScanResult)
+async def scan_folder(file: UploadFile = File(...)):
+    """
+    Scan an entire folder structure from ZIP file
+    - Accepts ZIP file with folder structure
+    - Scans all images recursively
+    - Returns ZIP with PDFs maintaining same structure
+    """
+    start_time = datetime.now(timezone.utc)
+    temp_dir = None
+    result_zip_path = None
+    
+    try:
+        # Validate file is ZIP
+        if not file.filename.endswith('.zip'):
+            raise HTTPException(status_code=400, detail="Chỉ chấp nhận file ZIP")
+        
+        # Create temp directory for processing
+        temp_dir = tempfile.mkdtemp(prefix='folder_scan_')
+        upload_dir = os.path.join(temp_dir, 'upload')
+        extract_dir = os.path.join(temp_dir, 'extracted')
+        os.makedirs(upload_dir, exist_ok=True)
+        os.makedirs(extract_dir, exist_ok=True)
+        
+        # Save uploaded ZIP
+        zip_path = os.path.join(upload_dir, file.filename)
+        content = await file.read()
+        
+        # Check file size
+        file_size_mb = len(content) / (1024 * 1024)
+        if file_size_mb > MAX_ZIP_SIZE_MB:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"File quá lớn ({file_size_mb:.1f}MB). Giới hạn: {MAX_ZIP_SIZE_MB}MB"
+            )
+        
+        with open(zip_path, 'wb') as f:
+            f.write(content)
+        
+        logger.info(f"Processing ZIP file: {file.filename} ({file_size_mb:.1f}MB)")
+        
+        # Extract ZIP and find images
+        image_files = extract_zip_and_find_images(zip_path, extract_dir)
+        
+        if len(image_files) == 0:
+            raise HTTPException(status_code=400, detail="Không tìm thấy file ảnh nào trong ZIP")
+        
+        if len(image_files) > MAX_FILES_PER_ZIP:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Quá nhiều files ({len(image_files)}). Giới hạn: {MAX_FILES_PER_ZIP} files"
+            )
+        
+        # Process each image
+        file_results = []
+        success_count = 0
+        error_count = 0
+        
+        # Use semaphore for concurrency control (same as batch-scan)
+        MAX_CONCURRENT = 5
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+        
+        async def process_single_image(relative_path: str, absolute_path: str):
+            async with semaphore:
+                try:
+                    # Read image
+                    with open(absolute_path, 'rb') as img_file:
+                        image_bytes = img_file.read()
+                    
+                    # Detect aspect ratio
+                    img_original = Image.open(BytesIO(image_bytes))
+                    img_width, img_height = img_original.size
+                    aspect_ratio = img_width / img_height
+                    
+                    # Determine crop percentage
+                    crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
+                    
+                    # Analyze document
+                    cropped_image_base64 = resize_image_for_api(
+                        image_bytes, 
+                        max_size=800, 
+                        crop_top_only=True, 
+                        crop_percentage=crop_percent
+                    )
+                    analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                    
+                    return FolderScanFileResult(
+                        relative_path=relative_path,
+                        original_filename=Path(relative_path).name,
+                        detected_full_name=analysis_result["detected_full_name"],
+                        short_code=analysis_result["short_code"],
+                        confidence_score=analysis_result["confidence"],
+                        status="success"
+                    )
+                    
+                except Exception as e:
+                    logger.error(f"Error processing {relative_path}: {e}")
+                    return FolderScanFileResult(
+                        relative_path=relative_path,
+                        original_filename=Path(relative_path).name,
+                        detected_full_name="Lỗi",
+                        short_code="ERROR",
+                        confidence_score=0.0,
+                        status="error",
+                        error_message=str(e)[:200]
+                    )
+        
+        # Process all images in parallel
+        logger.info(f"Starting parallel processing of {len(image_files)} images...")
+        tasks = [process_single_image(rel_path, abs_path) for rel_path, abs_path in image_files]
+        file_results = await asyncio.gather(*tasks)
+        
+        # Count results
+        success_count = len([r for r in file_results if r.status == "success"])
+        error_count = len([r for r in file_results if r.status == "error"])
+        
+        logger.info(f"Processing complete: {success_count} success, {error_count} errors")
+        
+        # Create result ZIP with PDFs
+        result_zip_path = os.path.join(temp_dir, 'result.zip')
+        create_result_zip(file_results, extract_dir, result_zip_path)
+        
+        # Calculate processing time
+        end_time = datetime.now(timezone.utc)
+        processing_time = (end_time - start_time).total_seconds()
+        
+        # Save result ZIP to a permanent location for download
+        result_filename = f"scan_result_{uuid.uuid4().hex[:8]}.zip"
+        permanent_result_path = os.path.join(ROOT_DIR, 'temp_results', result_filename)
+        os.makedirs(os.path.dirname(permanent_result_path), exist_ok=True)
+        shutil.copy(result_zip_path, permanent_result_path)
+        
+        # Return result
+        return FolderScanResult(
+            total_files=len(image_files),
+            processed_files=len(file_results),
+            success_count=success_count,
+            error_count=error_count,
+            skipped_count=0,
+            processing_time_seconds=processing_time,
+            files=file_results,
+            download_url=f"/api/download-folder-result/{result_filename}"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in folder scan: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Lỗi xử lý: {str(e)}")
+    
+    finally:
+        # Cleanup temp directory (but keep result zip for download)
+        if temp_dir and os.path.exists(temp_dir):
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception as e:
+                logger.warning(f"Could not clean up temp dir: {e}")
+
+
+@api_router.get("/download-folder-result/{filename}")
+async def download_folder_result(filename: str):
+    """Download the result ZIP from folder scan"""
+    try:
+        result_path = os.path.join(ROOT_DIR, 'temp_results', filename)
+        
+        if not os.path.exists(result_path):
+            raise HTTPException(status_code=404, detail="File không tồn tại hoặc đã hết hạn")
+        
+        return FileResponse(
+            result_path,
+            media_type="application/zip",
+            filename=f"scanned_documents_{filename}"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error downloading result: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include the router in the main app
 app.include_router(api_router)
 

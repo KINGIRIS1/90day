@@ -671,24 +671,27 @@ async def scan_document(file: UploadFile = File(...)):
         # Read file content
         content = await file.read()
         
-        # Create FULL image for preview/storage
-        full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1280)
-        
-        # SMART CROP: Detect 2-page spread and use appropriate crop
-        img_temp = Image.open(BytesIO(content))
-        img_width, img_height = img_temp.size
+        # DETECT ASPECT RATIO FROM ORIGINAL IMAGE FIRST (before any resize)
+        img_original = Image.open(BytesIO(content))
+        img_width, img_height = img_original.size
         aspect_ratio = img_width / img_height
+        
+        logger.info(f"Original image: {img_width}x{img_height}, aspect ratio: {aspect_ratio:.2f}")
         
         # If aspect ratio > 1.5, likely 2-page horizontal spread (like GCN cũ)
         if aspect_ratio > 1.5:
             # 2-page spread: Title may be at 40-60%, use 65% crop
             crop_percent = 0.65
-            logger.info(f"Detected 2-page spread (aspect {aspect_ratio:.2f}) → Using 65% crop")
+            logger.info(f"→ Detected 2-page spread → Using 65% crop")
         else:
             # Single page: 50% crop sufficient
             crop_percent = 0.50
-            logger.info(f"Detected single page (aspect {aspect_ratio:.2f}) → Using 50% crop")
+            logger.info(f"→ Detected single page → Using 50% crop")
         
+        # Create FULL image for preview/storage (AFTER detection)
+        full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1280)
+        
+        # Crop and analyze with detected percentage
         cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=800, crop_percentage=crop_percent)
         analysis_result = await analyze_document_with_vision(cropped_image_base64)
         

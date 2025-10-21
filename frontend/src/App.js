@@ -561,7 +561,7 @@ const DocumentScanner = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 1800000, // 30 minutes
+        timeout: 3600000, // 60 minutes for large batches
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percentCompleted);
@@ -582,8 +582,17 @@ const DocumentScanner = () => {
 
     } catch (error) {
       console.error('Error scanning folder:', error);
-      const errorMsg = error.response?.data?.detail || error.message || 'Lỗi không xác định';
-      toast.error(`Lỗi: ${errorMsg}`, { duration: 6000 });
+      
+      let errorMsg = error.response?.data?.detail || error.message || 'Lỗi không xác định';
+      
+      // Better error messages
+      if (error.code === 'ECONNABORTED' || errorMsg.includes('timeout')) {
+        errorMsg = 'Timeout: File quá lớn hoặc quá nhiều files. Khuyến nghị: Chia nhỏ thành các ZIP 50-100 files.';
+      } else if (error.response?.status === 504) {
+        errorMsg = 'Gateway Timeout: Xử lý quá lâu. Vui lòng chia nhỏ ZIP thành các batch 50-100 files.';
+      }
+      
+      toast.error(`Lỗi: ${errorMsg}`, { duration: 8000 });
     } finally {
       setFolderScanLoading(false);
       setUploadProgress(0);

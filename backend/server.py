@@ -1543,7 +1543,7 @@ async def scan_folder(file: UploadFile = File(...)):
         
         logger.info(f"Processing {len(image_files)} files with MAX_CONCURRENT={MAX_CONCURRENT}, MAX_SIZE={MAX_SIZE}")
         
-        async def process_single_image(relative_path: str, absolute_path: str, retry_count=0):
+        async def process_single_image(relative_path: str, absolute_path: str, max_size: int, retry_count=0):
             async with semaphore:
                 max_retries = 2
                 try:
@@ -1559,10 +1559,10 @@ async def scan_folder(file: UploadFile = File(...)):
                     # Determine crop percentage
                     crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
                     
-                    # Analyze document
+                    # Analyze document - use max_size passed from parent
                     cropped_image_base64 = resize_image_for_api(
                         image_bytes, 
-                        max_size=800, 
+                        max_size=max_size,  # Dynamic size based on batch
                         crop_top_only=True, 
                         crop_percentage=crop_percent
                     )
@@ -1589,7 +1589,7 @@ async def scan_folder(file: UploadFile = File(...)):
                     if is_retryable and retry_count < max_retries:
                         logger.warning(f"Retrying {relative_path} (attempt {retry_count + 1}/{max_retries}): {error_msg[:100]}")
                         await asyncio.sleep(2 ** retry_count)  # Exponential backoff
-                        return await process_single_image(relative_path, absolute_path, retry_count + 1)
+                        return await process_single_image(relative_path, absolute_path, max_size, retry_count + 1)
                     
                     logger.error(f"Error processing {relative_path}: {e}")
                     return FolderScanFileResult(

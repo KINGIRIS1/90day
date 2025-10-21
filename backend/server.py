@@ -86,6 +86,7 @@ DOCUMENT_TYPES = {
     "Đơn xin xác nhận lại thời hạn sử dụng đất nông nghiệp": "DXNTH",
     "Giấy chứng nhận kết hôn": "GKH",
     "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất": "GCNM",
+    "Giấy chứng nhận quyền sử dụng đất": "GCNC",
     "Giấy đề nghị xác nhận các khoản nộp vào ngân sách": "GXNNVTC",
     "Giấy Khai Sinh": "GKS",
     "Giấy nộp tiền vào Ngân sách nhà nước": "GNT",

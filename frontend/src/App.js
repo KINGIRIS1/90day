@@ -232,8 +232,8 @@ const DocumentScanner = () => {
         });
       }
       
-      // Process files in smaller chunks with progress updates
-      const CHUNK_SIZE = 10;
+      // Process files in smaller chunks to avoid timeout (reduced from 10 to 5)
+      const CHUNK_SIZE = 5;
       const allResults = [];
       
       for (let i = 0; i < compressedFiles.length; i += CHUNK_SIZE) {

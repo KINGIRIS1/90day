@@ -108,6 +108,17 @@ user_problem_statement: |
   Previous features: 35% crop + quốc huy detection, optimized image size 1024px, rules management UI.
 
 backend:
+  - task: "Folder scanning feature (ZIP upload with structure preservation)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW FEATURE: Added /api/scan-folder endpoint. Accepts ZIP file, extracts, scans all images recursively, creates PDFs, rebuilds ZIP maintaining folder structure. Added helper functions: extract_zip_and_find_images, create_result_zip. Limits: 500 files, 500MB max. Uses same analyze_document_with_vision logic with semaphore concurrency control (MAX_CONCURRENT=5)."
   - task: "Image cropping optimization (35% top crop + quốc huy detection)"
     implemented: true
     working: true

@@ -220,7 +220,26 @@ class FolderBatchResult(BaseModel):
     files: List[FolderScanFileResult]
 
 
-class FolderScanResult(BaseModel):
+class FolderScanJobStatus(BaseModel):
+    """Status of a folder scan job"""
+    job_id: str
+    status: str  # "processing", "completed", "error"
+    total_folders: int
+    completed_folders: int
+    current_folder: Optional[str] = None
+    folder_results: List[FolderBatchResult]
+    error_message: Optional[str] = None
+    started_at: datetime
+    updated_at: datetime
+
+
+class FolderScanStartResponse(BaseModel):
+    """Response when starting a folder scan"""
+    job_id: str
+    message: str
+    total_folders: int
+    total_files: int
+    status_url: str
     """Result for entire folder scan"""
     scan_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     total_folders: int

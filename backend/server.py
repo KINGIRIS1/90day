@@ -374,9 +374,14 @@ Nhận diện tài liệu dựa vào QUỐC HUY và TIÊU ĐỀ.
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
 🔍 Sau đó kiểm tra tiêu đề:
-  • "Giấy chứng nhận quyền sử dụng đất" → GCNM (GCN mới)
-  • "Giấy chứng nhận" + thông tin đất đai → GCN (GCN cũ)
+  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" → GCNM (GCN mới - tiêu đề DÀI)
+  • "Giấy chứng nhận quyền sử dụng đất" (KHÔNG có "quyền sở hữu...") → GCNC (GCN cũ - tiêu đề NGẮN)
+  • Nếu chỉ thấy "GIẤY CHỨNG NHẬN" mà không rõ tiếp theo → GCNC
   • Các loại khác theo danh sách bên dưới
+
+⚠️ IMPORTANT for 2-page horizontal documents:
+- If you see orange/colored background with national emblem on RIGHT side → This is GCNC
+- Focus on the RIGHT page for title
 
 ⚠️ IGNORE any photos/faces in the document - focus ONLY on text and official stamps.
 

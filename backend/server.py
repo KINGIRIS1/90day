@@ -198,6 +198,31 @@ class UpdateRuleRequest(BaseModel):
     short_code: Optional[str] = None
 
 
+class FolderScanFileResult(BaseModel):
+    """Result for a single file in folder scan"""
+    relative_path: str  # Path relative to ZIP root (e.g., "folder1/subfolder/file.jpg")
+    original_filename: str
+    detected_full_name: str
+    short_code: str
+    confidence_score: float
+    status: str  # "success", "error", "skipped"
+    error_message: Optional[str] = None
+
+
+class FolderScanResult(BaseModel):
+    """Result for entire folder scan"""
+    scan_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    total_files: int
+    processed_files: int
+    success_count: int
+    error_count: int
+    skipped_count: int
+    processing_time_seconds: float
+    files: List[FolderScanFileResult]
+    download_url: Optional[str] = None  # URL to download result ZIP
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 async def get_document_rules() -> dict:
     """Get all document rules from database or initialize from DOCUMENT_TYPES"""
     try:

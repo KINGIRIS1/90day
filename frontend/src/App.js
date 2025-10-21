@@ -34,6 +34,12 @@ const DocumentScanner = () => {
   const [retryingIds, setRetryingIds] = useState(new Set());
   const [scanDuration, setScanDuration] = useState(null); // Track scan time
   const [scanStartTime, setScanStartTime] = useState(null);
+  
+  // Folder scanning states
+  const [zipFile, setZipFile] = useState(null);
+  const [folderScanLoading, setFolderScanLoading] = useState(false);
+  const [folderScanResult, setFolderScanResult] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     fetchScanHistory();

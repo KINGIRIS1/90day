@@ -209,17 +209,28 @@ class FolderScanFileResult(BaseModel):
     error_message: Optional[str] = None
 
 
+class FolderBatchResult(BaseModel):
+    """Result for a single folder batch"""
+    folder_name: str
+    total_files: int
+    success_count: int
+    error_count: int
+    processing_time_seconds: float
+    download_url: str
+    files: List[FolderScanFileResult]
+
+
 class FolderScanResult(BaseModel):
     """Result for entire folder scan"""
     scan_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    total_folders: int
     total_files: int
     processed_files: int
     success_count: int
     error_count: int
     skipped_count: int
     processing_time_seconds: float
-    files: List[FolderScanFileResult]
-    download_url: Optional[str] = None  # URL to download result ZIP
+    folder_results: List[FolderBatchResult]  # One per folder
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

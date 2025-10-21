@@ -678,15 +678,16 @@ async def scan_document(file: UploadFile = File(...)):
         
         logger.info(f"Original image: {img_width}x{img_height}, aspect ratio: {aspect_ratio:.2f}")
         
-        # If aspect ratio > 1.5, likely 2-page horizontal spread (like GCN cũ)
-        if aspect_ratio > 1.5:
-            # 2-page spread: Title may be at 40-60%, use 65% crop
+        # If aspect ratio > 1.35, likely 2-page horizontal spread or wide format (like GCN cũ)
+        # Lowered from 1.5 to 1.35 to catch more 2-page documents
+        if aspect_ratio > 1.35:
+            # 2-page spread or wide format: Title may be at 40-60%, use 65% crop
             crop_percent = 0.65
-            logger.info(f"→ Detected 2-page spread → Using 65% crop")
+            logger.info(f"→ Detected 2-page/wide format (aspect {aspect_ratio:.2f}) → Using 65% crop")
         else:
-            # Single page: 50% crop sufficient
+            # Single page portrait: 50% crop sufficient
             crop_percent = 0.50
-            logger.info(f"→ Detected single page → Using 50% crop")
+            logger.info(f"→ Detected single page (aspect {aspect_ratio:.2f}) → Using 50% crop")
         
         # Create FULL image for preview/storage (AFTER detection)
         full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1280)

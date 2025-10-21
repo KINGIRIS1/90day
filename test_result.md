@@ -319,6 +319,28 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      🎯 NEW FEATURE: FOLDER SCANNING WITH ZIP UPLOAD
+      
+      IMPLEMENTATION COMPLETE - NEEDS TESTING:
+      1. ✅ Backend endpoint: POST /api/scan-folder
+      2. ✅ Accepts ZIP file upload (max 500MB, max 500 files)
+      3. ✅ Extracts ZIP, finds all images recursively (.jpg, .jpeg, .png, .webp, .heic, .heif)
+      4. ✅ Scans each image using existing analyze_document_with_vision
+      5. ✅ Creates PDFs for each scanned image
+      6. ✅ Rebuilds ZIP with same folder structure (images → PDFs)
+      7. ✅ Download endpoint: GET /api/download-folder-result/{filename}
+      
+      TESTING NEEDED:
+      - Upload test ZIP with folder structure
+      - Verify all images are found and scanned
+      - Verify folder structure is preserved in result ZIP
+      - Test limits (file count, size)
+      - Test error handling (bad ZIP, no images)
+      
+      Backend restarted and running. Ready for testing.
+      Test ZIP created at /tmp/test_structure.zip (3 images in 2 folders)
+  - agent: "main"
+    message: |
       Updated test_result.md with current implementation status. All backend tasks marked as needs_retesting.
       Priority tasks:
       1. Test image cropping (20% crop capturing title lines 5-7)

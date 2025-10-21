@@ -110,15 +110,18 @@ user_problem_statement: |
 backend:
   - task: "Folder scanning feature (ZIP upload with structure preservation)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "NEW FEATURE: Added /api/scan-folder endpoint. Accepts ZIP file, extracts, scans all images recursively, creates PDFs, rebuilds ZIP maintaining folder structure. Added helper functions: extract_zip_and_find_images, create_result_zip. Limits: 500 files, 500MB max. Uses same analyze_document_with_vision logic with semaphore concurrency control (MAX_CONCURRENT=5)."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE TESTED: Folder scanning with ZIP upload working perfectly! Comprehensive testing completed with 10/10 tests passed. TESTED: 1) Basic folder scan with test ZIP (3 images in 2 folders) - processed successfully, 2) Response validation - all required fields present (scan_id, total_files, success_count, processing_time, files, download_url), 3) Folder structure preservation - PDFs created in exact same folder structure as original images, 4) Download functionality - result ZIP downloaded successfully with correct PDF structure, 5) Error handling - correctly rejects non-ZIP files and empty ZIPs with 400 status, 6) Large folder structures - handles deep nested folders correctly, 7) Mixed file types - correctly processes only image files (.jpg, .png, etc.), 8) File size limits - handles multiple files within limits, 9) Unicode filenames - supports Vietnamese characters in folder/file names, 10) Concurrent processing - uses semaphore (MAX_CONCURRENT=5) for parallel image processing. Backend logs confirm: ZIP extraction working, image detection working, smart cropping applied, LLM integration functional, PDF creation successful, result ZIP generation working. All endpoints functional: POST /api/scan-folder and GET /api/download-folder-result/{filename}. Feature is production-ready!"
   - task: "Image cropping optimization (35% top crop + quốc huy detection)"
     implemented: true
     working: true

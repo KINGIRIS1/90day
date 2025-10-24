@@ -853,21 +853,22 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
                 confidence_score=0.95,  # High confidence for grouped pages
                 image_base64=result.image_base64,
                 user_id=result.user_id,
+                session_id=result.session_id,  # Keep session_id
                 timestamp=result.timestamp
             ))
         else:
-            # This is a new document with clear title
+            # Trang này có tiêu đề KHỚP 100% → Tài liệu mới!
             last_valid_code = result.short_code
             last_valid_name = result.detected_full_name
             continuation_count = 0
             
-            # Mark as page 1 if it has good confidence
-            if result.confidence_score > 0.7:
-                grouped.append(ScanResult(
-                    id=result.id,
-                    original_filename=result.original_filename,
-                    detected_type=f"{result.detected_full_name} (trang 1)",
-                    detected_full_name=f"{result.detected_full_name} (trang 1)",
+            # Đánh dấu là trang 1
+            logger.info(f"Page {i+1} ({result.original_filename}) → Tài liệu mới: {result.detected_full_name} (trang 1)")
+            grouped.append(ScanResult(
+                id=result.id,
+                original_filename=result.original_filename,
+                detected_type=f"{result.detected_full_name} (trang 1)",
+                detected_full_name=f"{result.detected_full_name} (trang 1)",
                     short_code=result.short_code,
                     confidence_score=result.confidence_score,
                     image_base64=result.image_base64,

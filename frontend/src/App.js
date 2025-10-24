@@ -490,9 +490,26 @@ const DocumentScanner = () => {
     setUploadedFiles([]);
   };
 
-  const startEdit = (id, currentCode) => {
+  const startEdit = (id, currentCode, event) => {
+    // Prevent default action and stop propagation
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     setEditingId(id);
     setEditValue(currentCode);
+    
+    // Scroll to the element being edited after a short delay
+    setTimeout(() => {
+      const element = document.querySelector(`[data-result-id="${id}"]`);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100);
   };
 
   const cancelEdit = () => {

@@ -45,6 +45,9 @@ api_router = APIRouter(prefix="/api")
 # Emergent LLM Key
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 
+# Import auth dependencies after database setup
+from auth_dependencies import get_current_user, require_approved_user, require_admin
+
 # Document type mapping
 DOCUMENT_TYPES = {
     "Bản mô tả ranh giới, mốc giới thửa đất": "BMT",

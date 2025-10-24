@@ -145,6 +145,14 @@ DOCUMENT_TYPES = {
     "Quyết định điều chỉnh quyết định giao đất (cho thuê đất, cho phép chuyển mục đích)": "QDDCGD",
     "Quyết định điều chỉnh thời hạn SDĐ của dự án đầu tư": "QDDCTH",
     "Quyết định gia hạn sử dụng đất khi hết thời hạn SDĐ": "QDGH",
+class LlmHealth(BaseModel):
+    status: str
+    provider: str
+    model: Optional[str] = None
+    openai_available: bool = False
+    emergent_available: bool = False
+    details: Optional[str] = None
+
     "Quyết định giao đất, cho thuê đất": "QDGTD",
     "Quyết định hủy Giấy chứng nhận quyền sử dụng đất": "QDHG",
     "Quyết định phê duyệt phương án bồi thường, hỗ trợ, tái định cư": "QDPDBT",

@@ -1033,7 +1033,10 @@ async def update_filename(
 
 
 @api_router.post("/export-single-document")
-async def export_single_document(request: ExportPDFRequest):
+async def export_single_document(
+    request: ExportPDFRequest,
+    current_user: dict = Depends(require_approved_user)
+):
     """Export a single document as PDF"""
     try:
         # Get scan result

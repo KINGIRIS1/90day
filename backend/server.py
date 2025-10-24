@@ -856,6 +856,10 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
                 session_id=result.session_id,  # Keep session_id
                 timestamp=result.timestamp
             ))
+        elif is_continuation and not last_valid_code:
+            # Trang đầu tiên không có tiêu đề → Giữ nguyên UNKNOWN
+            logger.info(f"Page {i+1} ({result.original_filename}) → Không rõ (không có tài liệu trước)")
+            grouped.append(result)
         else:
             # Trang này có tiêu đề KHỚP 100% → Tài liệu mới!
             last_valid_code = result.short_code

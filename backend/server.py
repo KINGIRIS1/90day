@@ -900,7 +900,7 @@ async def batch_scan(
         MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))  # Default 2 for deployed env
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        async def process_file(file, current_user_dict, session_id, retry_count=0):
+        async def process_file(file, current_user_dict, session_id, file_index, retry_count=0):
             async with semaphore:  # Control concurrency
                 max_retries = 2
                 try:
@@ -933,7 +933,7 @@ async def batch_scan(
                         session_id=session_id  # Add session ID
                     )
                     
-                    return scan_result
+                    return (file_index, scan_result)  # Return with index
                 except Exception as e:
                     error_msg = str(e)
                     

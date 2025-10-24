@@ -96,6 +96,16 @@ export default function AdminPanel() {
               Quản Lý Users
             </CardTitle>
           </CardHeader>
+        {/* LLM Status Panel */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">LLM Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LlmStatus />
+          </CardContent>
+        </Card>
+
         </Card>
 
         {/* Tabs */}

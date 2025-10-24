@@ -1421,15 +1421,15 @@ async def root():
 
 @api_router.get("/setup-admin")
 async def setup_admin_endpoint():
-    """One-time admin setup endpoint - accessible via browser for easy deployment setup"""
+    """One-time admin setup endpoint - accessible via browser for easy deployment setup
+    This will DELETE any existing 'admin' user (including pending ones) and create a fresh admin account
+    """
     users_collection = db["users"]
     
-    # Check if admin exists
-    existing = await users_collection.find_one({"username": "admin"})
-    if existing:
-        return {"message": "Admin already exists", "status": "exists"}
+    # Delete ALL existing users with username "admin" (including pending ones)
+    delete_result = await users_collection.delete_many({"username": "admin"})
     
-    # Create admin
+    # Create fresh admin account
     from auth_utils import PasswordHasher
     admin_password = "Thommit@19"
     hashed = PasswordHasher.hash_password(admin_password)
@@ -1458,9 +1458,10 @@ async def setup_admin_endpoint():
         pass
     
     return {
-        "message": "Admin created successfully",
+        "message": "Admin account created successfully (deleted {} existing admin account(s))".format(delete_result.deleted_count),
         "username": "admin",
-        "user_id": str(result.inserted_id)
+        "user_id": str(result.inserted_id),
+        "deleted_old_accounts": delete_result.deleted_count
     }
 
 

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Scan - Direct API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        input[type="file"] { margin: 10px 0; }
+        .step { margin: 15px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Scan Trực Tiếp (Bypass Cache)</h1>
+    
+    <div class="step">
+        <h3>Bước 1: Đăng nhập</h3>
+        <button onclick="login()">Đăng nhập (admin / Thommit@19)</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Bước 2: Chọn file và Scan</h3>
+        <input type="file" id="fileInput" accept="image/*" multiple>
+        <button onclick="scanFiles()">Quét File</button>
+        <div id="scanResult"></div>
+    </div>
+
+    <script>
+        let authToken = '';
+        const API_URL = window.location.origin;
+        
+        async function login() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Đang đăng nhập...';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'Thommit@19'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    resultDiv.innerHTML = `<div class="result success">✅ Đăng nhập thành công!\nToken: ${authToken.substring(0, 50)}...</div>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<div class="result error">❌ Lỗi: ${response.status}\n${error}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Lỗi: ${error.message}</div>`;
+            }
+        }
+        
+        async function scanFiles() {
+            const resultDiv = document.getElementById('scanResult');
+            const fileInput = document.getElementById('fileInput');
+            
+            if (!authToken) {
+                resultDiv.innerHTML = '<div class="result error">❌ Vui lòng đăng nhập trước!</div>';
+                return;
+            }
+            
+            if (fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">❌ Vui lòng chọn file!</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Đang quét...';
+            
+            try {
+                const formData = new FormData();
+                for (let file of fileInput.files) {
+                    formData.append('files', file);
+                }
+                
+                const startTime = Date.now();
+                const response = await fetch(`${API_URL}/api/batch-scan`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    },
+                    body: formData
+                });
+                
+                const endTime = Date.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(2);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let resultHTML = `<div class="result success">`;
+                    resultHTML += `✅ Quét thành công! (${duration}s)\n\n`;
+                    resultHTML += `HTTP Status: ${response.status}\n`;
+                    resultHTML += `Số file: ${data.length}\n\n`;
+                    data.forEach((item, idx) => {
+                        resultHTML += `File ${idx + 1}: ${item.original_filename}\n`;
+                        resultHTML += `  - Loại: ${item.detected_full_name}\n`;
+                        resultHTML += `  - Mã: ${item.short_code}\n`;
+                        resultHTML += `  - Độ tin cậy: ${(item.confidence_score * 100).toFixed(0)}%\n\n`;
+                    });
+                    resultHTML += `</div>`;
+                    resultDiv.innerHTML = resultHTML;
+                } else {
+                    const errorText = await response.text();
+                    resultDiv.innerHTML = `<div class="result error">❌ Lỗi ${response.status} (${duration}s)\n\n${errorText}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">❌ Exception: ${error.message}\n\nStack: ${error.stack}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

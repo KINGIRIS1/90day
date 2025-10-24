@@ -1542,17 +1542,4 @@ const DocumentScanner = () => {
     </div>
   );
 };
-
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<DocumentScanner />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
-}
-
 export default App;

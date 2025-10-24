@@ -11,13 +11,10 @@ security = HTTPBearer()
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncIOMotorDatabase = None
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """Extract and validate current user from JWT token"""
-    if db is None:
-        from server import db as server_db
-        db = server_db.db
+    from server import db
     
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

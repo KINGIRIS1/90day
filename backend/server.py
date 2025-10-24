@@ -1844,7 +1844,7 @@ async def register(user_data: UserRegisterRequest):
 @auth_router.post("/login", response_model=TokenResponse)
 async def login(login_data: UserLoginRequest):
     """Authenticate user and return access token"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     
     # Find user
     user = await users_collection.find_one({"username": login_data.username.lower()})
@@ -1915,7 +1915,7 @@ admin_router = APIRouter(prefix="/api/admin", tags=["admin"])
 @admin_router.get("/users/pending")
 async def get_pending_users(admin: dict = Depends(require_admin)):
     """List all pending users awaiting approval"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     pending_users = await users_collection.find({"status": "pending"}).to_list(None)
     
     return [
@@ -1933,7 +1933,7 @@ async def get_pending_users(admin: dict = Depends(require_admin)):
 @admin_router.get("/users/all")
 async def get_all_users(admin: dict = Depends(require_admin)):
     """List all users"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     all_users = await users_collection.find({}).to_list(None)
     
     return [
@@ -1954,7 +1954,7 @@ async def get_all_users(admin: dict = Depends(require_admin)):
 @admin_router.post("/users/approve/{user_id}")
 async def approve_user(user_id: str, admin: dict = Depends(require_admin)):
     """Approve a pending user"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     
     result = await users_collection.find_one_and_update(
         {"_id": ObjectId(user_id), "status": "pending"},
@@ -1982,7 +1982,7 @@ async def approve_user(user_id: str, admin: dict = Depends(require_admin)):
 @admin_router.post("/users/disable/{user_id}")
 async def disable_user(user_id: str, admin: dict = Depends(require_admin)):
     """Disable a user account"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     
     result = await users_collection.find_one_and_update(
         {"_id": ObjectId(user_id)},
@@ -2005,7 +2005,7 @@ async def disable_user(user_id: str, admin: dict = Depends(require_admin)):
 @admin_router.post("/users/enable/{user_id}")
 async def enable_user(user_id: str, admin: dict = Depends(require_admin)):
     """Enable a user account"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     
     result = await users_collection.find_one_and_update(
         {"_id": ObjectId(user_id)},

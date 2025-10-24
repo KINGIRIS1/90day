@@ -1419,6 +1419,51 @@ async def root():
     return {"message": "Document Scanner API"}
 
 
+@api_router.post("/setup-admin")
+async def setup_admin_endpoint():
+    """One-time admin setup endpoint - should be removed after first use"""
+    users_collection = db["users"]
+    
+    # Check if admin exists
+    existing = await users_collection.find_one({"username": "admin"})
+    if existing:
+        return {"message": "Admin already exists", "status": "exists"}
+    
+    # Create admin
+    from auth_utils import PasswordHasher
+    admin_password = "Thommit@19"
+    hashed = PasswordHasher.hash_password(admin_password)
+    
+    admin_user = {
+        "email": "admin@smartdocscan.com",
+        "username": "admin",
+        "hashed_password": hashed,
+        "full_name": "Admin",
+        "roles": ["admin", "user"],
+        "status": "approved",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+        "approved_at": datetime.now(timezone.utc),
+        "approved_by": None
+    }
+    
+    result = await users_collection.insert_one(admin_user)
+    
+    # Create indexes
+    try:
+        await users_collection.create_index("email", unique=True)
+        await users_collection.create_index("username", unique=True)
+    except:
+        pass
+    
+    return {
+        "message": "Admin created successfully",
+        "username": "admin",
+        "user_id": str(result.inserted_id)
+    }
+
+
 # ==================== FOLDER SCANNING FEATURE ====================
 
 SUPPORTED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'}

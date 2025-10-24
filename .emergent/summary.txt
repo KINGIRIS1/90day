@@ -1,93 +1,17 @@
 <analysis>
-The AI engineer has been meticulously developing and debugging a document scanning application. Initially, it built out core functionalities like OCR, automatic renaming, PDF export, batch processing, and a rules management UI. Significant effort was then directed towards performance, ZIP archive processing with folder structure preservation, and real-time progressive downloads. A crucial phase involved implementing a robust JWT authentication system with user registration, admin approval, and an admin panel.
-
-The latest interactions primarily focused on resolving critical deployment-related issues and refining core logic. This included fixing persistent 520 errors on the deployed application, which required deep troubleshooting to identify scope issues in nested functions ( not accessible),  vs. UUID mismatches, and ensuring authentication headers were correctly applied across all frontend API calls. The AI engineer also addressed user feedback on history grouping, a scan more button, and refined the CONTINUATION document naming rule to be stricter, requiring exact matches for new document types.
-
-The current challenge revolves around migrating the application to a production-grade environment, specifically Railway. The AI engineer has been providing multiple, increasingly updated guides for Railway deployment, continuously adapting to user feedback and Railway's evolving interface, while troubleshooting persistent build errors like pip: command not found.
+The AI engineer's recent work focused on resolving deployment and functional issues. Initially, the challenge was persistent build errors on Railway, like pip: command not found, which required iterative adjustments to  and  for proper Python environment and package management, including  downgrade. Following successful backend deployment, an  during admin setup pointed to incorrect  and missing environment variables, eventually prompting a migration to MongoDB Atlas. Post-migration, admin setup worked, but a critical LLM-related error () emerged during document analysis, indicating an issue with the LLM API key. A frontend bug causing page jumps during filename editing was identified and fixed by adding  in . The LLM key issue remains the primary unresolved problem, with the user considering Gemini.
 </analysis>
 
 <product_requirements>
-The application's core purpose is to scan land-related document images, use OpenAI GPT-4 Vision for content recognition (especially Vietnamese text), and automatically rename them with predefined Vietnamese short codes (e.g., Giấy chứng nhận to GCN) before exporting as PDFs.
-
-Key features implemented include:
-1.  **Image Scanning & OCR**: OpenAI GPT-4 Vision for accurate recognition with Emergent LLM Key.
-2.  **Automatic Naming**: Rule-based renaming using short codes.
-3.  **PDF Export**: Single, merged, and smart merging of multi-page documents with dynamic paper size/orientation.
-4.  **Batch Processing**: Simultaneous upload and scanning.
-5.  **Scan History**: Maintained history with filename editing.
-6.  **Performance Optimization**: Image resizing, dynamic cropping, client-side compression, backend concurrency.
-7.  **Progress Tracking & Error Handling**: Real-time display of progress and errors.
-8.  **Rules Management UI**: Frontend for managing recognition rules.
-
-Recent additions/refinements:
-1.  **Large-Scale Folder Scanning**: ZIP uploads, maintaining folder structure, individual PDF generation per file.
-2.  **Folder-Based Processing**: Sequential scanning by sub-folders, real-time progressive downloads.
-3.  **Authentication & Authorization**: User registration, mandatory JWT login, admin account (), admin panel for user management, history grouped by session.
-4.  **Performance & UX Fixes**: Addressed slow upload/download, page scrolling, lazy-loading history.
-5.  **Stricter Naming Rules**: AI should only change document type on 100% exact title match; otherwise, continue with the previous document type, not UNKNOWN.
-6.  **Cross-Batch Grouping**: Maintain naming context across multiple uploaded batches.
-7.  **Deployment to Railway**: User wants to move the application to Railway for better scalability and concurrent user support (up to 30 users).
+The application is a document scanning tool for land-related images, utilizing OpenAI GPT-4 Vision (via Emergent LLM Key) for OCR and automated renaming with Vietnamese short codes, followed by PDF export (single, merged, smart merging). It supports batch processing, scan history with editing, and performance optimizations. Recent enhancements include large-scale folder scanning with ZIP uploads, sequential processing, robust JWT authentication (user registration, admin approval, admin panel), session-grouped history, and stricter naming conventions. The primary objective is production deployment on platforms like Railway (and later Render.com) to support up to 30 concurrent users.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database).
--   **AI/OCR**: OpenAI GPT-4 Vision, Emergent LLM Key for content recognition.
--   **Image Processing**: Pillow, .
--   **PDF Manipulation**: .
--   **Asynchronous Programming**: , .
--   **Authentication**: JWT (JSON Web Tokens), , Pydantic models.
--   **Routing**:  v7.
--   **Deployment**: Kubernetes (Emergent platform), Railway, Render.com, Docker/Nixpacks (for build configurations).
-</key_technical_concepts>
-
-<code_architecture>
-The application follows a standard full-stack architecture with a FastAPI backend and a React frontend.
-
-
-
--   ****:
-    -   **Importance**: Core backend logic. Handles API, LLM, DB, PDF. Now includes ZIP processing, folder-based scanning, and authentication routes.
-    -   **Changes Made**:
-        -   Changed  from POST to GET, then modified to delete existing admin users before creating a new one.
-        -   Removed temporary  endpoint and related  import.
-        -   Modified prompt for GPT-4 Vision to enforce 100% exact match for document titles and remove CONTINUATION short code.
-        -   Updated  logic to handle stricter naming rules, propagating  more robustly and ensuring trang 1 is added for new documents.
-        -   Introduced  into  model and  endpoint to group scans.
-        -   Fixed  values and added  and  to .
-        -   Addressed scope issues in nested  and  functions by passing  explicitly.
-        -   Modified  to accept  to maintain grouping context across multiple batches.
--   ****:
-    -   **Importance**: Main React Router component.
-    -   **Changes Made**: Added a route for the new  page.
--   ****:
-    -   **Importance**: Main document scanner UI and logic.
-    -   **Changes Made**: Added  helper function and applied authentication headers to all API calls (batch scan, folder scan, delete, update filename, export, clear history). Fixed a syntax error (extra ). Added a Quét thêm (Scan more) button. Updated  to send .
--   ****:
-    -   **Importance**: Authentication utilities (hashing, JWT).
-    -   **Changes Made**: Increased JWT  from 30 minutes to 24 hours.
--   ****:
-    -   **Importance**: FastAPI dependencies for authentication.
-    -   **Changes Made**: Modified  to handle  as a string (UUID) instead of converting to , preventing crashes.
--   ****: **New file created**. Provides UI and logic for setting up the admin user, including messages for success/failure and warnings about existing admin accounts.
--   ****:
-    -   **Importance**: Component for managing document rules.
-    -   **Changes Made**: Integrated  hook and added authentication headers to , , , and  API calls.
--   ****: **New file created**. Excludes  and  to prevent large files from being included in Docker builds.
--   **, **: **New files created**. Configuration files for Railway deployment (though their usage/efficacy is still being determined by recent Railway changes).
--   **, **: **New files created**. Nixpacks configuration files (also part of the evolving Railway deployment strategy).
--   **, **: **New files created**. Procfile for process commands on platforms like Railway.
--   ****:
-    -   **Importance**: Node.js dependencies and scripts.
-    -   **Changes Made**: Added  package for static file serving.
-</code_architecture>
-
-<pending_tasks>
--   Resolve the  error during Railway deployment, which indicates an issue with Python environment setup or  configuration.
--   Successfully deploy the application to Railway, following the latest instructions for their updated interface.
-</pending_tasks>
-
-<current_work>
-Immediately before this summary request, the AI engineer was attempting to guide the user through deploying the application to Railway. The user reported a recurring build error on Railway: RUN pip install -r requirements.txt /bin/bash: line 1: pip: command not found Error: Docker build failed (Chat Message 600). This indicates that the 
+-   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database, including Atlas).
+-   **AI/OCR**: OpenAI GPT-4 Vision, Emergent LLM Key.
+-   **Authentication**: JWT, bcrypt, Pydantic.
+-   **Deployment**: Railway, Nixpacks, Procfile, Docker, Render.com.
+-   **Python Environment**: , 
 Usage:   
   pip <command> [options]
 
@@ -163,11 +87,30 @@ General Options:
                               removed in the future.
   --resume-retries <resume_retries>
                               Maximum attempts to resume or restart an
-                              incomplete download. (default: 5) command is not available in the build environment when Railway attempts to install Python dependencies. The user also noted that the Railway deployment process seemed to have changed significantly from previous instructions (Chat Message 596, 598).
+                              incomplete download. (default: 5), .
+-   **Web Technologies**: CORS, , Shadcn UI.
+</key_technical_concepts>
 
-The AI engineer had created several configuration files (, ,  for both backend and frontend) and modified  to include a  script, attempting to address Railway's monorepo and build process. However, the  error suggests a more fundamental issue with how Railway's build system (likely Nixpacks) is setting up the Python environment, or how the  or explicit build commands are configured. The AI engineer acknowledges this as a  config issue and is preparing to address it.
+<code_architecture>
+
+-   : Crucial for Railway builds, configured Python environment, virtual environment activation,  installation, and  start command.
+-   : Python dependencies.  was downgraded to  for Python 3.10 compatibility.
+-   : Main UI for document scanning. Modified to add  to , , and an input field's  to prevent page jumps.
+-   : Defines process commands for Railway. Updated to  for correct service startup.
+-   , : Railway deployment configurations. Removed  commands to allow automatic service detection.
+</code_architecture>
+
+<pending_tasks>
+-   Resolve the  error, indicating an issue with LLM API key configuration.
+-   Address user's difficulty with using and securely managing LLM API keys.
+-   Debug the  error.
+</pending_tasks>
+
+<current_work>
+Immediately before this summary request, the AI engineer was focused on two main issues. The primary, unresolved problem is the  error occurring during document analysis. This error suggests a misconfiguration or invalidity of the LLM API key (either  or a user-provided OpenAI key), resulting in a  response object. The  had been retrieved previously, and the user was advised on environment variable settings, but mistakenly exposed an OpenAI key multiple times. Concurrently, a frontend bug causing the page to jump when editing filenames was reported. This bug was successfully fixed by modifying  to include  in ,  functions, and the  event handler for the filename input. The frontend fix is complete, leaving the LLM key issue as the main pending item.
 </current_work>
 
 <optional_next_step>
-Provide the corrected Nixpacks configuration or Railway build commands to resolve the  error for the backend service.
+Wait for the user to confirm their choice for the LLM API key (EMERGENT_LLM_KEY, their Gemini key, or their OpenAI key).
 </optional_next_step>
+

@@ -869,14 +869,13 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
                 original_filename=result.original_filename,
                 detected_type=f"{result.detected_full_name} (trang 1)",
                 detected_full_name=f"{result.detected_full_name} (trang 1)",
-                    short_code=result.short_code,
-                    confidence_score=result.confidence_score,
-                    image_base64=result.image_base64,
-                    user_id=result.user_id,
-                    timestamp=result.timestamp
-                ))
-            else:
-                grouped.append(result)
+                short_code=result.short_code,
+                confidence_score=result.confidence_score,
+                image_base64=result.image_base64,
+                user_id=result.user_id,
+                session_id=result.session_id,  # Keep session_id
+                timestamp=result.timestamp
+            ))
     
     return grouped
 

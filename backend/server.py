@@ -166,6 +166,7 @@ class ScanResult(BaseModel):
     short_code: str
     confidence_score: float
     image_base64: str
+    user_id: Optional[str] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

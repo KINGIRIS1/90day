@@ -43,6 +43,25 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 # Emergent LLM Key
+# OpenAI direct integration (primary)
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+OPENAI_MODEL = os.environ.get('OPENAI_MODEL', 'gpt-4o-mini')
+LLM_FALLBACK_ENABLED = os.environ.get('LLM_FALLBACK_ENABLED', 'true').lower() == 'true'
+
+# Lazy OpenAI client init
+_openai_client = None
+
+def get_openai_client():
+    global _openai_client
+    if _openai_client is None and OPENAI_API_KEY:
+        try:
+            from openai import OpenAI
+            _openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        except Exception as e:
+            logger.error(f"Failed to initialize OpenAI client: {e}")
+            _openai_client = None
+    return _openai_client
+
 EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY')
 
 # Import auth dependencies after database setup

@@ -713,7 +713,10 @@ async def retry_scan(scan_id: str):
 
 
 @api_router.post("/scan-document", response_model=ScanResult)
-async def scan_document(file: UploadFile = File(...)):
+async def scan_document(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(require_approved_user)
+):
     """Scan a single document and detect type"""
     try:
         # Read file content

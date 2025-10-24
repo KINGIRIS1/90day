@@ -1753,6 +1753,250 @@ async def download_folder_result(filename: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+
+# ==================== AUTHENTICATION ENDPOINTS ====================
+from auth_models import UserRegisterRequest, UserLoginRequest, TokenResponse
+from auth_utils import PasswordHasher, TokenManager
+from auth_dependencies import get_current_user, require_approved_user, require_admin
+
+auth_router = APIRouter(prefix="/api/auth", tags=["authentication"])
+
+
+@auth_router.post("/register", status_code=201)
+async def register(user_data: UserRegisterRequest):
+    """Register a new user (pending approval)"""
+    users_collection = db.db["users"]
+    
+    # Check for existing email
+    existing_email = await users_collection.find_one({"email": user_data.email.lower()})
+    if existing_email:
+        raise HTTPException(status_code=409, detail="Email already registered")
+    
+    # Check for existing username  
+    existing_username = await users_collection.find_one({"username": user_data.username.lower()})
+    if existing_username:
+        raise HTTPException(status_code=409, detail="Username already taken")
+    
+    # Hash password and create user
+    hashed_password = PasswordHasher.hash_password(user_data.password)
+    new_user = {
+        "email": user_data.email.lower(),
+        "username": user_data.username.lower(),
+        "hashed_password": hashed_password,
+        "full_name": user_data.full_name,
+        "roles": ["user"],
+        "status": "pending",  # pending, approved, disabled
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+        "approved_at": None,
+        "approved_by": None
+    }
+    
+    result = await users_collection.insert_one(new_user)
+    
+    return {
+        "message": "Registration successful. Awaiting admin approval.",
+        "user_id": str(result.inserted_id),
+        "email": new_user["email"],
+        "status": new_user["status"]
+    }
+
+
+@auth_router.post("/login", response_model=TokenResponse)
+async def login(login_data: UserLoginRequest):
+    """Authenticate user and return access token"""
+    users_collection = db.db["users"]
+    
+    # Find user
+    user = await users_collection.find_one({"username": login_data.username.lower()})
+    
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password"
+        )
+    
+    # Verify password
+    if not PasswordHasher.verify_password(login_data.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password"
+        )
+    
+    # Check user status
+    if user["status"] != "approved":
+        raise HTTPException(
+            status_code=403,
+            detail=f"User account is {user['status']}. Please contact admin."
+        )
+    
+    if not user.get("is_active", False):
+        raise HTTPException(
+            status_code=403,
+            detail="User account is disabled"
+        )
+    
+    # Create access token
+    access_token = TokenManager.create_access_token(
+        data={"sub": str(user["_id"]), "username": user["username"]}
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": str(user["_id"]),
+            "username": user["username"],
+            "email": user["email"],
+            "full_name": user.get("full_name"),
+            "roles": user.get("roles", []),
+            "status": user["status"]
+        }
+    }
+
+
+@auth_router.get("/me")
+async def get_current_user_info(current_user: dict = Depends(require_approved_user)):
+    """Get current authenticated user info"""
+    return {
+        "id": str(current_user["_id"]),
+        "username": current_user["username"],
+        "email": current_user["email"],
+        "full_name": current_user.get("full_name"),
+        "roles": current_user.get("roles", []),
+        "status": current_user["status"],
+        "created_at": current_user["created_at"]
+    }
+
+
+# Admin endpoints
+admin_router = APIRouter(prefix="/api/admin", tags=["admin"])
+
+
+@admin_router.get("/users/pending")
+async def get_pending_users(admin: dict = Depends(require_admin)):
+    """List all pending users awaiting approval"""
+    users_collection = db.db["users"]
+    pending_users = await users_collection.find({"status": "pending"}).to_list(None)
+    
+    return [
+        {
+            "id": str(user["_id"]),
+            "email": user["email"],
+            "username": user["username"],
+            "full_name": user.get("full_name"),
+            "created_at": user["created_at"]
+        }
+        for user in pending_users
+    ]
+
+
+@admin_router.get("/users/all")
+async def get_all_users(admin: dict = Depends(require_admin)):
+    """List all users"""
+    users_collection = db.db["users"]
+    all_users = await users_collection.find({}).to_list(None)
+    
+    return [
+        {
+            "id": str(user["_id"]),
+            "email": user["email"],
+            "username": user["username"],
+            "full_name": user.get("full_name"),
+            "roles": user.get("roles", []),
+            "status": user["status"],
+            "is_active": user.get("is_active", True),
+            "created_at": user["created_at"]
+        }
+        for user in all_users
+    ]
+
+
+@admin_router.post("/users/approve/{user_id}")
+async def approve_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Approve a pending user"""
+    users_collection = db.db["users"]
+    
+    result = await users_collection.find_one_and_update(
+        {"_id": ObjectId(user_id), "status": "pending"},
+        {
+            "$set": {
+                "status": "approved",
+                "approved_at": datetime.now(timezone.utc),
+                "approved_by": str(admin["_id"]),
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        return_document=True
+    )
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found or not in pending status")
+    
+    return {
+        "message": "User approved successfully",
+        "user_id": str(result["_id"]),
+        "status": result["status"]
+    }
+
+
+@admin_router.post("/users/disable/{user_id}")
+async def disable_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Disable a user account"""
+    users_collection = db.db["users"]
+    
+    result = await users_collection.find_one_and_update(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "is_active": False,
+                "status": "disabled",
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        return_document=True
+    )
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User disabled successfully"}
+
+
+@admin_router.post("/users/enable/{user_id}")
+async def enable_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Enable a user account"""
+    users_collection = db.db["users"]
+    
+    result = await users_collection.find_one_and_update(
+        {"_id": ObjectId(user_id)},
+        {
+            "$set": {
+                "is_active": True,
+                "status": "approved",
+                "updated_at": datetime.now(timezone.utc)
+            }
+        },
+        return_document=True
+    )
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User enabled successfully"}
+
+
+app.include_router(auth_router)
+app.include_router(admin_router)
+
+
+# ==================== END AUTHENTICATION ====================
+
+
+# Include the router in the main app
+app.include_router(api_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

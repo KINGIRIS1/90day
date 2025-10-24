@@ -1160,7 +1160,10 @@ async def export_pdf_single(
 
 
 @api_router.post("/export-pdf-merged")
-async def export_pdf_merged(request: ExportPDFRequest):
+async def export_pdf_merged(
+    request: ExportPDFRequest,
+    current_user: dict = Depends(require_approved_user)
+):
     """Export all scans merged into one PDF"""
     try:
         # Get scan results

@@ -42,10 +42,14 @@ const DocumentScanner = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [scanJobId, setScanJobId] = useState(null);
   const [pollingInterval, setPollingInterval] = useState(null);
+  
+  // History lazy loading
+  const [historyLoaded, setHistoryLoaded] = useState(false);
 
-  useEffect(() => {
-    fetchScanHistory();
-  }, []);
+  // DON'T auto-load history on mount - only load when user clicks History tab
+  // useEffect(() => {
+  //   fetchScanHistory();
+  // }, []);
 
   const fetchScanHistory = async () => {
     try {

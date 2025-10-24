@@ -863,7 +863,7 @@ async def batch_scan(
         MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))  # Default 2 for deployed env
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        async def process_file(file, retry_count=0):
+        async def process_file(file, current_user_dict, retry_count=0):
             async with semaphore:  # Control concurrency
                 max_retries = 2
                 try:
@@ -892,7 +892,7 @@ async def batch_scan(
                         short_code=analysis_result["short_code"],
                         confidence_score=analysis_result["confidence"],
                         image_base64=full_image_base64,  # Store full image
-                        user_id=current_user.get("id")
+                        user_id=current_user_dict.get("id") if current_user_dict else None
                     )
                     
                     return scan_result

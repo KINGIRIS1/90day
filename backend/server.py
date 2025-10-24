@@ -1013,6 +1013,16 @@ async def batch_scan(
         logger.info(f"Received {len(results)} scan results in correct order")
         
         # SMART GROUPING: Apply continuation logic
+        # IMPORTANT: Merge with previous results for cross-batch grouping
+        if previous_scan_results:
+            logger.info(f"Merging with {len(previous_scan_results)} previous results for continuation")
+            all_results = previous_scan_results + results
+            grouped_results = apply_smart_grouping(all_results)
+            # Return only NEW results (skip previous ones)
+            new_grouped_results = grouped_results[len(previous_scan_results):]
+        else:
+            logger.info("No previous results, applying grouping to current batch only")
+            new_grouped_results = apply_smart_grouping(results)
         logger.info("Applying smart grouping for multi-page documents...")
         grouped_results = apply_smart_grouping(results)
         

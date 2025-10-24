@@ -897,7 +897,8 @@ async def batch_scan(
                         short_code=analysis_result["short_code"],
                         confidence_score=analysis_result["confidence"],
                         image_base64=full_image_base64,  # Store full image
-                        user_id=current_user_dict.get("id") if current_user_dict else None
+                        user_id=current_user_dict.get("id") if current_user_dict else None,
+                        session_id=session_id  # Add session ID
                     )
                     
                     return scan_result

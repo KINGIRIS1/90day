@@ -1524,6 +1524,30 @@ async def cleanup_duplicate_rules():
         
         # Collect IDs to delete (keep first, delete rest)
         ids_to_delete = []
+        for group in duplicates_groups:
+            # Keep first ID, delete the rest
+            ids_to_delete.extend(group["ids"][1:])
+        
+        if ids_to_delete:
+            # Delete duplicates in batch
+            delete_result = await db.document_rules.delete_many({"id": {"$in": ids_to_delete}})
+            deleted_count = delete_result.deleted_count
+        else:
+            deleted_count = 0
+        
+        # Get final count
+        remaining_count = await db.document_rules.count_documents({})
+        
+        return {
+            "message": f"Đã xóa {deleted_count} quy tắc trùng lặp",
+            "deleted": deleted_count,
+            "remaining": remaining_count
+        }
+        
+    except Exception as e:
+        logger.error(f"Error cleaning up duplicates: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @api_router.get("/llm/health", response_model=LlmHealth)
 async def llm_health():

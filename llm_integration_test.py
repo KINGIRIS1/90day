@@ -156,7 +156,7 @@ class LLMIntegrationTester:
             
             # Prepare request
             headers = {"Authorization": f"Bearer {self.auth_token}"}
-            files = {'file': ('test.png', test_image, 'image/png')}
+            files = {'file': ('test.jpg', test_image, 'image/jpeg')}
             
             response = requests.post(f"{self.base_url}/scan-document", 
                                    headers=headers, files=files)

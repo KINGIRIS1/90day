@@ -716,7 +716,11 @@ const DocumentScanner = () => {
     const isSelected = selectedIds.has(result.id);
     
     return (
-    <Card className={`overflow-hidden hover-card ${isError ? 'border-red-500 border-2' : ''} ${isSelected ? 'ring-2 ring-blue-500' : ''}`} data-testid={`result-card-${result.id}`}>
+    <Card 
+      className={`overflow-hidden hover-card ${isError ? 'border-red-500 border-2' : ''} ${isSelected ? 'ring-2 ring-2 ring-blue-500' : ''}`} 
+      data-testid={`result-card-${result.id}`}
+      data-result-id={result.id}
+    >
       {/* Checkbox for bulk selection */}
       {showCheckbox && (
         <div className="absolute top-2 left-2 z-10">

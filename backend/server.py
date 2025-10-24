@@ -1701,7 +1701,7 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
             MAX_SIZE = 700 if len(image_files) > 50 else 800
             semaphore = asyncio.Semaphore(MAX_CONCURRENT)
             
-            async def process_single_image(relative_path: str, absolute_path: str, max_size: int, retry_count=0):
+            async def process_single_image(relative_path: str, absolute_path: str, max_size: int, current_user_dict: dict, retry_count=0):
                 async with semaphore:
                     max_retries = 2
                     try:
@@ -1725,7 +1725,7 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                             short_code=analysis_result["short_code"],
                             confidence_score=analysis_result["confidence"],
                             status="success",
-                            user_id=current_user.get("id")
+                            user_id=current_user_dict.get("id") if current_user_dict else None
                         )
                     except Exception as e:
                         error_msg = str(e)
@@ -1734,7 +1734,7 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                         
                         if is_retryable and retry_count < max_retries:
                             await asyncio.sleep(2 ** retry_count)
-                            return await process_single_image(relative_path, absolute_path, max_size, retry_count + 1)
+                            return await process_single_image(relative_path, absolute_path, max_size, current_user_dict, retry_count + 1)
                         
                         logger.error(f"Error processing {relative_path}: {e}")
                         return FolderScanFileResult(
@@ -1745,11 +1745,11 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                             confidence_score=0.0,
                             status="error",
                             error_message=str(e)[:200],
-                            user_id=current_user.get("id")
+                            user_id=current_user_dict.get("id") if current_user_dict else None
                         )
             
             # Process all images in this folder
-            tasks = [process_single_image(rel_path, abs_path, MAX_SIZE) for rel_path, abs_path in image_files]
+            tasks = [process_single_image(rel_path, abs_path, MAX_SIZE, current_user) for rel_path, abs_path in image_files]
             file_results = await asyncio.gather(*tasks)
             
             # Count results

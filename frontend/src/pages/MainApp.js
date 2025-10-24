@@ -599,6 +599,7 @@ const DocumentScanner = () => {
       const response = await axios.post(`${API}/scan-folder`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          ...getAuthHeaders()
         },
         timeout: 120000, // 2 minutes for upload only
         onUploadProgress: (progressEvent) => {

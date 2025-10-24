@@ -391,7 +391,13 @@ const DocumentScanner = () => {
     }
   };
 
-  const handleUpdateFilename = async (id, newCode) => {
+  const handleUpdateFilename = async (id, newCode, event) => {
+    // Prevent default and stop propagation
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     if (!newCode || newCode.trim() === '') {
       toast.error('Tên file không được để trống');
       return;

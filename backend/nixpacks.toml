@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["python310", "cairo", "pango"]
+nixPkgs = ["python310", "cairo", "pango", "pip"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = ["python3 -m pip install --upgrade pip", "python3 -m pip install -r requirements.txt"]
 
 [phases.build]
 cmds = []
 
 [start]
-cmd = "uvicorn server:app --host 0.0.0.0 --port $PORT"
+cmd = "python3 -m uvicorn server:app --host 0.0.0.0 --port $PORT"

@@ -34,10 +34,20 @@ class LLMIntegrationTester:
                 print(f"   {details}")
     
     def create_test_image(self):
-        """Create a minimal 1x1 PNG image for testing"""
-        img = Image.new('RGB', (1, 1), color='white')
+        """Create a minimal test image for testing"""
+        # Create a small but valid image (100x100 pixels)
+        img = Image.new('RGB', (100, 100), color='white')
+        
+        # Add some text to make it more realistic
+        try:
+            from PIL import ImageDraw
+            draw = ImageDraw.Draw(img)
+            draw.text((10, 10), "Test Document", fill='black')
+        except:
+            pass  # If ImageDraw fails, just use plain white image
+        
         buffer = BytesIO()
-        img.save(buffer, format='PNG')
+        img.save(buffer, format='JPEG', quality=85)
         buffer.seek(0)
         return buffer
     

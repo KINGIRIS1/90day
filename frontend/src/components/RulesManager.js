@@ -117,7 +117,9 @@ const RulesManager = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${API}/rules/cleanup-duplicates`);
+      const response = await axios.post(`${API}/rules/cleanup-duplicates`, {}, {
+        headers: getAuthHeaders()
+      });
       toast.success(`✅ ${response.data.message}`);
       // Refresh rules list
       await fetchRules();

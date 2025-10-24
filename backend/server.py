@@ -1644,8 +1644,8 @@ async def setup_admin_endpoint():
     try:
         await users_collection.create_index("email", unique=True)
         await users_collection.create_index("username", unique=True)
-    except:
-        pass
+    except Exception:
+        pass  # Indexes may already exist
     
     return {
         "message": "Admin account created successfully (deleted {} existing admin account(s))".format(delete_result.deleted_count),

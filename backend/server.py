@@ -1603,33 +1603,6 @@ async def llm_health():
         details="; ".join(detail_msgs) if detail_msgs else None
     )
 
-        for group in duplicates_groups:
-            # Keep first ID, delete the rest
-            ids_to_delete.extend(group['ids'][1:])
-        
-        # Delete in batches to avoid timeout
-        BATCH_SIZE = 100
-        total_deleted = 0
-        
-        for i in range(0, len(ids_to_delete), BATCH_SIZE):
-            batch = ids_to_delete[i:i+BATCH_SIZE]
-            result = await db.document_rules.delete_many({"id": {"$in": batch}})
-            total_deleted += result.deleted_count
-            logger.info(f"Deleted batch {i//BATCH_SIZE + 1}: {result.deleted_count} rules")
-        
-        remaining_count = await db.document_rules.count_documents({})
-        logger.info(f"Cleanup complete: deleted {total_deleted} duplicates, {remaining_count} remaining")
-        
-        return {
-            "message": f"Đã xóa {total_deleted} quy tắc trùng lặp",
-            "remaining": remaining_count,
-            "deleted": total_deleted
-        }
-            
-    except Exception as e:
-        logger.error(f"Error cleaning duplicates: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @api_router.get("/")
 async def root():

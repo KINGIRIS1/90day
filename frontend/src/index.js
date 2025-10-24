@@ -27,6 +27,10 @@ const router = createBrowserRouter([
         element: <RegisterPage />
       },
       {
+        path: "/setup-admin",
+        element: <SetupAdmin />
+      },
+      {
         path: "/",
         element: (
           <ProtectedRoute>

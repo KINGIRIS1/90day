@@ -445,9 +445,18 @@ Nhận diện tài liệu dựa vào QUỐC HUY và TIÊU ĐỀ.
 
 ❌ KHÔNG được đoán hoặc chọn "gần giống"
 ❌ KHÔNG được bỏ qua từ khóa phân biệt
-✅ CHỈ chọn khi khớp CHÍNH XÁC 100% với danh sách
+❌ KHÔNG được nhận diện nếu chỉ khớp 1 nửa hoặc vài chữ
+✅ CHỈ chọn khi khớp CHÍNH XÁC, TOÀN BỘ tiêu đề với danh sách
 
-NẾU KHÔNG CHẮC CHẮN 100% → Trả về "CONTINUATION" (trang tiếp theo của tài liệu trước)
+NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
+  - detected_full_name: "Không rõ loại tài liệu"
+  - short_code: "UNKNOWN"
+  - confidence: 0.1
+
+⚠️ QUAN TRỌNG: Một tài liệu có thể có NHIỀU TRANG
+  - Trang 1: Có tiêu đề "GIẤY CHỨNG NHẬN" → GCN
+  - Trang 2, 3, 4...: Không có tiêu đề mới → Hệ thống sẽ tự động gán là GCN
+  - CHỈ KHI thấy tiêu đề MỚI khớp 100% → Mới đổi sang loại mới
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

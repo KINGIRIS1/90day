@@ -272,6 +272,11 @@ const DocumentScanner = () => {
         chunk.forEach((file) => {
           formData.append('files', file);
         });
+        
+        // Send previous results for continuation across batches
+        if (allResults.length > 0) {
+          formData.append('previous_results', JSON.stringify(allResults));
+        }
 
         // Retry logic with exponential backoff
         let retries = 0;

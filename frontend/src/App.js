@@ -863,7 +863,13 @@ const DocumentScanner = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="scan" className="w-full" data-testid="main-tabs">
+        <Tabs defaultValue="scan" className="w-full" data-testid="main-tabs" onValueChange={(value) => {
+          // Lazy load history only when user clicks History tab
+          if (value === 'history' && !historyLoaded) {
+            fetchScanHistory();
+            setHistoryLoaded(true);
+          }
+        }}>
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-4 mb-8">
             <TabsTrigger value="scan" data-testid="scan-tab">
               <FileText className="h-4 w-4 mr-2" />

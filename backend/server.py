@@ -652,7 +652,10 @@ def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
 
 
 @api_router.post("/retry-scan")
-async def retry_scan(scan_id: str):
+async def retry_scan(
+    scan_id: str,
+    current_user: dict = Depends(require_approved_user)
+):
     """Retry scanning a failed document"""
     try:
         # DEBUG: Log query

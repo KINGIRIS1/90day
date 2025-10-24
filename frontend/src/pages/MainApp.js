@@ -501,7 +501,9 @@ const DocumentScanner = () => {
   const handleClearHistory = async () => {
     if (window.confirm('Bạn có chắc muốn xóa toàn bộ lịch sử?')) {
       try {
-        await axios.delete(`${API}/clear-history`);
+        await axios.delete(`${API}/clear-history`, {
+          headers: getAuthHeaders()
+        });
         setScanHistory([]);
         toast.success('Đã xóa lịch sử');
       } catch (error) {

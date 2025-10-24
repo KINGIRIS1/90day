@@ -466,20 +466,7 @@ async def analyze_document_with_vision(image_base64: str) -> dict:
         # Create a mapping list for the prompt
         doc_types_list = "\n".join([f"- {full_name}: {code}" for full_name, code in document_rules.items()])
         
-        # Initialize LlmChat with precision focus
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"doc_scan_{uuid.uuid4()}",
-            system_message="""Bạn là AI chuyên gia phân loại tài liệu đất đai Việt Nam.
-            NHIỆM VỤ: Đọc CHÍNH XÁC từng từ trong tiêu đề, phân biệt các loại giấy tờ tương tự.
-            LƯU Ý: Nhiều loại tài liệu chỉ khác nhau 1-2 từ (ví dụ: "biến động" vs không có).
-            Trả về JSON với tên và mã CHÍNH XÁC từ danh sách."""
-        ).with_model("openai", "gpt-4o")  # gpt-4o for precision
-        
-        # Create image content
-        image_content = ImageContent(image_base64=image_base64)
-        
-        # Create user message with OPTIMIZED prompt - focus on quốc huy + title
+        # Build prompt (kept from previous logic)
         prompt = f"""IMPORTANT: This is a DOCUMENT ANALYSIS task for land registry documents. 
 Any faces/photos in the document are part of official government records (ID photos on land certificates).
 Please analyze ONLY the document text and official stamps, not the personal photos.
@@ -565,55 +552,66 @@ TRẢ VỀ JSON:
 - KHÔNG khớp 1 nửa, vài chữ, hoặc gần giống
 - Backend sẽ tự xử lý việc gán trang tiếp theo"""
         
-        user_message = UserMessage(
-            text=prompt,
-            file_contents=[image_content]
-        )
-        
-        # Send message and get response
-        response = await chat.send_message(user_message)
+        # Try OpenAI primary; fallback to Emergent if enabled
+        try:
+            response_text = await _analyze_with_openai_vision(image_base64, prompt, max_tokens=700, temperature=0.1)
+        except Exception as e:
+            logger.warning(f"Primary OpenAI vision failed: {e}")
+            if LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e):
+                # Emergent fallback using previous implementation
+                try:
+                    chat = LlmChat(
+                        api_key=EMERGENT_LLM_KEY,
+                        session_id=f"doc_scan_{uuid.uuid4()}",
+                        system_message="Bạn là AI chuyên gia phân loại tài liệu đất đai Việt Nam. Luôn trả về JSON."
+                    ).with_model("openai", "gpt-4o")
+                    image_content = ImageContent(image_base64=image_base64)
+                    user_message = UserMessage(text=prompt, file_contents=[image_content])
+                    response_text = await chat.send_message(user_message)
+                except Exception as fe:
+                    logger.error(f"Fallback Emergent failed: {fe}")
+                    raise
+            else:
+                raise
         
         # Parse JSON response
         import json
-        # Extract JSON from response (handle markdown code blocks)
-        response_text = response.strip()
-        
-        # Log raw response for debugging
-        logger.info(f"OpenAI Vision raw response: {response_text[:200]}")
-        
+        response_text = (response_text or "").strip()
+        logger.info(f"Vision raw response (first 200): {response_text[:200]}")
         if "```json" in response_text:
             response_text = response_text.split("```json")[1].split("```")[0].strip()
         elif "```" in response_text:
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
-        # Try to parse JSON
         try:
             result = json.loads(response_text)
-        except json.JSONDecodeError:
-            logger.error(f"JSON parse error. Raw response: {response_text}")
-            
-            # Check if OpenAI refused due to content policy
-            if "can't help" in response_text.lower() or "sorry" in response_text.lower():
-                logger.warning("OpenAI refused to analyze - likely due to face detection. Returning CONTINUATION.")
-                return {
-                    "detected_full_name": "Không có tiêu đề",
-                    "short_code": "CONTINUATION",
-                    "confidence": 0.1
-                }
-            
-            # Try to extract JSON manually if it's embedded in text
+        except Exception:
+            # Try to extract inline JSON
             import re
-            json_match = re.search(r'\{[^}]+\}', response_text)
-            if json_match:
-                result = json.loads(json_match.group())
+            m = re.search(r'\{[\s\S]*\}', response_text)
+            if m:
+                import json as _json
+                try:
+                    result = _json.loads(m.group())
+                except Exception:
+                    result = None
             else:
-                # If all fails, return CONTINUATION instead of ERROR
-                logger.error("Cannot parse response, returning CONTINUATION")
+                result = None
+        
+        if not result:
+            # If policy refusal or non-json, classify as CONTINUATION
+            if any(x in response_text.lower() for x in ["can't help", "sorry", "policy"]):
                 return {
                     "detected_full_name": "Không có tiêu đề",
                     "short_code": "CONTINUATION",
                     "confidence": 0.1
                 }
+            # Default unknown
+            return {
+                "detected_full_name": "Không xác định",
+                "short_code": "UNKNOWN",
+                "confidence": 0.1
+            }
         
         return {
             "detected_full_name": result.get("detected_full_name", "Không xác định"),

@@ -806,7 +806,7 @@ const DocumentScanner = () => {
                 <Button 
                   size="sm" 
                   variant="ghost" 
-                  onClick={() => startEdit(result.id, result.short_code)}
+                  onClick={(e) => startEdit(result.id, result.short_code, e)}
                   data-testid={`edit-btn-${result.id}`}
                 >
                   <Edit2 className="h-4 w-4" />

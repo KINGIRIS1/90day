@@ -276,7 +276,10 @@ const DocumentScanner = () => {
         while (retries < 3 && !success) {
           try {
             response = await axios.post(`${API}/batch-scan`, formData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
+              headers: { 
+                'Content-Type': 'multipart/form-data',
+                ...getAuthHeaders()
+              },
               timeout: 300000, // 5 minutes
               onUploadProgress: (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);

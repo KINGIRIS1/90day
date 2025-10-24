@@ -859,7 +859,8 @@ async def batch_scan(
     """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
     try:
         # Semaphore to limit concurrent API calls (avoid rate limits and timeout)
-        MAX_CONCURRENT = 5  # Reduced from 10 to 5 to avoid timeout
+        # Use lower concurrency in production to avoid infrastructure timeouts
+        MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))  # Default 2 for deployed env
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
         async def process_file(file, retry_count=0):

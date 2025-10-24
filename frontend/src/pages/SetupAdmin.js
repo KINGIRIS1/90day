@@ -1,0 +1,113 @@
+import React, { useState } from 'react';
+
+const SetupAdmin = () => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleSetupAdmin = async () => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/setup-admin`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResult(data);
+      } else {
+        setError(data.detail || 'Đã xảy ra lỗi');
+      }
+    } catch (err) {
+      setError(`Lỗi kết nối: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      maxWidth: '600px', 
+      margin: '50px auto', 
+      padding: '30px',
+      background: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+    }}>
+      <h1 style={{ color: '#333', marginBottom: '20px' }}>🔧 Thiết Lập Admin</h1>
+      <p style={{ marginBottom: '20px', color: '#666' }}>
+        Công cụ này sẽ tạo tài khoản admin cho ứng dụng Document Scanner.
+      </p>
+
+      <button 
+        onClick={handleSetupAdmin}
+        disabled={loading}
+        style={{
+          width: '100%',
+          padding: '12px',
+          background: loading ? '#ccc' : '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          fontSize: '16px',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          fontWeight: 'bold'
+        }}
+      >
+        {loading ? 'Đang xử lý...' : 'Tạo Tài Khoản Admin'}
+      </button>
+
+      {result && (
+        <div style={{
+          marginTop: '20px',
+          padding: '15px',
+          background: result.message.includes('exists') ? '#d1ecf1' : '#d4edda',
+          color: result.message.includes('exists') ? '#0c5460' : '#155724',
+          border: result.message.includes('exists') ? '1px solid #bee5eb' : '1px solid #c3e6cb',
+          borderRadius: '4px'
+        }}>
+          <strong>{result.message.includes('exists') ? 'ℹ️' : '✅'} {result.message}</strong>
+          {result.username && (
+            <div style={{ marginTop: '10px' }}>
+              <p>Username: <strong>{result.username}</strong></p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <div style={{
+          marginTop: '20px',
+          padding: '15px',
+          background: '#f8d7da',
+          color: '#721c24',
+          border: '1px solid #f5c6cb',
+          borderRadius: '4px'
+        }}>
+          <strong>❌ Lỗi:</strong> {error}
+        </div>
+      )}
+
+      <div style={{
+        marginTop: '20px',
+        padding: '15px',
+        background: '#fff3cd',
+        border: '1px solid #ffeeba',
+        borderRadius: '4px'
+      }}>
+        <h3 style={{ margin: '0 0 10px 0', color: '#856404' }}>📋 Thông Tin Đăng Nhập Admin:</h3>
+        <p style={{ margin: '5px 0', color: '#856404' }}><strong>Username:</strong> admin</p>
+        <p style={{ margin: '5px 0', color: '#856404' }}><strong>Password:</strong> Thommit@19</p>
+      </div>
+    </div>
+  );
+};
+
+export default SetupAdmin;

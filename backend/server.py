@@ -913,7 +913,7 @@ async def batch_scan(
                     if is_retryable and retry_count < max_retries:
                         logger.warning(f"Retrying {file.filename} (attempt {retry_count + 1}/{max_retries})")
                         await asyncio.sleep(2 ** retry_count)  # Exponential backoff
-                        return await process_file(file, current_user_dict, retry_count + 1)
+                        return await process_file(file, current_user_dict, session_id, retry_count + 1)
                     
                     logger.error(f"Error processing {file.filename}: {error_msg}", exc_info=True)
                     
@@ -945,7 +945,8 @@ async def batch_scan(
                         short_code="ERROR",
                         confidence_score=0.0,
                         image_base64="",
-                        user_id=current_user_dict.get("id") if current_user_dict else None
+                        user_id=current_user_dict.get("id") if current_user_dict else None,
+                        session_id=session_id  # Add session ID even for errors
                     )
         
         # Process files with controlled concurrency

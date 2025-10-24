@@ -99,7 +99,9 @@ const RulesManager = () => {
     }
 
     try {
-      await axios.delete(`${API}/rules/${ruleId}`);
+      await axios.delete(`${API}/rules/${ruleId}`, {
+        headers: getAuthHeaders()
+      });
       setRules(rules.filter(r => r.id !== ruleId));
       toast.success('✅ Đã xóa quy tắc');
     } catch (error) {

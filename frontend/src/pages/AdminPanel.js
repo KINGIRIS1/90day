@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Clock, User } from 'lucide-react';
 import { toast } from 'sonner';
+import LlmStatus from '../components/LlmStatus';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 

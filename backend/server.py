@@ -887,9 +887,17 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
 @api_router.post("/batch-scan", response_model=List[ScanResult])
 async def batch_scan(
     files: List[UploadFile] = File(...),
+    previous_results: Optional[str] = Form(None),  # JSON string of previous batch results
     current_user: dict = Depends(require_approved_user)
 ):
-    """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
+    """
+    Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency
+    
+    Args:
+        files: Files to scan
+        previous_results: JSON string of previous scan results (for continuation across batches)
+        current_user: Current authenticated user
+    """
     try:
         # Generate session ID for this batch scan
         session_id = f"scan_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"

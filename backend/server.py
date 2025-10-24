@@ -1792,7 +1792,6 @@ app.include_router(api_router)
 # ==================== AUTHENTICATION ENDPOINTS ====================
 from auth_models import UserRegisterRequest, UserLoginRequest, TokenResponse
 from auth_utils import PasswordHasher, TokenManager
-from auth_dependencies import get_current_user, require_approved_user, require_admin
 
 auth_router = APIRouter(prefix="/api/auth", tags=["authentication"])
 

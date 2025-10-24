@@ -1213,7 +1213,7 @@ async def export_pdf_merged(
 
 
 @api_router.delete("/clear-history")
-async def clear_history():
+async def clear_history(current_user: dict = Depends(require_approved_user)):
     """Clear all scan history"""
     try:
         result = await db.scan_results.delete_many({})

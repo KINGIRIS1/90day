@@ -253,7 +253,7 @@ async def get_document_rules() -> dict:
         try:
             await db.document_rules.drop_index("short_code_1")
             logger.info("Dropped unique index on short_code to allow duplicates")
-        except Exception as e:
+        except Exception:
             # Index doesn't exist or already dropped
             pass
         
@@ -506,7 +506,7 @@ TRẢ VỀ JSON:
         # Try to parse JSON
         try:
             result = json.loads(response_text)
-        except json.JSONDecodeError as je:
+        except json.JSONDecodeError:
             logger.error(f"JSON parse error. Raw response: {response_text}")
             
             # Check if OpenAI refused due to content policy
@@ -1009,7 +1009,7 @@ async def update_filename(
         
         if not existing:
             # DEBUG: Try to find by any field containing this id
-            logger.error(f"Document not found. Searching all docs...")
+            logger.error("Document not found. Searching all docs...")
             sample = await db.scan_results.find({}).limit(2).to_list(2)
             if sample:
                 logger.error(f"Sample doc keys: {list(sample[0].keys())}")

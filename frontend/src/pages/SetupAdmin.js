@@ -68,15 +68,20 @@ const SetupAdmin = () => {
         <div style={{
           marginTop: '20px',
           padding: '15px',
-          background: result.message.includes('exists') ? '#d1ecf1' : '#d4edda',
-          color: result.message.includes('exists') ? '#0c5460' : '#155724',
-          border: result.message.includes('exists') ? '1px solid #bee5eb' : '1px solid #c3e6cb',
+          background: '#d4edda',
+          color: '#155724',
+          border: '1px solid #c3e6cb',
           borderRadius: '4px'
         }}>
-          <strong>{result.message.includes('exists') ? 'ℹ️' : '✅'} {result.message}</strong>
+          <strong>✅ {result.message}</strong>
           {result.username && (
             <div style={{ marginTop: '10px' }}>
               <p>Username: <strong>{result.username}</strong></p>
+              {result.deleted_old_accounts > 0 && (
+                <p style={{ color: '#856404', marginTop: '5px' }}>
+                  ⚠️ Đã xóa {result.deleted_old_accounts} tài khoản admin cũ (bao gồm tài khoản pending)
+                </p>
+              )}
             </div>
           )}
         </div>

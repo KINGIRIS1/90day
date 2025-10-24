@@ -464,15 +464,21 @@ CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
    "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
-   Nếu không rõ có "BIẾN ĐỘNG" không → "CONTINUATION"
+   Nếu không rõ có "BIẾN ĐỘNG" không → "UNKNOWN"
 
 2. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
    "Hợp đồng THUÊ" → HDTD (PHẢI có "THUÊ")
    "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
-   Nếu không rõ loại nào → "CONTINUATION"
+   Nếu không rõ loại nào → "UNKNOWN"
 
 3. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP")
-   Nếu không thấy "CHO PHÉP" rõ ràng → "CONTINUATION"
+   Nếu không thấy "CHO PHÉP" rõ ràng → "UNKNOWN"
+
+VÍ DỤ:
+- Thấy "Giấy chứng nhận quyền sử dụng" (khớp 100%) → GCN ✅
+- Thấy "Bản mô tả" (khớp 100%) → BMT ✅
+- Thấy "Hợp đồng" nhưng không rõ loại → UNKNOWN ❌
+- Chỉ thấy nội dung, không có tiêu đề → UNKNOWN ❌
 
 DANH SÁCH ĐẦY ĐỦ (khớp chính xác):
 {doc_types_list}

@@ -1490,6 +1490,60 @@ async def cleanup_duplicate_rules():
         
         # Collect IDs to delete (keep first, delete rest)
         ids_to_delete = []
+
+@api_router.get("/llm/health", response_model=LlmHealth)
+async def llm_health():
+    """Lightweight healthcheck for LLM providers."""
+    # Check OpenAI first
+    openai_ok = False
+    emergent_ok = False
+    detail_msgs = []
+
+    # OpenAI
+    client = get_openai_client()
+    if client:
+        try:
+            resp = client.chat.completions.create(
+                model=OPENAI_MODEL,
+                messages=[{"role": "user", "content": "ping"}],
+                max_tokens=5,
+                temperature=0.2
+            )
+            openai_ok = True if getattr(resp, 'id', None) else True
+        except Exception as e:
+            detail_msgs.append(f"openai: {str(e)[:120]}")
+    else:
+        if OPENAI_API_KEY:
+            detail_msgs.append("openai: client init failed")
+        else:
+            detail_msgs.append("openai: missing OPENAI_API_KEY")
+
+    # Emergent fallback
+    if EMERGENT_LLM_KEY:
+        try:
+            chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"health_{uuid.uuid4()}")\
+                .with_model("openai", "gpt-4o")
+            msg = UserMessage(text="ping")
+            res = await chat.send_message(msg)
+            if isinstance(res, str) and len(res) >= 0:
+                emergent_ok = True
+        except Exception as e:
+            detail_msgs.append(f"emergent: {str(e)[:120]}")
+    else:
+        detail_msgs.append("emergent: missing EMERGENT_LLM_KEY")
+
+    status = "healthy" if openai_ok else ("degraded" if emergent_ok else "unhealthy")
+    provider = "openai" if openai_ok else ("emergent" if emergent_ok else "none")
+
+    return LlmHealth(
+        status=status,
+        provider=provider,
+        model=OPENAI_MODEL if openai_ok else ("gpt-4o" if emergent_ok else None),
+        openai_available=openai_ok,
+        emergent_available=emergent_ok,
+        details="; ".join(detail_msgs) if detail_msgs else None
+    )
+
         for group in duplicates_groups:
             # Keep first ID, delete the rest
             ids_to_delete.extend(group['ids'][1:])

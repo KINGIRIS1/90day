@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production
+build/
+dist/
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.vscode/
+.idea/
+
+# Cache
+.cache/
+*.log
+
+# Temporary files and results - IMPORTANT: Exclude large temp files
+backend/temp_results/
+backend/temp_uploads/
+backend/*.zip
+backend/*.pdf
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Frontend build artifacts
+frontend/build/
+frontend/.cache/
+frontend/node_modules/.cache/
+
+# Git
+.git/
+.gitignore

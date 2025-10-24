@@ -874,8 +874,48 @@ const DocumentScanner = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50" data-testid="document-scanner-app">
+      {/* Header with User Info */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-gray-800">Document Scanner</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                {user?.full_name || user?.username}
+              </p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
+            </div>
+            {isAdmin() && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/admin')}
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Admin Panel
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                logout();
+                toast.success('Đã đăng xuất');
+              }}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Đăng Xuất
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <Toaster position="top-right" richColors />
       
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">

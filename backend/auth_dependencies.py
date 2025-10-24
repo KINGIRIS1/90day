@@ -35,8 +35,14 @@ async def get_current_user(
     # Retrieve user from database
     users_collection = db["users"]
     try:
-        user = await users_collection.find_one({"_id": ObjectId(user_id)})
-    except:
+        # Try ObjectId first (legacy), then try as string (UUID)
+        try:
+            user = await users_collection.find_one({"_id": ObjectId(user_id)})
+        except:
+            # If ObjectId fails, try with string _id (for UUID-based documents)
+            user = await users_collection.find_one({"_id": user_id})
+    except Exception as e:
+        print(f"Database error when fetching user: {e}")
         raise credentials_exception
     
     if user is None:

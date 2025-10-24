@@ -853,14 +853,10 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
 
 @api_router.post("/batch-scan", response_model=List[ScanResult])
 async def batch_scan(
-    files: List[UploadFile] = File(...)
-    # TEMPORARILY REMOVED AUTH for debugging 520 error
-    # current_user: dict = Depends(require_approved_user)
+    files: List[UploadFile] = File(...),
+    current_user: dict = Depends(require_approved_user)
 ):
-    """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency
-    
-    TEMPORARY: Authentication disabled for debugging deployed environment 520 errors
-    """
+    """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
     try:
         # Semaphore to limit concurrent API calls (avoid rate limits and timeout)
         # Use lower concurrency in production to avoid infrastructure timeouts

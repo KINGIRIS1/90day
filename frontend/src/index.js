@@ -8,6 +8,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import AdminPanel from "@/pages/AdminPanel";
 import MainApp from "@/pages/MainApp";
+import SetupAdmin from "@/pages/SetupAdmin";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 

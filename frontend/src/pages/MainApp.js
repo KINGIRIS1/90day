@@ -156,7 +156,9 @@ const DocumentScanner = () => {
       // Delete from backend (batch)
       await Promise.all(
         Array.from(selectedIds).map(id => 
-          axios.delete(`${API}/scan-result/${id}`).catch(() => {})
+          axios.delete(`${API}/scan-result/${id}`, {
+            headers: getAuthHeaders()
+          }).catch(() => {})
         )
       );
       
@@ -176,7 +178,10 @@ const DocumentScanner = () => {
     try {
       const response = await axios.post(`${API}/export-pdf-single`, 
         { scan_ids: Array.from(selectedIds) },
-        { responseType: 'blob' }
+        { 
+          responseType: 'blob',
+          headers: getAuthHeaders()
+        }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));

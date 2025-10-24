@@ -378,3 +378,24 @@ agent_communication:
       2) POST /api/scan-document — ensure analysis still returns structured result using fallback if OpenAI not available (requires auth: seed admin via GET /api/setup-admin, login, then call)
       3) Frontend: After login as admin, open Admin Panel and verify LLM Status tile shows correct states and updates on refresh.
       Note: Do not change protected env vars. OPENAI_API_KEY must be set in backend/.env and backend restarted to enable primary provider.
+  - agent: "testing"
+    message: |
+      TESTING COMPLETED - LLM Integration Results:
+      
+      ✅ WORKING:
+      - LLM health endpoint (/api/llm/health) - Returns correct JSON structure and status
+      - Authentication system - Admin setup and login working
+      - Rules endpoint regression check - 107 rules returned correctly
+      - Document scan endpoint - Accepts files and returns structured response
+      
+      ❌ CRITICAL ISSUE - LLM PROVIDERS FAILING:
+      - OpenAI: Missing OPENAI_API_KEY (expected behavior)
+      - Emergent: Authentication error - "Invalid proxy server token passed. Key Hash =6ca35a08a503ca466d0a1bcd3f9ee12921179b6da69adb7e5573b1c8b960f138. Unable to find token in cache or LiteLLM_VerificationTokenTable"
+      
+      IMPACT: Document scanning returns ERROR status because both LLM providers fail. The integration code is implemented correctly, but neither provider can authenticate successfully.
+      
+      RECOMMENDATION: Need to either:
+      1. Add valid OPENAI_API_KEY to backend/.env, OR
+      2. Fix Emergent LLM authentication issue (appears to be server-side proxy token problem)
+      
+      Without working LLM provider, document analysis cannot function.

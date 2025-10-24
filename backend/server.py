@@ -818,6 +818,7 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
                 short_code=last_valid_code,
                 confidence_score=0.95,  # High confidence for grouped pages
                 image_base64=result.image_base64,
+                user_id=result.user_id,
                 timestamp=result.timestamp
             ))
         else:

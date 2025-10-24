@@ -1520,7 +1520,10 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
 
 
 @api_router.post("/scan-folder", response_model=FolderScanStartResponse)
-async def scan_folder(file: UploadFile = File(...)):
+async def scan_folder(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(require_approved_user)
+):
     """
     Start folder scan job (returns immediately with job_id)
     - Client polls /api/folder-scan-status/{job_id} for progress

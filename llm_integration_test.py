@@ -107,7 +107,7 @@ class LLMIntegrationTester:
             
             # Login
             login_data = {
-                "username": "admin@smartdocscan.com",
+                "username": "admin",
                 "password": "Thommit@19"
             }
             

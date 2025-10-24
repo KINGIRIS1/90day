@@ -76,7 +76,9 @@ const RulesManager = () => {
     }
 
     try {
-      const response = await axios.put(`${API}/rules/${ruleId}`, editData);
+      const response = await axios.put(`${API}/rules/${ruleId}`, editData, {
+        headers: getAuthHeaders()
+      });
       setRules(rules.map(r => r.id === ruleId ? response.data : r));
       setEditingId(null);
       toast.success('✅ Đã cập nhật quy tắc');

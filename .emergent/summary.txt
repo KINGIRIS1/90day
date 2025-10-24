@@ -1,38 +1,39 @@
 <analysis>
-The previous AI engineer developed a full-stack document scanning application using React, FastAPI, and MongoDB. The project started from scratch, with an initial goal to scan images, name them based on content (using predefined short codes), and export them as PDFs. The AI engineer successfully set up the core infrastructure, integrated OpenAI GPT-4 Vision via Emergent LLM Key, and implemented basic scanning, history, and PDF export functionalities. Throughout the development, the engineer iteratively refined the application based on user feedback. Key challenges involved optimizing scanning speed, improving OCR accuracy for similar document types, and enhancing the user experience with features like progress tracking, detailed error display, retry mechanisms, and smart grouping for multi-page documents. The engineer demonstrated proficiency in debugging, performance tuning, and frontend/backend integration, culminating in a robust application.
+The AI engineer has transformed a simple document scanner into a robust, feature-rich application. Initially, a full-stack MVP with React, FastAPI, and MongoDB was built, focusing on OpenAI GPT-4 Vision for OCR, automatic renaming, and PDF export. Significant effort was then dedicated to optimizing OCR accuracy for Vietnamese documents through dynamic image cropping, resizing, and a Two-Pass AI Scanning approach. Performance was enhanced via client-side image compression and backend concurrency tuning. A rules management UI was also integrated.
+
+The project then scaled to handle large-scale ZIP uploads, maintaining folder structures, and generating individual PDFs per file. This involved introducing folder-based processing, real-time progressive downloads, and extensive performance optimizations to mitigate timeouts. Subsequently, a full-fledged JWT authentication system was implemented, including user registration, an admin approval workflow, an admin account, and an admin panel for user management. Numerous critical bugs were addressed throughout, encompassing duplicate filenames, Pydantic validation, incorrect folder grouping, and complex deployment-specific issues related to database connections and React Router v7 compatibility. The current state reflects a secure and highly functional application, with a clear focus on addressing user feedback and refining core functionalities.
 </analysis>
 
 <product_requirements>
-The user requested a web application to scan images of land-related documents, identify their content, and automatically rename them according to a predefined set of Vietnamese phrases and their corresponding short codes (e.g., Giấy chứng nhận -> GCN, Phiếu chuyển thông tin nghĩa vụ tài chính -> PCT). The application must support exporting scanned and renamed documents as PDF files.
+The user initially required a web application to scan land-related document images, identify their content using OpenAI GPT-4 Vision, and automatically rename them with predefined Vietnamese short codes (e.g., Giấy chứng nhận to GCN). The application must export these renamed documents as PDFs.
 
-**Key features requested and implemented:**
-1.  **Image Scanning & OCR**: Utilize OpenAI GPT-4 Vision with Emergent LLM Key for accurate content recognition, especially for Vietnamese text.
-2.  **Automatic Naming**: Apply a comprehensive set of rules to rename documents with specific short codes based on scanned content.
-3.  **PDF Export**:
-    *   Export single documents.
-    *   Export all scanned documents as a merged PDF.
-    *   Automatically merge consecutively scanned documents of the same type into a multi-page PDF.
-4.  **Batch Processing**: Allow users to upload and scan multiple files simultaneously.
-5.  **Scan History**: Maintain a history of previously scanned documents.
-6.  **Filename Editing**: Enable users to edit the automatically assigned filenames, allowing duplicate names.
-7.  **Performance Optimization**: Achieve fast scanning speeds, particularly for large batches (e.g., 50 files).
-8.  **Progress Tracking**: Display a visual indicator (checkmark) for files as they are scanned.
-9.  **Error Handling & Display**: Show detailed error messages for failed scans.
-10. **Retry Mechanism**: Allow users to retry failed scans.
-11. **Search & Filter**: Implement functionality to search and filter scanned documents by name, type, or status (success/error).
-12. **Bulk Operations**: Enable selection of multiple files for bulk deletion or export.
-13. **Smart Grouping**: Group consecutive no title pages with the preceding titled document to form multi-page documents.
-14. **Precision Matching**: Enhance AI to accurately distinguish between similar document types and strictly match titles, falling back to continuation for non-matches.
+Key features implemented and refined:
+1.  **Image Scanning & OCR**: Utilizes OpenAI GPT-4 Vision for accurate content recognition, especially Vietnamese text, with an Emergent LLM Key.
+2.  **Automatic Naming**: Renames documents using a comprehensive set of rules and short codes.
+3.  **PDF Export**: Supports single document, merged PDF, and smart merging of multi-page documents, with dynamic paper size/orientation.
+4.  **Batch Processing**: Allows simultaneous upload and scanning of multiple files.
+5.  **Scan History**: Maintains history with options to edit filenames.
+6.  **Performance Optimization**: Faster scanning via image resizing, dynamic cropping, client-side compression, and backend concurrency controls.
+7.  **Progress Tracking & Error Handling**: Displays progress and detailed error messages.
+8.  **Rules Management UI**: Frontend interface for adding, editing, and deleting recognition rules.
+
+Recent additions (during the trajectory):
+1.  **Large-Scale Folder Scanning**: Upload ZIP archives, extract, scan files within, retain folder structure, and produce a ZIP of PDFs maintaining that structure.
+2.  **Folder-Based Processing**: Scan sequentially by original sub-folders within the uploaded ZIP, generating separate result ZIPs for each folder.
+3.  **Real-time Progressive Download**: Allow downloading results for individual folders as soon as they are processed, without waiting for the entire batch.
+4.  **Authentication & Authorization**: Implement user registration, mandatory login, JWT-based authentication, an admin account () with a panel to view/enable/disable users, and history grouped by session.
+5.  **Performance & UX Fixes**: Address issues like slow upload/download, page scrolling to top on edit, and lazy-loading history to reduce initial page lag.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database).
--   **AI/OCR**: OpenAI GPT-4 Vision for image content recognition.
--   **LLM Integration**: Emergent LLM Key via  library.
--   **Image Processing**: Pillow (PIL) for resizing and cropping images.
--   **PDF Manipulation**:  for merging and exporting PDFs.
--   **Asynchronous Programming**:  for parallelizing backend tasks.
--   **UI Components**: Shadcn UI for modern and accessible frontend elements.
+-   **AI/OCR**: OpenAI GPT-4 Vision for image content recognition and national emblem detection.
+-   **LLM Integration**: Emergent LLM Key via .
+-   **Image Processing**: Pillow, .
+-   **PDF Manipulation**: .
+-   **Asynchronous Programming**: , .
+-   **Authentication**: JWT (JSON Web Tokens), , Pydantic models.
+-   **Routing**:  v7.
 </key_technical_concepts>
 
 <code_architecture>
@@ -40,71 +41,61 @@ The application follows a standard full-stack architecture:
 
 
 
-**Detailed File Summaries:**
-
 -   **/app/backend/server.py**:
-    -   **Importance**: This is the core of the backend logic. It defines API endpoints, handles image uploads, integrates with OpenAI GPT-4 Vision, processes document naming, manages MongoDB interactions (saving scan results), and generates PDF exports.
+    -   **Importance**: Core backend logic. Handles API, LLM, DB, PDF. Now also includes ZIP processing, folder-based scanning, and authentication routes.
     -   **Changes Made**:
-        -   Initial setup for , , , ,  endpoints.
-        -   Fixed  import to .
-        -   Added  dictionary for document type short codes.
-        -   Implemented parallel processing for  using .
-        -   Integrated image resizing () and cropping () for performance.
-        -   Enhanced error handling for OpenAI Vision responses, including  and .
-        -   Added  endpoint for individual file PDF export.
-        -   Implemented  endpoint and auto-retry logic in .
-        -   Refined LLM prompts for accuracy, precision, and no title detection.
-        -   Added  function to group multi-page documents.
-        -   Adjusted  for images (1280px) and LLM model (gpt-4o) for balanced speed and accuracy.
-        -   Modified cropping logic (top 20%) for title detection and strict matching.
+        -   Added imports for , , , .
+        -   New Pydantic models for folder scanning results and job tracking.
+        -   Implemented , , .
+        -   Introduced , ,  (for seeding admin on deployment) endpoints.
+        -   Modified  to sequentially process images grouped by their immediate parent folder.
+        -   Implemented retry logic and reduced  for large file processing.
+        -   Fixed duplicate PDF filename generation by appending numerical suffixes.
+        -   Integrated  for user authentication and management.
+        -   Protected various existing scanner and rule management endpoints using .
+        -   Corrected all MongoDB collection accesses from  to .
+        -   Increased  and reduced  for performance.
+        -   Removed a redundant, old  definition that caused Pydantic validation errors.
 -   **/app/frontend/src/App.js**:
-    -   **Importance**: The main React component responsible for the user interface, state management (uploaded files, scan results, loading status, filters, etc.), making API calls to the backend, and rendering scan results, history, and actions.
-    -   **Changes Made**:
-        -   Initial UI for file upload, displaying scan results, and history tabs.
-        -   Added preview for uploaded images.
-        -   Integrated toast notifications for merges and errors.
-        -   Implemented UI for editing filenames with an input field and save button.
-        -   Added Xuất file này button for single file export in each .
-        -   Added progress indicators (checkmarks) for scanned files during batch processing.
-        -   Implemented retry functionality, search input, filter dropdown, and checkboxes for bulk operations.
-        -   Updated  to visually indicate error states.
-        -   Enabled action buttons (edit, delete, export) in the history tab.
--   **/app/backend/.env**:
-    -   **Importance**: Stores environment variables critical for backend operations, such as the MongoDB connection string and the Emergent LLM Key.
-    -   **Changes Made**: Updated with  and .
--   **/app/frontend/.env**:
-    -   **Importance**: Stores environment variables for the frontend, primarily the backend API URL.
-    -   **Changes Made**: Not directly modified by the AI in the trajectory, but its  is crucial.
--   **/app/backend/requirements.txt**:
-    -   **Importance**: Lists all Python dependencies required by the FastAPI backend.
-    -   **Changes Made**:  was installed. Other dependencies like , ,  are implicitly managed.
--   **/app/frontend/package.json**:
-    -   **Importance**: Manages Node.js dependencies and scripts for the React frontend.
-    -   **Changes Made**:  was confirmed as available;  is used for toasts. Dependencies were managed via yarn install v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-Done in 0.04s..
+    -   **Importance**: Now functions as the main React Router component.
+    -   **Changes Made**: Refactored original scanner UI to . Rewritten to use  v7's  and , handling routes for , , and protected routes for  and . Removed all  references.
+-   **/app/frontend/src/pages/MainApp.js**:
+    -   **Importance**: Contains the main document scanner UI and its associated logic.
+    -   **Changes Made**: This file was created by extracting the original  content. It now includes new state variables and handler functions for ZIP folder scanning, real-time progress, and multiple result downloads. The UI was updated with a Quét Thư Mục tab. The  was updated to use  for direct downloads. Lazy-loading for scan history was implemented. The edit filename button bug, causing page scroll to top, was fixed by using . Integrated  hook and added user info, logout button, and admin link in the header.
+-   **/app/frontend/src/index.js**:
+    -   **Importance**: The entry point for the React application.
+    -   **Changes Made**: Updated to use  and  from  v7. Wrapped the application with  (from ) and .
+-   **/app/backend/auth_utils.py**:
+    -   **Importance**: Provides core utilities for authentication, including password hashing/verification and JWT token creation/decoding.
+    -   **Changes Made**: New file created. Updated to directly use the  library instead of  for password hashing to resolve compatibility issues.
+-   **/app/backend/seed_admin.py**:
+    -   **Importance**: Script to create an initial admin user in the MongoDB database.
+    -   **Changes Made**: Modified to dynamically fetch  and the database name from environment variables, ensuring it works across different environments. Added logic to delete existing admin users before creating a new one, preventing duplicates.
+-   **/app/backend/auth_models.py**: **New file created**. Defines Pydantic models for user-related data (e.g., , , , ).
+-   **/app/backend/auth_dependencies.py**: **New file created**. Contains FastAPI dependency functions to handle user authentication, extract the current user from JWT tokens, and enforce role-based access control.
+-   **/app/frontend/src/contexts/AuthContext.js**: **New file created**. Implements a React Context for managing global authentication state, including user login/logout, token storage, and user information.
+-   **/app/frontend/src/pages/LoginPage.js**: **New file created**. Provides the user interface and logic for user login.
+-   **/app/frontend/src/pages/RegisterPage.js**: **New file created**. Provides the user interface and logic for user registration.
+-   **/app/frontend/src/pages/AdminPanel.js**: **New file created**. Offers a UI for administrators to view and manage registered users, including enabling or disabling their accounts.
+-   **/app/frontend/src/components/ProtectedRoute.js**: **New file created**. A React component that wraps routes, ensuring only authenticated users with necessary roles can access them, redirecting unauthenticated users to the login page.
 </code_architecture>
 
 <pending_tasks>
-The AI engineer's last action was to restart the backend after implementing strict matching and refined smart grouping logic. The immediate pending task is to test these latest changes and then generate a final summary document.
+- The user has requested detailed instructions on how to call the newly implemented  endpoint to create the admin user on their *deployed* environment.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was focused on refining the document scanning accuracy and the Smart Grouping feature based on explicit user feedback. The user had reported that the previous 40% crop was too much, and titles were usually within lines 5-7. Also, they requested strict matching for document types, defaulting to continuation for unconfident matches.
+Immediately before this summary request, the AI engineer completed the integration and debugging of a comprehensive authentication and authorization system. This included:
+1.  **Backend Implementation**: New files , ,  were created.  was updated with  endpoints (, , , , ) and existing scanner endpoints were protected using .
+2.  **Frontend Implementation**: The main scanner UI () was refactored into . The new  was rewritten to handle routing using  v7, directing users to , , and protected sections (, ). , , , , and  were created.
+3.  **Critical Bug Fixes**:
+    *   **Admin Login Issue**: Multiple problems preventing admin login were resolved, including: ensuring  in  specifies the database, handling / compatibility (switching to direct  usage), correcting MongoDB collection access (), and crucially, ensuring the admin user was seeded into the *correct* database ().
+    *   **Frontend Router Issue**: BrowserRouter is not defined errors were fixed by fully migrating to  v7's  and  and removing all  references from  and .
+4.  **Deployment Admin Setup**: Recognizing that preview and deployed environments use separate databases, a new API endpoint  was added to . This allows the user to trigger the admin user seeding process on their deployed environment via a web request.
 
-The engineer's last actions involved:
-1.  **Reducing Image Crop Area**: The  percentage was adjusted to approximately 20% (to capture lines 5-7) in  to target the typical title location more precisely.
-2.  **Implementing Strict Matching Logic**: The LLM prompt in  was updated to instruct OpenAI Vision to perform strict matching only for document titles. If a high-confidence match isn't found, the document should be classified as a CONTINUATION page, indicating it belongs to the previous document in a multi-page set.
-3.  **Updating Smart Grouping**: The  function in  was likely modified to correctly interpret the new CONTINUATION  and group these pages with the preceding confidently identified document.
-4.  **Backend Restart**: The backend service was restarted to apply these changes (, ).
-
-The application's current state includes all previously implemented features: fast parallel scanning, comprehensive naming rules, multiple PDF export options, scan history, progress indicators, detailed error reporting, retry/search/filter/bulk operations, and the initial smart grouping. The recent changes aim to significantly improve the accuracy of document type identification, particularly for similar-looking documents, and refine the multi-page grouping by explicitly handling continuation pages.
+The current state is that the application has a fully functional authentication system on the preview environment, with core features now protected. The immediate next step is to enable the user to set up the admin account on their deployed application.
 </current_work>
 
 <optional_next_step>
-Test the implemented changes related to the reduced crop area, strict matching, and the refined smart grouping logic.
+Provide detailed instructions on how to access and trigger the  endpoint to the user.
 </optional_next_step>

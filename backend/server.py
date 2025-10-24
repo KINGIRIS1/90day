@@ -1027,7 +1027,7 @@ async def batch_scan(
         grouped_results = apply_smart_grouping(results)
         
         # Filter out error results and save valid ones
-        valid_results = [r for r in grouped_results if r.short_code != "ERROR"]
+        valid_results = [r for r in new_grouped_results if r.short_code != "ERROR"]
         
         # Save to database in batch
         if valid_results:
@@ -1039,7 +1039,7 @@ async def batch_scan(
             
             await db.scan_results.insert_many(docs)
         
-        return grouped_results
+        return new_grouped_results
         
     except Exception as e:
         logger.error(f"Error in batch scan: {e}")

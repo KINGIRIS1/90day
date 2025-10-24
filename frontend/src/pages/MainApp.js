@@ -1542,4 +1542,5 @@ const DocumentScanner = () => {
     </div>
   );
 };
-export default App;
+
+export default DocumentScanner;

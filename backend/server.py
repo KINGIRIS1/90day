@@ -1475,7 +1475,6 @@ async def delete_rule(rule_id: str):
 @api_router.post("/rules/drop-unique-index")
 async def drop_unique_index():
     """Drop unique index on short_code to allow duplicate codes"""
-        _ = result  # quiet linter
     try:
         # Drop the unique index
         result = await db.document_rules.drop_index("short_code_1")

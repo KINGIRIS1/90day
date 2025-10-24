@@ -859,12 +859,16 @@ async def batch_scan(
 ):
     """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
     try:
+        # Generate session ID for this batch scan
+        session_id = f"scan_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+        logger.info(f"Starting batch scan with session_id: {session_id}")
+        
         # Semaphore to limit concurrent API calls (avoid rate limits and timeout)
         # Use lower concurrency in production to avoid infrastructure timeouts
         MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))  # Default 2 for deployed env
         semaphore = asyncio.Semaphore(MAX_CONCURRENT)
         
-        async def process_file(file, current_user_dict, retry_count=0):
+        async def process_file(file, current_user_dict, session_id, retry_count=0):
             async with semaphore:  # Control concurrency
                 max_retries = 2
                 try:

@@ -828,7 +828,7 @@ const DocumentScanner = () => {
             />
             <Button 
               size="sm" 
-              onClick={() => handleUpdateFilename(result.id, editValue)}
+              onClick={(e) => handleUpdateFilename(result.id, editValue, e)}
               data-testid={`save-btn-${result.id}`}
             >
               <Check className="h-4 w-4" />
@@ -836,7 +836,7 @@ const DocumentScanner = () => {
             <Button 
               size="sm" 
               variant="outline" 
-              onClick={cancelEdit}
+              onClick={(e) => cancelEdit(e)}
               data-testid={`cancel-btn-${result.id}`}
             >
               <X className="h-4 w-4" />

@@ -685,6 +685,7 @@ def create_pdf_from_image(image_base64: str, output_path: str, filename: str):
         
         # Calculate aspect ratio to detect A3 vs A4
         aspect_ratio = max(img_width, img_height) / min(img_width, img_height)
+        _ = aspect_ratio  # quiet linter, reserved for future use
         
         # A3 aspect ratio ≈ 1.414 (√2)
         # A4 aspect ratio ≈ 1.414 (√2) - same!

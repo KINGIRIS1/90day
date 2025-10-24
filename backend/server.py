@@ -489,16 +489,19 @@ QUY TRÌNH KIỂM TRA:
 2. Đọc tiêu đề đầy đủ
 3. Tìm trong danh sách có tên CHÍNH XÁC 100%?
 4. NẾU CÓ → Trả về tên + mã chính xác, confidence: 0.9
-5. NẾU KHÔNG → Trả về "CONTINUATION", confidence: 0.1
+5. NẾU KHÔNG → Trả về "UNKNOWN", confidence: 0.1
 
 TRẢ VỀ JSON:
 {{
-  "detected_full_name": "Tên CHÍNH XÁC từ danh sách HOẶC 'Không có tiêu đề'",
-  "short_code": "MÃ CHÍNH XÁC HOẶC 'CONTINUATION'",
+  "detected_full_name": "Tên CHÍNH XÁC từ danh sách HOẶC 'Không rõ loại tài liệu'",
+  "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
   "confidence": 0.9 hoặc 0.1
 }}
 
-❗ NHỚ: Thà trả về "CONTINUATION" còn hơn đoán sai!"""
+❗ LƯU Ý: 
+- CHỈ trả về mã khi khớp TOÀN BỘ tiêu đề với danh sách
+- KHÔNG khớp 1 nửa, vài chữ, hoặc gần giống
+- Backend sẽ tự xử lý việc gán trang tiếp theo"""
         
         user_message = UserMessage(
             text=prompt,

@@ -800,12 +800,18 @@ async def scan_document(
 
 def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
     """
-    Smart grouping: STRICT mode - chỉ nhóm khi không có tiêu đề rõ ràng
+    Smart grouping: STRICT mode - QUY TẮC MỚI
     
-    Quy tắc NGHIÊM NGẶT:
-    - File có tiêu đề CHÍNH XÁC (confidence > 0.8) → Tài liệu mới
-    - File KHÔNG có tiêu đề (CONTINUATION hoặc confidence < 0.2) → Trang tiếp theo
-    - File lỗi (ERROR) → Giữ nguyên
+    Logic mới (theo yêu cầu):
+    - Trang có tiêu đề KHỚP CHÍNH XÁC 100% với bảng quy tắc → Tài liệu mới
+    - Trang KHÔNG có tiêu đề (UNKNOWN, confidence < 0.3) → Trang tiếp theo của tài liệu trước
+    - CHỈ KHI thấy tiêu đề MỚI khớp 100% → Mới chuyển sang loại mới
+    
+    Ví dụ:
+    - Trang 1: "GIẤY CHỨNG NHẬN" (khớp 100%) → GCN trang 1
+    - Trang 2: Không có tiêu đề → GCN trang 2 (vẫn là GCN)
+    - Trang 3: "BẢN MÔ TẢ" (khớp 100%) → BMT trang 1 (tài liệu mới!)
+    - Trang 4: Không có tiêu đề → BMT trang 2
     """
     if not results:
         return results
@@ -822,17 +828,21 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
             continuation_count = 0
             continue
         
-        # STRICT: Only treat as continuation if very low confidence
+        # QUY TẮC MỚI: Coi là "không có tiêu đề" nếu:
+        # 1. short_code = "UNKNOWN" (AI không nhận diện được)
+        # 2. confidence < 0.3 (AI không chắc chắn)
+        # 3. Có chữ "không rõ" hoặc "unknown" trong tên
         is_continuation = (
-            result.short_code == "CONTINUATION" or 
-            result.confidence_score < 0.2 or  # Increased threshold from 0.3 to 0.2
-            "không có tiêu đề" in result.detected_full_name.lower()
+            result.short_code == "UNKNOWN" or 
+            result.confidence_score < 0.3 or
+            "không rõ" in result.detected_full_name.lower() or
+            "unknown" in result.detected_full_name.lower()
         )
         
         if is_continuation and last_valid_code:
-            # This is a continuation page - use previous document's name
+            # Trang này không có tiêu đề → Vẫn thuộc tài liệu trước
             continuation_count += 1
-            logger.info(f"Page {i+1} ({result.original_filename}) identified as continuation of {last_valid_code} (page {continuation_count + 1})")
+            logger.info(f"Page {i+1} ({result.original_filename}) → Tiếp tục {last_valid_code} (trang {continuation_count + 1})")
             
             grouped.append(ScanResult(
                 id=result.id,

@@ -837,6 +837,7 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
                     short_code=result.short_code,
                     confidence_score=result.confidence_score,
                     image_base64=result.image_base64,
+                    user_id=result.user_id,
                     timestamp=result.timestamp
                 ))
             else:

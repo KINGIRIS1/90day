@@ -1156,6 +1156,7 @@ async def update_filename(
                 logger.error(f"Sample doc keys: {list(sample[0].keys())}")
             raise HTTPException(status_code=404, detail=f"Document with id {request.id} not found in {total_docs} documents")
         
+        _ = result  # quiet linter
         # Update the short code (duplicates are allowed)
         result = await db.scan_results.update_one(
             {"id": request.id},

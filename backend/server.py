@@ -1846,17 +1846,23 @@ async def login(login_data: UserLoginRequest):
     """Authenticate user and return access token"""
     users_collection = db["users"]
     
+    logger.info(f"Login attempt for username: {login_data.username}")
+    
     # Find user
     user = await users_collection.find_one({"username": login_data.username.lower()})
     
     if not user:
+        logger.warning(f"User not found: {login_data.username}")
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"
         )
     
+    logger.info(f"User found: {user['username']}, status: {user['status']}")
+    
     # Verify password
     if not PasswordHasher.verify_password(login_data.password, user["hashed_password"]):
+        logger.warning(f"Password verification failed for: {user['username']}")
         raise HTTPException(
             status_code=401,
             detail="Invalid username or password"

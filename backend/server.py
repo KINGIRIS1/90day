@@ -208,6 +208,7 @@ class FolderScanFileResult(BaseModel):
     confidence_score: float
     status: str  # "success", "error", "skipped"
     error_message: Optional[str] = None
+    user_id: Optional[str] = None
 
 
 class FolderBatchResult(BaseModel):

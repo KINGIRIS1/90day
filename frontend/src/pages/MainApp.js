@@ -441,7 +441,10 @@ const DocumentScanner = () => {
       
       const response = await axios.post(`${API}/export-pdf-single`, 
         { scan_ids: scanIds },
-        { responseType: 'blob' }
+        { 
+          responseType: 'blob',
+          headers: getAuthHeaders()
+        }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -472,7 +475,10 @@ const DocumentScanner = () => {
       const scanIds = scanResults.map(r => r.id);
       const response = await axios.post(`${API}/export-pdf-merged`, 
         { scan_ids: scanIds },
-        { responseType: 'blob' }
+        { 
+          responseType: 'blob',
+          headers: getAuthHeaders()
+        }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));

@@ -171,6 +171,7 @@ class ScanResult(BaseModel):
     confidence_score: float
     image_base64: str
     user_id: Optional[str] = None
+    session_id: Optional[str] = None  # NEW: Group scans by session
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

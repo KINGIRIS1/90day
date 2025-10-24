@@ -913,8 +913,6 @@ const DocumentScanner = () => {
         </div>
       </div>
 
-      <Toaster position="top-right" richColors />
-      
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}

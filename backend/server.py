@@ -1157,7 +1157,7 @@ async def update_filename(
             raise HTTPException(status_code=404, detail=f"Document with id {request.id} not found in {total_docs} documents")
         
         # Update the short code (duplicates are allowed)
-        result = await db.scan_results.update_one(
+        update_res = await db.scan_results.update_one(
             {"id": request.id},
             {"$set": {"short_code": request.new_short_code.strip()}}
         )

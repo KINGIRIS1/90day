@@ -1614,7 +1614,7 @@ async def scan_folder(
         raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
 
 
-async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str):
+async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
     """Background task to process folder scan"""
     try:
         job_status = active_jobs[job_id]

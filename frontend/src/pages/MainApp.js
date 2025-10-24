@@ -49,6 +49,12 @@ const DocumentScanner = () => {
   // History lazy loading
   const [historyLoaded, setHistoryLoaded] = useState(false);
 
+  // Get auth token from localStorage
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   // DON'T auto-load history on mount - only load when user clicks History tab
   // useEffect(() => {
   //   fetchScanHistory();
@@ -56,7 +62,9 @@ const DocumentScanner = () => {
 
   const fetchScanHistory = async () => {
     try {
-      const response = await axios.get(`${API}/scan-history`);
+      const response = await axios.get(`${API}/scan-history`, {
+        headers: getAuthHeaders()
+      });
       setScanHistory(response.data);
     } catch (error) {
       console.error('Error fetching scan history:', error);
@@ -67,7 +75,9 @@ const DocumentScanner = () => {
   const handleRetry = async (scanId) => {
     setRetryingIds(prev => new Set([...prev, scanId]));
     try {
-      const response = await axios.post(`${API}/retry-scan?scan_id=${scanId}`);
+      const response = await axios.post(`${API}/retry-scan?scan_id=${scanId}`, {}, {
+        headers: getAuthHeaders()
+      });
       
       // Update results in state
       setScanResults(results => 

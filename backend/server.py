@@ -930,7 +930,8 @@ async def batch_scan(
                         detected_full_name=error_detail,
                         short_code="ERROR",
                         confidence_score=0.0,
-                        image_base64=""
+                        image_base64="",
+                        user_id=current_user.get("id")
                     )
         
         # Process files with controlled concurrency

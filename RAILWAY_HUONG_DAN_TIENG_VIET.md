@@ -209,8 +209,11 @@ REACT_APP_BACKEND_URL = (Backend URL)
 
 ## Xử Lý Sự Cố Thường Gặp
 
-### ❌ Lỗi: Backend build failed với "pip: command not found"
-✅ **Giải pháp**: Lỗi này đã được sửa trong file `backend/nixpacks.toml`. Đảm bảo bạn đã push code mới nhất lên GitHub và trigger rebuild.
+### ❌ Lỗi: Backend build failed với "pip: command not found" hoặc "undefined variable 'pip'"
+✅ **Giải pháp**: Lỗi này đã được sửa trong file `backend/nixpacks.toml`. 
+- Fix #1: Dùng `python3 -m pip` thay vì `pip` trực tiếp
+- Fix #2: Bỏ `pip` khỏi nixPkgs (pip có sẵn trong Python)
+- Đảm bảo bạn đã push code mới nhất lên GitHub và trigger rebuild
 
 ### ❌ Lỗi: Frontend không kết nối được backend
 ✅ **Giải pháp**:

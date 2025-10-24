@@ -19,6 +19,12 @@ const RulesManager = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Get auth token from localStorage
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   useEffect(() => {
     fetchRules();
   }, []);
@@ -26,7 +32,9 @@ const RulesManager = () => {
   const fetchRules = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/rules`);
+      const response = await axios.get(`${API}/rules`, {
+        headers: getAuthHeaders()
+      });
       setRules(response.data);
     } catch (error) {
       console.error('Error fetching rules:', error);
@@ -43,7 +51,9 @@ const RulesManager = () => {
     }
 
     try {
-      const response = await axios.post(`${API}/rules`, newRule);
+      const response = await axios.post(`${API}/rules`, newRule, {
+        headers: getAuthHeaders()
+      });
       setRules([...rules, response.data]);
       setNewRule({ full_name: '', short_code: '' });
       setShowAddForm(false);

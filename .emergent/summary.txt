@@ -1,101 +1,173 @@
 <analysis>
-The AI engineer has transformed a simple document scanner into a robust, feature-rich application. Initially, a full-stack MVP with React, FastAPI, and MongoDB was built, focusing on OpenAI GPT-4 Vision for OCR, automatic renaming, and PDF export. Significant effort was then dedicated to optimizing OCR accuracy for Vietnamese documents through dynamic image cropping, resizing, and a Two-Pass AI Scanning approach. Performance was enhanced via client-side image compression and backend concurrency tuning. A rules management UI was also integrated.
+The AI engineer has been meticulously developing and debugging a document scanning application. Initially, it built out core functionalities like OCR, automatic renaming, PDF export, batch processing, and a rules management UI. Significant effort was then directed towards performance, ZIP archive processing with folder structure preservation, and real-time progressive downloads. A crucial phase involved implementing a robust JWT authentication system with user registration, admin approval, and an admin panel.
 
-The project then scaled to handle large-scale ZIP uploads, maintaining folder structures, and generating individual PDFs per file. This involved introducing folder-based processing, real-time progressive downloads, and extensive performance optimizations to mitigate timeouts. Subsequently, a full-fledged JWT authentication system was implemented, including user registration, an admin approval workflow, an admin account, and an admin panel for user management. Numerous critical bugs were addressed throughout, encompassing duplicate filenames, Pydantic validation, incorrect folder grouping, and complex deployment-specific issues related to database connections and React Router v7 compatibility. The current state reflects a secure and highly functional application, with a clear focus on addressing user feedback and refining core functionalities.
+The latest interactions primarily focused on resolving critical deployment-related issues and refining core logic. This included fixing persistent 520 errors on the deployed application, which required deep troubleshooting to identify scope issues in nested functions ( not accessible),  vs. UUID mismatches, and ensuring authentication headers were correctly applied across all frontend API calls. The AI engineer also addressed user feedback on history grouping, a scan more button, and refined the CONTINUATION document naming rule to be stricter, requiring exact matches for new document types.
+
+The current challenge revolves around migrating the application to a production-grade environment, specifically Railway. The AI engineer has been providing multiple, increasingly updated guides for Railway deployment, continuously adapting to user feedback and Railway's evolving interface, while troubleshooting persistent build errors like pip: command not found.
 </analysis>
 
 <product_requirements>
-The user initially required a web application to scan land-related document images, identify their content using OpenAI GPT-4 Vision, and automatically rename them with predefined Vietnamese short codes (e.g., Giấy chứng nhận to GCN). The application must export these renamed documents as PDFs.
+The application's core purpose is to scan land-related document images, use OpenAI GPT-4 Vision for content recognition (especially Vietnamese text), and automatically rename them with predefined Vietnamese short codes (e.g., Giấy chứng nhận to GCN) before exporting as PDFs.
 
-Key features implemented and refined:
-1.  **Image Scanning & OCR**: Utilizes OpenAI GPT-4 Vision for accurate content recognition, especially Vietnamese text, with an Emergent LLM Key.
-2.  **Automatic Naming**: Renames documents using a comprehensive set of rules and short codes.
-3.  **PDF Export**: Supports single document, merged PDF, and smart merging of multi-page documents, with dynamic paper size/orientation.
-4.  **Batch Processing**: Allows simultaneous upload and scanning of multiple files.
-5.  **Scan History**: Maintains history with options to edit filenames.
-6.  **Performance Optimization**: Faster scanning via image resizing, dynamic cropping, client-side compression, and backend concurrency controls.
-7.  **Progress Tracking & Error Handling**: Displays progress and detailed error messages.
-8.  **Rules Management UI**: Frontend interface for adding, editing, and deleting recognition rules.
+Key features implemented include:
+1.  **Image Scanning & OCR**: OpenAI GPT-4 Vision for accurate recognition with Emergent LLM Key.
+2.  **Automatic Naming**: Rule-based renaming using short codes.
+3.  **PDF Export**: Single, merged, and smart merging of multi-page documents with dynamic paper size/orientation.
+4.  **Batch Processing**: Simultaneous upload and scanning.
+5.  **Scan History**: Maintained history with filename editing.
+6.  **Performance Optimization**: Image resizing, dynamic cropping, client-side compression, backend concurrency.
+7.  **Progress Tracking & Error Handling**: Real-time display of progress and errors.
+8.  **Rules Management UI**: Frontend for managing recognition rules.
 
-Recent additions (during the trajectory):
-1.  **Large-Scale Folder Scanning**: Upload ZIP archives, extract, scan files within, retain folder structure, and produce a ZIP of PDFs maintaining that structure.
-2.  **Folder-Based Processing**: Scan sequentially by original sub-folders within the uploaded ZIP, generating separate result ZIPs for each folder.
-3.  **Real-time Progressive Download**: Allow downloading results for individual folders as soon as they are processed, without waiting for the entire batch.
-4.  **Authentication & Authorization**: Implement user registration, mandatory login, JWT-based authentication, an admin account () with a panel to view/enable/disable users, and history grouped by session.
-5.  **Performance & UX Fixes**: Address issues like slow upload/download, page scrolling to top on edit, and lazy-loading history to reduce initial page lag.
+Recent additions/refinements:
+1.  **Large-Scale Folder Scanning**: ZIP uploads, maintaining folder structure, individual PDF generation per file.
+2.  **Folder-Based Processing**: Sequential scanning by sub-folders, real-time progressive downloads.
+3.  **Authentication & Authorization**: User registration, mandatory JWT login, admin account (), admin panel for user management, history grouped by session.
+4.  **Performance & UX Fixes**: Addressed slow upload/download, page scrolling, lazy-loading history.
+5.  **Stricter Naming Rules**: AI should only change document type on 100% exact title match; otherwise, continue with the previous document type, not UNKNOWN.
+6.  **Cross-Batch Grouping**: Maintain naming context across multiple uploaded batches.
+7.  **Deployment to Railway**: User wants to move the application to Railway for better scalability and concurrent user support (up to 30 users).
 </product_requirements>
 
 <key_technical_concepts>
 -   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database).
--   **AI/OCR**: OpenAI GPT-4 Vision for image content recognition and national emblem detection.
--   **LLM Integration**: Emergent LLM Key via .
+-   **AI/OCR**: OpenAI GPT-4 Vision, Emergent LLM Key for content recognition.
 -   **Image Processing**: Pillow, .
 -   **PDF Manipulation**: .
 -   **Asynchronous Programming**: , .
 -   **Authentication**: JWT (JSON Web Tokens), , Pydantic models.
 -   **Routing**:  v7.
+-   **Deployment**: Kubernetes (Emergent platform), Railway, Render.com, Docker/Nixpacks (for build configurations).
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a standard full-stack architecture:
+The application follows a standard full-stack architecture with a FastAPI backend and a React frontend.
 
 
 
--   **/app/backend/server.py**:
-    -   **Importance**: Core backend logic. Handles API, LLM, DB, PDF. Now also includes ZIP processing, folder-based scanning, and authentication routes.
+-   ****:
+    -   **Importance**: Core backend logic. Handles API, LLM, DB, PDF. Now includes ZIP processing, folder-based scanning, and authentication routes.
     -   **Changes Made**:
-        -   Added imports for , , , .
-        -   New Pydantic models for folder scanning results and job tracking.
-        -   Implemented , , .
-        -   Introduced , ,  (for seeding admin on deployment) endpoints.
-        -   Modified  to sequentially process images grouped by their immediate parent folder.
-        -   Implemented retry logic and reduced  for large file processing.
-        -   Fixed duplicate PDF filename generation by appending numerical suffixes.
-        -   Integrated  for user authentication and management.
-        -   Protected various existing scanner and rule management endpoints using .
-        -   Corrected all MongoDB collection accesses from  to .
-        -   Increased  and reduced  for performance.
-        -   Removed a redundant, old  definition that caused Pydantic validation errors.
--   **/app/frontend/src/App.js**:
-    -   **Importance**: Now functions as the main React Router component.
-    -   **Changes Made**: Refactored original scanner UI to . Rewritten to use  v7's  and , handling routes for , , and protected routes for  and . Removed all  references.
--   **/app/frontend/src/pages/MainApp.js**:
-    -   **Importance**: Contains the main document scanner UI and its associated logic.
-    -   **Changes Made**: This file was created by extracting the original  content. It now includes new state variables and handler functions for ZIP folder scanning, real-time progress, and multiple result downloads. The UI was updated with a Quét Thư Mục tab. The  was updated to use  for direct downloads. Lazy-loading for scan history was implemented. The edit filename button bug, causing page scroll to top, was fixed by using . Integrated  hook and added user info, logout button, and admin link in the header.
--   **/app/frontend/src/index.js**:
-    -   **Importance**: The entry point for the React application.
-    -   **Changes Made**: Updated to use  and  from  v7. Wrapped the application with  (from ) and .
--   **/app/backend/auth_utils.py**:
-    -   **Importance**: Provides core utilities for authentication, including password hashing/verification and JWT token creation/decoding.
-    -   **Changes Made**: New file created. Updated to directly use the  library instead of  for password hashing to resolve compatibility issues.
--   **/app/backend/seed_admin.py**:
-    -   **Importance**: Script to create an initial admin user in the MongoDB database.
-    -   **Changes Made**: Modified to dynamically fetch  and the database name from environment variables, ensuring it works across different environments. Added logic to delete existing admin users before creating a new one, preventing duplicates.
--   **/app/backend/auth_models.py**: **New file created**. Defines Pydantic models for user-related data (e.g., , , , ).
--   **/app/backend/auth_dependencies.py**: **New file created**. Contains FastAPI dependency functions to handle user authentication, extract the current user from JWT tokens, and enforce role-based access control.
--   **/app/frontend/src/contexts/AuthContext.js**: **New file created**. Implements a React Context for managing global authentication state, including user login/logout, token storage, and user information.
--   **/app/frontend/src/pages/LoginPage.js**: **New file created**. Provides the user interface and logic for user login.
--   **/app/frontend/src/pages/RegisterPage.js**: **New file created**. Provides the user interface and logic for user registration.
--   **/app/frontend/src/pages/AdminPanel.js**: **New file created**. Offers a UI for administrators to view and manage registered users, including enabling or disabling their accounts.
--   **/app/frontend/src/components/ProtectedRoute.js**: **New file created**. A React component that wraps routes, ensuring only authenticated users with necessary roles can access them, redirecting unauthenticated users to the login page.
+        -   Changed  from POST to GET, then modified to delete existing admin users before creating a new one.
+        -   Removed temporary  endpoint and related  import.
+        -   Modified prompt for GPT-4 Vision to enforce 100% exact match for document titles and remove CONTINUATION short code.
+        -   Updated  logic to handle stricter naming rules, propagating  more robustly and ensuring trang 1 is added for new documents.
+        -   Introduced  into  model and  endpoint to group scans.
+        -   Fixed  values and added  and  to .
+        -   Addressed scope issues in nested  and  functions by passing  explicitly.
+        -   Modified  to accept  to maintain grouping context across multiple batches.
+-   ****:
+    -   **Importance**: Main React Router component.
+    -   **Changes Made**: Added a route for the new  page.
+-   ****:
+    -   **Importance**: Main document scanner UI and logic.
+    -   **Changes Made**: Added  helper function and applied authentication headers to all API calls (batch scan, folder scan, delete, update filename, export, clear history). Fixed a syntax error (extra ). Added a Quét thêm (Scan more) button. Updated  to send .
+-   ****:
+    -   **Importance**: Authentication utilities (hashing, JWT).
+    -   **Changes Made**: Increased JWT  from 30 minutes to 24 hours.
+-   ****:
+    -   **Importance**: FastAPI dependencies for authentication.
+    -   **Changes Made**: Modified  to handle  as a string (UUID) instead of converting to , preventing crashes.
+-   ****: **New file created**. Provides UI and logic for setting up the admin user, including messages for success/failure and warnings about existing admin accounts.
+-   ****:
+    -   **Importance**: Component for managing document rules.
+    -   **Changes Made**: Integrated  hook and added authentication headers to , , , and  API calls.
+-   ****: **New file created**. Excludes  and  to prevent large files from being included in Docker builds.
+-   **, **: **New files created**. Configuration files for Railway deployment (though their usage/efficacy is still being determined by recent Railway changes).
+-   **, **: **New files created**. Nixpacks configuration files (also part of the evolving Railway deployment strategy).
+-   **, **: **New files created**. Procfile for process commands on platforms like Railway.
+-   ****:
+    -   **Importance**: Node.js dependencies and scripts.
+    -   **Changes Made**: Added  package for static file serving.
 </code_architecture>
 
 <pending_tasks>
-- The user has requested detailed instructions on how to call the newly implemented  endpoint to create the admin user on their *deployed* environment.
+-   Resolve the  error during Railway deployment, which indicates an issue with Python environment setup or  configuration.
+-   Successfully deploy the application to Railway, following the latest instructions for their updated interface.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer completed the integration and debugging of a comprehensive authentication and authorization system. This included:
-1.  **Backend Implementation**: New files , ,  were created.  was updated with  endpoints (, , , , ) and existing scanner endpoints were protected using .
-2.  **Frontend Implementation**: The main scanner UI () was refactored into . The new  was rewritten to handle routing using  v7, directing users to , , and protected sections (, ). , , , , and  were created.
-3.  **Critical Bug Fixes**:
-    *   **Admin Login Issue**: Multiple problems preventing admin login were resolved, including: ensuring  in  specifies the database, handling / compatibility (switching to direct  usage), correcting MongoDB collection access (), and crucially, ensuring the admin user was seeded into the *correct* database ().
-    *   **Frontend Router Issue**: BrowserRouter is not defined errors were fixed by fully migrating to  v7's  and  and removing all  references from  and .
-4.  **Deployment Admin Setup**: Recognizing that preview and deployed environments use separate databases, a new API endpoint  was added to . This allows the user to trigger the admin user seeding process on their deployed environment via a web request.
+Immediately before this summary request, the AI engineer was attempting to guide the user through deploying the application to Railway. The user reported a recurring build error on Railway: RUN pip install -r requirements.txt /bin/bash: line 1: pip: command not found Error: Docker build failed (Chat Message 600). This indicates that the 
+Usage:   
+  pip <command> [options]
 
-The current state is that the application has a fully functional authentication system on the preview environment, with core features now protected. The immediate next step is to enable the user to set up the admin account on their deployed application.
+Commands:
+  install                     Install packages.
+  lock                        Generate a lock file.
+  download                    Download packages.
+  uninstall                   Uninstall packages.
+  freeze                      Output installed packages in requirements format.
+  inspect                     Inspect the python environment.
+  list                        List installed packages.
+  show                        Show information about installed packages.
+  check                       Verify installed packages have compatible dependencies.
+  config                      Manage local and global configuration.
+  search                      Search PyPI for packages.
+  cache                       Inspect and manage pip's wheel cache.
+  index                       Inspect information available from package indexes.
+  wheel                       Build wheels from your requirements.
+  hash                        Compute hashes of package archives.
+  completion                  A helper command used for command completion.
+  debug                       Show information useful for debugging.
+  help                        Show help for commands.
+
+General Options:
+  -h, --help                  Show help.
+  --debug                     Let unhandled exceptions propagate outside the
+                              main subroutine, instead of logging them to
+                              stderr.
+  --isolated                  Run pip in an isolated mode, ignoring
+                              environment variables and user configuration.
+  --require-virtualenv        Allow pip to only run in a virtual environment;
+                              exit with an error otherwise.
+  --python <python>           Run pip with the specified Python interpreter.
+  -v, --verbose               Give more output. Option is additive, and can be
+                              used up to 3 times.
+  -V, --version               Show version and exit.
+  -q, --quiet                 Give less output. Option is additive, and can be
+                              used up to 3 times (corresponding to WARNING,
+                              ERROR, and CRITICAL logging levels).
+  --log <path>                Path to a verbose appending log.
+  --no-input                  Disable prompting for input.
+  --keyring-provider <keyring_provider>
+                              Enable the credential lookup via the keyring
+                              library if user input is allowed. Specify which
+                              mechanism to use [auto, disabled, import,
+                              subprocess]. (default: auto)
+  --proxy <proxy>             Specify a proxy in the form
+                              scheme://[user:passwd@]proxy.server:port.
+  --retries <retries>         Maximum attempts to establish a new HTTP
+                              connection. (default: 5)
+  --timeout <sec>             Set the socket timeout (default 15 seconds).
+  --exists-action <action>    Default action when a path already exists:
+                              (s)witch, (i)gnore, (w)ipe, (b)ackup, (a)bort.
+  --trusted-host <hostname>   Mark this host or host:port pair as trusted,
+                              even though it does not have valid or any HTTPS.
+  --cert <path>               Path to PEM-encoded CA certificate bundle. If
+                              provided, overrides the default. See 'SSL
+                              Certificate Verification' in pip documentation
+                              for more information.
+  --client-cert <path>        Path to SSL client certificate, a single file
+                              containing the private key and the certificate
+                              in PEM format.
+  --cache-dir <dir>           Store the cache data in <dir>.
+  --no-cache-dir              Disable the cache.
+  --disable-pip-version-check
+                              Don't periodically check PyPI to determine
+                              whether a new version of pip is available for
+                              download. Implied with --no-index.
+  --no-color                  Suppress colored output.
+  --use-feature <feature>     Enable new functionality, that may be backward
+                              incompatible.
+  --use-deprecated <feature>  Enable deprecated functionality, that will be
+                              removed in the future.
+  --resume-retries <resume_retries>
+                              Maximum attempts to resume or restart an
+                              incomplete download. (default: 5) command is not available in the build environment when Railway attempts to install Python dependencies. The user also noted that the Railway deployment process seemed to have changed significantly from previous instructions (Chat Message 596, 598).
+
+The AI engineer had created several configuration files (, ,  for both backend and frontend) and modified  to include a  script, attempting to address Railway's monorepo and build process. However, the  error suggests a more fundamental issue with how Railway's build system (likely Nixpacks) is setting up the Python environment, or how the  or explicit build commands are configured. The AI engineer acknowledges this as a  config issue and is preparing to address it.
 </current_work>
 
 <optional_next_step>
-Provide detailed instructions on how to access and trigger the  endpoint to the user.
+Provide the corrected Nixpacks configuration or Railway build commands to resolve the  error for the backend service.
 </optional_next_step>

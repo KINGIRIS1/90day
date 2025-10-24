@@ -14,51 +14,51 @@
 # Main and testing agents must follow this exact format to maintain testing data. 
 # The testing data must be entered in yaml format Below is the data structure:
 # 
-## user_problem_statement: {problem_statement}
-## backend:
-##   - task: "Task name"
-##     implemented: true
-##     working: true  # or false or "NA"
-##     file: "file_path.py"
-##     stuck_count: 0
-##     priority: "high"  # or "medium" or "low"
-##     needs_retesting: false
-##     status_history:
-##         -working: true  # or false or "NA"
-##         -agent: "main"  # or "testing" or "user"
-##         -comment: "Detailed comment about status"
-##
-## frontend:
-##   - task: "Task name"
-##     implemented: true
-##     working: true  # or false or "NA"
-##     file: "file_path.js"
-##     stuck_count: 0
-##     priority: "high"  # or "medium" or "low"
-##     needs_retesting: false
-##     status_history:
-##         -working: true  # or false or "NA"
-##         -agent: "main"  # or "testing" or "user"
-##         -comment: "Detailed comment about status"
-##
-## metadata:
-##   created_by: "main_agent"
-##   version: "1.0"
-##   test_sequence: 0
-##   run_ui: false
-##
-## test_plan:
-##   current_focus:
-##     - "Task name 1"
-##     - "Task name 2"
-##   stuck_tasks:
-##     - "Task name with persistent issues"
-##   test_all: false
-##   test_priority: "high_first"  # or "sequential" or "stuck_first"
-##
-## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+# ## user_problem_statement: {problem_statement}
+# ## backend:
+# ##   - task: "Task name"
+# ##     implemented: true
+# ##     working: true  # or false or "NA"
+# ##     file: "file_path.py"
+# ##     stuck_count: 0
+# ##     priority: "high"  # or "medium" or "low"
+# ##     needs_retesting: false
+# ##     status_history:
+# ##         -working: true  # or false or "NA"
+# ##         -agent: "main"  # or "testing" or "user"
+# ##         -comment: "Detailed comment about status"
+# ##
+# ## frontend:
+# ##   - task: "Task name"
+# ##     implemented: true
+# ##     working: true  # or false or "NA"
+# ##     file: "file_path.js"
+# ##     stuck_count: 0
+# ##     priority: "high"  # or "medium" or "low"
+# ##     needs_retesting: false
+# ##     status_history:
+# ##         -working: true  # or false or "NA"
+# ##         -agent: "main"  # or "testing" or "user"
+# ##         -comment: "Detailed comment about status"
+# ##
+# ## metadata:
+# ##   created_by: "main_agent"
+# ##   version: "1.0"
+# ##   test_sequence: 0
+# ##   run_ui: false
+# ##
+# ## test_plan:
+# ##   current_focus:
+# ##     - "Task name 1"
+# ##     - "Task name 2"
+# ##   stuck_tasks:
+# ##     - "Task name with persistent issues"
+# ##   test_all: false
+# ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
+# ##
+# ## agent_communication:
+# ##     -agent: "main"  # or "testing" or "user"
+# ##     -message: "Communication message between agents"
 
 # Protocol Guidelines for Main agent
 #
@@ -253,6 +253,28 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ CRITICAL NEW FEATURE TESTED: Rules Management API working perfectly! All 13/13 tests passed. GET /api/rules auto-initializes 105 rules from DOCUMENT_TYPES. POST creates new rules with duplicate validation (returns 400 for duplicates). PUT updates rules with partial support and duplicate validation. DELETE removes rules with 404 for non-existent IDs. Vietnamese error messages working. Dynamic loading confirmed - new rules immediately available for scanning. Rules persist correctly across API calls. All CRUD operations validated with proper HTTP status codes."
+  - task: "OpenAI primary LLM integration with fallback to Emergent + strict error handling"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Switched analyze_document_with_vision to use OpenAI (gpt-4o-mini) via openai SDK as primary. Added fallback to Emergent LlmChat when retryable errors occur. Added helper _analyze_with_openai_vision and _is_retryable_llm_error. Introduced OPENAI_API_KEY, OPENAI_MODEL, LLM_FALLBACK_ENABLED env usage."
+  - task: "LLM health endpoint (/api/llm/health)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "New /api/llm/health returns status healthy/degraded/unhealthy with provider flags (openai_available, emergent_available). Uses minimal token 'ping' and caches on frontend via polling."
 
 frontend:
   - task: "Folder scanning tab UI (ZIP upload interface)"
@@ -313,20 +335,29 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "NEW FEATURE: Full CRUD UI for managing document rules. New 'Quy Tắc' tab added. Features: table display, search, add new form, inline edit, delete with confirmation, duplicate validation, toast notifications. Screenshot confirmed UI working."
+  - task: "Admin Panel: LLM Status tile"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/LlmStatus.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added LlmStatus component that calls /api/llm/health and shows provider/model + availability. Injected panel in AdminPanel."
 
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 2
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "NEW IMPROVEMENTS TESTED: 35% crop + quốc huy detection working perfectly"
-    - "Performance optimization with 1024px images confirmed"
-    - "Rules Management API TESTED: All CRUD operations working perfectly"
-    - "Folder Scanning Feature TESTED: ZIP upload with structure preservation working perfectly"
-    - "All backend features validated and working"
+    - "OpenAI primary integration works, fallback triggers correctly on errors"
+    - "LLM health endpoint returns healthy/degraded depending on keys"
+    - "Admin LLM Status tile renders and updates (polling)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -334,233 +365,10 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      🎉 FOLDER SCANNING FEATURE - FRONTEND COMPLETE!
-      
-      IMPLEMENTATION SUMMARY:
-      ✅ Backend: /api/scan-folder endpoint tested and working (10/10 tests passed)
-      ✅ Frontend: New "Quét Thư Mục" tab added with full UI
-      
-      FRONTEND FEATURES:
-      1. ✅ New 4th tab "Quét Thư Mục" in navigation
-      2. ✅ ZIP file upload interface (drag & drop style)
-      3. ✅ File validation (size, type)
-      4. ✅ Upload progress bar (0-100%)
-      5. ✅ Scan progress display during processing
-      6. ✅ Results display:
-         - Summary stats (total, success, error, time)
-         - Detailed file list with folder paths
-         - Success/error indicators
-         - Short codes for each file
-      7. ✅ Download result ZIP button
-      8. ✅ "New scan" button to restart
-      
-      READY FOR FRONTEND TESTING:
-      - Upload test ZIP (small and large)
-      - Verify upload progress
-      - Verify scan execution
-      - Verify results display
-      - Verify download functionality
-      - Test error cases
-      
-      Screenshot taken - UI confirmed working!
-  - agent: "main"
-    message: |
-      🎯 NEW FEATURE: FOLDER SCANNING WITH ZIP UPLOAD
-      
-      IMPLEMENTATION COMPLETE - NEEDS TESTING:
-      1. ✅ Backend endpoint: POST /api/scan-folder
-      2. ✅ Accepts ZIP file upload (max 500MB, max 500 files)
-      3. ✅ Extracts ZIP, finds all images recursively (.jpg, .jpeg, .png, .webp, .heic, .heif)
-      4. ✅ Scans each image using existing analyze_document_with_vision
-      5. ✅ Creates PDFs for each scanned image
-      6. ✅ Rebuilds ZIP with same folder structure (images → PDFs)
-      7. ✅ Download endpoint: GET /api/download-folder-result/{filename}
-      
-      TESTING NEEDED:
-      - Upload test ZIP with folder structure
-      - Verify all images are found and scanned
-      - Verify folder structure is preserved in result ZIP
-      - Test limits (file count, size)
-      - Test error handling (bad ZIP, no images)
-      
-      Backend restarted and running. Ready for testing.
-      Test ZIP created at /tmp/test_structure.zip (3 images in 2 folders)
-  - agent: "main"
-    message: |
-      Updated test_result.md with current implementation status. All backend tasks marked as needs_retesting.
-      Priority tasks:
-      1. Test image cropping (20% crop capturing title lines 5-7)
-      2. Test strict matching logic (CONTINUATION fallback for unconfident matches)
-      3. Test smart grouping (multi-page document grouping with continuation pages)
-      4. Test batch scanning with multiple files
-      
-      Backend is running. MongoDB is accessible. Emergent LLM Key is configured.
-      Please test backend endpoints first before frontend testing.
-  - agent: "testing"
-    message: |
-      ✅ BACKEND TESTING COMPLETE - ALL CRITICAL FEATURES WORKING
-      
-      TESTED SUCCESSFULLY:
-      1. ✅ Image Cropping (20% top crop) - Working perfectly, logs show 3496px→699px cropping
-      2. ✅ Strict Matching with CONTINUATION - High confidence (0.90) for clear docs, CONTINUATION (0.10) for unclear
-      3. ✅ Smart Grouping Multi-Page - Proper page numbering "Document (trang 1)", "Document (trang 2)"
-      4. ✅ Batch Processing - Parallel execution working, 1.78s avg per file
-      5. ✅ MongoDB Connectivity - Scan history, data persistence working
-      6. ✅ PDF Exports - Both single and merged PDF generation working
-      7. ✅ Retry Scan - Error handling and retry logic functioning
-      
-      PERFORMANCE: Fast scanning with 20% crop optimization, proper LLM integration via Emergent Key.
-      
-      Minor: Some BytesIO reuse errors in batch testing (test artifact, not affecting production).
-      
-      RECOMMENDATION: Backend is production-ready. All recent improvements working as designed.
-  - agent: "main"
-    message: |
-      🎯 NEW IMPROVEMENTS IMPLEMENTED (Based on user feedback about old GCN documents):
-      
-      CHANGES MADE:
-      1. ✅ Increased crop from 20% → 35% (covers quốc huy at top + title in middle for old GCN)
-      2. ✅ Added quốc huy (Vietnam coat of arms) detection logic in prompt
-         - If quốc huy detected → identifies as official document (GCN/GCNM)
-         - Distinguishes GCNM (new) vs GCN (old) based on title text
-      3. ✅ Optimized image size: 1280px → 1024px for faster processing
-      4. ✅ Kept JPEG quality at 80% for accurate Vietnamese OCR
-      
-      BENEFITS:
-      - Better recognition for old GCN documents (title in middle of page)
-      - Faster scanning speed (reduced image data transfer ~20%)
-      - More accurate GCN identification using visual quốc huy recognition
-      
-      Backend restarted successfully. Ready for retesting to validate:
-      - 35% crop effectiveness for old GCN documents
-      - Quốc huy detection accuracy
-      - Performance improvement with 1024px images
-  - agent: "main"
-    message: |
-      🎯 NEW FEATURE: RULES MANAGEMENT SYSTEM IMPLEMENTED
-      
-      BACKEND APIs:
-      1. ✅ GET /api/rules - Get all document rules
-      2. ✅ POST /api/rules - Create new rule
-      3. ✅ PUT /api/rules/{rule_id} - Update existing rule
-      4. ✅ DELETE /api/rules/{rule_id} - Delete rule
-      5. ✅ Auto-initialization from DOCUMENT_TYPES to database on first run
-      6. ✅ Dynamic rules loading in analyze_document_with_vision function
-      
-      FRONTEND UI:
-      1. ✅ New "Quy Tắc" tab in navigation (3 tabs now: Quét, Lịch Sử, Quy Tắc)
-      2. ✅ RulesManager component with full CRUD operations
-      3. ✅ Search functionality for rules
-      4. ✅ Add new rule form with validation
-      5. ✅ Inline edit/delete buttons
-      6. ✅ Duplicate short_code validation
-      7. ✅ Toast notifications for all operations
-      
-      BENEFITS:
-      - Users can add/edit/delete document types without touching code
-      - Rules stored in MongoDB, dynamically loaded during scanning
-      - Clean UI with search and table display
-      
-      Ready for testing of rules management APIs and UI functionality.
-  - agent: "testing"
-    message: |
-      🎉 NEW IMPROVEMENTS TESTING COMPLETE - ALL CRITICAL FEATURES WORKING PERFECTLY!
-      
-      ✅ CRITICAL NEW FEATURES VALIDATED:
-      1. ✅ 35% Crop + Quốc Huy Detection - WORKING! Backend logs confirm "Cropped image from 3496px to 1223px (top 35%, quốc huy + tiêu đề)"
-      2. ✅ GCN vs GCNM Distinction - WORKING! Successfully detected GCNM with 0.90 confidence
-      3. ✅ Performance Improvement - WORKING! Average processing time: 3.79s (faster with 1024px optimization)
-      4. ✅ Accuracy Maintained - WORKING! 100% accuracy, all documents achieved 0.90 confidence
-      5. ✅ Regression Testing - WORKING! All previous features still functional
-      
-      📊 COMPREHENSIVE TEST RESULTS:
-      - All 5/5 tests passed including 2/2 CRITICAL tests
-      - GCN documents properly identified with quốc huy detection
-      - Fast processing with 1024px images (3-4 seconds per document)
-      - High confidence scores (0.90) maintained across all document types
-      - All endpoints working: scan-document, batch-scan, scan-history, PDF exports
-      
-      Minor: BytesIO reuse errors in duplicate file testing (test artifact only, not affecting production)
-      
-      🚀 RECOMMENDATION: NEW IMPROVEMENTS ARE PRODUCTION-READY! 
-      The 35% crop + quốc huy detection successfully addresses old GCN document recognition while maintaining performance and accuracy.
-  - agent: "testing"
-    message: |
-      🎉 RULES MANAGEMENT API TESTING COMPLETE - ALL FEATURES WORKING PERFECTLY!
-      
-      ✅ COMPREHENSIVE TESTING RESULTS (15/15 API calls successful):
-      
-      1. ✅ GET /api/rules - Auto-initialization working perfectly
-         - Loaded 105 rules from DOCUMENT_TYPES on first call
-         - Proper response structure with id, full_name, short_code, timestamps
-         - All expected rule codes found (GCNM, DDK, HDCQ, BMT, HSKT)
-      
-      2. ✅ POST /api/rules - Create operations working perfectly
-         - Successfully creates new rules with valid data
-         - Duplicate short_code validation working (returns 400 error)
-         - Missing fields validation working (returns 422 error)
-         - Vietnamese error messages: "Mã 'GCNM' đã tồn tại"
-      
-      3. ✅ PUT /api/rules/{rule_id} - Update operations working perfectly
-         - Full updates working (both full_name and short_code)
-         - Partial updates working (full_name only)
-         - Duplicate validation working (returns 400 error)
-         - Non-existent rule_id handling (returns 404 error)
-         - Updated_at timestamp correctly changes
-      
-      4. ✅ DELETE /api/rules/{rule_id} - Delete operations working perfectly
-         - Successfully deletes existing rules
-         - Non-existent rule_id handling (returns 404 error)
-         - Deleted rules no longer appear in GET /api/rules
-      
-      5. ✅ Dynamic Loading Integration - Working perfectly
-         - New rules immediately available for document scanning
-         - Rules persist correctly across multiple API calls
-         - Database integration working seamlessly
-      
-      📊 CRITICAL VALIDATION COMPLETE:
-      - All HTTP status codes correct (200, 400, 404, 422)
-      - Vietnamese error messages working
-      - Auto-initialization from DOCUMENT_TYPES working
-      - Dynamic loading in scanning confirmed
-      - Database persistence validated
-      - CRUD operations fully functional
-      
-      🚀 RECOMMENDATION: Rules Management API is PRODUCTION-READY!
-      Users can now add/edit/delete document types without touching code.
-  - agent: "testing"
-    message: |
-      🎉 FOLDER SCANNING FEATURE TESTING COMPLETE - ALL CRITICAL FEATURES WORKING PERFECTLY!
-      
-      ✅ COMPREHENSIVE TESTING RESULTS (10/10 tests passed):
-      
-      🔍 CORE FUNCTIONALITY TESTS:
-      1. ✅ ZIP Structure Validation - Test ZIP contains 3 images in correct folder structure
-      2. ✅ Folder Scan Endpoint - POST /api/scan-folder processes ZIP successfully
-      3. ✅ Response Validation - All required fields present (scan_id, total_files, success_count, processing_time, files, download_url)
-      4. ✅ File Results Validation - Individual file results contain proper structure and confidence scores
-      5. ✅ Download Result ZIP - GET /api/download-folder-result/{filename} returns ZIP with PDFs in preserved folder structure
-      6. ✅ Error Handling - Correctly rejects non-ZIP files and empty ZIPs with 400 status
-      
-      🔍 ADVANCED FUNCTIONALITY TESTS:
-      7. ✅ Large Folder Structure - Handles deep nested folders (level1/level2/level3/) correctly
-      8. ✅ Mixed File Types - Correctly processes only image files, ignores .txt, .pdf, .xlsx files
-      9. ✅ File Size Limits - Processes multiple files within 500MB/500 files limits
-      10. ✅ Unicode Filenames - Supports Vietnamese characters in folder/file names (tài_liệu/giấy_chứng_nhận.jpg)
-      
-      📊 TECHNICAL VALIDATION:
-      - Folder structure preservation: ✅ PDFs created in exact same folders as original images
-      - Concurrent processing: ✅ Semaphore (MAX_CONCURRENT=5) controls parallel processing
-      - Image detection: ✅ Supports .jpg, .jpeg, .png, .webp, .heic, .heif extensions
-      - Smart cropping: ✅ Applies 50% crop for single page, 65% for wide format documents
-      - LLM integration: ✅ Uses same analyze_document_with_vision logic as single scan
-      - Error handling: ✅ Proper HTTP status codes and Vietnamese error messages
-      - File limits: ✅ 500 files max, 500MB max ZIP size validation working
-      
-      📁 STRUCTURE PRESERVATION VERIFIED:
-      Original: test_zip/folder1/test_1.jpg → Result: test_zip/folder1/CONTINUATION.pdf
-      Original: test_zip/folder1/test_2.jpg → Result: test_zip/folder1/GCNM.pdf  
-      Original: test_zip/folder2/subfolder/test_3.jpg → Result: test_zip/folder2/subfolder/CONTINUATION.pdf
-      
-      🚀 RECOMMENDATION: Folder Scanning Feature is PRODUCTION-READY!
-      All endpoints functional, structure preservation working, error handling robust.
+      Implemented OpenAI primary provider (gpt-4o-mini) with Emergent fallback, plus /api/llm/health and Admin LLM Status tile. Please test:
+      1) GET /api/llm/health — expect:
+         - If OPENAI_API_KEY missing but EMERGENT_LLM_KEY present: status=degraded, openai_available=false, emergent_available=true
+         - If both keys present and valid: status=healthy, openai_available=true
+      2) POST /api/scan-document — ensure analysis still returns structured result using fallback if OpenAI not available (requires auth: seed admin via GET /api/setup-admin, login, then call)
+      3) Frontend: After login as admin, open Admin Panel and verify LLM Status tile shows correct states and updates on refresh.
+      Note: Do not change protected env vars. OPENAI_API_KEY must be set in backend/.env and backend restarted to enable primary provider.

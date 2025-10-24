@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '@/App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { toast, Toaster } from 'sonner';
-import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, CheckCircle2, Settings } from 'lucide-react';
+import { toast } from 'sonner';
+import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, CheckCircle2, Settings, LogOut, Shield, User } from 'lucide-react';
 import axios from 'axios';
 import RulesManager from '@/components/RulesManager';
 import { compressImages } from '@/utils/imageCompression';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const DocumentScanner = () => {
+  const { user, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [scanResults, setScanResults] = useState([]);
   const [scanHistory, setScanHistory] = useState([]);

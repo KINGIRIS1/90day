@@ -758,7 +758,8 @@ async def scan_document(
             detected_full_name=analysis_result["detected_full_name"],
             short_code=analysis_result["short_code"],
             confidence_score=analysis_result["confidence"],
-            image_base64=full_image_base64  # Store full image
+            image_base64=full_image_base64,  # Store full image
+            user_id=current_user.get("id")
         )
         
         # Save to database

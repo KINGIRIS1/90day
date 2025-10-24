@@ -945,7 +945,7 @@ async def batch_scan(
                     if is_retryable and retry_count < max_retries:
                         logger.warning(f"Retrying {file.filename} (attempt {retry_count + 1}/{max_retries})")
                         await asyncio.sleep(2 ** retry_count)  # Exponential backoff
-                        return await process_file(file, current_user_dict, session_id, retry_count + 1)
+                        return await process_file(file, current_user_dict, session_id, file_index, retry_count + 1)
                     
                     logger.error(f"Error processing {file.filename}: {error_msg}", exc_info=True)
                     
@@ -969,8 +969,8 @@ async def batch_scan(
                         error_type = "Unknown Error"
                         error_detail = error_msg[:100]
                     
-                    # Return error result with details
-                    return ScanResult(
+                    # Return error result with details (with index)
+                    return (file_index, ScanResult(
                         original_filename=file.filename,
                         detected_type=f"❌ {error_type}",
                         detected_full_name=error_detail,
@@ -979,16 +979,19 @@ async def batch_scan(
                         image_base64="",
                         user_id=current_user_dict.get("id") if current_user_dict else None,
                         session_id=session_id  # Add session ID even for errors
-                    )
+                    ))
         
         # Process files with controlled concurrency
         # IMPORTANT: Preserve original file order for correct grouping
-        tasks = [process_file(file, current_user, session_id) for file in files]
-        results = await asyncio.gather(*tasks, return_exceptions=False)
+        tasks = [process_file(file, current_user, session_id, idx) for idx, file in enumerate(files)]
+        indexed_results = await asyncio.gather(*tasks, return_exceptions=False)
         
-        # Sort results by original filename to maintain upload order
+        # Sort results by original index to maintain upload order
         # This is CRITICAL for multi-page grouping to work correctly
-        logger.info(f"Received {len(results)} scan results, preserving original order...")
+        indexed_results.sort(key=lambda x: x[0])  # Sort by index
+        results = [result for idx, result in indexed_results]  # Extract results only
+        
+        logger.info(f"Received {len(results)} scan results in correct order")
         
         # SMART GROUPING: Apply continuation logic
         logger.info("Applying smart grouping for multi-page documents...")

@@ -950,7 +950,7 @@ async def batch_scan(
                     )
         
         # Process files with controlled concurrency
-        tasks = [process_file(file, current_user) for file in files]
+        tasks = [process_file(file, current_user, session_id) for file in files]
         results = await asyncio.gather(*tasks, return_exceptions=False)
         
         # SMART GROUPING: Apply continuation logic

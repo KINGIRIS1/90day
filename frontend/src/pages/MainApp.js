@@ -827,8 +827,18 @@ const DocumentScanner = () => {
             <Input 
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleUpdateFilename(result.id, editValue, e);
+                } else if (e.key === 'Escape') {
+                  e.preventDefault();
+                  cancelEdit(e);
+                }
+              }}
               className="h-8"
               data-testid={`edit-input-${result.id}`}
+              autoFocus
             />
             <Button 
               size="sm" 

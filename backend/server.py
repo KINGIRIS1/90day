@@ -1803,7 +1803,7 @@ auth_router = APIRouter(prefix="/api/auth", tags=["authentication"])
 @auth_router.post("/register", status_code=201)
 async def register(user_data: UserRegisterRequest):
     """Register a new user (pending approval)"""
-    users_collection = db.db["users"]
+    users_collection = db["users"]
     
     # Check for existing email
     existing_email = await users_collection.find_one({"email": user_data.email.lower()})

@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python310", "cairo", "pango", "pip"]
+nixPkgs = ["python310", "cairo", "pango"]
 
 [phases.install]
 cmds = ["python3 -m pip install --upgrade pip", "python3 -m pip install -r requirements.txt"]

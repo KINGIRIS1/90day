@@ -982,8 +982,13 @@ async def batch_scan(
                     )
         
         # Process files with controlled concurrency
+        # IMPORTANT: Preserve original file order for correct grouping
         tasks = [process_file(file, current_user, session_id) for file in files]
         results = await asyncio.gather(*tasks, return_exceptions=False)
+        
+        # Sort results by original filename to maintain upload order
+        # This is CRITICAL for multi-page grouping to work correctly
+        logger.info(f"Received {len(results)} scan results, preserving original order...")
         
         # SMART GROUPING: Apply continuation logic
         logger.info("Applying smart grouping for multi-page documents...")

@@ -553,7 +553,10 @@ const DocumentScanner = () => {
     try {
       const response = await axios.post(`${API}/export-single-document`, 
         { scan_ids: [scanId] },
-        { responseType: 'blob' }
+        { 
+          responseType: 'blob',
+          headers: getAuthHeaders()
+        }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));

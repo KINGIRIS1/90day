@@ -15,7 +15,14 @@ async def create_admin():
     # Connect to MongoDB
     mongo_url = os.getenv("MONGO_URL")
     client = AsyncIOMotorClient(mongo_url)
-    db = client.get_database()
+    
+    # Extract database name from MONGO_URL or use default
+    if mongo_url and "/" in mongo_url:
+        db_name = mongo_url.split("/")[-1].split("?")[0]
+    else:
+        db_name = "document_scanner"
+    
+    db = client[db_name]
     users_collection = db["users"]
     
     # Check if admin already exists

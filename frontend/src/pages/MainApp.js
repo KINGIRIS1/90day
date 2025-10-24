@@ -554,7 +554,11 @@ const DocumentScanner = () => {
     }, 100);
   };
 
-  const cancelEdit = () => {
+  const cancelEdit = (event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     setEditingId(null);
     setEditValue('');
   };

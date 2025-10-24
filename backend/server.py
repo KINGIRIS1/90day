@@ -840,7 +840,10 @@ def apply_smart_grouping(results: List[ScanResult]) -> List[ScanResult]:
 
 
 @api_router.post("/batch-scan", response_model=List[ScanResult])
-async def batch_scan(files: List[UploadFile] = File(...)):
+async def batch_scan(
+    files: List[UploadFile] = File(...),
+    current_user: dict = Depends(require_approved_user)
+):
     """Scan multiple documents - OPTIMIZED for 50+ files with controlled concurrency"""
     try:
         # Semaphore to limit concurrent API calls (avoid rate limits and timeout)

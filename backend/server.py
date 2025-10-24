@@ -1476,7 +1476,7 @@ async def drop_unique_index():
     """Drop unique index on short_code to allow duplicate codes"""
     try:
         # Drop the unique index
-        result = await db.document_rules.drop_index("short_code_1")
+        _drop = await db.document_rules.drop_index("short_code_1")
         logger.info("Successfully dropped unique index on short_code")
         return {
             "message": "Đã xóa unique index, giờ có thể thêm mã trùng lặp",

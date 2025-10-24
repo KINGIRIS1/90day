@@ -1581,8 +1581,11 @@ async def llm_health():
     # Emergent fallback
     if EMERGENT_LLM_KEY:
         try:
-            chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"health_{uuid.uuid4()}")\
-                .with_model("openai", "gpt-4o")
+            chat = LlmChat(
+                api_key=EMERGENT_LLM_KEY, 
+                session_id=f"health_{uuid.uuid4()}",
+                system_message="You are a health check assistant."
+            ).with_model("openai", "gpt-4o")
             msg = UserMessage(text="ping")
             res = await chat.send_message(msg)
             if isinstance(res, str) and len(res) >= 0:

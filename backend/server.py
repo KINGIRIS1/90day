@@ -1676,7 +1676,8 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                             short_code="ERROR",
                             confidence_score=0.0,
                             status="error",
-                            error_message=str(e)[:200]
+                            error_message=str(e)[:200],
+                            user_id=current_user.get("id")
                         )
             
             # Process all images in this folder

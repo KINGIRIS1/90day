@@ -1597,7 +1597,7 @@ async def scan_folder(
         active_jobs[job_id] = job_status
         
         # Start background task
-        asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir))
+        asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir, current_user))
         
         return FolderScanStartResponse(
             job_id=job_id,

@@ -1419,9 +1419,9 @@ async def root():
     return {"message": "Document Scanner API"}
 
 
-@api_router.post("/setup-admin")
+@api_router.get("/setup-admin")
 async def setup_admin_endpoint():
-    """One-time admin setup endpoint - should be removed after first use"""
+    """One-time admin setup endpoint - accessible via browser for easy deployment setup"""
     users_collection = db["users"]
     
     # Check if admin exists

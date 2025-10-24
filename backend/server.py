@@ -1696,8 +1696,8 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
             
             logger.info(f"[Job {job_id}] Processing folder {folder_idx}/{len(folder_groups)}: {folder_name} ({len(image_files)} files)")
             
-            # Determine concurrency
-            MAX_CONCURRENT = 3 if len(image_files) > 50 else 5
+            # Determine concurrency - Lower for deployed environment to avoid timeouts
+            MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))  # Default 2
             MAX_SIZE = 700 if len(image_files) > 50 else 800
             semaphore = asyncio.Semaphore(MAX_CONCURRENT)
             

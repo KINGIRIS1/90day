@@ -1074,7 +1074,10 @@ async def export_single_document(
 
 
 @api_router.post("/export-pdf-single")
-async def export_pdf_single(request: ExportPDFRequest):
+async def export_pdf_single(
+    request: ExportPDFRequest,
+    current_user: dict = Depends(require_approved_user)
+):
     """Export scans as PDFs, automatically grouping by short_code"""
     try:
         # Get scan results

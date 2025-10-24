@@ -1464,6 +1464,21 @@ async def setup_admin_endpoint():
     }
 
 
+
+@app.get("/admin-setup-tool", response_class=HTMLResponse)
+async def admin_setup_tool():
+    """Serve the HTML tool for setting up admin account"""
+    html_path = Path(__file__).parent / "setup_admin_tool.html"
+    if html_path.exists():
+        with open(html_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    else:
+        return HTMLResponse(
+            content="<h1>Setup tool not found</h1>",
+            status_code=404
+        )
+
+
 # ==================== FOLDER SCANNING FEATURE ====================
 
 SUPPORTED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif'}

@@ -255,26 +255,32 @@ backend:
         comment: "✅ CRITICAL NEW FEATURE TESTED: Rules Management API working perfectly! All 13/13 tests passed. GET /api/rules auto-initializes 105 rules from DOCUMENT_TYPES. POST creates new rules with duplicate validation (returns 400 for duplicates). PUT updates rules with partial support and duplicate validation. DELETE removes rules with 404 for non-existent IDs. Vietnamese error messages working. Dynamic loading confirmed - new rules immediately available for scanning. Rules persist correctly across API calls. All CRUD operations validated with proper HTTP status codes."
   - task: "OpenAI primary LLM integration with fallback to Emergent + strict error handling"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Switched analyze_document_with_vision to use OpenAI (gpt-4o-mini) via openai SDK as primary. Added fallback to Emergent LlmChat when retryable errors occur. Added helper _analyze_with_openai_vision and _is_retryable_llm_error. Introduced OPENAI_API_KEY, OPENAI_MODEL, LLM_FALLBACK_ENABLED env usage."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE: Both LLM providers failing. OpenAI: Missing OPENAI_API_KEY (expected). Emergent: Authentication error - 'Invalid proxy server token passed. Received API Key = sk-...15d7, Key Hash (Token) =6ca35a08a503ca466d0a1bcd3f9ee12921179b6da69adb7e5573b1c8b960f138. Unable to find token in cache or LiteLLM_VerificationTokenTable'. Document scan returns ERROR status due to LLM failures. Integration code is correct but both providers are non-functional due to authentication issues."
   - task: "LLM health endpoint (/api/llm/health)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "New /api/llm/health returns status healthy/degraded/unhealthy with provider flags (openai_available, emergent_available). Uses minimal token 'ping' and caches on frontend via polling."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: LLM health endpoint working correctly. Returns proper JSON structure with required fields: status, provider, openai_available, emergent_available, details. Currently returns 'unhealthy' status with both providers false due to: OpenAI missing API key (expected), Emergent authentication error. Endpoint correctly detects and reports provider availability. Fixed minor issue with missing system_message parameter in Emergent health check."
 
 frontend:
   - task: "Folder scanning tab UI (ZIP upload interface)"

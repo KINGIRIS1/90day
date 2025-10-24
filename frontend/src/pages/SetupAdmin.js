@@ -45,6 +45,18 @@ const SetupAdmin = () => {
       <p style={{ marginBottom: '20px', color: '#666' }}>
         Công cụ này sẽ tạo tài khoản admin cho ứng dụng Document Scanner.
       </p>
+      <div style={{
+        padding: '12px',
+        background: '#fff3cd',
+        border: '1px solid #ffeeba',
+        borderRadius: '4px',
+        marginBottom: '20px',
+        fontSize: '14px',
+        color: '#856404'
+      }}>
+        <strong>⚠️ Lưu ý:</strong> Nếu đã có tài khoản "admin" (kể cả tài khoản pending), 
+        tất cả sẽ bị xóa và tạo lại tài khoản admin mới với quyền đầy đủ.
+      </div>
 
       <button 
         onClick={handleSetupAdmin}

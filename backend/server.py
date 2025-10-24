@@ -424,6 +424,41 @@ Your answer:"""
         return False
 
 
+async def _analyze_with_openai_vision(image_base64: str, prompt: str, max_tokens: int = 512, temperature: float = 0.2) -> str:
+    """Call OpenAI Vision (gpt-4o-mini) and return text content."""
+    client = get_openai_client()
+    if not client:
+        raise RuntimeError("OpenAI client not initialized. Missing or invalid OPENAI_API_KEY")
+    data_url = f"data:image/jpeg;base64,{image_base64}"
+    # Use chat.completions (OpenAI SDK v1.x)
+    resp = client.chat.completions.create(
+        model=OPENAI_MODEL,
+        messages=[
+            {"role": "system", "content": "You are a precise OCR and document classifier. Always answer in JSON when asked."},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": data_url, "detail": "auto"}}
+                ]
+            }
+        ],
+        max_tokens=max_tokens,
+        temperature=temperature
+    )
+    content = resp.choices[0].message.content or ""
+    return content
+
+
+def _is_retryable_llm_error(e: Exception) -> bool:
+    s = str(e).lower()
+    if any(tok in s for tok in ["rate", "429", "timeout", "temporar", "unavailable", "connection", "reset"]):
+        return True
+    if any(tok in s for tok in ["unauthorized", "401", "invalid_api_key", "permission", "forbidden"]):
+        return False
+    return True
+
+
 async def analyze_document_with_vision(image_base64: str) -> dict:
     """Analyze document using OpenAI Vision API with dynamic rules from database"""
     try:

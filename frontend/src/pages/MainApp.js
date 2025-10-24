@@ -396,6 +396,9 @@ const DocumentScanner = () => {
       await axios.put(`${API}/update-filename`, {
         id,
         new_short_code: newCode.trim()
+      }, {
+        headers: getAuthHeaders()
+      });
       });
       
       // Update local state - allow duplicates

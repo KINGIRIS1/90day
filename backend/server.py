@@ -1656,7 +1656,8 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                             detected_full_name=analysis_result["detected_full_name"],
                             short_code=analysis_result["short_code"],
                             confidence_score=analysis_result["confidence"],
-                            status="success"
+                            status="success",
+                            user_id=current_user.get("id")
                         )
                     except Exception as e:
                         error_msg = str(e)

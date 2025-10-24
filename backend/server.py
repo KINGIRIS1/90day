@@ -984,7 +984,10 @@ async def get_scan_history():
 
 
 @api_router.put("/update-filename")
-async def update_filename(request: UpdateFilenameRequest):
+async def update_filename(
+    request: UpdateFilenameRequest,
+    current_user: dict = Depends(require_approved_user)
+):
     """Update the short code for a scan result - allows duplicate names"""
     try:
         # Validate input

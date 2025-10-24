@@ -176,3 +176,7 @@ backend/temp_results/scan_result_b62bf154.zip
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*

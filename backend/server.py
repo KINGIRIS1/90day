@@ -179,6 +179,15 @@ DOCUMENT_TYPES = {
 
 
 # Define Models
+class LlmHealth(BaseModel):
+    status: str
+    provider: str
+    model: Optional[str] = None
+    openai_available: bool = False
+    emergent_available: bool = False
+    details: Optional[str] = None
+
+
 class ScanResult(BaseModel):
     model_config = ConfigDict(extra="ignore")
     

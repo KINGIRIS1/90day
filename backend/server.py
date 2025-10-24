@@ -966,10 +966,12 @@ async def batch_scan(
 
 
 @api_router.get("/scan-history", response_model=List[ScanResult])
-async def get_scan_history():
-    """Get all scan history"""
+async def get_scan_history(current_user: dict = Depends(require_approved_user)):
+    """Get scan history for current user"""
     try:
-        results = await db.scan_results.find({}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
+        # Filter by user_id to only show current user's scans
+        user_id = current_user.get("id")
+        results = await db.scan_results.find({"user_id": user_id}, {"_id": 0}).sort("timestamp", -1).to_list(1000)
         
         # Convert ISO string timestamps back to datetime objects
         for result in results:

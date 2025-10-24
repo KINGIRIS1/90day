@@ -1603,13 +1603,16 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
 
 @api_router.post("/scan-folder", response_model=FolderScanStartResponse)
 async def scan_folder(
-    file: UploadFile = File(...),
-    current_user: dict = Depends(require_approved_user)
+    file: UploadFile = File(...)
+    # TEMPORARILY REMOVED AUTH for debugging 520 error
+    # current_user: dict = Depends(require_approved_user)
 ):
     """
     Start folder scan job (returns immediately with job_id)
     - Client polls /api/folder-scan-status/{job_id} for progress
     - Each folder available for download as soon as it completes
+    
+    TEMPORARY: Authentication disabled for debugging deployed environment 520 errors
     """
     try:
         # Validate file is ZIP

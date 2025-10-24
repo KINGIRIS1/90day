@@ -26,7 +26,6 @@ import asyncio
 import zipfile
 import shutil
 from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
-from auth_dependencies import get_current_user, require_approved_user, require_admin
 
 
 ROOT_DIR = Path(__file__).parent

@@ -1280,6 +1280,44 @@ const DocumentScanner = () => {
                 </CardContent>
               </Card>
             )}
+            {/* Button: Quét Thêm - Show after scan results */}
+            {scanResults.length > 0 && !loading && (
+              <div className="flex gap-3">
+                <Button 
+                  onClick={() => {
+                    // Reset to allow new scan
+                    setUploadedFiles([]);
+                    setScanResults([]);
+                    setProcessedFiles(new Set());
+                    setScanProgress({ current: 0, total: 0 });
+                    setScanDuration(null);
+                    toast.info('✅ Đã làm mới. Có thể upload và quét thêm hồ sơ mới!');
+                  }}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1"
+                  data-testid="scan-more-btn"
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  Quét Thêm Hồ Sơ
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setUploadedFiles([]);
+                    setScanResults([]);
+                    setProcessedFiles(new Set());
+                    setScanProgress({ current: 0, total: 0 });
+                    setScanDuration(null);
+                  }}
+                  variant="ghost"
+                  size="lg"
+                  data-testid="clear-results-btn"
+                >
+                  <X className="h-5 w-5 mr-2" />
+                  Xóa Kết Quả
+                </Button>
+              </div>
+            )}
           </TabsContent>
 
           {/* NEW TAB: FOLDER SCANNING */}

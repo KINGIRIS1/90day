@@ -399,7 +399,6 @@ const DocumentScanner = () => {
       }, {
         headers: getAuthHeaders()
       });
-      });
       
       // Update local state - allow duplicates
       setScanResults(results => 

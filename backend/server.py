@@ -899,6 +899,17 @@ async def batch_scan(
         current_user: Current authenticated user
     """
     try:
+        # Parse previous results if provided
+        previous_scan_results = []
+        if previous_results:
+            try:
+                import json
+                prev_data = json.loads(previous_results)
+                previous_scan_results = [ScanResult(**item) for item in prev_data]
+                logger.info(f"Received {len(previous_scan_results)} previous results for continuation")
+            except Exception as e:
+                logger.warning(f"Failed to parse previous_results: {e}")
+        
         # Generate session ID for this batch scan
         session_id = f"scan_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
         logger.info(f"Starting batch scan with session_id: {session_id}")

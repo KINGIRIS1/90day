@@ -38,6 +38,14 @@ export default function FolderPickerDirect({ token }) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setJob(res.data);
+      // start timer
+      const t0 = Date.now();
+      setStartTs(t0);
+      if (timerId) clearInterval(timerId);
+      const id = setInterval(()=>{
+        setElapsed(Math.floor((Date.now() - t0)/1000));
+      }, 1000);
+      setTimerId(id);
     } catch (e) {
       setError(e?.response?.data?.detail || e.message || 'Lỗi không xác định');
     } finally {

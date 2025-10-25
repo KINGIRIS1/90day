@@ -75,7 +75,7 @@ user_problem_statement: |
 backend:
   - task: "LLM Health diagnosis"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "critical"
@@ -87,6 +87,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "CRITICAL ISSUE IDENTIFIED: Called GET /api/llm/health - Status: unhealthy, OpenAI: false, Emergent: false. Details show '429 Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a' AND 'emergent: AuthenticationError'. PRIMARY ISSUE: 429 rate limit on OpenAI API. SECONDARY: Emergent auth failure. Both providers unavailable - system cannot process documents."
+      - working: true
+        agent: "testing"
+        comment: "RE-TEST AFTER EMERGENT_LLM_KEY UPDATE: Called GET /api/llm/health successfully. FULL JSON RESPONSE: {'status': 'degraded', 'provider': 'emergent', 'model': 'gpt-4o', 'openai_available': false, 'emergent_available': true, 'details': 'openai: Error code: 429 - Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a'}. IMPROVEMENT: Emergent provider now working! OpenAI still rate-limited (429) but system is functional in degraded mode using Emergent fallback. Document scanning should work."
 
 frontend: []
 

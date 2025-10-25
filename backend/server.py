@@ -393,6 +393,31 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
 async def detect_emblem_in_image(image_base64: str) -> bool:
     """Quick check to detect Vietnamese national emblem in image - for smart cropping"""
     try:
+
+async def _analyze_with_openai_vision(image_base64: str, prompt: str, max_tokens: int = 512, temperature: float = 0.2) -> str:
+    """Call OpenAI Vision (gpt-4o-mini) and return text content."""
+    client = get_openai_client()
+    if not client:
+        raise RuntimeError("OpenAI client not initialized. Missing or invalid OPENAI_API_KEY")
+    data_url = f"data:image/jpeg;base64,{image_base64}"
+    resp = client.chat.completions.create(
+        model=OPENAI_MODEL,
+        messages=[
+            {"role": "system", "content": "You are a precise OCR and document classifier. Always answer in JSON when asked."},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": data_url, "detail": "auto"}}
+                ]
+            }
+        ],
+        max_tokens=max_tokens,
+        temperature=temperature
+    )
+    content = resp.choices[0].message.content or ""
+    return content
+
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"emblem_detect_{uuid.uuid4()}",

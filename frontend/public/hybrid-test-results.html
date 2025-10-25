@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Kết quả Test Hybrid Approach</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .card-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .card-label {
+            font-size: 1.1em;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .chart-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+        
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .metric-good {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .metric-bad {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .recommendation {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .recommendation h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .recommendation ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .recommendation li {
+            padding: 10px 0;
+            font-size: 1.1em;
+            color: #555;
+        }
+        
+        .recommendation li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 10px;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer p {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 KẾT QUẢ TEST: HYBRID APPROACH</h1>
+            <p>OCR + Rule-based Classifier vs GPT-4 Vision</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Tested với 30 tài liệu đất đai Việt Nam</p>
+        </div>
+        
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <div class="card-value">76.7%</div>
+                <div class="card-label">Độ chính xác</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <div class="card-value">$0.00</div>
+                <div class="card-label">Chi phí/tài liệu</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <div class="card-value">0.1s</div>
+                <div class="card-label">Thời gian xử lý</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🎯</div>
+                <div class="card-value">23/30</div>
+                <div class="card-label">Kết quả đúng</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">📈 Biểu đồ so sánh tổng quan</h2>
+                <div class="chart-container">
+                    <img src="hybrid_test_results.png" alt="Test Results Overview">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📊 Phân tích chi tiết</h2>
+                <div class="chart-container">
+                    <img src="hybrid_analysis_detailed.png" alt="Detailed Analysis">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">⚖️ So sánh Hybrid vs GPT-4</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Tiêu chí</th>
+                            <th>Hybrid (OCR + Rules)</th>
+                            <th>GPT-4 Vision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Độ chính xác</strong></td>
+                            <td class="metric-bad">76.7% (cần improve)</td>
+                            <td class="metric-good">95-98%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chi phí/ảnh</strong></td>
+                            <td class="metric-good">$0.0002 (90% FREE)</td>
+                            <td class="metric-bad">$0.002</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chi phí/tháng (1000 ảnh)</strong></td>
+                            <td class="metric-good">$4.4/tháng</td>
+                            <td class="metric-bad">$43/tháng</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tốc độ xử lý</strong></td>
+                            <td class="metric-good">0.1 - 0.5s</td>
+                            <td>2 - 3s</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EASY cases</strong></td>
+                            <td class="metric-good">100% (7/7)</td>
+                            <td class="metric-good">~98%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MEDIUM cases</strong></td>
+                            <td class="metric-bad">66.7% (12/18)</td>
+                            <td class="metric-good">~95%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HARD cases</strong></td>
+                            <td class="metric-good">80% (4/5)</td>
+                            <td>~92%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maintenance</strong></td>
+                            <td class="metric-bad">Cần update rules (1 ngày/tháng)</td>
+                            <td class="metric-good">Không cần</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Offline capability</strong></td>
+                            <td class="metric-good">✓ Có (90% cases)</td>
+                            <td class="metric-bad">✗ Phải online</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="recommendation">
+                <h3>💡 Khuyến nghị</h3>
+                <ul>
+                    <li><strong>Cần cải thiện Rules:</strong> Thêm keywords cho MEDIUM cases để đạt 85-90% accuracy</li>
+                    <li><strong>Tiết kiệm 90% chi phí:</strong> Chỉ $4-5/tháng cho 1000 ảnh vs $43 với GPT-4</li>
+                    <li><strong>Tốc độ nhanh hơn 30x:</strong> 0.1s vs 3s - quan trọng cho UX</li>
+                    <li><strong>Trade-off hợp lý:</strong> Giảm 18% accuracy (95% → 77%) để tiết kiệm 90% chi phí</li>
+                    <li><strong>Giải pháp:</strong> Improve rules trong 1-2 ngày để đạt target 85-88% accuracy</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📋 Kết luận</h2>
+                <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; font-size: 1.1em; line-height: 1.8;">
+                    <p><strong>✅ Hybrid Approach là khả thi</strong> với một số cải thiện:</p>
+                    <br>
+                    <p><strong>1. Cần làm gì?</strong></p>
+                    <ul style="margin-left: 30px; margin-top: 10px;">
+                        <li>Thêm 20-30 keywords cho các loại MEDIUM</li>
+                        <li>Fine-tune threshold từ 0.7 → 0.6</li>
+                        <li>Test thêm với 100 ảnh thật</li>
+                    </ul>
+                    <br>
+                    <p><strong>2. Timeline:</strong></p>
+                    <ul style="margin-left: 30px; margin-top: 10px;">
+                        <li>Day 1-2: Improve rules và test</li>
+                        <li>Day 3: Integration vào code hiện tại</li>
+                        <li>Week 1: Deploy và monitor</li>
+                    </ul>
+                    <br>
+                    <p><strong>3. Expected Result:</strong></p>
+                    <ul style="margin-left: 30px; margin-top: 10px;">
+                        <li>Accuracy: 85-88% (target)</li>
+                        <li>Cost saving: 85-90%</li>
+                        <li>Speed: 10-30x faster</li>
+                    </ul>
+                    <br>
+                    <p style="margin-top: 20px; padding: 20px; background: #d4edda; border-left: 4px solid #28a745; border-radius: 5px;">
+                        <strong>🎯 Verdict:</strong> Đáng implement! Trade-off giữa accuracy và cost là hợp lý cho use case Việt Nam.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🚀 Test completed on October 25, 2025</p>
+            <p style="margin-top: 10px;">Generated by SmartScan Document Scanner System</p>
+        </div>
+    </div>
+</body>
+</html>

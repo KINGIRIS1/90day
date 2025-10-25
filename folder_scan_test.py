@@ -207,40 +207,115 @@ class FolderScanTester:
             # Direct response
             return self.validate_folder_scan_result(result_data)
 
-    def test_folder_scan_endpoint(self):
-        """Test 2: Basic folder scan functionality"""
-        print("\n🔍 Test 2: Folder Scan Endpoint")
+    def poll_folder_scan_status(self, job_id):
+        """Poll folder scan status until completion"""
+        print(f"   Polling status for job: {job_id}")
         
-        try:
-            url = f"{self.base_url}/scan-folder"
+        max_polls = 30  # 30 seconds max
+        for i in range(max_polls):
+            response = self.make_request('GET', f'folder-direct-status/{job_id}')
             
-            # Prepare file upload
-            with open(self.test_zip_path, 'rb') as f:
-                files = {'file': ('test_structure.zip', f, 'application/zip')}
-                
-                print(f"   Uploading to: {url}")
-                response = requests.post(url, files=files, timeout=120)  # 2 minute timeout
-            
-            if response.status_code != 200:
-                return self.log_test("Folder scan request", False, 
-                                   f"Status: {response.status_code}, Response: {response.text[:200]}")
+            if not response or response.status_code != 200:
+                return self.log_test("Folder Status Poll", False, f"Poll failed: {response.status_code if response else 'No response'}")
             
             try:
-                result = response.json()
-            except json.JSONDecodeError:
-                return self.log_test("Folder scan response format", False, 
-                                   f"Invalid JSON response: {response.text[:200]}")
+                status_data = response.json()
+            except:
+                return self.log_test("Folder Status Parse", False, "Failed to parse status response")
             
-            # Store result for later tests
-            self.scan_result = result
+            status = status_data.get('status')
+            print(f"   Poll {i+1}: Status = {status}")
             
-            return self.log_test("Folder scan request", True, 
-                               f"Processed {result.get('processed_files', 0)} files")
+            if status == 'completed':
+                return self.validate_folder_scan_result(status_data)
+            elif status == 'error':
+                error_msg = status_data.get('error_message', 'Unknown error')
+                return self.log_test("Folder Scan Completion", False, f"Job failed: {error_msg}")
             
-        except requests.exceptions.Timeout:
-            return self.log_test("Folder scan request", False, "Request timeout (>2 minutes)")
-        except Exception as e:
-            return self.log_test("Folder scan request", False, f"Error: {str(e)}")
+            time.sleep(1)
+        
+        return self.log_test("Folder Scan Timeout", False, "Polling timed out after 30 seconds")
+    
+    def validate_folder_scan_result(self, result_data):
+        """Validate folder scan result structure"""
+        # Check for required fields
+        required_fields = ['folder_results']
+        for field in required_fields:
+            if field not in result_data:
+                return self.log_test("Folder Result Validation", False, f"Missing field: {field}")
+        
+        folder_results = result_data.get('folder_results', [])
+        if not folder_results:
+            return self.log_test("Folder Results", False, "No folder results returned")
+        
+        # Check first folder result
+        folder_result = folder_results[0]
+        
+        # Check for PDF URLs with short codes
+        if 'pdf_urls' in folder_result:
+            pdf_urls = folder_result['pdf_urls']
+            if not pdf_urls:
+                return self.log_test("PDF URLs", False, "No PDF URLs in result")
+            
+            # Check if PDFs are named by short_code
+            for pdf_url in pdf_urls:
+                if not any(code in pdf_url for code in ['GCNM', 'DDK', 'HDCQ', 'UNKNOWN', 'CONTINUATION']):
+                    print(f"   Warning: PDF URL may not contain short code: {pdf_url}")
+        
+        # Check for ZIP download if pack_as_zip was true
+        if 'download_url' in folder_result or 'zip_url' in result_data:
+            zip_url = folder_result.get('download_url') or result_data.get('zip_url')
+            if zip_url:
+                self.log_test("ZIP Download URL", True, f"ZIP available at: {zip_url}")
+            else:
+                self.log_test("ZIP Download URL", False, "pack_as_zip=true but no ZIP URL provided")
+        
+        return self.log_test("Direct Folder Scan", True, f"Processed {len(folder_results)} folder(s)")
+    
+    def test_regular_folder_scan(self):
+        """3) Regression: ZIP-based folder scan still works"""
+        print("\n📦 3) Testing ZIP-based Folder Scan (Regression)")
+        
+        if not self.admin_token:
+            return self.log_test("ZIP Folder Scan - Auth", False, "No admin token available")
+        
+        # Create a ZIP file with test images
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for img in self.test_images[:2]:  # Use first 2 images for regression test
+                zip_file.writestr(img['relative_path'], img['data'])
+        
+        zip_buffer.seek(0)
+        
+        # Upload ZIP file
+        files = {'file': ('test_folder.zip', zip_buffer, 'application/zip')}
+        
+        response = self.make_request('POST', 'scan-folder', files=files)
+        
+        if not response:
+            return self.log_test("ZIP Folder Scan - Request", False, "Failed to make request")
+        
+        if response.status_code not in [200, 202]:
+            try:
+                error_data = response.json()
+                error_msg = error_data.get('detail', response.text)
+            except:
+                error_msg = response.text
+            return self.log_test("ZIP Folder Scan - Status", False, f"Status {response.status_code}: {error_msg}")
+        
+        try:
+            result_data = response.json()
+        except:
+            return self.log_test("ZIP Folder Scan - Parse", False, "Failed to parse response")
+        
+        # Check if we got a job_id for polling or direct result
+        job_id = result_data.get('job_id')
+        if job_id:
+            # Poll for completion
+            return self.poll_zip_folder_status(job_id)
+        else:
+            # Direct response - validate structure
+            return self.validate_zip_folder_result(result_data)
 
     def test_response_validation(self):
         """Test 3: Validate response structure and counts"""

@@ -1,0 +1,422 @@
+{
+  "method": "OCR + Rules",
+  "total_tests": 30,
+  "correct": 23,
+  "accuracy": "76.7%",
+  "cost_per_doc": "$0.00",
+  "avg_time": "0.1s",
+  "results": [
+    {
+      "id": 1,
+      "text_preview": "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM Độc lập - Tự do - Hạnh ph...",
+      "expected": "GCN",
+      "predicted": "GCN",
+      "confidence": 0.83,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "giấy chứng nhận quyền sử dụng đất",
+        "giấy chứng nhận",
+        "quyền sử dụng đất",
+        "quyền sở hữu nhà ở",
+        "cộng hòa xã hội chủ nghĩa việt nam"
+      ]
+    },
+    {
+      "id": 2,
+      "text_preview": "BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT Tờ bản đồ số: 25 Thửa...",
+      "expected": "BMT",
+      "predicted": "BMT",
+      "confidence": 0.95,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "bản mô tả ranh giới",
+        "mốc giới thửa đất",
+        "vị trí ranh giới",
+        "thửa đất số",
+        "tờ bản đồ số"
+      ]
+    },
+    {
+      "id": 3,
+      "text_preview": "BẢN VẼ TRÍCH LỤC TỶ LỆ 1:500 Hồ sơ kỹ thuật đo đạc chỉnh lý ...",
+      "expected": "HSKT",
+      "predicted": "HSKT",
+      "confidence": 0.56,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "bản vẽ",
+        "trích lục",
+        "chỉnh lý",
+        "hồ sơ kỹ thuật",
+        "tỷ lệ 1:"
+      ]
+    },
+    {
+      "id": 4,
+      "text_preview": "BẢN VẼ HOÀN CÔNG CÔNG TRÌNH XÂY DỰNG Công trình: Nhà ở riêng...",
+      "expected": "BVHC",
+      "predicted": "BVHC",
+      "confidence": 0.95,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "bản vẽ hoàn công",
+        "hoàn công công trình",
+        "công trình xây dựng",
+        "bản vẽ thi công"
+      ]
+    },
+    {
+      "id": 5,
+      "text_preview": "BẢN VẼ MẶT BẰNG NHÀ Ở Tầng 1: Phòng khách, bếp, WC Tầng 2: 2...",
+      "expected": "BVN",
+      "predicted": "BVN",
+      "confidence": 0.23,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "mặt bằng nhà"
+      ]
+    },
+    {
+      "id": 6,
+      "text_preview": "BẢNG KÊ KHAI DIỆN TÍCH ĐẤT ĐANG SỬ DỤNG Người sử dụng: Lê Th...",
+      "expected": "BKKDT",
+      "predicted": "BKKDT",
+      "confidence": 0.33,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "bảng kê khai diện tích"
+      ]
+    },
+    {
+      "id": 7,
+      "text_preview": "DANH SÁCH CÁC THỬA ĐẤT CẤP GIẤY Xã An Phước, Huyện Bình Chán...",
+      "expected": "DSCG",
+      "predicted": "DSCG",
+      "confidence": 0.6,
+      "correct": true,
+      "difficulty": "hard",
+      "method": "rules",
+      "matched_keywords": [
+        "danh sách",
+        "cấp giấy",
+        "thửa đất cấp giấy"
+      ]
+    },
+    {
+      "id": 8,
+      "text_preview": "BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN Ngày 15/01/2025, Hội đồng đấu g...",
+      "expected": "BBBDG",
+      "predicted": "BBBDG",
+      "confidence": 0.95,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "biên bản bán đấu giá",
+        "đấu giá tài sản",
+        "bán đấu giá"
+      ]
+    },
+    {
+      "id": 9,
+      "text_preview": "BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA Hôm nay, ngày 20/01/2025...",
+      "expected": "BBGD",
+      "predicted": "BBGD",
+      "confidence": 0.75,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "biên bản bàn giao",
+        "bàn giao đất",
+        "thực địa"
+      ]
+    },
+    {
+      "id": 10,
+      "text_preview": "BIÊN BẢN CỦA HỘI ĐỒNG ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU Ngày 05/02/202...",
+      "expected": "BBHDDK",
+      "predicted": "BBHDDK",
+      "confidence": 0.67,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "hội đồng đăng ký",
+        "đăng ký đất đai lần đầu"
+      ]
+    },
+    {
+      "id": 11,
+      "text_preview": "BIÊN BẢN NGHIỆM THU CÔNG TRÌNH XÂY DỰNG Công trình: Nhà ở tạ...",
+      "expected": "BBNT",
+      "predicted": "BBNT",
+      "confidence": 0.67,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "biên bản nghiệm thu",
+        "nghiệm thu công trình"
+      ]
+    },
+    {
+      "id": 12,
+      "text_preview": "BIÊN BẢN KIỂM TRA SAI SÓT TRÊN GIẤY CHỨNG NHẬN Số GCN: BK 12...",
+      "expected": "BBKTSS",
+      "predicted": "BBKTSS",
+      "confidence": 0.95,
+      "correct": true,
+      "difficulty": "hard",
+      "method": "rules",
+      "matched_keywords": [
+        "kiểm tra sai sót",
+        "sai sót trên giấy chứng nhận",
+        "biên bản kiểm tra"
+      ]
+    },
+    {
+      "id": 13,
+      "text_preview": "BIÊN BẢN XÁC MINH HIỆN TRẠNG SỬ DỤNG ĐẤT Ngày 10/03/2025, ti...",
+      "expected": "BBKTHT",
+      "predicted": "BBKTHT",
+      "confidence": 0.67,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "xác minh hiện trạng",
+        "kiểm tra hiện trạng"
+      ]
+    },
+    {
+      "id": 14,
+      "text_preview": "Văn phòng đăng ký đất đai TP.HCM Thông báo về việc tiếp nhận...",
+      "expected": "UNKNOWN",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": true,
+      "difficulty": "hard",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 15,
+      "text_preview": "BẢN VẼ ĐO ĐẠC Phiếu đo đạc chỉnh lý Tỷ lệ 1:200 Khu vực: Phư...",
+      "expected": "HSKT",
+      "predicted": "HSKT",
+      "confidence": 0.45,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "bản vẽ",
+        "chỉnh lý",
+        "tỷ lệ 1:",
+        "phiếu đo đạc"
+      ]
+    },
+    {
+      "id": 16,
+      "text_preview": "Giấy chứng nhận Số: 456789 Quyền sử dụng đất ở Địa chỉ thửa ...",
+      "expected": "GCN",
+      "predicted": "GCN",
+      "confidence": 0.33,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "giấy chứng nhận",
+        "quyền sử dụng đất"
+      ]
+    },
+    {
+      "id": 17,
+      "text_preview": "Mô tả ranh giới Thửa số 234 giáp đường ABC ở phía đông...",
+      "expected": "BMT",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 18,
+      "text_preview": "Thiết kế kiến trúc nhà 2 tầng Mặt bằng tầng 1 và tầng 2...",
+      "expected": "BVN",
+      "predicted": "BVN",
+      "confidence": 0.23,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "kiến trúc nhà"
+      ]
+    },
+    {
+      "id": 19,
+      "text_preview": "Bàn giao thực địa giữa UBND và người dân Xã An Phú ngày 15/0...",
+      "expected": "BBGD",
+      "predicted": "BBGD",
+      "confidence": 0.5,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "thực địa",
+        "bàn giao thực địa"
+      ]
+    },
+    {
+      "id": 20,
+      "text_preview": "Đăng ký lần đầu cho hộ gia đình Họ tên chủ hộ: Phạm Văn H...",
+      "expected": "BBHDDK",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "hard",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 21,
+      "text_preview": "CỘNG HÒA XÃ HỘI Giấy xác nhận quyền sử dụng đất ở và quyền s...",
+      "expected": "GCN",
+      "predicted": "GCN",
+      "confidence": 0.33,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "quyền sử dụng đất",
+        "quyền sở hữu nhà ở"
+      ]
+    },
+    {
+      "id": 22,
+      "text_preview": "BẢN VẼ Trích đo địa chính Tỷ lệ 1:500 Đo tách thửa...",
+      "expected": "HSKT",
+      "predicted": "HSKT",
+      "confidence": 0.45,
+      "correct": true,
+      "difficulty": "easy",
+      "method": "rules",
+      "matched_keywords": [
+        "bản vẽ",
+        "đo tách",
+        "trích đo",
+        "tỷ lệ 1:"
+      ]
+    },
+    {
+      "id": 23,
+      "text_preview": "Kê khai diện tích đất sử dụng Loại đất: Đất ở nông thôn...",
+      "expected": "BKKDT",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 24,
+      "text_preview": "Liệt kê thửa đất cấp giấy chứng nhận Danh sách 50 thửa...",
+      "expected": "DSCG",
+      "predicted": "DSCG",
+      "confidence": 0.8,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "danh sách",
+        "cấp giấy",
+        "thửa đất cấp giấy",
+        "liệt kê"
+      ]
+    },
+    {
+      "id": 25,
+      "text_preview": "Đấu giá tài sản là quyền sử dụng đất Giá khởi điểm 1 tỷ...",
+      "expected": "BBBDG",
+      "predicted": "BBBDG",
+      "confidence": 0.33,
+      "correct": true,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": [
+        "đấu giá tài sản"
+      ]
+    },
+    {
+      "id": 26,
+      "text_preview": "Hoàn công nhà ở riêng lẻ theo thiết kế được duyệt...",
+      "expected": "BVHC",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 27,
+      "text_preview": "Nghiệm thu xây dựng công trình Kết quả: Đạt yêu cầu...",
+      "expected": "BBNT",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 28,
+      "text_preview": "Kiểm tra sai sót diện tích trên giấy GCN số 998877...",
+      "expected": "BBKTSS",
+      "predicted": "BBKTSS",
+      "confidence": 0.33,
+      "correct": true,
+      "difficulty": "hard",
+      "method": "rules",
+      "matched_keywords": [
+        "kiểm tra sai sót"
+      ]
+    },
+    {
+      "id": 29,
+      "text_preview": "Xác minh thực trạng đất đai Hiện trạng: Đang canh tác...",
+      "expected": "BBKTHT",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    },
+    {
+      "id": 30,
+      "text_preview": "Tờ bản đồ 45 Ranh giới thửa đất Mốc giới A, B, C, D...",
+      "expected": "BMT",
+      "predicted": "UNKNOWN",
+      "confidence": 0.0,
+      "correct": false,
+      "difficulty": "medium",
+      "method": "rules",
+      "matched_keywords": []
+    }
+  ]
+}

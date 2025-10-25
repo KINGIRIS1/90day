@@ -2493,7 +2493,13 @@ async def download_all_direct(job_id: str):
         raise HTTPException(status_code=500, detail=f"Không thể tạo ZIP: {str(e)}")
 
     # Return zip file
-    return FileResponse(out_zip.name, media_type="application/zip", filename=f"all_direct_{job_id}.zip")
+    # Optimize headers for download performance
+    stat_info = os.stat(out_zip.name)
+    headers = {
+        "Content-Length": str(stat_info.st_size),
+        "Cache-Control": "private, max-age=3600",
+    }
+    return FileResponse(out_zip.name, media_type="application/zip", filename=f"all_direct_{job_id}.zip", headers=headers)
 
 
 @auth_router.get("/me")

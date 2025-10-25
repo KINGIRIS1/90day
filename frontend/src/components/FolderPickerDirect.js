@@ -17,16 +17,29 @@ export default function FolderPickerDirect({ token }) {
   };
 
   const startScan = async () => {
-    if (!files.length) return;
-    const form = new FormData();
-    for (const f of files) form.append('files', f);
-    const rels = files.map(f => f.webkitRelativePath || f.name);
-    form.append('relative_paths', JSON.stringify(rels));
-    form.append('pack_as_zip', String(packZip));
-    const res = await axios.post(`${API_URL}/api/scan-folder-direct`, form, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    setJob(res.data);
+    if (!files.length) {
+      setError('Vui lòng chọn thư mục trước khi quét');
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      setStatus(null);
+      setJob(null);
+      const form = new FormData();
+      for (const f of files) form.append('files', f);
+      const rels = files.map(f => f.webkitRelativePath || f.name);
+      form.append('relative_paths', JSON.stringify(rels));
+      form.append('pack_as_zip', String(packZip));
+      const res = await axios.post(`${API_URL}/api/scan-folder-direct`, form, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setJob(res.data);
+    } catch (e) {
+      setError(e?.response?.data?.detail || e.message || 'Lỗi không xác định');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

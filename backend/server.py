@@ -2243,12 +2243,6 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
             job.completed_folders += 1
             job.updated_at = datetime.now(timezone.utc)
 
-                success_count=len([r for r in grouped_results if r.status == 'success']),
-                error_count=len([r for r in grouped_results if r.status == 'error'])
-            ))
-            job.completed_folders += 1
-            job.updated_at = datetime.now(timezone.utc)
-
         # Build ALL ZIP if requested later via endpoint; here only mark completed
         job.status = "completed"
         job.current_folder = None

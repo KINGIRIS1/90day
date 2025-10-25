@@ -2258,25 +2258,8 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
                         create_pdf_from_image(b64, tmp.name, code)
                         temp_pdfs.append(tmp.name)
                         merger.append(tmp.name)
-            # Pre-generate folder ZIP (optional) for faster downloads per folder
-            if pack_as_zip:
-                per_folder_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
-                per_folder_zip.close()
-                try:
-                    with zipfile.ZipFile(per_folder_zip.name, 'w', zipfile.ZIP_STORED) as zf:
-                        for p in pdf_files:
-                            zf.write(p, Path(p).name)
-                    # Persist in temp_results
-                    final_name = f"{job_id}_{folder_name}_all.zip"
-                    dest_zip = os.path.join(ROOT_DIR, 'temp_results', final_name)
-                    shutil.copy(per_folder_zip.name, dest_zip)
-                    urls.append(f"/api/download-folder-result/{os.path.basename(dest_zip)}")
-                finally:
-                    try:
-                        os.unlink(per_folder_zip.name)
-                    except Exception:
-                        pass
-
+                    
+                    # Write the merged PDF
                     out_pdf = os.path.join(out_folder, f"{code}.pdf")
                     with open(out_pdf, 'wb') as f_out:
                         merger.write(f_out)

@@ -107,3 +107,6 @@ agent_communication:
   - agent: "main"
     message: |
       Please call GET {REACT_APP_BACKEND_URL}/api/llm/health and return the JSON including 'details'. We need to know if it's 401 (invalid key), 429 (rate limit), or other. Also confirm openai_available/emergent_available flags.
+  - agent: "testing"
+    message: |
+      DIAGNOSIS COMPLETE: Called GET /api/llm/health successfully. FULL JSON RESPONSE: {"status": "unhealthy", "provider": "none", "model": null, "openai_available": false, "emergent_available": false, "details": "openai: Error code: 429 - Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a; emergent: AuthenticationError"}. ROOT CAUSE: 429 rate limit on OpenAI API + Emergent auth failure. BOTH providers down. Document scanning will fail until rate limit resets or API plan upgraded.

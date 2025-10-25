@@ -1938,6 +1938,7 @@ async def scan_folder(
         async def process_folder_scan_job(job_id_local: str, folder_groups_local: dict, extract_dir_local: str, temp_dir_local: str, current_user_local: dict):
             try:
                 MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))
+                MAX_SIZE = 700 if len(folder_groups_local) > 50 else 800
                 semaphore = asyncio.Semaphore(MAX_CONCURRENT)
                 for folder_name, image_files in folder_groups_local.items():
                     # Sort

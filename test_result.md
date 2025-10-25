@@ -206,9 +206,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Admin LLM Status tile renders and updates"
-    - "FolderPickerDirect: can pick folder, start scan, see status and PDF links"
-    - "ZIP folder scan UI path unaffected (if present)"
+    - "Direct folder scan all-zip endpoint validation - COMPLETED"
+    - "ZIP folder scan regression testing - COMPLETED"
+    - "Authentication endpoint fix - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

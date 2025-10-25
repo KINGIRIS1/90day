@@ -48,7 +48,9 @@ export default function FolderPickerDirect({ token }) {
       try {
         const r = await axios.get(`${API_URL}${job.status_url}`);
         setStatus(r.data);
-      } catch {}
+      } catch (e) {
+        setError(e?.response?.data?.detail || e.message);
+      }
     }, 2000);
     return () => clearInterval(id);
   }, [job]);

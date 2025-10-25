@@ -15,7 +15,7 @@ import sys
 class LLMIntegrationTester:
     def __init__(self):
         # Get backend URL from environment
-        self.base_url = "https://smartscan-land.preview.emergentagent.com/api"
+        self.base_url = "https://land-scanner-1.preview.emergentagent.com/api"
         self.auth_token = None
         self.tests_run = 0
         self.tests_passed = 0

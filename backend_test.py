@@ -8,7 +8,7 @@ from PIL import Image
 import base64
 
 class DocumentScannerAPITester:
-    def __init__(self, base_url="https://smartscan-land.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://land-scanner-1.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

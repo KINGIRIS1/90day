@@ -2272,6 +2272,9 @@ async def folder_direct_status(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job không tồn tại")
     return job
+
+
+@api_router.get("/folder-scan-status/{job_id}", response_model=FolderScanJobStatus)
 async def get_folder_scan_status(job_id: str):
     """Get status of folder scan job (poll this endpoint)"""
     if job_id not in active_jobs:

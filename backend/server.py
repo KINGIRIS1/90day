@@ -2403,28 +2403,6 @@ async def download_all_direct(job_id: str):
 
     # Return zip file
     return FileResponse(out_zip.name, media_type="application/zip", filename=f"all_direct_{job_id}.zip")
-        raise HTTPException(
-            status_code=403,
-            detail="User account is disabled"
-        )
-    
-    # Create access token
-    access_token = TokenManager.create_access_token(
-        data={"sub": str(user["_id"]), "username": user["username"]}
-    )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": {
-            "id": str(user["_id"]),
-            "username": user["username"],
-            "email": user["email"],
-            "full_name": user.get("full_name"),
-            "roles": user.get("roles", []),
-            "status": user["status"]
-        }
-    }
 
 
 @auth_router.get("/me")

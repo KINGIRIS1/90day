@@ -2035,16 +2035,6 @@ class FolderDirectJobStatus(BaseModel):
     updated_at: datetime
     all_zip_url: Optional[str] = None
 
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error starting folder scan: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
-
-
-# (removed duplicate stub)
-
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
 

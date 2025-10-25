@@ -116,7 +116,7 @@ class ReviewTester:
         relative_paths = []
         
         for img in images:
-            files_data.append(('files[]', (img['filename'], BytesIO(img['data']), 'image/jpeg')))
+            files_data.append(('files', (img['filename'], BytesIO(img['data']), 'image/jpeg')))
             relative_paths.append(img['relative_path'])
         
         form_data = {

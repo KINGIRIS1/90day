@@ -597,22 +597,23 @@ TRẢ VỀ JSON:
                     if not (LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e)):
                         raise
 
-            if LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e):
-                # Emergent fallback using previous implementation
-                try:
-                    chat = LlmChat(
-                        api_key=EMERGENT_LLM_KEY,
-                        session_id=f"doc_scan_{uuid.uuid4()}",
-                        system_message="Bạn là AI chuyên gia phân loại tài liệu đất đai Việt Nam. Luôn trả về JSON."
-                    ).with_model("openai", "gpt-4o")
-                    image_content = ImageContent(image_base64=image_base64)
-                    user_message = UserMessage(text=prompt, file_contents=[image_content])
-                    response_text = await chat.send_message(user_message)
-                except Exception as fe:
-                    logger.error(f"Fallback Emergent failed: {fe}")
+                # If we reach here, fallback is enabled
+                if LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e):
+                    # Emergent fallback using previous implementation
+                    try:
+                        chat = LlmChat(
+                            api_key=EMERGENT_LLM_KEY,
+                            session_id=f"doc_scan_{uuid.uuid4()}",
+                            system_message="Bạn là AI chuyên gia phân loại tài liệu đất đai Việt Nam. Luôn trả về JSON."
+                        ).with_model("openai", "gpt-4o")
+                        image_content = ImageContent(image_base64=image_base64)
+                        user_message = UserMessage(text=prompt, file_contents=[image_content])
+                        response_text = await chat.send_message(user_message)
+                    except Exception as fe:
+                        logger.error(f"Fallback Emergent failed: {fe}")
+                        raise
+                else:
                     raise
-            else:
-                raise
         
         # Parse JSON response
         import json

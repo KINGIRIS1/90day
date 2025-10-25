@@ -2336,6 +2336,7 @@ async def folder_direct_status(job_id: str):
     job = direct_jobs.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job không tồn tại")
+    return job
 
 # ===== Serve React build from backend for production/health-check =====
 from fastapi.staticfiles import StaticFiles
@@ -2355,8 +2356,6 @@ except Exception as _e:
     @app.get("/", response_class=HTMLResponse)
     async def root_fallback():
         return "<!doctype html><html><body><h1>SmartScan Online</h1></body></html>"
-
-    return job
 
 
 @api_router.get("/folder-scan-status/{job_id}", response_model=FolderScanJobStatus)

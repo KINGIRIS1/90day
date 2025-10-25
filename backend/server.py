@@ -1786,7 +1786,7 @@ async def update_folder_scan_status(job_id: str, folder_name: str, success_count
     if not status:
         return
     # Append or update result for this folder
-    fr = FolderScanFolderResult(
+    fr = FolderBatchResult(
         folder_name=folder_name,
         files=[],
         success_count=success_count,

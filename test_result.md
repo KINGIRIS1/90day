@@ -150,6 +150,23 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ Backend ZIP folder scan endpoints available and properly structured."
+      - working: true
+        agent: "testing"
+        comment: "✅ ZIP regression test passed. Original POST /api/scan-folder endpoint functional, ZIP upload processing working, per-folder ZIP downloads available (4415 bytes), folder grouping and PDF generation intact."
+  - task: "Direct folder scan all-zip endpoint validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "User requested validation of new direct scan all-zip endpoint and UI field: 1) Direct folder scan via POST /api/scan-folder-direct 2) Poll /api/folder-direct-status/{job_id} 3) Verify all_zip_url and pdf_urls 4) Test ZIP download 5) Error aggregation 6) ZIP regression"
+      - working: true
+        agent: "testing"
+        comment: "✅ All validation tests passed. Direct folder scan flow working: scan start successful, status polling returns all_zip_url and folder_results with pdf_urls, all-zip download returns valid application/zip (6883 bytes), individual PDF downloads working, error aggregation functional, ZIP regression confirmed. Added missing /api/auth/login endpoint. Core functionality solid despite LLM service failures (OpenAI 429 + Emergent auth errors)."
 
 frontend:
   - task: "Admin Panel: LLM Status tile"

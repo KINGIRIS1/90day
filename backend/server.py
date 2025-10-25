@@ -1761,6 +1761,8 @@ def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_d
                             os.unlink(p)
                         except Exception:
 # Legacy field for compatibility
+                            pass
+
 class FolderBatchResultCompact(BaseModel):
     folder_name: str
     files: List[FolderScanFileResult] = []

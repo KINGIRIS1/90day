@@ -8,6 +8,8 @@ export default function FolderPickerDirect({ token }) {
   const [job, setJob] = useState(null);
   const [status, setStatus] = useState(null);
   const [packZip, setPackZip] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const onPick = (e) => {
     const list = Array.from(e.target.files || []);

@@ -2252,7 +2252,8 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
                         img_path = Path(base_dir) / fr.relative_path
                         with open(img_path, 'rb') as f:
                             bts = f.read()
-                        b64 = base64.b64encode(bts).decode('utf-8')
+                        # Unified PDF resize for folder direct
+                        b64 = resize_image_for_api(bts, max_size=1400, crop_top_only=False)
                         tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
                         create_pdf_from_image(b64, tmp.name, code)
                         temp_pdfs.append(tmp.name)

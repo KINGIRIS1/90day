@@ -2307,6 +2307,43 @@ from auth_utils import PasswordHasher, TokenManager
 auth_router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 
+@auth_router.post("/login", response_model=TokenResponse)
+async def login(user_data: UserLoginRequest):
+    """Login user and return access token"""
+    users_collection = db["users"]
+    
+    # Find user by username
+    user = await users_collection.find_one({"username": user_data.username.lower()})
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    # Verify password
+    if not PasswordHasher.verify_password(user_data.password, user["hashed_password"]):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    
+    # Check if user is active and approved
+    if not user.get("is_active", False):
+        raise HTTPException(status_code=401, detail="Account is disabled")
+    
+    if user.get("status") != "approved":
+        raise HTTPException(status_code=401, detail="Account is pending approval")
+    
+    # Generate access token
+    access_token = TokenManager.create_access_token(data={"sub": str(user["_id"])})
+    
+    return TokenResponse(
+        access_token=access_token,
+        user={
+            "id": str(user["_id"]),
+            "username": user["username"],
+            "email": user["email"],
+            "full_name": user.get("full_name"),
+            "roles": user.get("roles", []),
+            "status": user["status"]
+        }
+    )
+
+
 @auth_router.post("/register", status_code=201)
 async def register(user_data: UserRegisterRequest):
     """Register a new user (pending approval)"""

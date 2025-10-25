@@ -11,6 +11,7 @@ import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, 
 import axios from 'axios';
 import RulesManager from '@/components/RulesManager';
 import FolderPickerDirect from '../components/FolderPickerDirect';
+import FolderPickerDirectBatched from '../components/FolderPickerDirectBatched';
 import { compressImages } from '@/utils/imageCompression';
 import { useAuth } from '@/contexts/AuthContext';
 

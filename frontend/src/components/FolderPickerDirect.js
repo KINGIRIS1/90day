@@ -66,6 +66,14 @@ export default function FolderPickerDirect({ token }) {
     return () => clearInterval(id);
   }, [job]);
 
+  // stop timer when completed
+  useEffect(()=>{
+    if (status?.status === 'completed' || status?.status === 'error') {
+      if (timerId) clearInterval(timerId);
+      setTimerId(null);
+    }
+  }, [status, timerId]);
+
   return (
     <div className="space-y-3">
       <div>

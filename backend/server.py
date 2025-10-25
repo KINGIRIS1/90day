@@ -2207,7 +2207,7 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
             urls = []
             for p in pdf_files:
                 # save into a permanent temp_results area
-                final_name = f"{folder_name}_{Path(p).name}"
+                final_name = f"{job_id}_{folder_name}_{Path(p).name}"
                 dest = os.path.join(ROOT_DIR, 'temp_results', final_name)
                 os.makedirs(os.path.dirname(dest), exist_ok=True)
                 shutil.copy(p, dest)

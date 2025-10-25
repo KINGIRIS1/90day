@@ -1919,6 +1919,92 @@ async def scan_folder(
         # Start background task
         asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir, current_user))
         
+        async def process_folder_scan_job(job_id_local: str, folder_groups_local: dict, extract_dir_local: str, temp_dir_local: str, current_user_local: dict):
+            try:
+                MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))
+                semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+                for folder_name, image_files in folder_groups_local.items():
+                    # Sort
+                    image_files.sort(key=lambda t: t[0])
+                    grouped_short_code = None
+                    grouped_files: List[FolderScanFileResult] = []
+
+                    async def process_and_group(relative_path: str, absolute_path: str, max_size: int, current_user_dict: dict, retry_count=0):
+                        nonlocal grouped_short_code, grouped_files
+                        async with semaphore:
+                            max_retries = 1
+                            try:
+                                with open(absolute_path, 'rb') as img_file:
+                                    image_bytes = img_file.read()
+                                img_original = Image.open(BytesIO(image_bytes))
+                                img_width, img_height = img_original.size
+                                aspect_ratio = img_width / img_height
+                                crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
+                                cropped_image_base64 = resize_image_for_api(
+                                    image_bytes, max_size=max_size, crop_top_only=True, crop_percentage=crop_percent
+                                )
+                                analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                                short_code = analysis_result["short_code"]
+                                detected_name = analysis_result["detected_full_name"]
+                                confidence = analysis_result["confidence"]
+                                is_continuation = (
+                                    short_code == "UNKNOWN" or confidence < 0.3 or (isinstance(detected_name, str) and ("không rõ" in detected_name.lower() or "unknown" in detected_name.lower()))
+                                )
+                                if is_continuation and grouped_short_code:
+                                    short_code = grouped_short_code
+                                else:
+                                    grouped_short_code = short_code
+                                fr = FolderScanFileResult(
+                                    relative_path=relative_path,
+                                    original_filename=Path(relative_path).name,
+                                    detected_full_name=detected_name,
+                                    short_code=short_code,
+                                    confidence_score=confidence,
+                                    status="success",
+                                    user_id=current_user_dict.get("id") if current_user_dict else None
+                                )
+                                grouped_files.append(fr)
+                                return fr
+                            except Exception as e:
+                                if ("rate limit" in str(e).lower() or "429" in str(e)) and retry_count < 1:
+                                    await asyncio.sleep(20)
+                                    return await process_and_group(relative_path, absolute_path, max_size, current_user_dict, retry_count + 1)
+                                fr = FolderScanFileResult(
+                                    relative_path=relative_path,
+                                    original_filename=Path(relative_path).name,
+                                    detected_full_name="Lỗi",
+                                    short_code="ERROR",
+                                    confidence_score=0.0,
+                                    status="error",
+                                    error_message=str(e)[:200],
+                                    user_id=current_user_dict.get("id") if current_user_dict else None
+                                )
+                                grouped_files.append(fr)
+                                return fr
+
+                    tasks = [process_and_group(rel_path, abs_path, MAX_SIZE, current_user_local) for rel_path, abs_path in image_files]
+                    await asyncio.gather(*tasks)
+
+                    # Create grouped ZIP for this folder
+                    result_zip_filename = f"{folder_name}.zip"
+                    result_zip_path = os.path.join(temp_dir_local, result_zip_filename)
+                    create_result_zip_grouped(grouped_files, extract_dir_local, result_zip_path)
+
+                    # Save to temp_results to serve download
+                    os.makedirs(os.path.join(ROOT_DIR, 'temp_results'), exist_ok=True)
+                    final_zip_path = os.path.join(ROOT_DIR, 'temp_results', f"{job_id_local}_{folder_name}.zip")
+                    shutil.copy(result_zip_path, final_zip_path)
+
+                    # Update job status
+                    await update_folder_scan_status(job_id_local, folder_name, success_count=len([r for r in grouped_files if r.status=='success']), error_count=len([r for r in grouped_files if r.status=='error']), zip_filename=os.path.basename(final_zip_path))
+
+            except Exception as e:
+                logger.error(f"Error in process_folder_scan_job: {e}", exc_info=True)
+                raise
+
+        # Start background task with the inner function
+        asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir, current_user))
+
         return FolderScanStartResponse(
             job_id=job_id,
             message="Đã bắt đầu quét. Sử dụng status_url để theo dõi tiến trình.",

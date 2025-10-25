@@ -1584,9 +1584,21 @@ const DocumentScanner = () => {
             {/* Folder Picker (Direct) */}
             <Card data-testid="folder-direct-section">
               <CardHeader>
-                <CardTitle>Quét thư mục trực tiếp (không cần ZIP)</CardTitle>
+                <CardTitle>Quét thư mục (Batch Mode - Tối ưu cho nhiều người)</CardTitle>
                 <CardDescription>
-                  Chọn thư mục trực tiếp từ máy tính để quét và tải xuống kết quả
+                  Upload từng batch 10 ảnh để tránh quá tải băng thông khi nhiều người cùng sử dụng
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FolderPickerDirectBatched token={localStorage.getItem('token')} />
+              </CardContent>
+            </Card>
+            
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Quét thư mục (Upload 1 lần - Nhanh nếu băng thông tốt)</CardTitle>
+                <CardDescription>
+                  Tải lên tất cả ảnh cùng lúc - phù hợp khi chỉ 1-2 người sử dụng
                 </CardDescription>
               </CardHeader>
               <CardContent>

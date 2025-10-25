@@ -2348,14 +2348,6 @@ async def register(user_data: UserRegisterRequest):
     }
 
 
-@auth_router.post("/login", response_model=TokenResponse)
-async def login(login_data: UserLoginRequest):
-    """Authenticate user and return access token"""
-    users_collection = db["users"]
-    
-    logger.info(f"Login attempt for username: {login_data.username}")
-    
-
 @api_router.get("/download-all-direct/{job_id}")
 async def download_all_direct(job_id: str):
     job = direct_jobs.get(job_id)

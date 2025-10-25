@@ -2038,7 +2038,7 @@ class FolderDirectJobStatus(BaseModel):
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
 
-class FolderDirectFolderResult(BaseModel):
+
     folder_name: str
     files: List[str]
     pdf_urls: List[str]

@@ -2066,18 +2066,19 @@ async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir:
                             user_id=current_user_dict.get("id") if current_user_dict else None
                         )
             
-            # Process all images in this folder
-            tasks = [process_single_image(rel_path, abs_path, MAX_SIZE, current_user) for rel_path, abs_path in image_files]
+            # Process all images in this folder with grouping behavior
+            grouped_files = []  # will be filled inside process_and_group
+            tasks = [process_and_group(rel_path, abs_path, MAX_SIZE, current_user) for rel_path, abs_path in image_files]
             file_results = await asyncio.gather(*tasks)
-            
+
             # Count results
-            folder_success = len([r for r in file_results if r.status == "success"])
-            folder_error = len([r for r in file_results if r.status == "error"])
-            
-            # Create result ZIP for this folder IMMEDIATELY
+            folder_success = len([r for r in grouped_files if r.status == "success"])
+            folder_error = len([r for r in grouped_files if r.status == "error"])
+
+            # Create GROUPED result ZIP for this folder IMMEDIATELY (merge by short_code)
             result_zip_filename = f"{folder_name}.zip"
             result_zip_path = os.path.join(temp_dir, result_zip_filename)
-            create_result_zip(file_results, extract_dir, result_zip_path)
+            create_result_zip_grouped(grouped_files, extract_dir, result_zip_path)
             
             # Save to permanent location
             permanent_result_path = os.path.join(ROOT_DIR, 'temp_results', f"{folder_name}_{uuid.uuid4().hex[:8]}.zip")

@@ -1552,7 +1552,10 @@ async def cleanup_duplicate_rules():
 
 @api_router.get("/llm/health", response_model=LlmHealth)
 async def llm_health():
-    """Lightweight healthcheck for LLM providers."""
+    """Lightweight healthcheck for LLM providers with 60s cache."""
+    now = time.time()
+    if _llm_health_cache["cached"] and now - _llm_health_cache["ts"] < LLM_HEALTH_TTL_SECONDS:
+        return _llm_health_cache["cached"]
     # Check OpenAI first
     openai_ok = False
     emergent_ok = False

@@ -428,6 +428,17 @@ Your answer:"""
 async def _analyze_with_openai_vision(image_base64: str, prompt: str, max_tokens: int = 512, temperature: float = 0.2) -> str:
     """Call OpenAI Vision (gpt-4o-mini) and return text content."""
     client = get_openai_client()
+async def _analyze_with_emergent(image_base64: str, prompt: str) -> str:
+    chat = LlmChat(
+        api_key=EMERGENT_LLM_KEY,
+        session_id=f"doc_scan_{uuid.uuid4()}",
+        system_message="Bạn là AI chuyên gia phân loại tài liệu đất đai Việt Nam. Luôn trả về JSON."
+    ).with_model("openai", "gpt-4o")
+    image_content = ImageContent(image_base64=image_base64)
+    user_message = UserMessage(text=prompt, file_contents=[image_content])
+    response = await chat.send_message(user_message)
+    return response
+
     if not client:
         raise RuntimeError("OpenAI client not initialized. Missing or invalid OPENAI_API_KEY")
     data_url = f"data:image/jpeg;base64,{image_base64}"

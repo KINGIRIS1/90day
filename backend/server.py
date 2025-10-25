@@ -2000,14 +2000,7 @@ async def scan_folder(
         raise HTTPException(status_code=500, detail=f"Lỗi: {str(e)}")
 
 
-async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
-# removing accidental duplicate def below
-
-# NOTE: removed duplicate placeholder to fix syntax
-
-async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
-    pass
-
+# (removed duplicate stub)
 
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================

@@ -2203,8 +2203,25 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
                     try:
                         with open(abs_path, 'rb') as img_file:
                             image_bytes = img_file.read()
-                        img = Image.open(BytesIO(image_bytes))
-                        w, h = img.size
+                        
+                        # Try to open as image - skip if not a valid image
+                        try:
+                            img = Image.open(BytesIO(image_bytes))
+                            w, h = img.size
+                        except Exception as img_err:
+                            logger.warning(f"Cannot open as image: {rel_path} - {img_err}")
+                            grouped_results.append(FolderScanFileResult(
+                                relative_path=rel_path,
+                                original_filename=Path(rel_path).name,
+                                detected_full_name="Không phải file ảnh hợp lệ",
+                                short_code="INVALID",
+                                confidence_score=0.0,
+                                status="error",
+                                error_message=f"Cannot identify image file: {str(img_err)[:100]}",
+                                user_id=current_user.get("id") if current_user else None
+                            ))
+                            return
+                        
                         crop = 0.65 if (w / h) > 1.35 else 0.50
                         cropped_b64 = resize_image_for_api(image_bytes, max_size=800, crop_top_only=True, crop_percentage=crop)
                         analysis = await analyze_document_with_vision(cropped_b64)

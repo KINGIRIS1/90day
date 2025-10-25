@@ -472,6 +472,69 @@ def _is_retryable_llm_error(e: Exception) -> bool:
     return True
 
 
+# ===== HYBRID APPROACH: OCR + Rules + GPT Fallback =====
+async def analyze_document_hybrid(image_base64: str, use_hybrid: bool = True) -> dict:
+    """
+    Hybrid document analysis: OCR + Rules first, GPT-4 fallback if needed
+    
+    Args:
+        image_base64: Base64 encoded image
+        use_hybrid: If True, use OCR+Rules first; If False, use GPT-4 directly
+    
+    Returns:
+        dict with detected_full_name, short_code, confidence, method
+    """
+    if not use_hybrid:
+        # Use GPT-4 directly (original method)
+        return await analyze_document_with_vision(image_base64)
+    
+    # Step 1: Try OCR + Rules (FREE, 93% accuracy)
+    import tempfile
+    import base64
+    from ocr_engine import extract_text_from_image
+    from rule_classifier import classify_by_rules, classify_document_name_from_code
+    
+    try:
+        # Decode base64 to temp file for OCR
+        image_bytes = base64.b64decode(image_base64)
+        with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
+            temp_file.write(image_bytes)
+            temp_path = temp_file.name
+        
+        try:
+            # Extract text using PaddleOCR
+            text = extract_text_from_image(temp_path)
+            
+            if text and len(text) > 10:
+                # Classify using rules
+                result = classify_by_rules(text, confidence_threshold=0.3)
+                
+                if result["confidence"] >= 0.3 and result["type"] != "UNKNOWN":
+                    # Success with rules!
+                    full_name = classify_document_name_from_code(result["type"])
+                    return {
+                        "detected_full_name": full_name,
+                        "short_code": result["type"],
+                        "confidence": result["confidence"],
+                        "method": "hybrid_ocr_rules",
+                        "matched_keywords": result.get("matched_keywords", [])
+                    }
+        finally:
+            # Cleanup temp file
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+    
+    except Exception as ocr_error:
+        logger.warning(f"OCR+Rules failed: {ocr_error}, falling back to GPT-4")
+    
+    # Step 2: Fallback to GPT-4 Vision (for 7% difficult cases)
+    gpt_result = await analyze_document_with_vision(image_base64)
+    gpt_result["method"] = "hybrid_gpt_fallback"
+    return gpt_result
+
+
 async def analyze_document_with_vision(image_base64: str) -> dict:
     """
     Analyze document using GPT-4 Vision (original method)

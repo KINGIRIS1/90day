@@ -208,12 +208,13 @@ def normalize_text(text: str) -> str:
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-def classify_by_rules(text: str) -> Dict[str, any]:
+def classify_by_rules(text: str, confidence_threshold: float = 0.3) -> Dict[str, any]:
     """
     Classify document based on keyword rules
     
     Args:
         text: Extracted text from OCR
+        confidence_threshold: Minimum confidence to accept (default 0.3)
         
     Returns:
         Dict with classification result
@@ -243,7 +244,10 @@ def classify_by_rules(text: str) -> Dict[str, any]:
         
         if len(matched) >= min_matches:
             # Score based on number of matches and weight
-            score = (len(matched) / len(keywords)) * weight
+            # Give bonus for multiple matches
+            base_score = (len(matched) / len(keywords)) * weight
+            bonus = min(len(matched) * 0.1, 0.3)  # Bonus for multiple keywords
+            score = min(base_score + bonus, 1.0)
             scores[doc_type] = score
             matched_keywords_all[doc_type] = matched
     
@@ -259,13 +263,14 @@ def classify_by_rules(text: str) -> Dict[str, any]:
     best_type = max(scores, key=scores.get)
     confidence = min(scores[best_type], 0.95)  # Cap at 0.95
     
-    # Lower threshold for acceptance: 0.5 instead of 0.7
-    if confidence < 0.5:
+    # Use threshold parameter
+    if confidence < confidence_threshold:
         return {
             "type": "UNKNOWN",
             "confidence": confidence,
             "method": "rules_low_conf",
-            "matched_keywords": matched_keywords_all.get(best_type, [])
+            "matched_keywords": matched_keywords_all.get(best_type, []),
+            "best_guess": best_type  # Include best guess for debugging
         }
     
     return {

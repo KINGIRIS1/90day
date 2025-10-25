@@ -401,10 +401,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Direct folder scan feature (scan-folder-direct endpoint)"
-    - "ZIP-based folder scan regression (scan-folder endpoint)" 
-    - "LLM health endpoint functionality"
-    - "Grouped naming with short_code merging"
+    - "LLM provider authentication issues (OpenAI rate limits, Emergent auth errors)"
   stuck_tasks:
     - "LLM provider authentication issues (OpenAI rate limits, Emergent auth errors)"
   test_all: false

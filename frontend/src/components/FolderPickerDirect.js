@@ -54,10 +54,23 @@ export default function FolderPickerDirect({ token }) {
         <div className="text-sm">
           <div>Trạng thái: {status.status}</div>
           <div>Thư mục hoàn tất: {status.completed_folders}/{status.total_folders}</div>
+          {status.all_zip_url && status.status === 'completed' && (
+            <div className="mt-2">
+              <a className="px-3 py-1 border rounded bg-gray-50 hover:bg-gray-100" href={`${API_URL}${status.all_zip_url}`} target="_blank" rel="noreferrer">Tải tất cả (ZIP)</a>
+            </div>
+          )}
           {status.folder_results?.map(fr => (
             <div key={fr.folder_name} className="mt-2 p-2 border rounded">
               <div className="font-medium">{fr.folder_name}</div>
               <div>Thành công: {fr.success_count}, Lỗi: {fr.error_count}</div>
+              {fr.errors?.length > 0 && (
+                <details className="text-red-600 text-xs mt-1">
+                  <summary>Lỗi chi tiết</summary>
+                  <ul className="list-disc ml-6">
+                    {fr.errors.map((e,idx)=>(<li key={idx}>{e}</li>))}
+                  </ul>
+                </details>
+              )}
               <div className="space-x-2 mt-1">
                 {fr.pdf_urls?.map((u,i)=>(
                   <a key={i} className="text-blue-600 underline" href={`${API_URL}${u}`} target="_blank" rel="noreferrer">PDF {i+1}</a>

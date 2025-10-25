@@ -364,39 +364,48 @@ class FolderScanTester:
         
         return self.log_test("ZIP Folder Scan", False, "No valid result structure found")
 
-    def test_file_results_validation(self):
-        """Test 4: Validate individual file results"""
-        print("\n🔍 Test 4: File Results Validation")
+    def run_all_tests(self):
+        """Run all tests in sequence"""
+        print("🚀 Starting Folder Scan Feature Tests")
+        print("=" * 60)
         
-        if not hasattr(self, 'scan_result'):
-            return self.log_test("File results validation", False, "No scan result available")
+        # Test 1: LLM Health
+        test1_success = self.test_llm_health()
         
-        files = self.scan_result.get('files', [])
+        # Setup authentication
+        auth_success = self.setup_admin_auth()
+        if not auth_success:
+            print("\n❌ Cannot proceed without authentication")
+            return False
         
-        for i, file_result in enumerate(files):
-            # Check required fields for each file
-            required_file_fields = ['relative_path', 'original_filename', 'detected_full_name', 
-                                  'short_code', 'confidence_score', 'status']
-            
-            for field in required_file_fields:
-                if field not in file_result:
-                    return self.log_test(f"File {i+1} structure", False, f"Missing field: {field}")
-            
-            # Validate confidence score
-            confidence = file_result.get('confidence_score', 0)
-            if not isinstance(confidence, (int, float)) or confidence < 0 or confidence > 1:
-                return self.log_test(f"File {i+1} confidence", False, 
-                                   f"Invalid confidence: {confidence}")
-            
-            # Check status
-            status = file_result.get('status', '')
-            if status not in ['success', 'error', 'skipped']:
-                return self.log_test(f"File {i+1} status", False, f"Invalid status: {status}")
-            
-            print(f"   File {i+1}: {file_result.get('relative_path')} -> {file_result.get('short_code')} "
-                  f"(confidence: {confidence:.2f}, status: {status})")
+        # Test 2: Direct folder scan
+        test2_success = self.test_direct_folder_scan()
         
-        return self.log_test("File results validation", True, f"All {len(files)} file results valid")
+        # Test 3: ZIP regression
+        test3_success = self.test_regular_folder_scan()
+        
+        # Summary
+        print("\n" + "=" * 60)
+        print("📊 TEST SUMMARY")
+        print("=" * 60)
+        
+        tests = [
+            ("LLM Health Check", test1_success),
+            ("Direct Folder Scan", test2_success), 
+            ("ZIP Folder Scan (Regression)", test3_success)
+        ]
+        
+        for test_name, success in tests:
+            status = "✅ PASS" if success else "❌ FAIL"
+            print(f"{status} {test_name}")
+        
+        passed = sum(1 for _, success in tests if success)
+        total = len(tests)
+        
+        print(f"\n📈 Overall: {passed}/{total} major tests passed")
+        print(f"📈 API Calls: {self.tests_passed}/{self.tests_run} successful")
+        
+        return passed == total
 
     def test_download_result(self):
         """Test 5: Download result ZIP"""

@@ -2232,6 +2232,20 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
             job.folder_results.append(FolderDirectFolderResult(
                 folder_name=folder_name,
                 files=[rp for rp, _ in image_files],
+            # Capture errors list per folder
+            errs = [f"{r.relative_path}: {r.error_message}" for r in grouped_results if r.status=='error' and r.error_message]
+
+            job.folder_results.append(FolderDirectFolderResult(
+                folder_name=folder_name,
+                files=[rp for rp, _ in image_files],
+                pdf_urls=urls,
+                success_count=len([r for r in grouped_results if r.status == 'success']),
+                error_count=len([r for r in grouped_results if r.status == 'error']),
+                errors=errs if errs else None
+            ))
+            job.completed_folders += 1
+            job.updated_at = datetime.now(timezone.utc)
+
                 pdf_urls=urls,
                 success_count=len([r for r in grouped_results if r.status == 'success']),
                 error_count=len([r for r in grouped_results if r.status == 'error'])

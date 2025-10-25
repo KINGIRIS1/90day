@@ -2338,10 +2338,17 @@ async def download_folder_result(filename: str):
         if not os.path.exists(result_path):
             raise HTTPException(status_code=404, detail="File không tồn tại hoặc đã hết hạn")
         
+        # Optimize headers for download performance
+        stat_info = os.stat(result_path)
+        headers = {
+            "Content-Length": str(stat_info.st_size),
+            "Cache-Control": "private, max-age=3600",
+        }
         return FileResponse(
             result_path,
             media_type="application/zip",
-            filename=f"scanned_documents_{filename}"
+            filename=f"scanned_documents_{filename}",
+            headers=headers
         )
         
     except HTTPException:

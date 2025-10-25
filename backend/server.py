@@ -36,6 +36,9 @@ mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 LLM_PRIMARY = os.environ.get('LLM_PRIMARY', 'openai').lower()
 
+# Hybrid OCR settings
+USE_HYBRID_OCR = os.environ.get('USE_HYBRID_OCR', 'true').lower() == 'true'
+
 db = client[os.environ.get('DB_NAME', 'document_scanner_db')]
 
 # Create the main app without a prefix

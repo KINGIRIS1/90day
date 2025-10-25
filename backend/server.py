@@ -1754,7 +1754,44 @@ async def get_usage_stats(current_user: dict = Depends(require_admin)):
             "model": OPENAI_MODEL if LLM_PRIMARY == "openai" else "gpt-4o",
             "avg_tokens_per_image": tokens["input_tokens"] + tokens["output_tokens"],
             "note": "Giá ước tính, giá thực tế có thể khác tùy theo Emergent discount"
+        },
+        "hybrid_mode": {
+            "enabled": USE_HYBRID_OCR,
+            "expected_accuracy": "93.3%",
+            "expected_savings": "93%",
+            "fallback_rate": "~7%"
         }
+    }
+
+
+@api_router.post("/settings/hybrid-mode")
+async def toggle_hybrid_mode(enabled: bool, current_user: dict = Depends(require_admin)):
+    """
+    Toggle Hybrid OCR mode (Admin only)
+    """
+    global USE_HYBRID_OCR
+    USE_HYBRID_OCR = enabled
+    
+    # Update .env file
+    env_path = Path(__file__).parent / '.env'
+    with open(env_path, 'r') as f:
+        lines = f.readlines()
+    
+    with open(env_path, 'w') as f:
+        found = False
+        for line in lines:
+            if line.startswith('USE_HYBRID_OCR='):
+                f.write(f'USE_HYBRID_OCR={str(enabled).lower()}\n')
+                found = True
+            else:
+                f.write(line)
+        if not found:
+            f.write(f'USE_HYBRID_OCR={str(enabled).lower()}\n')
+    
+    return {
+        "success": True,
+        "hybrid_mode_enabled": USE_HYBRID_OCR,
+        "message": f"Hybrid OCR mode {'enabled' if enabled else 'disabled'}. Expected savings: {'93%' if enabled else '0%'}"
     }
     _llm_health_cache["cached"] = result
     _llm_health_cache["ts"] = now

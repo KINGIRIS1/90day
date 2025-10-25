@@ -267,6 +267,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL ISSUE: Both LLM providers failing. OpenAI: Missing OPENAI_API_KEY (expected). Emergent: Authentication error - 'Invalid proxy server token passed. Received API Key = sk-...15d7, Key Hash (Token) =6ca35a08a503ca466d0a1bcd3f9ee12921179b6da69adb7e5573b1c8b960f138. Unable to find token in cache or LiteLLM_VerificationTokenTable'. Document scan returns ERROR status due to LLM failures. Integration code is correct but both providers are non-functional due to authentication issues."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL ISSUE CONFIRMED: Both LLM providers still failing after backend restart. OpenAI: Rate limit exceeded (Error 429) - 'Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a on requests per min (RPM): Limit 3, Used 3, Requested 1. Please try again in 20s.' Emergent: Same authentication error - 'Invalid proxy server token passed. Key Hash =6ca35a08a503ca466d0a1bcd3f9ee12921179b6da69adb7e5573b1c8b960f138. Unable to find token in cache or LiteLLM_VerificationTokenTable'. Document scan returns ERROR status with confidence 0.0. Integration code working correctly but both providers have authentication/rate limit issues."
   - task: "LLM health endpoint (/api/llm/health)"
     implemented: true
     working: true

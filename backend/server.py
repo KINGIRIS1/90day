@@ -1762,6 +1762,14 @@ def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_d
                         try:
                             os.unlink(p)
                         except Exception:
+# Legacy field for compatibility
+class FolderBatchResultCompact(BaseModel):
+    folder_name: str
+    files: List[FolderScanFileResult] = []
+    success_count: int
+    error_count: int
+    zip_download_url: Optional[str] = None
+
                             pass
                     try:
                         os.unlink(merged_pdf.name)

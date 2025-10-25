@@ -2272,10 +2272,6 @@ async def folder_direct_status(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job không tồn tại")
     return job
-
-    """Background task to process folder scan"""
-    try:
-        job_status = active_jobs[job_id]
         
         for folder_idx, (folder_name, image_files) in enumerate(folder_groups.items(), 1):
             folder_start = datetime.now(timezone.utc)

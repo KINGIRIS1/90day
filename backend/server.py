@@ -2001,6 +2001,9 @@ async def scan_folder(
 
 
 async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
+async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
+    pass
+
 
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================

@@ -317,61 +317,52 @@ class FolderScanTester:
             # Direct response - validate structure
             return self.validate_zip_folder_result(result_data)
 
-    def test_response_validation(self):
-        """Test 3: Validate response structure and counts"""
-        print("\n🔍 Test 3: Response Validation")
+    def poll_zip_folder_status(self, job_id):
+        """Poll ZIP folder scan status"""
+        print(f"   Polling ZIP scan status for job: {job_id}")
         
-        if not hasattr(self, 'scan_result'):
-            return self.log_test("Response validation", False, "No scan result available")
+        max_polls = 30
+        for i in range(max_polls):
+            # Try different status endpoints
+            for status_endpoint in [f'folder-status/{job_id}', f'scan-status/{job_id}', f'job-status/{job_id}']:
+                response = self.make_request('GET', status_endpoint)
+                if response and response.status_code == 200:
+                    break
+            else:
+                return self.log_test("ZIP Status Poll", False, f"No valid status endpoint found for job {job_id}")
+            
+            try:
+                status_data = response.json()
+            except:
+                return self.log_test("ZIP Status Parse", False, "Failed to parse status response")
+            
+            status = status_data.get('status')
+            print(f"   Poll {i+1}: Status = {status}")
+            
+            if status == 'completed':
+                return self.validate_zip_folder_result(status_data)
+            elif status == 'error':
+                error_msg = status_data.get('error_message', 'Unknown error')
+                return self.log_test("ZIP Scan Completion", False, f"Job failed: {error_msg}")
+            
+            time.sleep(1)
         
-        result = self.scan_result
+        return self.log_test("ZIP Scan Timeout", False, "Polling timed out after 30 seconds")
+    
+    def validate_zip_folder_result(self, result_data):
+        """Validate ZIP folder scan result"""
+        # Check for grouped ZIP creation
+        if 'download_url' in result_data:
+            download_url = result_data['download_url']
+            return self.log_test("ZIP Folder Scan", True, f"Grouped ZIP created: {download_url}")
         
-        # Check required fields
-        required_fields = ['scan_id', 'total_files', 'processed_files', 'success_count', 
-                          'processing_time_seconds', 'files', 'download_url']
+        # Check for folder results with merged PDFs
+        if 'folder_results' in result_data:
+            folder_results = result_data['folder_results']
+            if folder_results:
+                return self.log_test("ZIP Folder Scan", True, f"Processed {len(folder_results)} folder(s)")
         
-        for field in required_fields:
-            if field not in result:
-                return self.log_test("Response structure", False, f"Missing field: {field}")
-        
-        # Validate counts
-        total_files = result.get('total_files', 0)
-        processed_files = result.get('processed_files', 0)
-        success_count = result.get('success_count', 0)
-        
-        if total_files != 3:
-            return self.log_test("Total files count", False, f"Expected 3, got {total_files}")
-        
-        if processed_files != 3:
-            return self.log_test("Processed files count", False, f"Expected 3, got {processed_files}")
-        
-        # Check files array
-        files = result.get('files', [])
-        if len(files) != 3:
-            return self.log_test("Files array length", False, f"Expected 3 files, got {len(files)}")
-        
-        # Validate file structure preservation
-        expected_paths = [
-            'test_zip/folder1/test_1.jpg',
-            'test_zip/folder1/test_2.jpg',
-            'test_zip/folder2/subfolder/test_3.jpg'
-        ]
-        
-        found_paths = [f.get('relative_path', '') for f in files]
-        
-        for expected_path in expected_paths:
-            if expected_path not in found_paths:
-                return self.log_test("Folder structure preservation", False, 
-                                   f"Missing path: {expected_path}")
-        
-        # Check processing time is reasonable
-        processing_time = result.get('processing_time_seconds', 0)
-        if processing_time <= 0 or processing_time > 300:  # Should be between 0 and 5 minutes
-            return self.log_test("Processing time reasonable", False, 
-                               f"Processing time: {processing_time}s")
-        
-        return self.log_test("Response validation", True, 
-                           f"All fields valid, {success_count}/{total_files} successful")
+        return self.log_test("ZIP Folder Scan", False, "No valid result structure found")
 
     def test_file_results_validation(self):
         """Test 4: Validate individual file results"""

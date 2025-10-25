@@ -1890,8 +1890,8 @@ def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str,
                         
                         with open(original_image_path, 'rb') as img_file:
                             image_bytes = img_file.read()
-                            # Convert to base64 for create_pdf_from_image
-                            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                        # Unified PDF resize for ZIP flow
+                        image_base64 = resize_image_for_api(image_bytes, max_size=1400, crop_top_only=False)
                         
                         create_pdf_from_image(image_base64, temp_pdf.name, file_result.short_code)
                         

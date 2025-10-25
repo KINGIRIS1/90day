@@ -2254,9 +2254,11 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
             job.completed_folders += 1
             job.updated_at = datetime.now(timezone.utc)
 
+        # Build ALL ZIP if requested later via endpoint; here only mark completed
         job.status = "completed"
         job.current_folder = None
         job.updated_at = datetime.now(timezone.utc)
+        job.all_zip_url = f"/api/download-all-direct/{job_id}"
     except Exception as e:
         logger.error(f"Error in direct folder processing: {e}", exc_info=True)
         job = direct_jobs.get(job_id)

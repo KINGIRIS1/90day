@@ -2336,6 +2336,26 @@ async def folder_direct_status(job_id: str):
     job = direct_jobs.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job không tồn tại")
+
+# ===== Serve React build from backend for production/health-check =====
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+
+try:
+    BACKEND_DIR = Path(__file__).resolve().parent
+    FRONTEND_BUILD_DIR = BACKEND_DIR.parent / "frontend" / "build"
+    if FRONTEND_BUILD_DIR.exists():
+        # Mount React build at root so base URL (/) responds OK
+        app.mount("/", StaticFiles(directory=str(FRONTEND_BUILD_DIR), html=True), name="frontend")
+    else:
+        @app.get("/", response_class=HTMLResponse)
+        async def root_alive():
+            return "<!doctype html><html><head><meta charset='utf-8'><title>SmartScan</title></head><body><h1>SmartScan Backend Online</h1><p>API at /api</p></body></html>"
+except Exception as _e:
+    @app.get("/", response_class=HTMLResponse)
+    async def root_fallback():
+        return "<!doctype html><html><body><h1>SmartScan Online</h1></body></html>"
+
     return job
 
 

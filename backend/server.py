@@ -1790,7 +1790,8 @@ def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_d
                         original_image_path = Path(source_dir) / fr.relative_path
                         with open(original_image_path, 'rb') as img_file:
                             image_bytes = img_file.read()
-                        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                        # Use unified PDF resize (no crop), same for single and folder scans
+                        image_base64 = resize_image_for_api(image_bytes, max_size=1400, crop_top_only=False)
 
                         temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
                         create_pdf_from_image(image_base64, temp_pdf.name, short_code)

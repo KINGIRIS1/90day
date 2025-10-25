@@ -2046,18 +2046,6 @@ class FolderDirectFolderResult(BaseModel):
     error_count: int
     errors: Optional[List[str]] = None
 
-class FolderDirectJobStatus(BaseModel):
-    job_id: str
-    status: str  # processing, completed, error
-    total_folders: int
-    completed_folders: int
-    current_folder: Optional[str] = None
-    folder_results: List[FolderDirectFolderResult]
-    error_message: Optional[str] = None
-    started_at: datetime
-    updated_at: datetime
-
-
 direct_jobs = {}
 
 @api_router.post("/scan-folder-direct")

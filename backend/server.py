@@ -1886,6 +1886,72 @@ async def scan_folder(
         with open(zip_path, 'wb') as f:
             f.write(content)
         
+            # Sort images by relative path for stable ordering
+            image_files.sort(key=lambda t: t[0])
+
+            # Apply grouping like single scan: continuation pages inherit last valid short_code
+            grouped_short_code = None
+            grouped_files: List[FolderScanFileResult] = []
+            
+            async def process_and_group(relative_path: str, absolute_path: str, max_size: int, current_user_dict: dict, retry_count=0):
+                nonlocal grouped_short_code, grouped_files
+                async with semaphore:
+                    max_retries = 2
+                    try:
+                        with open(absolute_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                        img_original = Image.open(BytesIO(image_bytes))
+                        img_width, img_height = img_original.size
+                        aspect_ratio = img_width / img_height
+                        crop_percent = 0.65 if aspect_ratio > 1.35 else 0.50
+                        cropped_image_base64 = resize_image_for_api(
+                            image_bytes, max_size=max_size, crop_top_only=True, crop_percentage=crop_percent
+                        )
+                        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+                        # Determine continuation
+                        short_code = analysis_result["short_code"]
+                        detected_name = analysis_result["detected_full_name"]
+                        confidence = analysis_result["confidence"]
+                        is_continuation = (
+                            short_code == "UNKNOWN" or confidence < 0.3 or
+                            (isinstance(detected_name, str) and ("không rõ" in detected_name.lower() or "unknown" in detected_name.lower()))
+                        )
+                        if is_continuation and grouped_short_code:
+                            short_code = grouped_short_code
+                        else:
+                            grouped_short_code = short_code
+                        fr = FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name=detected_name,
+                            short_code=short_code,
+                            confidence_score=confidence,
+                            status="success",
+                            user_id=current_user_dict.get("id") if current_user_dict else None
+                        )
+                        grouped_files.append(fr)
+                        return fr
+                    except Exception as e:
+                        error_msg = str(e)
+                        is_retryable = ("timeout" in error_msg.lower() or "connection" in error_msg.lower() or
+                                        "rate limit" in error_msg.lower() or "429" in error_msg)
+                        if is_retryable and retry_count < max_retries:
+                            await asyncio.sleep(2 ** retry_count)
+                            return await process_and_group(relative_path, absolute_path, max_size, current_user_dict, retry_count + 1)
+                        logger.error(f"Error processing {relative_path}: {e}")
+                        fr = FolderScanFileResult(
+                            relative_path=relative_path,
+                            original_filename=Path(relative_path).name,
+                            detected_full_name="Lỗi",
+                            short_code="ERROR",
+                            confidence_score=0.0,
+                            status="error",
+                            error_message=str(e)[:200],
+                            user_id=current_user_dict.get("id") if current_user_dict else None
+                        )
+                        grouped_files.append(fr)
+                        return fr
+
         logger.info(f"Processing ZIP file: {file.filename} ({file_size_mb:.1f}MB)")
         
         # Extract ZIP and group by folders

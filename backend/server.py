@@ -393,39 +393,12 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
 async def detect_emblem_in_image(image_base64: str) -> bool:
     """Quick check to detect Vietnamese national emblem in image - for smart cropping"""
     try:
-
-async def _analyze_with_openai_vision(image_base64: str, prompt: str, max_tokens: int = 512, temperature: float = 0.2) -> str:
-    """Call OpenAI Vision (gpt-4o-mini) and return text content."""
-    client = get_openai_client()
-    if not client:
-        raise RuntimeError("OpenAI client not initialized. Missing or invalid OPENAI_API_KEY")
-    data_url = f"data:image/jpeg;base64,{image_base64}"
-    resp = client.chat.completions.create(
-        model=OPENAI_MODEL,
-        messages=[
-            {"role": "system", "content": "You are a precise OCR and document classifier. Always answer in JSON when asked."},
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": data_url, "detail": "auto"}}
-                ]
-            }
-        ],
-        max_tokens=max_tokens,
-        temperature=temperature
-    )
-    content = resp.choices[0].message.content or ""
-    return content
-
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"emblem_detect_{uuid.uuid4()}",
             system_message="You are a visual recognition expert. Answer with simple YES or NO only."
         ).with_model("openai", "gpt-4o")
-        
         image_content = ImageContent(image_base64=image_base64)
-        
         prompt = """Look at this image carefully.
         
 Do you see the Vietnamese national emblem (QUỐC HUY VIỆT NAM)?
@@ -441,20 +414,14 @@ Answer with ONLY ONE WORD:
 - "NO" if you don't see it or unsure
 
 Your answer:"""
-        
         user_message = UserMessage(text=prompt, file_contents=[image_content])
         response = await chat.send_message(user_message)
-        
-        # Parse response
         answer = response.strip().upper()
         has_emblem = "YES" in answer
-        
         logger.info(f"Emblem detection result: {answer} → {has_emblem}")
         return has_emblem
-        
     except Exception as e:
         logger.error(f"Error detecting emblem: {e}")
-        # Fallback: assume emblem exists (use safer crop)
         return False
 
 

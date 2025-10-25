@@ -473,6 +473,9 @@ def _is_retryable_llm_error(e: Exception) -> bool:
 
 
 async def analyze_document_with_vision(image_base64: str) -> dict:
+    """
+    Analyze document using GPT-4 Vision (original method)
+    """
     """Analyze document using OpenAI Vision API with dynamic rules from database"""
     try:
         # Get document rules from database

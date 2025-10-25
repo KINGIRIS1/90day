@@ -2018,6 +2018,10 @@ async def scan_folder(
             total_files=total_files,
             status_url=f"/api/folder-scan-status/{job_id}"
         )
+
+
+# ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
+
 class FolderDirectJobStatus(BaseModel):
     job_id: str
     status: str  # processing, completed, error

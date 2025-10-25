@@ -39,6 +39,15 @@ db = client[os.environ.get('DB_NAME', 'document_scanner_db')]
 # Create the main app without a prefix
 app = FastAPI()
 
+# LLM health cache (60s)
+_llm_health_cache = {"cached": None, "ts": 0}
+LLM_HEALTH_TTL_SECONDS = 60
+
+# LLM queue/backoff
+import time
+LLM_QUEUE = None  # lazy init when event loop exists
+LLM_BACKOFF_SCHEDULE = [20, 40, 60]
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 

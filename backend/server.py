@@ -2342,6 +2342,14 @@ async def folder_direct_status(job_id: str):
         raise HTTPException(status_code=404, detail="Job không tồn tại")
     return job
 
+
+# ===== Health check endpoint for Kubernetes/deployment =====
+@app.get("/healthz")
+async def health_check():
+    """Simple health check endpoint for deployment platforms"""
+    return {"status": "ok"}
+
+
 # ===== Serve React build from backend for production/health-check =====
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse

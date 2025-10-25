@@ -28,17 +28,44 @@ export default function FolderPickerDirect({ token }) {
     try {
       setLoading(true);
       setError(null);
-      setStatus(null);
+      setStatus('Đang nén ảnh...');
       setJob(null);
+      
+      // Filter image files only
+      const imageFiles = files.filter(f => {
+        const ext = f.name.toLowerCase();
+        return ext.endsWith('.jpg') || ext.endsWith('.jpeg') || 
+               ext.endsWith('.png') || ext.endsWith('.gif') ||
+               ext.endsWith('.bmp') || ext.endsWith('.tiff') ||
+               ext.endsWith('.webp') || ext.endsWith('.heic');
+      });
+
+      if (!imageFiles.length) {
+        setError('Không tìm thấy file ảnh hợp lệ trong thư mục');
+        setLoading(false);
+        return;
+      }
+
+      // Compress images before upload (reduce 80% size)
+      const compressedFiles = await compressImages(imageFiles, (current, total, fileName) => {
+        setStatus(`Đang nén ảnh ${current}/${total}...`);
+      });
+
+      setStatus('Đang tải lên server...');
+      
       const form = new FormData();
-      for (const f of files) form.append('files', f);
-      const rels = files.map(f => f.webkitRelativePath || f.name);
+      for (const f of compressedFiles) form.append('files', f);
+      const rels = compressedFiles.map(f => f.webkitRelativePath || f.name);
       form.append('relative_paths', JSON.stringify(rels));
       form.append('pack_as_zip', String(packZip));
+      
+      setStatus('Đang khởi tạo tác vụ...');
       const res = await axios.post(`${API_URL}/api/scan-folder-direct`, form, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setJob(res.data);
+      setStatus(null);
+      
       // start timer
       const t0 = Date.now();
       setStartTs(t0);

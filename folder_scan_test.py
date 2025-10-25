@@ -557,10 +557,15 @@ class FolderScanTester:
             return False
 
 def main():
-    """Main test runner"""
     tester = FolderScanTester()
     success = tester.run_all_tests()
-    return 0 if success else 1
+    
+    if success:
+        print("\n🎉 All tests passed!")
+        return 0
+    else:
+        print("\n⚠️  Some tests failed - check details above")
+        return 1
 
 if __name__ == "__main__":
-    sys.exit(main())
+    exit(main())

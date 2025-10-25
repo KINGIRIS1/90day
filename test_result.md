@@ -175,9 +175,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "FolderPickerDirect shows 'Tải tất cả (ZIP)' when completed and link downloads a ZIP"
-    - "Folder results render PDF links; errors details expand properly"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

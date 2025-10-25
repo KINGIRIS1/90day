@@ -118,6 +118,12 @@ const DocumentScanner = () => {
       
       const matchCode = filterCode === 'all' || r.short_code === filterCode;
       
+      {/* Folder Picker (Direct) */}
+      <div className="mt-6 p-4 border rounded">
+        <h3 className="font-semibold mb-2">Quét thư mục trực tiếp (không cần ZIP)</h3>
+        <FolderPickerDirect token={token} />
+      </div>
+
       return matchSearch && matchType && matchCode;
     });
   };

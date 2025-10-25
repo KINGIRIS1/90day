@@ -2135,6 +2135,14 @@ async def scan_folder_direct(
             rp = rel_paths[idx] if rel_paths and idx < len(rel_paths) else uf.filename
             # Normalize path
             rp_norm = str(Path(rp))
+            
+            # Skip non-image files (PDF, docx, etc.)
+            file_ext = Path(rp_norm).suffix.lower()
+            valid_image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.heic', '.heif'}
+            if file_ext not in valid_image_exts:
+                logger.warning(f"Skipping non-image file: {rp_norm}")
+                continue
+            
             # Determine folder name (direct parent)
             parts = Path(rp_norm).parts
             folder_name = parts[-2] if len(parts) > 1 else "root"

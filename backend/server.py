@@ -2366,6 +2366,55 @@ async def login(login_data: UserLoginRequest):
     
     logger.info(f"Login attempt for username: {login_data.username}")
     
+
+@api_router.get("/download-all-direct/{job_id}")
+async def download_all_direct(job_id: str):
+    job = direct_jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job không tồn tại")
+    if job.status != "completed":
+        raise HTTPException(status_code=409, detail="Job chưa hoàn tất")
+
+    # Collect all per-folder PDFs copied to temp_results with name pattern {job_id}_{folder_name}_*.pdf
+    temp_dir = os.path.join(ROOT_DIR, 'temp_results')
+    if not os.path.isdir(temp_dir):
+        raise HTTPException(status_code=404, detail="Không tìm thấy kết quả")
+
+    # Map folder_name -> list of (zip_name_inside, abs_path)
+    files_map = {}
+    for fr in job.folder_results:
+        for url in fr.pdf_urls:
+            # url like /api/download-folder-result/{filename}
+            fname = url.split('/')[-1]
+            if not fname.startswith(job_id + "_"):
+                # Ensure unique prefixing when saved earlier
+                continue
+            abs_path = os.path.join(temp_dir, fname)
+            if os.path.exists(abs_path):
+                inside_name = f"{fr.folder_name}/{fname.split('_', 2)[-1]}"  # keep short_code.pdf under folder
+                files_map.setdefault(fr.folder_name, []).append((inside_name, abs_path))
+
+    if not files_map:
+        raise HTTPException(status_code=404, detail="Chưa có PDF nào để đóng gói")
+
+    # Create one ZIP on the fly
+    out_zip = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
+    out_zip.close()
+    try:
+        with zipfile.ZipFile(out_zip.name, 'w', zipfile.ZIP_STORED) as z:
+            for folder, items in files_map.items():
+                for inside_name, path in items:
+                    z.write(path, inside_name)
+    except Exception as e:
+        try:
+            os.unlink(out_zip.name)
+        except Exception:
+            pass
+        raise HTTPException(status_code=500, detail=f"Không thể tạo ZIP: {str(e)}")
+
+    # Return zip file
+    return FileResponse(out_zip.name, media_type="application/zip", filename=f"all_direct_{job_id}.zip")
+
     # Find user
     user = await users_collection.find_one({"username": login_data.username.lower()})
     

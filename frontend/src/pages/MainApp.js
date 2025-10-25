@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Upload, FileText, Download, History, Trash2, Edit2, Check, X, Loader2, CheckCircle2, Settings, LogOut, Shield, User } from 'lucide-react';
 import axios from 'axios';
 import RulesManager from '@/components/RulesManager';
+import FolderPickerDirect from '../components/FolderPickerDirect';
 import { compressImages } from '@/utils/imageCompression';
 import { useAuth } from '@/contexts/AuthContext';
 

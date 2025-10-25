@@ -259,6 +259,15 @@ def classify_by_rules(text: str) -> Dict[str, any]:
     best_type = max(scores, key=scores.get)
     confidence = min(scores[best_type], 0.95)  # Cap at 0.95
     
+    # Lower threshold for acceptance: 0.5 instead of 0.7
+    if confidence < 0.5:
+        return {
+            "type": "UNKNOWN",
+            "confidence": confidence,
+            "method": "rules_low_conf",
+            "matched_keywords": matched_keywords_all.get(best_type, [])
+        }
+    
     return {
         "type": best_type,
         "confidence": round(confidence, 2),

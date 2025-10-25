@@ -2001,6 +2001,240 @@ async def scan_folder(
 
 
 async def process_folder_scan_job(job_id: str, folder_groups: dict, extract_dir: str, temp_dir: str, current_user: dict):
+
+
+# ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
+
+class FolderDirectFolderResult(BaseModel):
+    folder_name: str
+    files: List[str]
+    pdf_urls: List[str]
+    success_count: int
+    error_count: int
+
+class FolderDirectJobStatus(BaseModel):
+    job_id: str
+    status: str  # processing, completed, error
+    total_folders: int
+    completed_folders: int
+    current_folder: Optional[str] = None
+    folder_results: List[FolderDirectFolderResult]
+    error_message: Optional[str] = None
+    started_at: datetime
+    updated_at: datetime
+
+
+direct_jobs = {}
+
+@api_router.post("/scan-folder-direct")
+async def scan_folder_direct(
+    files: List[UploadFile] = File(...),
+    relative_paths: Optional[str] = Form(None),
+    pack_as_zip: Optional[bool] = Form(False),
+    current_user: dict = Depends(require_approved_user)
+):
+    """Scan a folder directly from multiple file inputs with their relative paths (no ZIP)."""
+    try:
+        # Build mapping of folder -> list[(relative_path, temp_abs_path)]
+        if not files:
+            raise HTTPException(status_code=400, detail="Không có file nào")
+
+        rel_paths = []
+        if relative_paths:
+            try:
+                import json
+                rel_paths = json.loads(relative_paths)
+            except Exception:
+                rel_paths = []
+        if rel_paths and len(rel_paths) != len(files):
+            raise HTTPException(status_code=400, detail="relative_paths không khớp số lượng files")
+
+        temp_dir = tempfile.mkdtemp(prefix='folder_direct_')
+        folder_groups = {}
+
+        for idx, uf in enumerate(files):
+            rp = rel_paths[idx] if rel_paths and idx < len(rel_paths) else uf.filename
+            # Normalize path
+            rp_norm = str(Path(rp))
+            # Determine folder name (direct parent)
+            parts = Path(rp_norm).parts
+            folder_name = parts[-2] if len(parts) > 1 else "root"
+
+            # Save to temp file
+            abs_path = os.path.join(temp_dir, rp_norm)
+            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+            content = await uf.read()
+            with open(abs_path, 'wb') as f:
+                f.write(content)
+
+            folder_groups.setdefault(folder_name, []).append((rp_norm, abs_path))
+
+        # Create job
+        job_id = str(uuid.uuid4())
+        job_status = FolderDirectJobStatus(
+            job_id=job_id,
+            status="processing",
+            total_folders=len(folder_groups),
+            completed_folders=0,
+            current_folder=None,
+            folder_results=[],
+            started_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc)
+        )
+        direct_jobs[job_id] = job_status
+
+        # Start processing
+        asyncio.create_task(_process_folder_direct(job_id, folder_groups, temp_dir, pack_as_zip, current_user))
+
+        return {"job_id": job_id, "status_url": f"/api/folder-direct-status/{job_id}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error starting direct folder scan: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str, pack_as_zip: bool, current_user: dict):
+    try:
+        job = direct_jobs[job_id]
+        MAX_CONCURRENT = int(os.getenv("MAX_CONCURRENT_SCANS", "2"))
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+
+        for folder_idx, (folder_name, image_files) in enumerate(folder_groups.items(), 1):
+            job.current_folder = folder_name
+            job.updated_at = datetime.now(timezone.utc)
+
+            # Sort for stable order
+            image_files.sort(key=lambda t: t[0])
+
+            grouped_short_code = None
+            grouped_results: List[FolderScanFileResult] = []
+
+            async def process_item(rel_path: str, abs_path: str, retry_count=0):
+                nonlocal grouped_short_code, grouped_results
+                async with semaphore:
+                    try:
+                        with open(abs_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                        img = Image.open(BytesIO(image_bytes))
+                        w, h = img.size
+                        crop = 0.65 if (w / h) > 1.35 else 0.50
+                        cropped_b64 = resize_image_for_api(image_bytes, max_size=800, crop_top_only=True, crop_percentage=crop)
+                        analysis = await analyze_document_with_vision(cropped_b64)
+                        code = analysis["short_code"]
+                        name = analysis["detected_full_name"]
+                        conf = analysis["confidence"]
+                        is_cont = (code == "UNKNOWN" or conf < 0.3 or (isinstance(name, str) and ("không rõ" in name.lower() or "unknown" in name.lower())))
+                        if is_cont and grouped_short_code:
+                            code = grouped_short_code
+                        else:
+                            grouped_short_code = code
+                        grouped_results.append(FolderScanFileResult(
+                            relative_path=rel_path,
+                            original_filename=Path(rel_path).name,
+                            detected_full_name=name,
+                            short_code=code,
+                            confidence_score=conf,
+                            status="success",
+                            user_id=current_user.get("id") if current_user else None
+                        ))
+                    except Exception as e:
+                        if ("rate limit" in str(e).lower() or "429" in str(e)) and retry_count < 1:
+                            await asyncio.sleep(20)  # backoff 20s as requested
+                            return await process_item(rel_path, abs_path, retry_count + 1)
+                        grouped_results.append(FolderScanFileResult(
+                            relative_path=rel_path,
+                            original_filename=Path(rel_path).name,
+                            detected_full_name="Lỗi",
+                            short_code="ERROR",
+                            confidence_score=0.0,
+                            status="error",
+                            error_message=str(e)[:200],
+                            user_id=current_user.get("id") if current_user else None
+                        ))
+
+            await asyncio.gather(*[process_item(rp, ap) for rp, ap in image_files])
+
+            # After processing a folder: write PDFs merged by short_code into a temp folder
+            out_folder = os.path.join(base_dir, f"out_{folder_name}")
+            os.makedirs(out_folder, exist_ok=True)
+
+            # Build PDFs merged by short_code
+            merged_count = 0
+            from collections import defaultdict
+            by_code = defaultdict(list)
+            for fr in grouped_results:
+                if fr.status == "success":
+                    by_code[fr.short_code].append(fr)
+            for code, items in by_code.items():
+                # Create merged PDF for this short_code
+                temp_pdfs = []
+                merger = PdfMerger()
+                try:
+                    for fr in items:
+                        img_path = Path(base_dir) / fr.relative_path
+                        with open(img_path, 'rb') as f:
+                            bts = f.read()
+                        b64 = base64.b64encode(bts).decode('utf-8')
+                        tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+                        create_pdf_from_image(b64, tmp.name, code)
+                        temp_pdfs.append(tmp.name)
+                        merger.append(tmp.name)
+                    out_pdf = os.path.join(out_folder, f"{code}.pdf")
+                    with open(out_pdf, 'wb') as f_out:
+                        merger.write(f_out)
+                    merged_count += 1
+                finally:
+                    try:
+                        merger.close()
+                    except Exception:
+                        pass
+                    for p in temp_pdfs:
+                        try:
+                            os.unlink(p)
+                        except Exception:
+                            pass
+
+            # Build URLs for each PDF (serve via a download endpoint)
+            pdf_files = [str(Path(out_folder) / f) for f in os.listdir(out_folder) if f.lower().endswith('.pdf')]
+            urls = []
+            for p in pdf_files:
+                # save into a permanent temp_results area
+                final_name = f"{folder_name}_{Path(p).name}"
+                dest = os.path.join(ROOT_DIR, 'temp_results', final_name)
+                os.makedirs(os.path.dirname(dest), exist_ok=True)
+                shutil.copy(p, dest)
+                urls.append(f"/api/download-folder-result/{os.path.basename(dest)}")
+
+            job.folder_results.append(FolderDirectFolderResult(
+                folder_name=folder_name,
+                files=[rp for rp, _ in image_files],
+                pdf_urls=urls,
+                success_count=len([r for r in grouped_results if r.status == 'success']),
+                error_count=len([r for r in grouped_results if r.status == 'error'])
+            ))
+            job.completed_folders += 1
+            job.updated_at = datetime.now(timezone.utc)
+
+        job.status = "completed"
+        job.current_folder = None
+        job.updated_at = datetime.now(timezone.utc)
+    except Exception as e:
+        logger.error(f"Error in direct folder processing: {e}", exc_info=True)
+        job = direct_jobs.get(job_id)
+        if job:
+            job.status = "error"
+            job.error_message = str(e)
+            job.updated_at = datetime.now(timezone.utc)
+
+
+@api_router.get("/folder-direct-status/{job_id}", response_model=FolderDirectJobStatus)
+async def folder_direct_status(job_id: str):
+    job = direct_jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job không tồn tại")
+    return job
+
     """Background task to process folder scan"""
     try:
         job_status = active_jobs[job_id]

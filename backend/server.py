@@ -2332,7 +2332,7 @@ async def _process_folder_direct(job_id: str, folder_groups: dict, base_dir: str
                         
                         crop = 0.65 if (w / h) > 1.35 else 0.50
                         cropped_b64 = resize_image_for_api(image_bytes, max_size=800, crop_top_only=True, crop_percentage=crop)
-                        analysis = await analyze_document_with_vision(cropped_b64)
+                        analysis = await analyze_document_hybrid(cropped_b64, use_hybrid=USE_HYBRID_OCR)
                         code = analysis["short_code"]
                         name = analysis["detected_full_name"]
                         conf = analysis["confidence"]

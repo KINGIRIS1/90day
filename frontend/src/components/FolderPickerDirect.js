@@ -98,6 +98,7 @@ export default function FolderPickerDirect({ token }) {
             <div className="flex items-center gap-2 text-gray-600">
               <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
               <span>Đang xử lý... {status.completed_folders}/{status.total_folders} thư mục</span>
+              <span className="ml-2 text-xs text-gray-500">Thời gian: {elapsed}s</span>
             </div>
           )}
           <div>Trạng thái: {status.status}</div>

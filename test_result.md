@@ -281,6 +281,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: LLM health endpoint working correctly. Returns proper JSON structure with required fields: status, provider, openai_available, emergent_available, details. Currently returns 'unhealthy' status with both providers false due to: OpenAI missing API key (expected), Emergent authentication error. Endpoint correctly detects and reports provider availability. Fixed minor issue with missing system_message parameter in Emergent health check."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED: LLM health endpoint working correctly after backend restart. Returns proper JSON structure with all required fields (status, provider, model, openai_available, emergent_available, details). Status shows 'unhealthy' with both providers false due to: 1) OpenAI rate limit exceeded (RPM limit 3, used 3) - Error 429, 2) Emergent authentication error - Invalid proxy server token. Endpoint correctly detects and reports both provider failures with detailed error messages."
 
 frontend:
   - task: "Folder scanning tab UI (ZIP upload interface)"

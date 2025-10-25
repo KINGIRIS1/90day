@@ -367,10 +367,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "OpenAI primary integration works, fallback triggers correctly on errors"
-    - "LLM health endpoint returns healthy/degraded depending on keys"
-    - "Admin LLM Status tile renders and updates (polling)"
-  stuck_tasks: []
+    - "Direct folder scan feature (scan-folder-direct endpoint)"
+    - "ZIP-based folder scan regression (scan-folder endpoint)" 
+    - "LLM health endpoint functionality"
+    - "Grouped naming with short_code merging"
+  stuck_tasks:
+    - "LLM provider authentication issues (OpenAI rate limits, Emergent auth errors)"
   test_all: false
   test_priority: "high_first"
 

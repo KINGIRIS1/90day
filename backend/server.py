@@ -34,6 +34,8 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
+LLM_PRIMARY = os.environ.get('LLM_PRIMARY', 'openai').lower()
+
 db = client[os.environ.get('DB_NAME', 'document_scanner_db')]
 
 # Create the main app without a prefix

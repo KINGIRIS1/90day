@@ -49,9 +49,18 @@ export default function FolderPickerDirect({ token }) {
           <span>Tải tất cả (ZIP)</span>
         </label>
         <button onClick={startScan} className="px-3 py-1 border rounded">Bắt đầu quét</button>
+        {job && !status && (
+          <span className="text-xs text-gray-500 ml-2">Đang khởi tạo tác vụ...</span>
+        )}
       </div>
       {status && (
         <div className="text-sm">
+          {status.status !== 'completed' && (
+            <div className="flex items-center gap-2 text-gray-600">
+              <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span>Đang xử lý... {status.completed_folders}/{status.total_folders} thư mục</span>
+            </div>
+          )}
           <div>Trạng thái: {status.status}</div>
           <div>Thư mục hoàn tất: {status.completed_folders}/{status.total_folders}</div>
           {status.all_zip_url && status.status === 'completed' && (

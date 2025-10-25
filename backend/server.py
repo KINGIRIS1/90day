@@ -389,7 +389,7 @@ async def smart_crop_and_analyze(image_bytes: bytes) -> tuple[str, dict]:
         # Fallback: use 45% crop (middle ground)
         logger.info("⚠️  Fallback to 45% crop due to error")
         fallback_crop = resize_image_for_api(image_bytes, max_size=1024, crop_top_only=True, crop_percentage=0.45)
-        analysis = await analyze_document_with_vision(fallback_crop)
+        analysis = await analyze_document_hybrid(fallback_crop, use_hybrid=USE_HYBRID_OCR)
         return fallback_crop, analysis
 
 

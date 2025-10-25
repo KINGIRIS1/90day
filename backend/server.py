@@ -1648,6 +1648,45 @@ async def llm_health():
         emergent_available=emergent_ok,
         details="; ".join(detail_msgs) if detail_msgs else None
     )
+
+
+# ===== Usage & Cost Tracking =====
+from usage_tracker import UsageStats, calculate_cost, estimate_tokens, format_cost_display
+
+# In-memory usage tracker (in production, store in DB)
+_usage_stats = UsageStats()
+
+@api_router.get("/usage/stats")
+async def get_usage_stats(current_user: dict = Depends(require_admin)):
+    """
+    Get usage statistics and cost estimation (Admin only)
+    """
+    tokens = estimate_tokens()
+    cost_per_image = calculate_cost(
+        provider="openai" if LLM_PRIMARY == "openai" else "emergent",
+        model=OPENAI_MODEL if LLM_PRIMARY == "openai" else "gpt-4o",
+        input_tokens=tokens["input_tokens"],
+        output_tokens=tokens["output_tokens"],
+        image_count=1
+    )
+    
+    return {
+        "current_period": {
+            "total_scans": _usage_stats.total_scans,
+            "total_images": _usage_stats.total_images,
+            "emergent_calls": _usage_stats.emergent_calls,
+            "openai_calls": _usage_stats.openai_calls,
+            "estimated_cost": format_cost_display(_usage_stats.estimated_cost_usd),
+            "period_start": _usage_stats.period_start.isoformat()
+        },
+        "cost_per_image": format_cost_display(cost_per_image),
+        "pricing_info": {
+            "provider": LLM_PRIMARY,
+            "model": OPENAI_MODEL if LLM_PRIMARY == "openai" else "gpt-4o",
+            "avg_tokens_per_image": tokens["input_tokens"] + tokens["output_tokens"],
+            "note": "Giá ước tính, giá thực tế có thể khác tùy theo Emergent discount"
+        }
+    }
     _llm_health_cache["cached"] = result
     _llm_health_cache["ts"] = now
     return result

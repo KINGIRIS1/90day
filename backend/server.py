@@ -1600,7 +1600,7 @@ async def llm_health():
     status = "healthy" if openai_ok else ("degraded" if emergent_ok else "unhealthy")
     provider = "openai" if openai_ok else ("emergent" if emergent_ok else "none")
 
-    return LlmHealth(
+    result = LlmHealth(
         status=status,
         provider=provider,
         model=OPENAI_MODEL if openai_ok else ("gpt-4o" if emergent_ok else None),
@@ -1608,6 +1608,9 @@ async def llm_health():
         emergent_available=emergent_ok,
         details="; ".join(detail_msgs) if detail_msgs else None
     )
+    _llm_health_cache["cached"] = result
+    _llm_health_cache["ts"] = now
+    return result
 
 
 @api_router.get("/")

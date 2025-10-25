@@ -15,11 +15,42 @@ from PIL import Image
 import base64
 
 class FolderScanTester:
-    def __init__(self, base_url="https://smartscan-land.preview.emergentagent.com/api"):
-        self.base_url = base_url
+    def __init__(self):
+        # Use the backend URL from frontend/.env
+        self.base_url = "https://smartscan-land.preview.emergentagent.com/api"
+        self.admin_token = None
         self.tests_run = 0
         self.tests_passed = 0
-        self.test_zip_path = "/tmp/test_structure.zip"
+        
+        # Create test images in memory
+        self.test_images = self.create_test_images()
+        
+    def create_test_images(self):
+        """Create 3 test images with different clarity levels"""
+        images = []
+        
+        for i in range(3):
+            # Create a simple test image
+            img = Image.new('RGB', (800, 600), color=(255, 255, 255))
+            
+            # Add some text-like patterns to simulate document content
+            # Second image will be "unclear" to trigger continuation
+            if i == 1:
+                # Make second image unclear/blurry
+                img = img.resize((400, 300)).resize((800, 600))  # Simulate blur
+            
+            # Convert to bytes
+            img_bytes = BytesIO()
+            img.save(img_bytes, format='JPEG', quality=85)
+            img_bytes.seek(0)
+            
+            images.append({
+                'filename': f'folder/page_{i+1}.jpg',
+                'data': img_bytes.getvalue(),
+                'relative_path': f'folder/page_{i+1}.jpg'
+            })
+            
+        return images
         
     def log_test(self, name, success, details=""):
         """Log test result"""

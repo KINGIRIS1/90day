@@ -196,7 +196,7 @@ class ReviewTester:
                 # Check for job_id or direct result
                 job_id = result.get('job_id')
                 if job_id:
-                    return self.poll_status(job_id, 'folder-status')
+                    return self.poll_status(job_id, 'folder-scan-status')
                 else:
                     return self.validate_zip_result(result)
             else:

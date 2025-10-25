@@ -245,14 +245,12 @@ class FolderScanFileResult(BaseModel):
 
 
 class FolderBatchResult(BaseModel):
-    """Result for a single folder batch"""
+    """Result for a single folder batch (grouped naming)."""
     folder_name: str
-    total_files: int
+    files: List[FolderScanFileResult]
     success_count: int
     error_count: int
-    processing_time_seconds: float
-    download_url: str
-    files: List[FolderScanFileResult]
+    zip_download_url: Optional[str] = None
 
 
 class FolderScanJobStatus(BaseModel):

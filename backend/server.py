@@ -1722,6 +1722,65 @@ def extract_zip_and_find_images(zip_file_path: str, extract_to: str) -> dict:
         raise HTTPException(status_code=500, detail=f"Lỗi giải nén ZIP: {str(e)}")
 
 
+
+def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_dir: str, output_zip_path: str):
+    """
+    Create result ZIP with PDFs grouped by short_code per folder.
+    Behavior matches 'Quét Tài Liệu': all pages with same short_code are merged into one PDF.
+    """
+    try:
+        # Group file results by short_code preserving original order
+        groups = {}
+        for fr in file_results:
+            if fr.status != "success":
+                continue
+            code = fr.short_code or "UNKNOWN"
+            groups.setdefault(code, []).append(fr)
+
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_STORED) as zip_out:
+            for short_code, items in groups.items():
+                # Create temp PDFs for each page then merge
+                temp_pdfs = []
+                try:
+                    for idx, fr in enumerate(items):
+                        # Read original image bytes
+                        original_image_path = Path(source_dir) / fr.relative_path
+                        with open(original_image_path, 'rb') as img_file:
+                            image_bytes = img_file.read()
+                        image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+
+                        temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+                        create_pdf_from_image(image_base64, temp_pdf.name, short_code)
+                        temp_pdfs.append(temp_pdf.name)
+                        temp_pdf.close()
+
+                    # Merge PDFs for this short_code
+                    merger = PdfMerger()
+                    for p in temp_pdfs:
+                        merger.append(p)
+                    merged_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+                    merger.write(merged_pdf.name)
+                    merger.close()
+
+                    # Path inside ZIP: short_code.pdf at folder root (caller ensures folder context)
+                    zip_out.write(merged_pdf.name, f"{short_code}.pdf")
+                finally:
+                    # Cleanup temps
+                    for p in temp_pdfs:
+                        try:
+                            os.unlink(p)
+                        except Exception:
+                            pass
+                    try:
+                        os.unlink(merged_pdf.name)
+                    except Exception:
+                        pass
+        logger.info(f"Created GROUPED result ZIP with {len(groups)} PDFs (merged by short_code)")
+    except Exception as e:
+        logger.error(f"Error creating grouped result ZIP: {e}")
+        raise HTTPException(status_code=500, detail=f"Lỗi tạo ZIP kết quả (grouped): {str(e)}")
+
+
 def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str, output_zip_path: str):
     """
     Create result ZIP with PDFs maintaining folder structure

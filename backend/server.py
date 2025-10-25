@@ -2026,6 +2026,14 @@ async def scan_folder(
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
 
+class FolderDirectFolderResult(BaseModel):
+    folder_name: str
+    files: List[str]
+    pdf_urls: List[str]
+    success_count: int
+    error_count: int
+    errors: Optional[List[str]] = None
+
 
 class FolderDirectJobStatus(BaseModel):
     job_id: str
@@ -2038,17 +2046,6 @@ class FolderDirectJobStatus(BaseModel):
     started_at: datetime
     updated_at: datetime
     all_zip_url: Optional[str] = None
-
-
-# ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================
-
-class FolderDirectFolderResult(BaseModel):
-    folder_name: str
-    files: List[str]
-    pdf_urls: List[str]
-    success_count: int
-    error_count: int
-    errors: Optional[List[str]] = None
 
 direct_jobs = {}
 

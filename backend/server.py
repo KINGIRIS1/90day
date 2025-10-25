@@ -1781,6 +1781,24 @@ def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_d
         raise HTTPException(status_code=500, detail=f"Lỗi tạo ZIP kết quả (grouped): {str(e)}")
 
 
+async def update_folder_scan_status(job_id: str, folder_name: str, success_count: int, error_count: int, zip_filename: Optional[str] = None):
+    status = active_jobs.get(job_id)
+    if not status:
+        return
+    # Append or update result for this folder
+    fr = FolderScanFolderResult(
+        folder_name=folder_name,
+        files=[],
+        success_count=success_count,
+        error_count=error_count,
+        zip_download_url=(f"/api/download-folder-result/{zip_filename}" if zip_filename else None)
+    )
+    status.folder_results.append(fr)
+    status.completed_folders += 1
+    status.current_folder = None
+    status.updated_at = datetime.now(timezone.utc)
+
+
 def create_result_zip(file_results: List[FolderScanFileResult], source_dir: str, output_zip_path: str):
     """
     Create result ZIP with PDFs maintaining folder structure

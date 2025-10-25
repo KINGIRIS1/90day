@@ -65,37 +65,147 @@ class FolderScanTester:
             if details:
                 print(f"   {details}")
         return success
-
-    def test_zip_structure_validation(self):
-        """Test 1: Validate test ZIP structure"""
-        print("\n🔍 Test 1: ZIP Structure Validation")
+    
+    def make_request(self, method, endpoint, **kwargs):
+        """Make HTTP request with error handling"""
+        url = f"{self.base_url}/{endpoint}"
+        headers = kwargs.get('headers', {})
+        
+        if self.admin_token:
+            headers['Authorization'] = f'Bearer {self.admin_token}'
         
         try:
-            if not os.path.exists(self.test_zip_path):
-                return self.log_test("ZIP file exists", False, f"File not found: {self.test_zip_path}")
+            if method == 'GET':
+                response = requests.get(url, headers=headers, **{k:v for k,v in kwargs.items() if k != 'headers'})
+            elif method == 'POST':
+                response = requests.post(url, headers=headers, **{k:v for k,v in kwargs.items() if k != 'headers'})
+            elif method == 'PUT':
+                response = requests.put(url, headers=headers, **{k:v for k,v in kwargs.items() if k != 'headers'})
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, **{k:v for k,v in kwargs.items() if k != 'headers'})
             
-            with zipfile.ZipFile(self.test_zip_path, 'r') as z:
-                files = z.namelist()
-                
-            expected_files = [
-                'test_zip/folder1/test_1.jpg',
-                'test_zip/folder1/test_2.jpg', 
-                'test_zip/folder2/subfolder/test_3.jpg'
-            ]
-            
-            image_files = [f for f in files if f.endswith(('.jpg', '.jpeg', '.png'))]
-            
-            if len(image_files) != 3:
-                return self.log_test("ZIP contains 3 images", False, f"Found {len(image_files)} images")
-            
-            for expected in expected_files:
-                if expected not in files:
-                    return self.log_test("ZIP structure correct", False, f"Missing: {expected}")
-            
-            return self.log_test("ZIP structure validation", True, f"Found {len(image_files)} images in correct structure")
-            
+            return response
         except Exception as e:
-            return self.log_test("ZIP structure validation", False, f"Error: {str(e)}")
+            print(f"Request error: {e}")
+            return None
+    
+    def test_llm_health(self):
+        """1) LLM health quick check"""
+        print("\n🔍 1) Testing LLM Health Endpoint")
+        
+        response = self.make_request('GET', 'llm/health')
+        
+        if not response:
+            return self.log_test("LLM Health - Request", False, "Failed to make request")
+        
+        if response.status_code != 200:
+            return self.log_test("LLM Health - Status Code", False, f"Expected 200, got {response.status_code}")
+        
+        try:
+            data = response.json()
+        except:
+            return self.log_test("LLM Health - JSON Parse", False, "Response is not valid JSON")
+        
+        # Check required fields
+        required_fields = ['status', 'provider', 'openai_available', 'emergent_available']
+        for field in required_fields:
+            if field not in data:
+                return self.log_test("LLM Health - Required Fields", False, f"Missing field: {field}")
+        
+        status = data.get('status')
+        if status not in ['healthy', 'degraded', 'unhealthy']:
+            return self.log_test("LLM Health - Status Value", False, f"Invalid status: {status}")
+        
+        return self.log_test("LLM Health - Complete", True, f"Status: {status}, OpenAI: {data.get('openai_available')}, Emergent: {data.get('emergent_available')}")
+    
+    def setup_admin_auth(self):
+        """Setup admin authentication"""
+        print("\n🔐 Setting up Admin Authentication")
+        
+        # Seed admin
+        response = self.make_request('GET', 'setup-admin')
+        if not response or response.status_code != 200:
+            return self.log_test("Admin Setup", False, f"Setup failed: {response.status_code if response else 'No response'}")
+        
+        # Login admin - try to get credentials from response or use defaults
+        try:
+            setup_data = response.json()
+            username = setup_data.get('username', 'admin')
+            password = setup_data.get('password', 'admin123')
+        except:
+            username = 'admin'
+            password = 'admin123'
+        
+        login_response = self.make_request('POST', 'auth/login', json={
+            'username': username,
+            'password': password
+        })
+        
+        if not login_response or login_response.status_code != 200:
+            return self.log_test("Admin Login", False, f"Login failed: {login_response.status_code if login_response else 'No response'}")
+        
+        try:
+            login_data = login_response.json()
+            self.admin_token = login_data.get('access_token')
+            if not self.admin_token:
+                return self.log_test("Admin Login - Token", False, "No access token in response")
+        except:
+            return self.log_test("Admin Login - Parse", False, "Failed to parse login response")
+        
+        return self.log_test("Admin Authentication", True, f"Token: {self.admin_token[:20]}...")
+    
+    def test_direct_folder_scan(self):
+        """2) Direct folder scan flow (no ZIP)"""
+        print("\n📁 2) Testing Direct Folder Scan Flow")
+        
+        if not self.admin_token:
+            return self.log_test("Direct Folder Scan - Auth", False, "No admin token available")
+        
+        # Check if scan-folder-direct endpoint exists
+        files_data = []
+        relative_paths = []
+        
+        for img in self.test_images:
+            files_data.append(('files[]', (img['filename'], BytesIO(img['data']), 'image/jpeg')))
+            relative_paths.append(img['relative_path'])
+        
+        # Prepare multipart data
+        form_data = {
+            'relative_paths': json.dumps(relative_paths),
+            'pack_as_zip': 'true'
+        }
+        
+        # Try scan-folder-direct endpoint first
+        response = self.make_request('POST', 'scan-folder-direct', files=files_data, data=form_data)
+        
+        if response and response.status_code == 404:
+            # Endpoint doesn't exist, try regular scan-folder
+            print("   scan-folder-direct not found, trying scan-folder...")
+            return self.test_regular_folder_scan()
+        
+        if not response:
+            return self.log_test("Direct Folder Scan - Request", False, "Failed to make request")
+        
+        if response.status_code not in [200, 202]:
+            try:
+                error_data = response.json()
+                error_msg = error_data.get('detail', response.text)
+            except:
+                error_msg = response.text
+            return self.log_test("Direct Folder Scan - Status", False, f"Status {response.status_code}: {error_msg}")
+        
+        try:
+            result_data = response.json()
+        except:
+            return self.log_test("Direct Folder Scan - Parse", False, "Failed to parse response")
+        
+        # Check if we got a job_id for polling
+        job_id = result_data.get('job_id')
+        if job_id:
+            return self.poll_folder_scan_status(job_id)
+        else:
+            # Direct response
+            return self.validate_folder_scan_result(result_data)
 
     def test_folder_scan_endpoint(self):
         """Test 2: Basic folder scan functionality"""

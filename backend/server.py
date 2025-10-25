@@ -2018,6 +2018,18 @@ async def scan_folder(
             total_files=total_files,
             status_url=f"/api/folder-scan-status/{job_id}"
         )
+class FolderDirectJobStatus(BaseModel):
+    job_id: str
+    status: str  # processing, completed, error
+    total_folders: int
+    completed_folders: int
+    current_folder: Optional[str] = None
+    folder_results: List[FolderDirectFolderResult]
+    error_message: Optional[str] = None
+    started_at: datetime
+    updated_at: datetime
+    all_zip_url: Optional[str] = None
+
         
     except HTTPException:
         raise

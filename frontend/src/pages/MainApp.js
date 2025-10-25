@@ -1585,6 +1585,19 @@ const DocumentScanner = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Folder Picker (Direct) */}
+            <Card data-testid="folder-direct-section">
+              <CardHeader>
+                <CardTitle>Quét thư mục trực tiếp (không cần ZIP)</CardTitle>
+                <CardDescription>
+                  Chọn thư mục trực tiếp từ máy tính để quét và tải xuống kết quả
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FolderPickerDirect token={localStorage.getItem('token')} />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="history" className="space-y-4">

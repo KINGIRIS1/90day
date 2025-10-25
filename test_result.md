@@ -75,15 +75,18 @@ user_problem_statement: |
 backend:
   - task: "LLM Health diagnosis"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "User reports AI key error. Please GET /api/llm/health and capture exact details field (429 vs 401), and confirm provider flags."
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL ISSUE IDENTIFIED: Called GET /api/llm/health - Status: unhealthy, OpenAI: false, Emergent: false. Details show '429 Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a' AND 'emergent: AuthenticationError'. PRIMARY ISSUE: 429 rate limit on OpenAI API. SECONDARY: Emergent auth failure. Both providers unavailable - system cannot process documents."
 
 frontend: []
 

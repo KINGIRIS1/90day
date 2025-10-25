@@ -2018,6 +2018,10 @@ async def scan_folder(
             total_files=total_files,
             status_url=f"/api/folder-scan-status/{job_id}"
         )
+        
+    except Exception as e:
+        logger.error(f"Error in scan_folder: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ==================== FOLDER SCAN (DIRECT) - NO ZIP UPLOAD ====================

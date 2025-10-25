@@ -1760,6 +1760,24 @@ def create_result_zip_grouped(file_results: List[FolderScanFileResult], source_d
                         merger.append(p)
                     merged_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
                     merger.write(merged_pdf.name)
+
+async def update_folder_scan_status(job_id: str, folder_name: str, success_count: int, error_count: int, zip_filename: Optional[str] = None):
+    status = active_jobs.get(job_id)
+    if not status:
+        return
+    # Append or update result for this folder
+    fr = FolderScanFolderResult(
+        folder_name=folder_name,
+        files=[],
+        success_count=success_count,
+        error_count=error_count,
+        zip_download_url=(f"/api/download-folder-result/{zip_filename}" if zip_filename else None)
+    )
+    status.folder_results.append(fr)
+    status.completed_folders += 1
+    status.current_folder = None
+    status.updated_at = datetime.now(timezone.utc)
+
                     merger.close()
 
                     # Path inside ZIP: short_code.pdf at folder root (caller ensures folder context)

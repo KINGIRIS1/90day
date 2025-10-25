@@ -65,11 +65,14 @@ export default function FolderPickerDirect({ token }) {
           <input type="checkbox" checked={packZip} onChange={(e)=>setPackZip(e.target.checked)} />
           <span>Tải tất cả (ZIP)</span>
         </label>
-        <button onClick={startScan} className="px-3 py-1 border rounded">Bắt đầu quét</button>
+        <button onClick={startScan} className="px-3 py-1 border rounded" disabled={loading}>
+          {loading ? 'Đang bắt đầu...' : 'Bắt đầu quét'}
+        </button>
         {job && !status && (
           <span className="text-xs text-gray-500 ml-2">Đang khởi tạo tác vụ...</span>
         )}
       </div>
+      {error && <div className="text-red-600 text-xs">{String(error)}</div>}
       {status && (
         <div className="text-sm">
           {status.status !== 'completed' && (

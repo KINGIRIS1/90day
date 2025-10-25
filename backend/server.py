@@ -2403,35 +2403,6 @@ async def download_all_direct(job_id: str):
 
     # Return zip file
     return FileResponse(out_zip.name, media_type="application/zip", filename=f"all_direct_{job_id}.zip")
-
-    # Find user
-    user = await users_collection.find_one({"username": login_data.username.lower()})
-    
-    if not user:
-        logger.warning(f"User not found: {login_data.username}")
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid username or password"
-        )
-    
-    logger.info(f"User found: {user['username']}, status: {user['status']}")
-    
-    # Verify password
-    if not PasswordHasher.verify_password(login_data.password, user["hashed_password"]):
-        logger.warning(f"Password verification failed for: {user['username']}")
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid username or password"
-        )
-    
-    # Check user status
-    if user["status"] != "approved":
-        raise HTTPException(
-            status_code=403,
-            detail=f"User account is {user['status']}. Please contact admin."
-        )
-    
-    if not user.get("is_active", False):
         raise HTTPException(
             status_code=403,
             detail="User account is disabled"

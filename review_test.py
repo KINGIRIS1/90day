@@ -61,8 +61,8 @@ class ReviewTester:
             if response.status_code == 200:
                 print("✅ Admin setup successful")
                 
-                # Try login with default credentials
-                login_data = {"username": "admin", "password": "admin123"}
+                # Try login with actual admin password from backend
+                login_data = {"username": "admin", "password": "Thommit@19"}
                 login_response = requests.post(f"{self.base_url}/auth/login", json=login_data, timeout=10)
                 
                 if login_response.status_code == 200:

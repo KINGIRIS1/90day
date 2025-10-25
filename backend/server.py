@@ -558,6 +558,28 @@ TRẢ VỀ JSON:
             response_text = await _analyze_with_openai_vision(image_base64, prompt, max_tokens=700, temperature=0.1)
         except Exception as e:
             logger.warning(f"Primary OpenAI vision failed: {e}")
+            # Queue + progressive backoff when rate-limited
+            err = str(e).lower()
+            if ("rate limit" in err or "429" in err) and LLM_BACKOFF_SCHEDULE:
+                for wait_s in LLM_BACKOFF_SCHEDULE:
+                    logger.warning(f"OpenAI 429: waiting {wait_s}s before retry...")
+                    await asyncio.sleep(wait_s)
+                    try:
+                        response_text = await _analyze_with_openai_vision(image_base64, prompt, max_tokens=700, temperature=0.1)
+                        break
+                    except Exception as e2:
+                        err2 = str(e2).lower()
+                        if not ("rate limit" in err2 or "429" in err2):
+                            raise
+                else:
+                    # exhausted backoff retries
+                    if not (LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY):
+                        raise
+                    # continue to fallback below
+            else:
+                if not (LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e)):
+                    raise
+
             if LLM_FALLBACK_ENABLED and EMERGENT_LLM_KEY and _is_retryable_llm_error(e):
                 # Emergent fallback using previous implementation
                 try:

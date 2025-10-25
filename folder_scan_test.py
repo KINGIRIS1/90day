@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """
-Folder Scanning Feature Test Suite
-Tests the new ZIP upload and folder structure preservation functionality
+Test script for new direct folder scan and grouped naming features
+Based on review request requirements
 """
 
 import requests
-import sys
 import json
 import time
-import zipfile
 import tempfile
+import zipfile
 import os
-from pathlib import Path
-from datetime import datetime
 from io import BytesIO
+from PIL import Image
+import base64
 
 class FolderScanTester:
     def __init__(self, base_url="https://smartscan-land.preview.emergentagent.com/api"):

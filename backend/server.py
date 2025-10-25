@@ -1949,7 +1949,6 @@ async def scan_folder(
                     async def process_and_group(relative_path: str, absolute_path: str, max_size: int, current_user_dict: dict, retry_count=0):
                         nonlocal grouped_short_code, grouped_files
                         async with semaphore:
-                            max_retries = 1
                             try:
                                 with open(absolute_path, 'rb') as img_file:
                                     image_bytes = img_file.read()

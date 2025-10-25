@@ -1934,8 +1934,6 @@ async def scan_folder(
         
         active_jobs[job_id] = job_status
         
-        # Start background task
-        asyncio.create_task(process_folder_scan_job(job_id, folder_groups, extract_dir, temp_dir, current_user))
         
         async def process_folder_scan_job(job_id_local: str, folder_groups_local: dict, extract_dir_local: str, temp_dir_local: str, current_user_local: dict):
             try:

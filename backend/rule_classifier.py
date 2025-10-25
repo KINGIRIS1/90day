@@ -4,7 +4,7 @@ Rule-based classifier for Vietnamese land documents
 import re
 from typing import Dict, Tuple
 
-# Document type rules with Vietnamese keywords
+# Document type rules with Vietnamese keywords (IMPROVED VERSION)
 DOCUMENT_RULES = {
     "GCN": {
         "keywords": [
@@ -13,10 +13,13 @@ DOCUMENT_RULES = {
             "quyền sử dụng đất",
             "quyền sở hữu nhà ở",
             "cộng hòa xã hội chủ nghĩa việt nam",
-            "độc lập tự do hạnh phúc"
+            "độc lập tự do hạnh phúc",
+            "gcn quyền sử dụng",
+            "quyền sở hữu",
+            "chứng nhận quyền"
         ],
         "weight": 1.0,
-        "min_matches": 2
+        "min_matches": 1  # Reduced from 2
     },
     "BMT": {
         "keywords": [
@@ -24,10 +27,18 @@ DOCUMENT_RULES = {
             "mốc giới thửa đất",
             "vị trí ranh giới",
             "thửa đất số",
-            "tờ bản đồ số"
+            "tờ bản đồ số",
+            "mô tả ranh giới",  # NEW
+            "ranh giới thửa",   # NEW
+            "giới hạn thửa",    # NEW
+            "mốc giới",          # NEW
+            "phía đông giáp",   # NEW
+            "phía tây giáp",    # NEW
+            "phía nam giáp",    # NEW
+            "phía bắc giáp"     # NEW
         ],
         "weight": 1.0,
-        "min_matches": 2
+        "min_matches": 1  # Reduced from 2
     },
     "HSKT": {
         "keywords": [
@@ -38,7 +49,10 @@ DOCUMENT_RULES = {
             "hồ sơ kỹ thuật",
             "trích đo",
             "tỷ lệ 1:",
-            "phiếu đo đạc"
+            "phiếu đo đạc",
+            "bản vẽ trích lục",  # NEW
+            "đo đạc chỉnh lý",   # NEW
+            "trích đo địa chính" # NEW
         ],
         "weight": 0.9,
         "min_matches": 1
@@ -48,7 +62,11 @@ DOCUMENT_RULES = {
             "bản vẽ hoàn công",
             "hoàn công công trình",
             "công trình xây dựng",
-            "bản vẽ thi công"
+            "bản vẽ thi công",
+            "hoàn công nhà",        # NEW
+            "hoàn công",            # NEW
+            "công trình hoàn công", # NEW
+            "thi công hoàn thành"   # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -58,7 +76,15 @@ DOCUMENT_RULES = {
             "bản vẽ nhà",
             "mặt bằng nhà",
             "thiết kế nhà",
-            "kiến trúc nhà"
+            "kiến trúc nhà",
+            "thiết kế kiến trúc",   # NEW
+            "mặt bằng",              # NEW
+            "mặt tiền",              # NEW
+            "mặt cắt",               # NEW
+            "tầng 1",                # NEW
+            "tầng 2",                # NEW
+            "phòng khách",           # NEW
+            "phòng ngủ"              # NEW
         ],
         "weight": 0.9,
         "min_matches": 1
@@ -67,7 +93,11 @@ DOCUMENT_RULES = {
         "keywords": [
             "bảng kê khai diện tích",
             "diện tích đang sử dụng",
-            "kê khai đất đai"
+            "kê khai đất đai",
+            "kê khai diện tích",     # NEW
+            "bảng kê diện tích",     # NEW
+            "diện tích sử dụng",     # NEW
+            "kê khai đất"            # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -77,16 +107,27 @@ DOCUMENT_RULES = {
             "danh sách",
             "cấp giấy",
             "thửa đất cấp giấy",
-            "liệt kê"
+            "liệt kê",
+            "danh sách thửa đất",    # NEW
+            "danh sách cấp giấy",    # NEW
+            "bảng liệt kê",          # NEW
+            "danh sách các thửa",    # NEW
+            "stt",                   # NEW (table indicator)
+            "tờ bđ"                  # NEW (table header)
         ],
         "weight": 0.8,
-        "min_matches": 2
+        "min_matches": 1  # Reduced from 2
     },
     "BBBDG": {
         "keywords": [
             "biên bản bán đấu giá",
             "đấu giá tài sản",
-            "bán đấu giá"
+            "bán đấu giá",
+            "đấu giá",               # NEW
+            "hội đồng đấu giá",      # NEW
+            "tổ chức đấu giá",       # NEW
+            "giá khởi điểm",         # NEW
+            "trúng đấu giá"          # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -96,7 +137,12 @@ DOCUMENT_RULES = {
             "biên bản bàn giao",
             "bàn giao đất",
             "thực địa",
-            "bàn giao thực địa"
+            "bàn giao thực địa",
+            "bàn giao",              # NEW
+            "nhận bàn giao",         # NEW
+            "giao nhận",             # NEW
+            "bên giao",              # NEW
+            "bên nhận"               # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -105,7 +151,11 @@ DOCUMENT_RULES = {
         "keywords": [
             "hội đồng đăng ký",
             "đăng ký đất đai lần đầu",
-            "biên bản hội đồng"
+            "biên bản hội đồng",
+            "hội đồng",              # NEW
+            "đăng ký lần đầu",       # NEW
+            "xét hồ sơ",             # NEW
+            "đăng ký đất đai"        # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -114,7 +164,11 @@ DOCUMENT_RULES = {
         "keywords": [
             "biên bản nghiệm thu",
             "nghiệm thu công trình",
-            "kiểm tra nghiệm thu"
+            "kiểm tra nghiệm thu",
+            "nghiệm thu",            # NEW
+            "hội đồng nghiệm thu",   # NEW
+            "xác nhận hoàn thành",   # NEW
+            "đạt yêu cầu"            # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -123,7 +177,11 @@ DOCUMENT_RULES = {
         "keywords": [
             "kiểm tra sai sót",
             "sai sót trên giấy chứng nhận",
-            "biên bản kiểm tra"
+            "biên bản kiểm tra",
+            "sai sót",               # NEW
+            "phát hiện sai sót",     # NEW
+            "chỉnh sửa thông tin",   # NEW
+            "sai sót trên gcn"       # NEW
         ],
         "weight": 1.0,
         "min_matches": 1
@@ -132,7 +190,11 @@ DOCUMENT_RULES = {
         "keywords": [
             "xác minh hiện trạng",
             "kiểm tra hiện trạng",
-            "sử dụng đất hiện trạng"
+            "sử dụng đất hiện trạng",
+            "hiện trạng",            # NEW
+            "kiểm tra thực địa",     # NEW
+            "hiện trạng sử dụng",    # NEW
+            "xác minh"               # NEW
         ],
         "weight": 1.0,
         "min_matches": 1

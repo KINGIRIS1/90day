@@ -520,42 +520,6 @@ class FolderScanTester:
         
         return success_6a and success_6b
 
-    def run_all_tests(self):
-        """Run all folder scanning tests"""
-        print("🚀 Starting Folder Scanning Feature Tests")
-        print("=" * 60)
-        
-        test_results = []
-        
-        # Run tests in sequence
-        test_results.append(("ZIP Structure Validation", self.test_zip_structure_validation()))
-        test_results.append(("Folder Scan Endpoint", self.test_folder_scan_endpoint()))
-        test_results.append(("Response Validation", self.test_response_validation()))
-        test_results.append(("File Results Validation", self.test_file_results_validation()))
-        test_results.append(("Download Result ZIP", self.test_download_result()))
-        test_results.append(("Error Handling", self.test_error_handling()))
-        
-        # Print summary
-        print("\n" + "=" * 60)
-        print("📊 FOLDER SCANNING TEST RESULTS")
-        print("=" * 60)
-        
-        for test_name, result in test_results:
-            status = "✅ PASS" if result else "❌ FAIL"
-            print(f"{status} {test_name}")
-        
-        passed_tests = sum(1 for _, result in test_results if result)
-        total_tests = len(test_results)
-        
-        print(f"\n📈 Overall: {passed_tests}/{total_tests} tests passed")
-        
-        if passed_tests == total_tests:
-            print("🎉 All folder scanning tests passed!")
-            return True
-        else:
-            print("⚠️  Some tests failed - check details above")
-            return False
-
 def main():
     tester = FolderScanTester()
     success = tester.run_all_tests()

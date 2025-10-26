@@ -7,6 +7,19 @@ Auto-generate Vietnamese keyword variants for better OCR matching
 import unicodedata
 import re
 from typing import List, Set
+import sys
+import io
+
+# Fix Windows console encoding for Vietnamese
+# Keep reference to prevent garbage collection
+_stdout = None
+_stderr = None
+
+if sys.platform == 'win32':
+    _stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
+    _stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', line_buffering=True)
+    sys.stdout = _stdout
+    sys.stderr = _stderr
 
 
 def remove_diacritics(text: str) -> str:

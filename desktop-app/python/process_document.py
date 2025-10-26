@@ -120,11 +120,14 @@ def main():
     
     file_path = sys.argv[1]
     
-    if not os.path.exists(file_path):
-        print(json.dumps({
-            "error": f"File not found: {file_path}",
+    if not file_path or not os.path.exists(file_path):
+        error_msg = json.dumps({
+            "error": "File not found or invalid path",
             "success": False
-        }, ensure_ascii=True))
+        }, ensure_ascii=False)
+        sys.stdout.write(error_msg)
+        sys.stdout.write('\n')
+        sys.stdout.flush()
         sys.exit(1)
     
     result = process_document(file_path)

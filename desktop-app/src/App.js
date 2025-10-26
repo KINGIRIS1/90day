@@ -7,6 +7,8 @@ function App() {
 import { useMemo } from 'react';
 
   const [activeTab, setActiveTab] = useState('scanner');
+  const [folders, setFolders] = useState([]); // multi-folder tabs
+
   const [isElectron, setIsElectron] = useState(false);
 
   useEffect(() => {

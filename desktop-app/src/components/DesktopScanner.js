@@ -19,6 +19,10 @@ const DesktopScanner = () => {
   // Load backend URL from config
   React.useEffect(() => {
     const loadConfig = async () => {
+    (async () => {
+      const enabled = await window.electronAPI.getConfig('autoFallbackEnabled');
+      setAutoFallbackEnabled(!!enabled);
+    })();
       const url = await window.electronAPI.getBackendUrl();
       setBackendUrl(url || '');
     };

@@ -133,7 +133,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       return;
     }
 
-    const files = listing.files.map(p => ({ path: p, name: p.split(/[\\\/]/).pop() }));
+    let fileList = listing.files.map(p => ({ path: p, name: p.split(/[\\\/]/).pop() }));
+    if (childScanImagesOnly) fileList = fileList.filter(f => /\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name));
+    const files = fileList;
     const childResults = [];
     for (let i = 0; i < files.length; i++) {
       const f = files[i];

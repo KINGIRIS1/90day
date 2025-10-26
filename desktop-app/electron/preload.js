@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // File/Folder selection
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   selectFiles: () => ipcRenderer.invoke('select-files'),
+  listFilesInFolder: (folderPath) => ipcRenderer.invoke('list-files-in-folder', folderPath),
+  renameFile: (oldPath, newBaseName) => ipcRenderer.invoke('rename-file', oldPath, newBaseName),
   
   // Offline OCR processing
   processDocumentOffline: (filePath) => ipcRenderer.invoke('process-document-offline', filePath),

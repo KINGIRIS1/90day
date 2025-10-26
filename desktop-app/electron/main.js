@@ -183,6 +183,79 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
           console.error('Raw output:', result);
           console.error('Stderr logs:', errorLogs);
           reject(new Error(`Failed to parse OCR result: ${e.message}`));
+
+ipcMain.handle('choose-save-path', async (event, defaultName) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: defaultName,
+    filters: [{ name: 'PDF', extensions: ['pdf'] }]
+  });
+  if (result.canceled) return null;
+  return result.filePath;
+});
+
+ipcMain.handle('merge-by-short-code', async (event, items) => {
+  // items: [{filePath, short_code}]  -> group by short_code and output one pdf per short_code
+  const fs = require('fs');
+  const path = require('path');
+  const { PDFDocument, StandardFonts } = require('pdf-lib');
+
+  const groups = items.reduce((acc, it) => {
+    const key = it.short_code || 'UNKNOWN';
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(it.filePath);
+    return acc;
+  }, {});
+
+  const results = [];
+
+  for (const [shortCode, filePaths] of Object.entries(groups)) {
+    try {
+      // Create a new PDF
+      const outPdf = await PDFDocument.create();
+
+      for (const fp of filePaths) {
+        const ext = path.extname(fp).toLowerCase();
+        const bytes = fs.readFileSync(fp);
+        if (ext === '.pdf') {
+          // Copy pages from existing PDF
+          const srcPdf = await PDFDocument.load(bytes);
+          const copiedPages = await outPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+          copiedPages.forEach((p) => outPdf.addPage(p));
+        } else if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.bmp' || ext === '.gif') {
+          // Embed image, keep original size
+          let img;
+          if (ext === '.png') img = await outPdf.embedPng(bytes);
+          else img = await outPdf.embedJpg(bytes); // pdf-lib supports jpg; gif/bmp may need conversion, try jpg embed
+          const { width, height } = img.size();
+          const page = outPdf.addPage([width, height]);
+          page.drawImage(img, { x: 0, y: 0, width, height });
+        } else {
+          // Skip unsupported
+          console.warn('Unsupported for merge:', fp);
+        }
+      }
+
+      const pdfBytes = await outPdf.save();
+      // Ask save path per short_code per your naming rule: short_code.pdf
+      const savePath = await dialog.showSaveDialog(mainWindow, {
+        defaultPath: `${shortCode}.pdf`,
+        filters: [{ name: 'PDF', extensions: ['pdf'] }]
+      });
+      if (!savePath.canceled && savePath.filePath) {
+        fs.writeFileSync(savePath.filePath, pdfBytes);
+        results.push({ short_code: shortCode, path: savePath.filePath, count: filePaths.length, success: true });
+      } else {
+        results.push({ short_code: shortCode, canceled: true, success: false });
+      }
+    } catch (err) {
+      console.error('Merge error for', shortCode, err);
+      results.push({ short_code: shortCode, error: err.message, success: false });
+    }
+  }
+
+  return results;
+});
+
         }
       } else {
         console.error('Process exited with code:', code);

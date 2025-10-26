@@ -219,11 +219,13 @@ DOCUMENT_RULES = {
     "CCCD": {
         "keywords": [
             # Có dấu
-            "căn cước công dân", "cccd", "thẻ căn cước",
+            "căn cước công dân", "cccd", "thẻ căn cước", "căn cước",
             # Không dấu
-            "can cuoc cong dan", "the can cuoc"
+            "can cuoc cong dan", "the can cuoc", "can cuoc",
+            # Viết hoa
+            "CAN CUOC CONG DAN", "CCCD", "THE CAN CUOC"
         ],
-        "weight": 1.2, "min_matches": 1
+        "weight": 1.3, "min_matches": 1
     },
     "DS15": {
         "keywords": [

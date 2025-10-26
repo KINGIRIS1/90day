@@ -344,7 +344,11 @@ const DesktopScanner = () => {
           return 'file://' + p;
         };
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
-          previewUrl = toFileUrl(file.path);
+          // Try data URL to avoid file protocol/security issues
+          previewUrl = await window.electronAPI.readImageDataUrl(file.path);
+          if (!previewUrl) {
+            previewUrl = toFileUrl(file.path);
+          }
         } else if (/\.pdf$/i.test(file.name)) {
           previewUrl = null;
         }

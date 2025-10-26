@@ -397,3 +397,28 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
     }
   });
 });
+
+// Read local image as data URL for safe rendering in renderer
+ipcMain.handle('read-image-data-url', async (event, filePath) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const ext = path.extname(filePath).toLowerCase();
+    const mimeMap = {
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.bmp': 'image/bmp'
+    };
+    const mime = mimeMap[ext];
+    if (!mime) return null; // not supported
+    const data = fs.readFileSync(filePath);
+    const base64 = data.toString('base64');
+    return `data:${mime};base64,${base64}`;
+  } catch (err) {
+    console.error('read-image-data-url error:', err);
+    return null;
+  }
+});
+

@@ -839,3 +839,47 @@ ipcMain.handle('open-rules-folder', async () => {
   }
 });
 
+
+// Generate keyword variants
+ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos = true) => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/keyword_variants.py');
+    const typosFlag = includeTypos ? 'true' : 'false';
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, keyword, typosFlag]);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Generate variants failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Generate variants timeout'));
+      }, 5000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+

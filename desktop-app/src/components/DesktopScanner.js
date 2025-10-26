@@ -162,6 +162,15 @@ const DesktopScanner = () => {
       return {
         success: false,
         error: 'Chưa cấu hình Backend URL. Vui lòng vào phần Cài đặt.',
+      // Build group-by-short_code order map
+      if (processedResult.success && processedResult.short_code) {
+        setOrderByShortCode(prev => {
+          const arr = prev[processedResult.short_code] ? [...prev[processedResult.short_code]] : [];
+          arr.push(file.path);
+          return { ...prev, [processedResult.short_code]: arr };
+        });
+      }
+
         method: 'cloud_boost_failed',
         errorType: 'CONFIG'
       };

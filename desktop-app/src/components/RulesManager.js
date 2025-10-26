@@ -189,6 +189,89 @@ const RulesManager = () => {
     });
   };
 
+  // Add new rule handlers
+  const startAddNew = () => {
+    setShowAddNew(true);
+    setNewRuleData({
+      docType: '',
+      keywords: [],
+      weight: 1.0,
+      min_matches: 1,
+      newKeyword: ''
+    });
+    setSelectedRule(null);
+    setEditingRule(null);
+  };
+
+  const addKeywordToNew = () => {
+    if (!newRuleData.newKeyword.trim()) return;
+    setNewRuleData({
+      ...newRuleData,
+      keywords: [...newRuleData.keywords, newRuleData.newKeyword.trim()],
+      newKeyword: ''
+    });
+  };
+
+  const removeKeywordFromNew = (index) => {
+    setNewRuleData({
+      ...newRuleData,
+      keywords: newRuleData.keywords.filter((_, i) => i !== index)
+    });
+  };
+
+  const handleCreateNewRule = async () => {
+    // Validation
+    if (!newRuleData.docType.trim()) {
+      showNotification('Vui lòng nhập mã tài liệu (Doc Type)', 'error');
+      return;
+    }
+
+    if (newRuleData.keywords.length === 0) {
+      showNotification('Vui lòng thêm ít nhất 1 keyword', 'error');
+      return;
+    }
+
+    // Check if doc type already exists
+    if (rules[newRuleData.docType.toUpperCase()]) {
+      showNotification(`Mã "${newRuleData.docType}" đã tồn tại. Vui lòng chọn mã khác.`, 'error');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const docType = newRuleData.docType.toUpperCase();
+      const result = await window.electronAPI.saveRule(docType, {
+        keywords: newRuleData.keywords,
+        weight: parseFloat(newRuleData.weight) || 1.0,
+        min_matches: parseInt(newRuleData.min_matches) || 1
+      });
+
+      if (result.success) {
+        showNotification(`Rule "${docType}" đã được tạo thành công!`, 'success');
+        await loadRules();
+        setShowAddNew(false);
+        setSelectedRule(docType);
+      } else {
+        showNotification('Lỗi tạo rule: ' + result.error, 'error');
+      }
+    } catch (error) {
+      showNotification('Lỗi: ' + error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelAddNew = () => {
+    setShowAddNew(false);
+    setNewRuleData({
+      docType: '',
+      keywords: [],
+      weight: 1.0,
+      min_matches: 1,
+      newKeyword: ''
+    });
+  };
+
   // Filter rules by search term
   const filteredRules = Object.keys(rules).filter(docType =>
     docType.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -103,6 +103,39 @@ ipcMain.handle('select-files', async () => {
   return result.filePaths;
 });
 
+ipcMain.handle('list-files-in-folder', async (event, folderPath) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const entries = fs.readdirSync(folderPath, { withFileTypes: true });
+    const files = entries
+      .filter((e) => e.isFile())
+      .filter((e) => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name))
+      .map((e) => path.join(folderPath, e.name));
+    return { success: true, files };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('rename-file', async (event, oldPath, newBaseName) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const dir = path.dirname(oldPath);
+    const ext = path.extname(oldPath);
+    const newPath = path.join(dir, `${newBaseName}${ext}`);
+    if (fs.existsSync(newPath)) {
+      return { success: false, error: 'Tên file đã tồn tại trong thư mục' };
+    }
+    fs.renameSync(oldPath, newPath);
+    return { success: true, newPath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+
 ipcMain.handle('process-document-offline', async (event, filePath) => {
   return new Promise((resolve, reject) => {
     // Auto-detect Python command based on platform

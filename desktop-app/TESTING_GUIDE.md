@@ -60,12 +60,12 @@ yarn electron-dev
    - Verify: Reload lại rules để xem thay đổi
 
 6. **Test Delete Rule:**
-   - Chọn rule vừa edit
+   - Chọn rule TEST_DOC vừa tạo
    - Click **🗑️ Xóa**
    - Confirm trong dialog
-   - Verify: Rule quay về mặc định
+   - Verify: Rule biến mất khỏi danh sách
 
-6. **Test Export:**
+7. **Test Export:**
    - Click **📤 Export JSON**
    - Chọn nơi lưu file
    - Verify: Mở file JSON để xem nội dung

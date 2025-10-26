@@ -20,36 +20,51 @@ DOCUMENT_RULES = {
             "chứng nhận quyền",
             "chi nhánh văn phòng đăng ký",
             "văn phòng đăng ký đất đai",
-            # Không dấu (OCR thường bị mất dấu)
+            # Không dấu
             "giay chung nhan",
             "quyen su dung dat",
             "quyen so huu",
             "chung nhan quyen",
-            "giay chung nhan quyen su dung dat"
+            "giay chung nhan quyen su dung dat",
+            "cong hoa xa hoi chu nghia viet nam",
+            "doc lap tu do hanh phuc"
         ],
         "weight": 1.5,
         "min_matches": 1
     },
     "BMT": {
         "keywords": [
+            # Có dấu
             "bản mô tả ranh giới",
             "mốc giới thửa đất",
             "vị trí ranh giới",
-            "mô tả ranh giới",  
-            "ranh giới thửa",   
-            "giới hạn thửa",    
-            "mốc giới",          
-            "phía đông giáp",   
-            "phía tây giáp",    
-            "phía nam giáp",    
-            "phía bắc giáp"     
-            # Removed generic "thửa đất số", "tờ bản đồ số" - too common in GCN
+            "mô tả ranh giới",
+            "ranh giới thửa",
+            "giới hạn thửa",
+            "mốc giới",
+            "phía đông giáp",
+            "phía tây giáp",
+            "phía nam giáp",
+            "phía bắc giáp",
+            # Không dấu
+            "ban mo ta ranh gioi",
+            "moc gioi thua dat",
+            "vi tri ranh gioi",
+            "mo ta ranh gioi",
+            "ranh gioi thua",
+            "gioi han thua",
+            "moc gioi",
+            "phia dong giap",
+            "phia tay giap",
+            "phia nam giap",
+            "phia bac giap"
         ],
         "weight": 1.0,
-        "min_matches": 2  # Increased to require more specific matches
+        "min_matches": 2
     },
     "HSKT": {
         "keywords": [
+            # Có dấu
             "bản vẽ",
             "trích lục",
             "đo tách",
@@ -58,151 +73,264 @@ DOCUMENT_RULES = {
             "trích đo",
             "tỷ lệ 1:",
             "phiếu đo đạc",
-            "bản vẽ trích lục",  # NEW
-            "đo đạc chỉnh lý",   # NEW
-            "trích đo địa chính" # NEW
+            "bản vẽ trích lục",
+            "đo đạc chỉnh lý",
+            "trích đo địa chính",
+            # Không dấu
+            "ban ve",
+            "trich luc",
+            "do tach",
+            "chinh ly",
+            "ho so ky thuat",
+            "trich do",
+            "ty le 1:",
+            "phieu do dac",
+            "ban ve trich luc",
+            "do dac chinh ly",
+            "trich do dia chinh"
         ],
         "weight": 0.9,
         "min_matches": 1
     },
     "BVHC": {
         "keywords": [
+            # Có dấu
             "bản vẽ hoàn công",
             "hoàn công công trình",
             "công trình xây dựng",
             "bản vẽ thi công",
-            "hoàn công nhà",        # NEW
-            "hoàn công",            # NEW
-            "công trình hoàn công", # NEW
-            "thi công hoàn thành"   # NEW
+            "hoàn công nhà",
+            "hoàn công",
+            "công trình hoàn công",
+            "thi công hoàn thành",
+            # Không dấu
+            "ban ve hoan cong",
+            "hoan cong cong trinh",
+            "cong trinh xay dung",
+            "ban ve thi cong",
+            "hoan cong nha",
+            "hoan cong",
+            "cong trinh hoan cong",
+            "thi cong hoan thanh"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BVN": {
         "keywords": [
+            # Có dấu
             "bản vẽ nhà",
             "mặt bằng nhà",
             "thiết kế nhà",
             "kiến trúc nhà",
-            "thiết kế kiến trúc",   # NEW
-            "mặt bằng",              # NEW
-            "mặt tiền",              # NEW
-            "mặt cắt",               # NEW
-            "tầng 1",                # NEW
-            "tầng 2",                # NEW
-            "phòng khách",           # NEW
-            "phòng ngủ"              # NEW
+            "thiết kế kiến trúc",
+            "mặt bằng",
+            "mặt tiền",
+            "mặt cắt",
+            "tầng 1",
+            "tầng 2",
+            "phòng khách",
+            "phòng ngủ",
+            # Không dấu
+            "ban ve nha",
+            "mat bang nha",
+            "thiet ke nha",
+            "kien truc nha",
+            "thiet ke kien truc",
+            "mat bang",
+            "mat tien",
+            "mat cat",
+            "tang 1",
+            "tang 2",
+            "phong khach",
+            "phong ngu"
         ],
         "weight": 0.9,
         "min_matches": 1
     },
     "BKKDT": {
         "keywords": [
+            # Có dấu
             "bảng kê khai diện tích",
             "diện tích đang sử dụng",
             "kê khai đất đai",
-            "kê khai diện tích",     # NEW
-            "bảng kê diện tích",     # NEW
-            "diện tích sử dụng",     # NEW
-            "kê khai đất"            # NEW
+            "kê khai diện tích",
+            "bảng kê diện tích",
+            "diện tích sử dụng",
+            "kê khai đất",
+            # Không dấu
+            "bang ke khai dien tich",
+            "dien tich dang su dung",
+            "ke khai dat dai",
+            "ke khai dien tich",
+            "bang ke dien tich",
+            "dien tich su dung",
+            "ke khai dat"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "DSCG": {
         "keywords": [
+            # Có dấu
             "danh sách",
             "cấp giấy",
             "thửa đất cấp giấy",
             "liệt kê",
-            "danh sách thửa đất",    # NEW
-            "danh sách cấp giấy",    # NEW
-            "bảng liệt kê",          # NEW
-            "danh sách các thửa",    # NEW
-            "stt",                   # NEW (table indicator)
-            "tờ bđ"                  # NEW (table header)
+            "danh sách thửa đất",
+            "danh sách cấp giấy",
+            "bảng liệt kê",
+            "danh sách các thửa",
+            "stt",
+            "tờ bđ",
+            # Không dấu
+            "danh sach",
+            "cap giay",
+            "thua dat cap giay",
+            "liet ke",
+            "danh sach thua dat",
+            "danh sach cap giay",
+            "bang liet ke",
+            "danh sach cac thua",
+            "to bd"
         ],
         "weight": 0.8,
-        "min_matches": 1  # Reduced from 2
+        "min_matches": 1
     },
     "BBBDG": {
         "keywords": [
+            # Có dấu
             "biên bản bán đấu giá",
             "đấu giá tài sản",
             "bán đấu giá",
-            "đấu giá",               # NEW
-            "hội đồng đấu giá",      # NEW
-            "tổ chức đấu giá",       # NEW
-            "giá khởi điểm",         # NEW
-            "trúng đấu giá"          # NEW
+            "đấu giá",
+            "hội đồng đấu giá",
+            "tổ chức đấu giá",
+            "giá khởi điểm",
+            "trúng đấu giá",
+            # Không dấu
+            "bien ban ban dau gia",
+            "dau gia tai san",
+            "ban dau gia",
+            "dau gia",
+            "hoi dong dau gia",
+            "to chuc dau gia",
+            "gia khoi diem",
+            "trung dau gia"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BBGD": {
         "keywords": [
+            # Có dấu
             "biên bản bàn giao",
             "bàn giao đất",
             "thực địa",
             "bàn giao thực địa",
-            "bàn giao",              # NEW
-            "nhận bàn giao",         # NEW
-            "giao nhận",             # NEW
-            "bên giao",              # NEW
-            "bên nhận"               # NEW
+            "bàn giao",
+            "nhận bàn giao",
+            "giao nhận",
+            "bên giao",
+            "bên nhận",
+            # Không dấu
+            "bien ban ban giao",
+            "ban giao dat",
+            "thuc dia",
+            "ban giao thuc dia",
+            "ban giao",
+            "nhan ban giao",
+            "giao nhan",
+            "ben giao",
+            "ben nhan"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BBHDDK": {
         "keywords": [
+            # Có dấu
             "hội đồng đăng ký",
             "đăng ký đất đai lần đầu",
             "biên bản hội đồng",
-            "hội đồng",              # NEW
-            "đăng ký lần đầu",       # NEW
-            "xét hồ sơ",             # NEW
-            "đăng ký đất đai"        # NEW
+            "hội đồng",
+            "đăng ký lần đầu",
+            "xét hồ sơ",
+            "đăng ký đất đai",
+            # Không dấu
+            "hoi dong dang ky",
+            "dang ky dat dai lan dau",
+            "bien ban hoi dong",
+            "hoi dong",
+            "dang ky lan dau",
+            "xet ho so",
+            "dang ky dat dai"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BBNT": {
         "keywords": [
+            # Có dấu
             "biên bản nghiệm thu",
             "nghiệm thu công trình",
             "kiểm tra nghiệm thu",
-            "nghiệm thu",            # NEW
-            "hội đồng nghiệm thu",   # NEW
-            "xác nhận hoàn thành",   # NEW
-            "đạt yêu cầu"            # NEW
+            "nghiệm thu",
+            "hội đồng nghiệm thu",
+            "xác nhận hoàn thành",
+            "đạt yêu cầu",
+            # Không dấu
+            "bien ban nghiem thu",
+            "nghiem thu cong trinh",
+            "kiem tra nghiem thu",
+            "nghiem thu",
+            "hoi dong nghiem thu",
+            "xac nhan hoan thanh",
+            "dat yeu cau"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BBKTSS": {
         "keywords": [
+            # Có dấu
             "kiểm tra sai sót",
             "sai sót trên giấy chứng nhận",
             "biên bản kiểm tra",
-            "sai sót",               # NEW
-            "phát hiện sai sót",     # NEW
-            "chỉnh sửa thông tin",   # NEW
-            "sai sót trên gcn"       # NEW
+            "sai sót",
+            "phát hiện sai sót",
+            "chỉnh sửa thông tin",
+            "sai sót trên gcn",
+            # Không dấu
+            "kiem tra sai sot",
+            "sai sot tren giay chung nhan",
+            "bien ban kiem tra",
+            "sai sot",
+            "phat hien sai sot",
+            "chinh sua thong tin",
+            "sai sot tren gcn"
         ],
         "weight": 1.0,
         "min_matches": 1
     },
     "BBKTHT": {
         "keywords": [
+            # Có dấu
             "xác minh hiện trạng",
             "kiểm tra hiện trạng",
             "sử dụng đất hiện trạng",
-            "hiện trạng",            # NEW
-            "kiểm tra thực địa",     # NEW
-            "hiện trạng sử dụng",    # NEW
-            "xác minh"               # NEW
+            "hiện trạng",
+            "kiểm tra thực địa",
+            "hiện trạng sử dụng",
+            "xác minh",
+            # Không dấu
+            "xac minh hien trang",
+            "kiem tra hien trang",
+            "su dung dat hien trang",
+            "hien trang",
+            "kiem tra thuc dia",
+            "hien trang su dung",
+            "xac minh"
         ],
         "weight": 1.0,
         "min_matches": 1

@@ -127,9 +127,9 @@ desktop-app/
 │   ├── main.js           # Main process
 │   └── preload.js        # Preload script (IPC bridge)
 ├── python/               # Python OCR engine
-│   ├── ocr_engine.py     # PaddleOCR wrapper
-│   ├── rule_classifier.py # Rule-based classification
-│   └── process_document.py # Main processing script
+│   ├── ocr_engine_tesseract.py  # Tesseract OCR wrapper
+│   ├── rule_classifier.py       # Rule-based classification
+│   └── process_document.py      # Main processing script
 ├── src/                  # React app
 │   ├── components/
 │   │   ├── DesktopScanner.js

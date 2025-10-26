@@ -427,9 +427,9 @@ const DesktopScanner = () => {
                     alert('Không có trang hợp lệ để gộp.');
                     return;
                   }
-                  const merged = await window.electronAPI.mergeByShortCode(payload);
+                  const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
                   const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
-                  alert(`Đã xử lý gộp theo short_code. Thành công: ${okCount}/${(merged || []).length}.`);
+                  alert(`Đã xử lý gộp theo short_code và lưu tự động. Thành công: ${okCount}/${(merged || []).length}.`);
                 }}
                 className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
               >

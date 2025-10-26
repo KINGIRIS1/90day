@@ -284,7 +284,7 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     }
     
     const scriptPath = isDev
-      ? path.join(__dirname, '../python/process_document.py')
+      ? getPythonScriptPath('process_document.py')
       : path.join(process.resourcesPath, 'python', 'process_document.py');
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath}`);

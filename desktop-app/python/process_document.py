@@ -38,7 +38,7 @@ except ImportError as e:
     print(json.dumps({
         "error": f"Failed to import modules: {str(e)}",
         "success": False
-    }), file=sys.stderr)
+    }, ensure_ascii=True), file=sys.stderr)
     sys.exit(1)
 
 

@@ -75,6 +75,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('scanner');
   const [folders, setFolders] = useState([]); // multi-folder tabs
   const [isElectron, setIsElectron] = useState(false);
+  const [enginePref, setEnginePref] = useState('offline'); // 'offline' | 'cloud'
 
   useEffect(() => {
     // Check if running in Electron or demo mode

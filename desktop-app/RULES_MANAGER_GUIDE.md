@@ -63,7 +63,7 @@ Click vào bất kỳ card nào để xem chi tiết:
 
 > **Lưu ý:** Rule đã chỉnh sửa sẽ được lưu vào file `rules_overrides.json` và có ưu tiên cao hơn rule mặc định.
 
-### 5. Xóa Rule (Revert về Default)
+### 6. Xóa Rule (Revert về Default)
 
 Click nút **🗑️ Xóa** để xóa rule tùy chỉnh và quay về rule mặc định.
 

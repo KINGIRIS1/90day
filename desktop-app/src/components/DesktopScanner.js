@@ -187,6 +187,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setAutoFallbackEnabled(!!enabled);
     };
     loadConfig();
+  // Auto load and process when initialFolder is provided
+  useEffect(() => {
+    const autoLoad = async () => {
+      if (initialFolder) {
+        const res = await window.electronAPI.listFilesInFolder(initialFolder);
+        if (res.success) {
+          const files = res.files.map(path => ({
+            path,
+            name: path.split(/[\\\/]/).pop(),
+            processed: false,
+            result: null
+          }));
+          setSelectedFiles(files);
+          await handleProcessFiles(false);
+        }
+      }
+    };
+    autoLoad();
+  }, [initialFolder]);
+
   }, []);
 
   const handleSelectFiles = async () => {

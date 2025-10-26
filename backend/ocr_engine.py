@@ -1,18 +1,29 @@
 """
 OCR Engine using PaddleOCR for Vietnamese document processing
 """
-from paddleocr import PaddleOCR
+import os
 import logging
+
+# Disable PaddleX initialization BEFORE importing PaddleOCR
+os.environ['PADDLEX_DISABLE_INIT'] = '1'
+os.environ['PADDLE_DISABLE_PDX'] = '1'
+
+from paddleocr import PaddleOCR
 
 logger = logging.getLogger(__name__)
 
 # Singleton instance
 _ocr_instance = None
 _ocr_lock = None
+_initialization_failed = False
 
 def get_ocr_instance():
     """Get or create PaddleOCR singleton instance"""
-    global _ocr_instance, _ocr_lock
+    global _ocr_instance, _ocr_lock, _initialization_failed
+    
+    # If initialization failed before, don't retry
+    if _initialization_failed:
+        raise RuntimeError("PaddleOCR initialization failed previously. Cannot proceed.")
     
     if _ocr_instance is None:
         # Import threading here to avoid issues
@@ -24,20 +35,22 @@ def get_ocr_instance():
             # Double-check locking pattern
             if _ocr_instance is None:
                 try:
-                    logger.info("Initializing PaddleOCR (first time only)...")
+                    logger.info("🔧 Initializing PaddleOCR (first time only)...")
                     _ocr_instance = PaddleOCR(
                         use_angle_cls=True,
                         lang='vi',
                         show_log=False,
                         use_gpu=False,
-                        rec_model_dir=None,  # Use default model
-                        det_model_dir=None,  # Use default model
-                        cls_model_dir=None   # Use default model
+                        enable_mkldnn=False,  # Disable to avoid conflicts
+                        rec_model_dir=None,
+                        det_model_dir=None,
+                        cls_model_dir=None
                     )
-                    logger.info("✓ PaddleOCR initialized successfully")
+                    logger.info("✅ PaddleOCR initialized successfully")
                 except Exception as e:
-                    logger.error(f"Failed to initialize PaddleOCR: {e}")
-                    raise
+                    _initialization_failed = True
+                    logger.error(f"❌ Failed to initialize PaddleOCR: {e}")
+                    raise RuntimeError(f"PaddleOCR initialization failed: {e}")
     
     return _ocr_instance
 

@@ -476,7 +476,16 @@ const DesktopScanner = () => {
                       </div>
                     </div>
 
-                    {result.recommend_cloud_boost && (
+                    {result.applied_sequential_logic && (
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-xs text-blue-800 flex items-center">
+                          <span className="mr-1">📄</span>
+                          <span><strong>Trang tiếp theo:</strong> Tự động nhận dạng là {result.short_code} (kế thừa từ trang trước)</span>
+                        </p>
+                      </div>
+                    )}
+
+                    {result.recommend_cloud_boost && !result.applied_sequential_logic && (
                       <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <p className="text-sm text-yellow-800">
                           💡 Độ tin cậy thấp. Khuyến nghị sử dụng <strong>Cloud Boost</strong> để độ chính xác cao hơn.

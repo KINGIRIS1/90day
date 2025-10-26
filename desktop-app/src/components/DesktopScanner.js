@@ -316,6 +316,58 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       return (
         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
           ☁️ Cloud Boost
+  // Progressive scanning controls for a parent folder
+  const [parentFolder, setParentFolder] = useState(null);
+  const [childTabs, setChildTabs] = useState([]); // { name, path, status: 'pending'|'scanning'|'done', results: [] }
+  const [activeChild, setActiveChild] = useState(null);
+
+  const handleSelectParentFolder = async () => {
+    const folderPath = await window.electronAPI.selectFolder();
+    if (!folderPath) return;
+    const res = await window.electronAPI.analyzeParentFolder(folderPath);
+    if (!res.success) {
+      alert('Không đọc được thư mục: ' + res.error);
+      return;
+    }
+    setParentFolder(folderPath);
+    setChildTabs(res.subfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
+    setActiveChild(res.subfolders.length ? res.subfolders[0].path : null);
+    // Notify summary
+    alert(`Thư mục lớn: ${res.summary.subfolderCount} thư mục con, ${res.summary.rootFileCount} file ở cấp gốc`);
+  };
+
+  // Progressive scan of a child folder (sequential)
+  const scanChildFolder = async (childPath) => {
+    const idx = childTabs.findIndex(t => t.path === childPath);
+    if (idx < 0) return;
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'scanning' } : t));
+
+    const listing = await window.electronAPI.listFilesInFolder(childPath);
+    if (!listing.success) {
+      setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'pending' } : t));
+      return;
+    }
+
+    const files = listing.files.map(p => ({ path: p, name: p.split(/[\\\/]/).pop() }));
+    const childResults = [];
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      const r = await processOffline(f);
+      // Build preview quickly
+      let previewUrl = null;
+      try {
+        if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name)) {
+          previewUrl = await window.electronAPI.readImageDataUrl(f.path);
+        }
+      } catch {}
+      childResults.push({ fileName: f.name, filePath: f.path, previewUrl, isPdf: /\.pdf$/i.test(f.name), ...r });
+      // Update UI incrementally
+      setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
+    }
+
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done' } : t));
+  };
+
         </span>
       );
     }

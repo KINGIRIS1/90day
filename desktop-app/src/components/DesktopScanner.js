@@ -54,6 +54,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   useEffect(() => {
     const autoLoad = async () => {
       if (!initialFolder) return;
+      if (!window.electronAPI) return;
       await analyzeAndLoadFolder(initialFolder);
       await handleProcessFiles(false);
     };

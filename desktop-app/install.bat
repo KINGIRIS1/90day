@@ -71,9 +71,34 @@ echo.
 
 REM Install Python dependencies
 echo [INSTALL] Installing Python dependencies...
-echo (This may take 5-10 minutes for PaddleOCR)
+echo.
+echo === Installing PaddleOCR (Vietnamese specialized, 90-95%% accuracy) ===
+echo This may take 5-10 minutes for first-time installation
+echo Models (~100MB) will be downloaded on first run
+echo.
 cd python
-python -m pip install -r requirements.txt
+
+REM Try to install PaddleOCR first (best accuracy)
+echo [1/3] Installing PaddlePaddle...
+python -m pip install paddlepaddle>=3.0.0 --quiet
+if %ERRORLEVEL% EQU 0 (
+    echo [OK] PaddlePaddle installed successfully
+    echo.
+    echo [2/3] Installing PaddleOCR...
+    python -m pip install paddleocr>=3.0.0 --quiet
+    if %ERRORLEVEL% EQU 0 (
+        echo [OK] PaddleOCR installed successfully
+        echo [SUCCESS] Using PaddleOCR engine - 90-95%% accuracy for Vietnamese!
+    ) else (
+        echo [WARN] PaddleOCR installation failed. Will use Tesseract fallback.
+    )
+) else (
+    echo [WARN] PaddlePaddle installation failed. Will use Tesseract fallback.
+)
+
+echo.
+echo [3/3] Installing other dependencies...
+python -m pip install -r requirements-windows.txt --quiet
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to install Python dependencies
     cd ..
@@ -81,7 +106,12 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 cd ..
-echo [OK] Python dependencies installed
+echo [OK] All Python dependencies installed
+echo.
+echo === OCR Engine Info ===
+echo - Primary: PaddleOCR (90-95%% accuracy)
+echo - Fallback: Tesseract (85-88%% accuracy)
+echo - For setup help: See PADDLEOCR_SETUP.md
 echo.
 
 echo ======================================

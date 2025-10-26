@@ -1,18 +1,14 @@
 # Desktop App - Windows Version
-# Option 1: PaddleOCR (RECOMMENDED - 90-95% accuracy for Vietnamese)
-# Note: PaddleOCR will auto-install compatible PaddlePaddle version
-paddleocr
+# Option 1: VietOCR (RECOMMENDED - 90-95% accuracy, Vietnamese specialized)
+vietocr
+torch>=1.9.0
+torchvision>=0.10.0
 Pillow>=10.0.0
-opencv-python-headless>=4.8.0
 
-# Option 2: Tesseract (FALLBACK - 85-88% accuracy)
+# Option 2: Tesseract (FALLBACK - 85-88% accuracy, fastest)
 pytesseract>=0.3.10
 # Note: Tesseract binary needs to be installed separately
 # Download from: https://github.com/UB-Mannheim/tesseract/wiki
 
-# Option 3: EasyOCR (ALTERNATIVE - slower but good accuracy)
-# Uncomment if you want to use EasyOCR instead:
-# easyocr>=1.7.0
-# numpy>=1.24.0
-# torch>=2.0.0
-# torchvision>=0.15.0
+# Common dependencies
+opencv-python-headless>=4.8.0

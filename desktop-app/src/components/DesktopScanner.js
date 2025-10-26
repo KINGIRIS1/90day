@@ -657,12 +657,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <h2 className="text-lg font-semibold text-gray-900">Kết quả ({results.length} tài liệu)</h2>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setOrderingOpen(true)}
-                className="hidden"
-              >
-                
-              </button>
-              <button
                 onClick={async () => {
                   const payload = results
                     .filter(r => r.success && r.short_code)

@@ -199,6 +199,14 @@ function App() {
                 </div>
               ))}
               <button
+                onClick={() => setActiveTab('rules')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'rules' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📋 Rules
+              </button>
+              <button
                 onClick={() => setActiveTab('settings')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'settings' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'

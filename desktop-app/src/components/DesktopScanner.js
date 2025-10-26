@@ -384,6 +384,23 @@ const DesktopScanner = () => {
     }
     return (
       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            {/* Process Folder Now toggle */}
+            {selectedFiles.length > 0 && (
+              <div className="mb-4 p-3 bg-gray-50 border rounded">
+                <label className="inline-flex items-center space-x-2 text-sm">
+                  <input
+                    type="checkbox"
+                    onChange={async (e) => {
+                      if (e.target.checked) {
+                        await handleProcessFiles(false);
+                      }
+                    }}
+                  />
+                  <span>Tự động xử lý ngay sau khi chọn thư mục (Process Folder Now)</span>
+                </label>
+              </div>
+            )}
+
         ⚠️ {method}
       </span>
     );

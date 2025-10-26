@@ -434,6 +434,30 @@ const DesktopScanner = () => {
                       <span>Cần kết nối internet</span>
                     </div>
                   </div>
+                    {/* Preview + rename */}
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
+                      <div className="md:col-span-1">
+                        {result.previewUrl ? (
+                          <img src={result.previewUrl} alt={result.fileName} className="w-full max-h-48 object-contain border rounded" />
+                        ) : (
+                          <div className="w-full h-48 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
+                            {result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="md:col-span-2 space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-gray-600 text-sm">Tên file:</span>
+                          <span className="text-sm font-medium break-all">{result.fileName}</span>
+                        </div>
+                        <RenameInline oldPath={result.filePath} currentName={result.fileName} onRenamed={(newName, newPath)=>{
+                          // Update state after rename
+                          setResults(prev => prev.map((r, idx2)=> idx2===idx ? { ...r, fileName: newName, filePath: newPath } : r));
+                          setSelectedFiles(prev => prev.map((f)=> f.path===result.filePath ? { ...f, name: newName, path: newPath } : f));
+                        }} />
+                      </div>
+                    </div>
+
                   {!backendUrl && (
                     <p className="text-xs text-red-600 mt-2">
                       Cần cấu hình Backend URL trong Cài đặt

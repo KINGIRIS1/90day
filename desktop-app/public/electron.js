@@ -540,7 +540,7 @@ ipcMain.handle('read-image-data-url', async (event, filePath) => {
 ipcMain.handle('get-rules', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'get']);

@@ -5,6 +5,15 @@ High accuracy OCR (90-95%) for Vietnamese documents
 """
 import sys
 import os
+import warnings
+import logging
+
+# Suppress all warnings and verbose output
+warnings.filterwarnings('ignore')
+os.environ['GLOG_minloglevel'] = '2'  # Suppress PaddlePaddle logs
+os.environ['FLAGS_use_mkldnn'] = '0'  # Disable oneDNN warnings
+logging.getLogger('ppocr').setLevel(logging.ERROR)
+logging.getLogger('paddle').setLevel(logging.ERROR)
 
 try:
     from paddleocr import PaddleOCR

@@ -136,6 +136,14 @@ ipcMain.handle('list-files-in-folder', async (event, folderPath) => {
   try {
     const entries = fs.readdirSync(folderPath, { withFileTypes: true });
     const files = entries
+      .filter((e) => e.isFile())
+      .filter((e) => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name))
+      .map((e) => path.join(folderPath, e.name));
+    return { success: true, files };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
 
 ipcMain.handle('list-subfolders-in-folder', async (event, folderPath) => {
   const fs = require('fs');

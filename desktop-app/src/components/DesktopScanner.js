@@ -138,6 +138,25 @@ const DesktopScanner = () => {
     const newResults = [];
     let currentLastKnown = null;
 
+      // If using Cloud and it failed with common cloud errors, optionally prompt fallback
+      if (useCloudBoost && (!result.success) && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
+        if (autoFallbackEnabled) {
+          // Show confirm dialog if user requested confirmation (C)
+          const doConfirm = true; // UI choice C requires a dialog
+          if (doConfirm) {
+            const userConfirmed = await new Promise((resolve) => {
+              const message = `Cloud lỗi: ${result.error || result.errorType}. Bạn có muốn chuyển sang Offline (Tesseract) cho file "${file.name}" không?`;
+              const ok = window.confirm(message);
+              resolve(ok);
+            });
+            if (userConfirmed) {
+              const offlineResult = await processOffline(file);
+              result = offlineResult;
+            }
+          }
+        }
+      }
+
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       setProgress({ current: i + 1, total: selectedFiles.length });

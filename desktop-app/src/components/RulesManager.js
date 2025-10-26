@@ -189,6 +189,38 @@ const RulesManager = () => {
     });
   };
 
+  // Auto-generate variants for editing rule
+  const generateVariantsForEdit = async () => {
+    if (editingRule.keywords.length === 0) {
+      showNotification('Chưa có keywords để generate variants', 'error');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const allVariants = new Set(editingRule.keywords);
+
+      // Generate variants for each keyword
+      for (const keyword of editingRule.keywords) {
+        const result = await window.electronAPI.generateKeywordVariants(keyword, true);
+        if (result.success && result.variants) {
+          result.variants.forEach(v => allVariants.add(v));
+        }
+      }
+
+      setEditingRule({
+        ...editingRule,
+        keywords: Array.from(allVariants)
+      });
+
+      showNotification(`✅ Đã tạo ${allVariants.size} variants (bao gồm ${editingRule.keywords.length} keywords gốc)`, 'success');
+    } catch (error) {
+      showNotification('Lỗi generate variants: ' + error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Add new rule handlers
   const startAddNew = () => {
     setShowAddNew(true);

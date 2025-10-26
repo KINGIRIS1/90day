@@ -17,9 +17,15 @@ os.environ['GLOG_minloglevel'] = '2'
 os.environ['FLAGS_use_mkldnn'] = '0'
 
 # Fix Windows console encoding for Vietnamese
+# Keep reference to prevent garbage collection
+_stdout = None
+_stderr = None
+
 if sys.platform == 'win32':
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    _stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
+    _stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', line_buffering=True)
+    sys.stdout = _stdout
+    sys.stderr = _stderr
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))

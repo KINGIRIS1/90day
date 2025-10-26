@@ -14,7 +14,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.landdoc.scanner",
+    "appId": "com.90daychonhanh.app",
     "productName": "Land Document Scanner",
     "files": [
       "build/**/*",

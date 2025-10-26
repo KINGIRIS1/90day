@@ -645,142 +645,47 @@ const DesktopScanner = () => {
           </div>
 
           <div className="space-y-4">
-            {results.map((result, idx) => (
-              <div key={idx} className="result-card p-4 border rounded-lg">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">{result.fileName}</h3>
-                    <div className="flex items-center space-x-2">
-                      {getMethodBadge(result.method)}
-                      {result.accuracy_estimate && (
-                        <span className="text-xs text-gray-500">{result.accuracy_estimate}</span>
-                      )}
-                    </div>
+            {/* Grid view for results */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {results.map((result, idx) => (
+                <div key={idx} className="p-3 border rounded-lg bg-white">
+                  <div className="mb-2">
+                    {result.previewUrl ? (
+                      <img src={result.previewUrl} alt={result.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
+                    ) : (
+                      <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
+                        {result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}
+                      </div>
+                    )}
                   </div>
+                  <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
+                  <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                    {getMethodBadge(result.method)}
+                    <span className="ml-auto font-semibold">{(result.confidence * 100).toFixed(0)}%</span>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    <div><span className="text-gray-500">Loại:</span> {result.doc_type}</div>
+                    <div><span className="text-gray-500">Mã:</span> <span className="text-blue-600">{result.short_code}</span></div>
+                  </div>
+
+                  {/* Inline short_code rename (not filesystem) */}
+                  <div className="mt-2 p-2 bg-gray-50 border rounded">
+                    <InlineShortCodeEditor
+                      value={result.short_code}
+                      onChange={(newCode) => {
+                        setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r));
+                      }}
+                    />
+                  </div>
+
+                  {result.previewUrl && (
+                    <button onClick={() => setSelectedPreview(result.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">
+                      Phóng to ảnh
+                    </button>
+                  )}
                 </div>
-
-                {result.success ? (
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-gray-600">Độ tin cậy:</span>
-                        <span className="text-sm font-medium">{(result.confidence * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full confidence-bar ${getConfidenceColor(result.confidence)}`}
-                          style={{ width: `${result.confidence * 100}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start mt-2">
-                      <div className="md:col-span-1">
-                        {result.previewUrl ? (
-                          <img src={result.previewUrl} alt={result.fileName} className="w-full max-h-48 object-contain border rounded" />
-                        ) : (
-                          <div className="w-full h-48 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
-                            {result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}
-                          </div>
-                        )}
-                        {result.previewUrl && (
-                          <button onClick={() => setSelectedPreview(result.previewUrl)} className="mt-1 text-xs text-blue-600 hover:underline">
-                            Phóng to ảnh
-                          </button>
-                        )}
-                      </div>
-                      <div className="md:col-span-2 space-y-2">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-600">Loại tài liệu:</span>
-                            <p className="font-medium text-gray-900">{result.doc_type}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">Mã rút gọn:</span>
-                            <p className="font-medium text-blue-600">{result.short_code}</p>
-                          </div>
-                        </div>
-                        <RenameInline
-                          oldPath={result.filePath}
-                          currentName={result.fileName}
-                          onRenamed={(newName, newPath) => {
-                            setResults(prev => prev.map((r, i) => i === idx ? { ...r, fileName: newName, filePath: newPath } : r));
-                            setSelectedFiles(prev => prev.map((f) => f.path === result.filePath ? { ...f, name: newName, path: newPath } : f));
-                          }}
-                        />
-
-                        {/* OCR Debug View - Collapsible */}
-                        {result.original_text && (
-                          <details className="mt-3">
-                            <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
-                              <span className="mr-2">🔍</span>
-                              <span>Xem text OCR đã đọc được (Debug)</span>
-                            </summary>
-                            <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2">
-                              <div>
-                                <p className="text-xs font-semibold text-gray-700 mb-1">📄 Text đầy đủ:</p>
-                                <div className="p-2 bg-white border rounded text-xs text-gray-800 max-h-32 overflow-y-auto">
-                                  {result.original_text || '(Không có text)'}
-                                </div>
-                              </div>
-                              {result.title_text && (
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-700 mb-1">🎯 Text tiêu đề (chữ to):</p>
-                                  <div className="p-2 bg-yellow-50 border border-yellow-300 rounded text-xs text-gray-800">
-                                    {result.title_text}
-                                  </div>
-                                </div>
-                              )}
-                              {result.reasoning && (
-                                <div>
-                                  <p className="text-xs font-semibold text-gray-700 mb-1">💡 Lý do phân loại:</p>
-                                  <div className="p-2 bg-blue-50 border border-blue-300 rounded text-xs text-gray-800">
-                                    {result.reasoning}
-                                  </div>
-                                </div>
-                              )}
-                              {result.avg_font_height && (
-                                <div className="flex items-center text-xs text-gray-600">
-                                  <span className="mr-2">📏</span>
-                                  <span>Chiều cao font trung bình: {result.avg_font_height}px</span>
-                                </div>
-                              )}
-                              {result.title_boost_applied && (
-                                <div className="flex items-center text-xs text-green-700">
-                                  <span className="mr-2">⭐</span>
-                                  <span>Title boost đã được áp dụng (+20% confidence)</span>
-                                </div>
-                              )}
-                            </div>
-                          </details>
-                        )}
-
-                        {result.applied_sequential_logic && (
-                          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-xs text-blue-800 flex items-center">
-                              <span className="mr-1">📄</span>
-                              <span><strong>Trang tiếp theo:</strong> Tự động nhận dạng là {result.short_code} (kế thừa từ trang trước)</span>
-                            </p>
-                          </div>
-                        )}
-
-                        {result.recommend_cloud_boost && !result.applied_sequential_logic && (
-                          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <p className="text-sm text-yellow-800">
-                              💡 Độ tin cậy thấp. Khuyến nghị sử dụng <strong>Cloud Boost</strong> để độ chính xác cao hơn.
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-800">❌ Lỗi: {result.error}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

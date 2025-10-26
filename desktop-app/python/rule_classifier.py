@@ -259,11 +259,20 @@ DOCUMENT_RULES = {
             # Có dấu
             "đơn đăng ký biến động", "biến động đất đai",
             "tài sản gắn liền", "đăng ký biến động",
-            # Không dấu
+            "đơn đăng ký biến động đất đai",
+            # Không dấu (OCR thường bỏ dấu)
             "don dang ky bien dong", "bien dong dat dai",
-            "tai san gan lien", "dang ky bien dong"
+            "tai san gan lien", "dang ky bien dong",
+            "don dang ky bien dong dat dai",
+            # OCR common typos
+            "dang ky bien dong", "bien dong",
+            "đăng ký biến động đất",
+            # Viết hoa (OCR thường đọc title là chữ hoa)
+            "DON DANG KY BIEN DONG", "BIEN DONG DAT DAI",
+            "DANG KY BIEN DONG"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.2,  # Tăng weight để ưu tiên hơn GCNM
+        "min_matches": 1
     },
     "DDK": {
         "keywords": [

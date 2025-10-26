@@ -285,7 +285,7 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       }
     });
 
-    // Add timeout (30 seconds for PaddleOCR)
+    // Add timeout (30 seconds for OCR processing)
     setTimeout(() => {
       childProcess.kill();
       reject(new Error('OCR processing timeout (30s)'));

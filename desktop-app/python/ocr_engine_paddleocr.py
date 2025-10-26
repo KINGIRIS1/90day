@@ -78,8 +78,8 @@ class OCREngine:
             temp_path = image_path + '.temp_crop.jpg'
             cropped_image.save(temp_path)
             
-            # Run PaddleOCR
-            result = self._ocr_model.ocr(temp_path, cls=True)
+            # Run PaddleOCR (v3+ uses predict instead of ocr)
+            result = self._ocr_model.predict(temp_path)
             
             # Clean up temp file
             if os.path.exists(temp_path):

@@ -182,9 +182,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const newResults = [];
     let currentLastKnown = null;
 
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      setProgress({ current: i + 1, total: selectedFiles.length });
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const file = filesToProcess[i];
+      setProgress({ current: i + 1, total: filesToProcess.length });
 
       let result;
       if (useCloudBoost) {

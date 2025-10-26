@@ -348,6 +348,12 @@ const DesktopScanner = () => {
                     Offline OCR + Rules
                   </h3>
                   <p className="text-sm text-gray-600 mb-2">
+                  {autoFallbackEnabled && (
+                    <p className="text-xs text-purple-700 mt-2">
+                      Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)
+                    </p>
+                  )}
+
                     Xử lý hoàn toàn offline, không tốn chi phí
                   </p>
                   <div className="space-y-1 text-xs">

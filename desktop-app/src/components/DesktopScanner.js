@@ -86,6 +86,33 @@ const DesktopScanner = () => {
     }
   };
 
+  const applySequentialNaming = (result, lastType) => {
+    /**
+     * Sequential naming logic:
+     * - If result is UNKNOWN/low confidence AND we have a last known type
+     * - Use the last known type (continuation of previous document)
+     * - Otherwise, use the detected type and update last known
+     */
+    
+    if (result.success && 
+        (result.short_code === 'UNKNOWN' || result.confidence < 0.3) && 
+        lastType) {
+      // Apply last known type
+      return {
+        ...result,
+        doc_type: lastType.doc_type,
+        short_code: lastType.short_code,
+        confidence: lastType.confidence * 0.9, // Slightly reduce confidence
+        original_confidence: result.confidence,
+        applied_sequential_logic: true,
+        note: `Trang tiếp theo của ${lastType.short_code}`
+      };
+    }
+    
+    // Return as-is (will become new last known type if valid)
+    return result;
+  };
+
   const handleProcessFiles = async (useCloudBoost = false) => {
     if (selectedFiles.length === 0) {
       alert('Vui lòng chọn file trước!');

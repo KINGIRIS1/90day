@@ -152,19 +152,18 @@ ipcMain.handle('list-subfolders-in-folder', async (event, folderPath) => {
   }
 });
 
-ipcMain.handle('list-folder-tree', async (event, basePath, maxDepth = 5) => {
+ipcMain.handle('list-folder-tree', async (event, basePath) => {
   const fs = require('fs');
   const path = require('path');
 
-  function buildTree(dirPath, depth) {
-    if (depth < 0) return null;
+  function buildTree(dirPath) {
     let children = [];
     try {
       const entries = fs.readdirSync(dirPath, { withFileTypes: true });
       for (const e of entries) {
         if (e.isDirectory()) {
           const childPath = path.join(dirPath, e.name);
-          const node = buildTree(childPath, depth - 1);
+          const node = buildTree(childPath); // no depth limit per user request
           children.push({ path: childPath, name: e.name, children: node ? node.children : [] });
         }
       }
@@ -175,7 +174,7 @@ ipcMain.handle('list-folder-tree', async (event, basePath, maxDepth = 5) => {
   }
 
   try {
-    const tree = buildTree(basePath, maxDepth);
+    const tree = buildTree(basePath);
     return { success: true, tree };
   } catch (err) {
     return { success: false, error: err.message };

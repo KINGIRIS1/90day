@@ -59,6 +59,21 @@ function createWindow() {
   });
 }
 
+// Helper function to get Python path
+function getPythonPath() {
+  if (isDev) {
+    // Development mode - try different Python commands based on platform
+    if (process.platform === 'win32') {
+      return 'py'; // Windows py launcher
+    } else {
+      return 'python3'; // Linux/Mac
+    }
+  } else {
+    // Production mode
+    return path.join(process.resourcesPath, 'python', 'python3');
+  }
+}
+
 // Initialize Python OCR engine
 function initPythonEngine() {
   const pythonPath = isDev

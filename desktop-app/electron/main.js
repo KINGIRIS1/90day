@@ -11,9 +11,23 @@ let pythonProcess;
 const isDev = !app.isPackaged;
 
 function createWindow() {
+  // Splash screen window
+  const splash = new BrowserWindow({
+    width: 420,
+    height: 420,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    icon: path.join(__dirname, '../assets/icon.png')
+  });
+  splash.loadURL(`file://${path.join(__dirname, '../public/splash.html')}`);
+
+  // Main window
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
+    show: false,
     title: '90dayChonThanh',
     webPreferences: {
       nodeIntegration: false,
@@ -29,6 +43,11 @@ function createWindow() {
     : `file://${path.join(__dirname, '../build/index.html')}`;
   
   mainWindow.loadURL(startUrl);
+
+  mainWindow.once('ready-to-show', () => {
+    splash.destroy();
+    mainWindow.show();
+  });
 
   // Open DevTools in development
   if (isDev) {

@@ -300,6 +300,10 @@ const DesktopScanner = () => {
 
     if (!backendUrl) {
       alert('Vui lòng cấu hình Backend URL trong Cài đặt trước!');
+            <div className="mt-2 text-xs text-gray-500">
+              Gợi ý: Click vào ảnh để phóng to xem chi tiết.
+            </div>
+
       return;
     }
 

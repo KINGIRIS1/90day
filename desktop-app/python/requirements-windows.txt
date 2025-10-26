@@ -1,7 +1,7 @@
 # Desktop App - Windows Version
 # Option 1: PaddleOCR (RECOMMENDED - 90-95% accuracy for Vietnamese)
-paddleocr>=3.0.0
-paddlepaddle>=3.0.0
+# Note: PaddleOCR will auto-install compatible PaddlePaddle version
+paddleocr
 Pillow>=10.0.0
 opencv-python-headless>=4.8.0
 

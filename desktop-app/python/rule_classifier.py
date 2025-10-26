@@ -1185,16 +1185,36 @@ class RuleClassifier:
     def __init__(self):
         pass
     
-    def classify(self, text: str) -> dict:
-        """Classify document using rules"""
-        result = classify_by_rules(text, confidence_threshold=0.3)
+    def classify(self, text: str, title_text: str = None) -> dict:
+        """
+        Classify document using rules with optional title text priority
+        
+        Args:
+            text: Full OCR text
+            title_text: Text from large fonts (titles/headers) - gets priority in matching
+            
+        Returns:
+            Classification result with doc_type, confidence, and reasoning
+        """
+        result = classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
         
         doc_type_code = result.get('type', 'UNKNOWN')
         confidence = result.get('confidence', 0.0)
+        title_boost = result.get('title_boost', False)
+        
+        # Build reasoning with title boost indicator
+        reasoning_parts = []
+        if result.get('matched_keywords'):
+            reasoning_parts.append(f"Matched keywords: {', '.join(result.get('matched_keywords', []))}")
+        if title_boost:
+            reasoning_parts.append("✓ Title detection boosted confidence")
+        
+        reasoning = " | ".join(reasoning_parts) if reasoning_parts else "No keywords matched"
         
         return {
             'doc_type': classify_document_name_from_code(doc_type_code),
             'short_code': doc_type_code,
             'confidence': confidence,
-            'reasoning': f"Matched keywords: {', '.join(result.get('matched_keywords', []))}"
+            'reasoning': reasoning,
+            'title_boost': title_boost
         }

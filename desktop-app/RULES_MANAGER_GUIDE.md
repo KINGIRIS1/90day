@@ -76,7 +76,7 @@ Click **📤 Export JSON** để xuất toàn bộ rules ra file JSON. Bạn có
 - Share rules với người khác
 - Chỉnh sửa rules bằng text editor
 
-### 7. Import Rules
+### 8. Import Rules
 
 Có 2 cách import:
 
@@ -87,13 +87,13 @@ Có 2 cách import:
 **📥 Import (Replace):** Thay thế toàn bộ rules bằng file JSON
 - ⚠️ Cẩn thận: Sẽ xóa tất cả rules tùy chỉnh hiện tại
 
-### 8. Reset Tất Cả
+### 9. Reset Tất Cả
 
 Click **🔄 Reset Tất Cả** để xóa toàn bộ rules tùy chỉnh và quay về mặc định.
 
 > ⚠️ **Cảnh báo:** Thao tác này không thể hoàn tác!
 
-### 9. Mở Folder Rules
+### 10. Mở Folder Rules
 
 Click **📁 Mở Folder** để mở thư mục chứa file `rules_overrides.json`. Bạn có thể:
 - Xem file rules trực tiếp

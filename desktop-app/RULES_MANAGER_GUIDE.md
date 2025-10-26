@@ -30,7 +30,25 @@ Click vào bất kỳ card nào để xem chi tiết:
 - Min Matches: Số keyword tối thiểu phải match
 - Danh sách tất cả keywords
 
-### 4. Chỉnh sửa Rule
+### 4. Tạo Rule Mới ⭐
+
+**Bước 1:** Click nút **➕ Thêm Rule Mới**
+
+**Bước 2:** Điền thông tin:
+- **Mã Tài Liệu (Doc Type)**: Mã ngắn gọn (VD: GCNM, BMT, HDMB...)
+  - Chữ hoa, không dấu, không khoảng trắng
+  - Không trùng với mã đã có
+- **Weight**: Trọng số ưu tiên (khuyến nghị: 0.8 - 1.5)
+- **Min Matches**: Số keyword tối thiểu (khuyến nghị: 1-3)
+- **Keywords**: Danh sách từ khóa đặc trưng
+  - Thêm cả variants: có dấu, không dấu, chữ hoa
+  - Thêm typo thường gặp từ OCR
+
+**Bước 3:** Click **💾 Tạo Rule**
+
+> **Lưu ý:** Rule mới sẽ được lưu vào `rules_overrides.json` và có hiệu lực ngay lập tức.
+
+### 5. Chỉnh sửa Rule
 
 **Bước 1:** Click nút **✏️ Sửa** khi đang xem chi tiết rule
 

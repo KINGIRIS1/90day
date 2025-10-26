@@ -656,7 +656,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       {/* Merge and Ordering Controls */}
       {results.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Kết quả ({results.length} tài liệu)</h2>
             <div className="flex items-center gap-2">
               <button

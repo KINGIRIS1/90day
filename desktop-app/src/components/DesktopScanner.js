@@ -416,6 +416,18 @@ const DesktopScanner = () => {
                 </label>
               </div>
             )}
+          {/* Open ordering panel */}
+          {results.length > 0 && (
+            <div className="mb-2 flex items-center gap-2">
+              <button
+                onClick={() => setOrderingOpen(true)}
+                className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                🧩 Sắp xếp thứ tự thủ công (drag‑drop)
+              </button>
+            </div>
+          )}
+
 
         ⚠️ {method}
       </span>

@@ -67,7 +67,9 @@ Click vào bất kỳ card nào để xem chi tiết:
 
 Click nút **🗑️ Xóa** để xóa rule tùy chỉnh và quay về rule mặc định.
 
-### 6. Export Rules
+> **Lưu ý:** Nếu là rule mới (tự tạo), xóa sẽ loại bỏ hoàn toàn rule đó.
+
+### 7. Export Rules
 
 Click **📤 Export JSON** để xuất toàn bộ rules ra file JSON. Bạn có thể:
 - Backup rules hiện tại

@@ -39,6 +39,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   const stopRef = useRef(false);
 
   // Load config (guard electron)
+  useEffect(() => { if (enginePrefProp) setEnginePref(enginePrefProp); }, [enginePrefProp]);
+
   useEffect(() => {
     const loadConfig = async () => {
       const api = window.electronAPI;

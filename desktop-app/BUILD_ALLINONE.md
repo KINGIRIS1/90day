@@ -304,8 +304,10 @@ pause
 - [ ] Python installer downloaded
 - [ ] Tesseract installer downloaded
 - [ ] Electron app built (dist/win-unpacked/)
-- [ ] LICENSE.txt exists
-- [ ] Icon file exists
+- [ ] LICENSE.txt exists (or will be auto-created)
+- [ ] Icon file optional (commented out in installer.nsi)
+
+**Note:** Icon is optional. If you want custom icon, create `assets/icon.ico` and uncomment line 21 in `installer.nsi`
 
 **After building:**
 - [ ] Test on clean VM

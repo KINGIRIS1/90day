@@ -11,6 +11,8 @@ const EnginePreferenceSetting = ({ enginePref: propPref, onChangeEnginePref }) =
     })();
   }, []);
 
+  useEffect(() => { if (propPref) setEngine(propPref); }, [propPref]);
+
   const save = async (val) => {
     setEngine(val);
     await window.electronAPI.setConfig('enginePreference', val);

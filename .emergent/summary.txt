@@ -1,64 +1,44 @@
 <analysis>
-The AI engineer's trajectory involved a significant expansion, shifting from a web-only application to a full-fledged Electron Desktop App, while simultaneously enhancing the backend's OCR capabilities. The initial focus was on establishing the desktop app's React/Electron/Python architecture, addressing numerous environment-specific (Windows Python, npm vs. yarn,  syntax) and dependency challenges (, , ). A major pivot occurred in local OCR engine selection, moving from PaddleOCR to EasyOCR and finally Tesseract due to Windows compatibility. Subsequent efforts focused on refining the OCR rule classification for Vietnamese documents, expanding the rule set from 13 to 95 types, incorporating diacritic-less keywords, and introducing partial image scanning. The latest work integrated Cloud Boost functionality, fixed authentication issues, and implemented a sophisticated 3-layer hybrid OCR fallback in the backend, culminating in sequential naming logic for multi-page documents in the desktop frontend.
+The AI engineer's trajectory chronicles a complex evolution of the application from a web-only document scanner to a full-fledged Electron desktop app, with a continuous focus on optimizing OCR accuracy and stability for Vietnamese documents. Key challenges included navigating Windows-specific Python environment issues, diverse OCR engine compatibilities (Tesseract, PaddleOCR, VietOCR, RapidOCR, GPT-4 Vision), and Electron's IPC limitations. The core work involved implementing sequential naming, developing font height detection for title prioritization, and iteratively expanding/refining a 95-type rule-based classification system with typo variants. After repeated failures with local deep-learning OCR engines due to compatibility and verbose logging, the project pivoted towards integrating a robust cloud-based solution, culminating in the decision to use Google Document AI as the next step.
 </analysis>
 
 <product_requirements>
-The application, originally a web-based document scanner for Vietnamese land-related images, aims to use LLMs for OCR and automated renaming with short codes. It supports single/batch scanning, history, and PDF export, targeting 30 concurrent users. Key objectives include LLM stability, enhanced folder scanning (e.g., ), performance, deployment reliability, and cost optimization via a hybrid OCR (PaddleOCR + rules with GPT-4 fallback).
+The application, originally a web-based document scanner for Vietnamese land-related images, aims to use LLMs for OCR and automated renaming with short codes. It supports single/batch scanning, history, and PDF export, targeting 30 concurrent users. Key objectives include LLM stability, enhanced folder scanning (), performance, deployment reliability, and cost optimization via a hybrid OCR (initially PaddleOCR + rules with GPT-4 fallback).
 
-Recently, the user explicitly requested a **Hybrid Desktop App** with two modes:
-1.  **Default: OCR+Rules (Offline)**: Free, works offline, aiming for 85-88% accuracy. The AI engineer implemented this using Tesseract OCR, configured to scan only the top 40% of documents, and a comprehensive rule classifier (now supporting 95 document types with diacritic and diacritic-less keywords).
-2.  **Optional: Cloud Boost (Online)**: Paid, leverages GPT-4 for higher accuracy (93%+). This mode integrates with the existing backend.
-Additionally, the user emphasized the need for **sequential naming logic** for multi-page documents, where a page without a clear title inherits the classification from the preceding page until a new title is identified.
+The user explicitly requested a **Hybrid Desktop App** with two modes:
+1.  **Default: OCR+Rules (Offline)**: Free, aiming for 85-88% accuracy. The AI engineer initially implemented this using Tesseract, scanning the top 40% of documents, and a comprehensive rule classifier (supporting 95 document types with diacritic and diacritic-less keywords).
+2.  **Optional: Cloud Boost (Online)**: Paid, leverages GPT-4 for higher accuracy (93%+).
+The user also required **sequential naming logic** for multi-page documents to classify UNKNOWN pages based on preceding pages.
+Subsequently, the user requested the ability to detect **bold/large text for title prioritization**, a **debug view to display raw OCR text**, and a **better Vietnamese OCR tool** (leading to explorations of PaddleOCR, VietOCR, RapidOCR, and now Google Document AI) to enhance accuracy and reduce misclassifications, especially for diacritics.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Desktop Development**: Electron (frontend shell), React (UI), Python (backend logic for local OCR).
--   **OCR Engines**: Tesseract, EasyOCR, PaddleOCR (with Windows compatibility challenges).
--   **AI/LLM Integration**: OpenAI GPT-4 Vision (for Cloud Boost), Hybrid OCR (Backend: PaddleOCR/GPT-4 fallback, Frontend: Tesseract/EasyOCR local).
--   **Inter-process Communication (IPC)**: Electron's  and  for secure communication between React and Python.
--   **Rule-based Classification**: Custom Python module for Vietnamese document type detection using keywords and confidence scoring.
--   **Environment/Deployment**: Windows OS specific considerations (Python path, build tools, command syntax).
+-   **Full-stack Desktop Development**: Electron (frontend), React (UI), Python (local OCR/processing).
+-   **OCR Engines**: Tesseract, PaddleOCR, VietOCR, RapidOCR, OpenAI GPT-4 Vision, Google Document AI.
+-   **AI/LLM Integration**: GPT-4 Vision for Cloud Boost, rule-based classification.
+-   **Inter-process Communication (IPC)**: Electron's /.
+-   **Rule-based Classification**: Custom Python module for Vietnamese document typing.
+-   **Environment/Deployment**: Windows OS compatibility (Python, Tesseract, PaddleOCR dependencies), , .
 </key_technical_concepts>
 
 <code_architecture>
 
--   : Core backend API.
-    -   **Importance**: Handles web API requests, including OCR processing.
-    -   **Changes**: Created  endpoint (bypassing authentication) to serve the desktop app. Modified this public endpoint to use  which incorporates a 3-layer fallback logic (OCR+Rules -> GPT-4 -> OCR+Rules Backup) to reduce UNKNOWN classifications.
--   : Rule-based document classification for the original backend.
-    -   **Importance**: Classifies documents based on keywords.
-    -   **Changes**: Initially refined for 13 types, later replaced by  for desktop app to support 95 types.
--   : Electron/React dependencies and scripts.
-    -   **Importance**: Defines the desktop app's build and runtime environment.
-    -   **Changes**: Added Electron, React, , , , , . Modified  script to use  or rely on  for .
--   : Environment variables for the desktop app.
-    -   **Importance**: Used to set  to prevent browser opening during yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command..
-    -   **Changes**: Created and added .
--   : Electron's main process.
-    -   **Importance**: Manages native OS interactions, window creation, and IPC.
-    -   **Changes**: Implemented ,  (calling local Python), and  (calling backend API) IPC handlers. Updated Python execution path to use  launcher on Windows.
--   : Secure bridge between Electron's main and renderer processes.
-    -   **Importance**: Exposes controlled APIs to the renderer process.
-    -   **Changes**: Added  with , , , , .
--   : Main Python script for local OCR.
-    -   **Importance**: Orchestrates local OCR and rule classification.
-    -   **Changes**: Modified to prioritize  on Windows, handle  by ensuring  outputs , and integrates the  class. Handles  for file paths.
--   : Implements Tesseract OCR logic.
-    -   **Importance**: Provides local Tesseract OCR functionality.
-    -   **Changes**: Created. Implemented cropping of the top 40% of the image to improve classification accuracy, and logic to automatically locate Tesseract executable.
--   : (NEW FILE) Comprehensive rule-based classifier.
-    -   **Importance**: Contains classification rules for 95 Vietnamese document types.
-    -   **Changes**: Created with a massive list of document types, including diacritic and diacritic-less keywords, weights, and minimum match thresholds. Replaced the simpler .
--   : Main UI for desktop scanning.
-    -   **Importance**: User interface for file selection, OCR processing, and result display.
-    -   **Changes**: Integrated  and  calls. Added Test Both functionality. Implemented  logic to inherit classification for subsequent UNKNOWN pages.
--   : Settings UI for the desktop app.
-    -   **Importance**: Allows users to configure settings like the backend URL.
-    -   **Changes**: Added input for Backend URL and saving logic.
--   : (NEW FILE) Component to compare OCR results.
-    -   **Importance**: Displays side-by-side results from Offline and Cloud Boost.
-    -   **Changes**: Created to show detailed classification and confidence.
+-   : Handles web API requests, including the  endpoint for desktop app, utilizing  (3-layer fallback: OCR+Rules -> GPT-4 -> OCR+Rules Backup) to reduce UNKNOWN classifications.
+-   : Manages Electron/React dependencies and scripts. Updated for  to use  or  for .
+-   : Electron's main process. Implemented , ,  IPC handlers. Updated Python execution path for Windows. Enhanced stderr handling to log verbose output without failing IPC, and added a 30s timeout for OCR.
+-   : Secure bridge for Electron's main/renderer processes. Exposes  with file selection, OCR processing, and URL management.
+-   : Orchestrates local OCR. Modified to prioritize different OCR engines (PaddleOCR, VietOCR, RapidOCR successively, with Tesseract as fallback). Handles ,  for file paths, passes  to the classifier, and includes environment variables to suppress PaddlePaddle logs. Fixed an OCREngine not defined error during RapidOCR integration.
+-   : Tesseract OCR logic. Created and implemented top 40% image cropping, Tesseract executable auto-location, and logic to extract font height. Currently serves as the fallback OCR engine.
+-   : (NEW FILE) Created for PaddleOCR integration. Attempts were made to suppress verbose logging.
+-   : (NEW FILE) Created for VietOCR integration.
+-   : (NEW FILE) Created for RapidOCR integration, aiming for high speed and clean output.
+-   : (Previously ) Comprehensive rule-based classifier for 95 Vietnamese document types. Updated with title priority scoring (2x weight for title keywords, 20% confidence boost), common OCR typo variants (giầy, chứng nhan, NHUQNG), and auto-enhanced 88 types with uppercase variants via . Weights adjusted for DDKBD, CCCD, HDCQ.
+-   : Main UI for desktop scanning. Integrates /, Test Both functionality, and  logic for multi-page documents. Recently updated to include a **debug view for raw OCR text**.
+-   : (NEW FILE) Displays side-by-side OCR results. Recently updated to include a **debug view for raw OCR text**.
+-   : (NEW FILE) Helper script to add keyword variants.
+-   : (NEW FILE) Script to automatically enhance all document type keywords with uppercase and typo variants.
+-   : (NEW FILE) Backup of the  before batch enhancements.
+-   , , : (NEW FILES) Installation and troubleshooting guides for PaddleOCR and VietOCR.
 </code_architecture>
 
 <pending_tasks>
@@ -66,14 +46,18 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
 -   Consider adding  to .
 -   Migrate or pin React/Webpack versions to address peer dependency warnings.
 -   Test the backend with 5-10 real images to validate the integrated Hybrid OCR.
+-   Test the desktop app with multi-page documents to validate the sequential naming logic.
+-   Fine-tune remaining document types in .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer completed the implementation of the **sequential naming logic** within the desktop application. This feature addresses the issue where multi-page documents might have a title only on the first page, leading to UNKNOWN classifications for subsequent pages. The  function, implemented in , iterates through the processed document results. If a page is classified as UNKNOWN and a preceding page had a valid  (document type), the current UNKNOWN page inherits the  and  from the last known classification. This logic is applied to both Offline OCR and Cloud Boost results, ensuring consistent classification for multi-page documents. UI updates were also made to reflect when sequential naming has been applied.
-
-This work was a direct response to the user's request: vẫn UNKNOWN với các trang không tìm được tiêu đề. xem lại quy tắc đặt tên với các trang tiếp theo ví dụ GCN có 2 trang trang 1 có tiêu đề trang 2 không thì trang 2 là GCN quét được tiêu đề tiếp theo là DDKBD có 4 trang thì trang 1 là DDKBD trang 2 3 4 cũng là DDKBD cho đến khi tìm được tiêu đề tiếp theo.
+Immediately before this summary request, the AI engineer was addressing the user's need for a superior Vietnamese OCR tool, specifically one that could handle diacritics better and provide reliable output for the desktop application. This involved an iterative process of:
+1.  **Attempting PaddleOCR integration**: This failed due to  in the ARM64 container and later  compiler requirements on the user's Windows machine, along with unsuppressable C++ logs breaking Electron IPC.
+2.  **Attempting VietOCR integration**: This failed due to corrupt model file downloads ().
+3.  **Attempting RapidOCR integration**: While initially promising for speed, it failed to accurately recognize Vietnamese diacritics, leading to misclassifications.
+Due to these failures and the need for a stable, accurate solution, the conversation pivoted to evaluating **Google Document AI**. The AI engineer performed a comprehensive comparison of Google Document AI with other OCR engines, highlighting its high accuracy (~98%), excellent Vietnamese diacritics support, and cost-effectiveness (.50/1k pages). The user then explicitly decided to proceed with Google Document AI. The current immediate work involves calling the  agent to obtain the necessary playbook for integrating Google Document AI.
 </current_work>
 
 <optional_next_step>
-Test the desktop app with multi-page documents to validate the sequential naming logic.
+Process the integration playbook received from the  agent for Google Document AI and implement the integration.
 </optional_next_step>

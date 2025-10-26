@@ -54,7 +54,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       await handleProcessFiles(false);
     };
     autoLoad();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [initialFolder]);
 
   const analyzeAndLoadFolder = async (folderPath) => {

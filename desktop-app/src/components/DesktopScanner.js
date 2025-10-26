@@ -2,6 +2,73 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import CompareResults from './CompareResults';
 
+const RenameInline = ({ oldPath, currentName, onRenamed }) => {
+  const [editing, setEditing] = useState(false);
+  const [baseName, setBaseName] = useState(currentName.replace(/\.[^/.]+$/, ''));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const onSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const res = await window.electronAPI.renameFile(oldPath, baseName);
+      if (res.success) {
+        const newPathParts = res.newPath.split(/[\\\/]/);
+        const newName = newPathParts[newPathParts.length - 1];
+        onRenamed(newName, res.newPath);
+        setEditing(false);
+      } else {
+        setError(res.error || 'Đổi tên thất bại');
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-2 p-2 border rounded bg-gray-50">
+      {!editing ? (
+        <button
+          onClick={() => setEditing(true)}
+          className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+        >
+          ✏️ Chỉnh sửa tên
+        </button>
+      ) : (
+        <div className="flex items-center space-x-2">
+          <input
+            className="px-2 py-1 text-sm border rounded flex-1"
+            value={baseName}
+            onChange={(e) => setBaseName(e.target.value)}
+          />
+          <button
+            disabled={saving}
+            onClick={onSave}
+            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          >
+            Lưu
+          </button>
+          <button
+            disabled={saving}
+            onClick={() => { setEditing(false); setBaseName(currentName.replace(/\.[^/.]+$/, '')); setError(''); }}
+            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          >
+            Hủy
+          </button>
+        </div>
+      )}
+      {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
+    </div>
+  );
+};
+
+import React, { useState, useRef } from 'react';
+import axios from 'axios';
+import CompareResults from './CompareResults';
+
 const DesktopScanner = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processing, setProcessing] = useState(false);

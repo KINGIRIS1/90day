@@ -316,7 +316,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       return (
         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
           ☁️ Cloud Boost
-  // Progressive scanning controls for a parent folder
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+        ⚠️ {method}
+      </span>
+    );
+  };  // Progressive scanning controls for a parent folder
   const [parentFolder, setParentFolder] = useState(null);
   const [childTabs, setChildTabs] = useState([]); // { name, path, status: 'pending'|'scanning'|'done', results: [] }
   const [activeChild, setActiveChild] = useState(null);

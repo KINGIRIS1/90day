@@ -157,6 +157,8 @@ const DesktopScanner = () => {
       if (useCloudBoost && (!result.success) && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
         if (autoFallbackEnabled) {
       // Build preview for image/pdf
+      const displayName = file.name;
+
       let previewUrl = null;
       try {
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {

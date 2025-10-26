@@ -138,6 +138,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const files = fileList;
     const childResults = [];
     for (let i = 0; i < files.length; i++) {
+      if (stopRef.current) break;
       const f = files[i];
       const r = await processOffline(f);
       let previewUrl = null;

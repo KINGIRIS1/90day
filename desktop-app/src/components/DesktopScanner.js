@@ -26,6 +26,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [parentSummary, setParentSummary] = useState(null); // { subfolderCount, rootFileCount }
   const [childTabs, setChildTabs] = useState([]); // [{ name, path, count, status, results }]
   const [activeChild, setActiveChild] = useState(null);
+  const [childScanImagesOnly, setChildScanImagesOnly] = useState(false);
+  const stopRef = React.useRef(false);
+
 
   // Load backend URL and settings from config
   useEffect(() => {

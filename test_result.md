@@ -149,3 +149,21 @@ agent_communication:
       4. Verify offline OCR works with sample images
       
       Note: Web app (/app/frontend & /app/backend) remains untouched and runs in parallel.
+  
+  - agent: "main"
+    message: |
+      Update: Restricted OCR Engine to Tesseract Only
+      ✅ Modified process_document.py to use only Tesseract OCR
+      ✅ Updated requirements.txt - removed PaddleOCR, kept only pytesseract + Pillow
+      ✅ Updated requirements-windows.txt for Tesseract-only setup
+      ✅ Updated Settings.js - changed display from "PaddleOCR 2.7" to "Tesseract OCR"
+      ✅ Updated README.md - all references now point to Tesseract
+      ✅ Updated electron/main.js comment for clarity
+      ✅ Verified script loads successfully with pytesseract 0.3.13
+      
+      Changes Made:
+      - Removed all fallback logic for VietOCR, PaddleOCR, RapidOCR, EasyOCR
+      - Simplified dependencies to just 2 lightweight packages
+      - Updated documentation across README and setup guides
+      
+      Note: User requested Tesseract-only due to issues with other OCR engines

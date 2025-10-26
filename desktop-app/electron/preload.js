@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectFiles: () => ipcRenderer.invoke('select-files'),
   listSubfoldersInFolder: (folderPath) => ipcRenderer.invoke('list-subfolders-in-folder', folderPath),
   listFolderTree: (folderPath) => ipcRenderer.invoke('list-folder-tree', folderPath),
+  analyzeParentFolder: (folderPath) => ipcRenderer.invoke('analyze-parent-folder', folderPath),
   listFilesInFolder: (folderPath) => ipcRenderer.invoke('list-files-in-folder', folderPath),
   renameFile: (oldPath, newBaseName) => ipcRenderer.invoke('rename-file', oldPath, newBaseName),
   

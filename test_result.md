@@ -123,10 +123,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Capture /api/llm/health current status and details"
+    - "Test Python OCR engine standalone with sample images"
+    - "Test Electron app startup and UI"
+    - "Test offline OCR flow end-to-end"
+    - "Test cloud boost configuration and flow"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "desktop_app_first"
 
 agent_communication:
   - agent: "main"

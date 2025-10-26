@@ -25,28 +25,35 @@ if sys.platform == 'win32':
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    # Try PaddleOCR first (best accuracy: 90-95%)
+    # Try VietOCR first (Vietnamese specialized, 90-95% accuracy)
     try:
-        from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
-        print("Trying PaddleOCR (Vietnamese specialized, 90-95% accuracy)", file=sys.stderr)
-        ocr_engine = PaddleOCREngine()
+        from ocr_engine_vietocr import OCREngine as VietOCREngine
+        print("Trying VietOCR (Vietnamese Transformer-based, 90-95% accuracy)", file=sys.stderr)
+        ocr_engine = VietOCREngine()
     except ImportError:
-        print("PaddleOCR not available, using Tesseract", file=sys.stderr)
-        # Fall back to Tesseract (good accuracy: 85-88%)
+        print("VietOCR not available, trying alternatives", file=sys.stderr)
+        # Try PaddleOCR second (best accuracy: 90-95%)
         try:
-            from ocr_engine_tesseract import OCREngine
-            print("Using Tesseract OCR", file=sys.stderr)
-            ocr_engine = OCREngine()
+            from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
+            print("Trying PaddleOCR (Vietnamese specialized, 90-95% accuracy)", file=sys.stderr)
+            ocr_engine = PaddleOCREngine()
         except ImportError:
-            # Last resort: Try EasyOCR
+            print("PaddleOCR not available, using Tesseract", file=sys.stderr)
+            # Fall back to Tesseract (good accuracy: 85-88%)
             try:
-                from ocr_engine import OCREngine
-                print("Using PaddleOCR (original)", file=sys.stderr)
+                from ocr_engine_tesseract import OCREngine
+                print("Using Tesseract OCR", file=sys.stderr)
                 ocr_engine = OCREngine()
             except ImportError:
-                from ocr_engine_easyocr import OCREngine
-                print("Using EasyOCR", file=sys.stderr)
-                ocr_engine = OCREngine()
+                # Last resort: Try original PaddleOCR or EasyOCR
+                try:
+                    from ocr_engine import OCREngine
+                    print("Using PaddleOCR (original)", file=sys.stderr)
+                    ocr_engine = OCREngine()
+                except ImportError:
+                    from ocr_engine_easyocr import OCREngine
+                    print("Using EasyOCR", file=sys.stderr)
+                    ocr_engine = OCREngine()
     
     from rule_classifier import RuleClassifier
 except ImportError as e:

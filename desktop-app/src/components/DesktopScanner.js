@@ -337,8 +337,14 @@ const DesktopScanner = () => {
       const displayName = file.name;
       let previewUrl = null;
       try {
+        const toFileUrl = (p) => {
+          if (/^[A-Za-z]:\\/.test(p)) {
+            return 'file:///' + p.replace(/\\/g, '/');
+          }
+          return 'file://' + p;
+        };
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
-          previewUrl = `file://${file.path}`;
+          previewUrl = toFileUrl(file.path);
         } else if (/\.pdf$/i.test(file.name)) {
           previewUrl = null;
         }

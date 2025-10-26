@@ -8,6 +8,7 @@ from typing import Dict, Tuple
 DOCUMENT_RULES = {
     "GCN": {
         "keywords": [
+            # Có dấu đầy đủ
             "giấy chứng nhận quyền sử dụng đất",
             "giấy chứng nhận",
             "quyền sử dụng đất",
@@ -17,10 +18,16 @@ DOCUMENT_RULES = {
             "gcn quyền sử dụng",
             "quyền sở hữu",
             "chứng nhận quyền",
-            "chi nhánh văn phòng đăng ký",  # NEW - Very specific to GCN
-            "văn phòng đăng ký đất đai"     # NEW - Very specific to GCN
+            "chi nhánh văn phòng đăng ký",
+            "văn phòng đăng ký đất đai",
+            # Không dấu (OCR thường bị mất dấu)
+            "giay chung nhan",
+            "quyen su dung dat",
+            "quyen so huu",
+            "chung nhan quyen",
+            "giay chung nhan quyen su dung dat"
         ],
-        "weight": 1.5,  # Increased from 1.0 - Higher priority
+        "weight": 1.5,
         "min_matches": 1
     },
     "BMT": {

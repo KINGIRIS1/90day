@@ -28,19 +28,18 @@ DOCUMENT_RULES = {
             "bản mô tả ranh giới",
             "mốc giới thửa đất",
             "vị trí ranh giới",
-            "thửa đất số",
-            "tờ bản đồ số",
-            "mô tả ranh giới",  # NEW
-            "ranh giới thửa",   # NEW
-            "giới hạn thửa",    # NEW
-            "mốc giới",          # NEW
-            "phía đông giáp",   # NEW
-            "phía tây giáp",    # NEW
-            "phía nam giáp",    # NEW
-            "phía bắc giáp"     # NEW
+            "mô tả ranh giới",  
+            "ranh giới thửa",   
+            "giới hạn thửa",    
+            "mốc giới",          
+            "phía đông giáp",   
+            "phía tây giáp",    
+            "phía nam giáp",    
+            "phía bắc giáp"     
+            # Removed generic "thửa đất số", "tờ bản đồ số" - too common in GCN
         ],
         "weight": 1.0,
-        "min_matches": 1  # Reduced from 2
+        "min_matches": 2  # Increased to require more specific matches
     },
     "HSKT": {
         "keywords": [

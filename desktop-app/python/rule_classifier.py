@@ -26,10 +26,12 @@ DOCUMENT_RULES = {
     "GCNC": {
         "keywords": [
             # Có dấu
-            "giấy chứng nhận quyền sử dụng đất", "giấy chứng nhận",
-            "bản chính", "gcn bản chính",
+            "giấy chứng nhận quyền sử dụng đất", "giấy chứng nhận", "giầy chứng nhận",
+            "bản chính", "gcn bản chính", "chứng nhận",
             # Không dấu
-            "giay chung nhan", "ban chinh", "gcn ban chinh"
+            "giay chung nhan", "ban chinh", "gcn ban chinh", "chung nhan",
+            # Viết hoa
+            "GIAY CHUNG NHAN", "BAN CHINH", "CHUNG NHAN"
         ],
         "weight": 1.4, "min_matches": 1
     },
@@ -37,25 +39,30 @@ DOCUMENT_RULES = {
         "keywords": [
             # Có dấu
             "bản mô tả ranh giới", "mốc giới thửa đất", "vị trí ranh giới",
-            "mô tả ranh giới", "ranh giới thửa", "mốc giới",
+            "mô tả ranh giới", "ranh giới thửa", "mốc giới", "ranh giới",
             "phía đông giáp", "phía tây giáp", "phía nam giáp", "phía bắc giáp",
             # Không dấu
             "ban mo ta ranh gioi", "moc gioi thua dat", "vi tri ranh gioi",
-            "mo ta ranh gioi", "ranh gioi thua", "moc gioi",
-            "phia dong giap", "phia tay giap", "phia nam giap", "phia bac giap"
+            "mo ta ranh gioi", "ranh gioi thua", "moc gioi", "ranh gioi",
+            "phia dong giap", "phia tay giap", "phia nam giap", "phia bac giap",
+            # Viết hoa
+            "BAN MO TA", "RANH GIOI", "MOC GIOI"
         ],
-        "weight": 1.0, "min_matches": 2
+        "weight": 1.1, "min_matches": 2
     },
     "HSKT": {
         "keywords": [
             # Có dấu
             "bản vẽ", "trích lục", "đo tách", "chỉnh lý", "hồ sơ kỹ thuật",
             "trích đo", "tỷ lệ 1:", "phiếu đo đạc", "đo đạc chỉnh lý",
+            "hồ sơ kỹ thuật", "kỹ thuật",
             # Không dấu
             "ban ve", "trich luc", "do tach", "chinh ly", "ho so ky thuat",
-            "trich do", "ty le 1:", "phieu do dac", "do dac chinh ly"
+            "trich do", "ty le 1:", "phieu do dac", "do dac chinh ly", "ky thuat",
+            # Viết hoa
+            "BAN VE", "TRICH LUC", "HO SO KY THUAT"
         ],
-        "weight": 0.9, "min_matches": 1
+        "weight": 1.0, "min_matches": 1
     },
     "BVHC": {
         "keywords": [

@@ -499,12 +499,31 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <span>Chọn file</span>
           </button>
           <button
-            onClick={handleSelectFolder}
+            onClick={async () => {
+              const folderPath = await window.electronAPI.selectFolder();
+              if (folderPath) {
+                if (onDisplayFolder) onDisplayFolder(folderPath);
+                else await handleSelectFolder();
+              }
+            }}
             disabled={processing}
             className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             <span>📂</span>
             <span>Chọn thư mục</span>
+          </button>
+          <button
+            onClick={async () => {
+              const folderPaths = await window.electronAPI.selectFolders();
+              if (folderPaths && folderPaths.length) {
+                folderPaths.forEach(fp => onDisplayFolder && onDisplayFolder(fp));
+              }
+            }}
+            disabled={processing}
+            className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <span>🗂️</span>
+            <span>Chọn nhiều thư mục</span>
           </button>
         </div>
 

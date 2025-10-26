@@ -678,7 +678,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
           <div className="space-y-4">
             {/* Grid view for results */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className={`grid gap-3 ${gridColsClass}`}>
               {results.map((result, idx) => (
                 <div key={idx} className="p-3 border rounded-lg bg-white">
                   <div className="mb-2">

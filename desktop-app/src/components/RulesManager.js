@@ -598,6 +598,20 @@ const RulesManager = () => {
                 </button>
               </div>
 
+              {/* Auto-generate variants button */}
+              <div className="mb-3">
+                <button
+                  onClick={generateVariantsForEdit}
+                  disabled={loading || editingRule.keywords.length === 0}
+                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  🤖 Tự động tạo variants (có dấu, không dấu, chữ hoa, typo...)
+                </button>
+                <p className="mt-1 text-xs text-gray-500">
+                  Tự động tạo tất cả biến thể từ keywords hiện có
+                </p>
+              </div>
+
               {/* Keywords list */}
               <div className="border border-gray-300 rounded-lg p-3 max-h-64 overflow-y-auto">
                 <div className="flex flex-wrap gap-2">

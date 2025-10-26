@@ -223,7 +223,7 @@ const RulesManager = () => {
 
   // Add new rule handlers
   const startAddNew = () => {
-    setShowAddNew(true);
+    setShowAddNewModal(true);
     setNewRuleData({
       docType: '',
       keywords: [],

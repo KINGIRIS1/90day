@@ -58,6 +58,20 @@ import { useMemo } from 'react';
               >
                 📄 Quét tài liệu
               </button>
+              {folders.map((f, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveTab(`folder-${idx}`)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === `folder-${idx}`
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title={f}
+                >
+                  📁 {idx+1}
+                </button>
+              ))}
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${

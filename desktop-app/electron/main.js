@@ -189,15 +189,6 @@ ipcMain.handle('list-folder-tree', async (event, basePath) => {
 });
 
 
-      .filter((e) => e.isFile())
-      .filter((e) => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name))
-      .map((e) => path.join(folderPath, e.name));
-    return { success: true, files };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
 ipcMain.handle('rename-file', async (event, oldPath, newBaseName) => {
   const fs = require('fs');
   const path = require('path');

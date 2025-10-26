@@ -72,20 +72,20 @@ echo.
 REM Install Python dependencies
 echo [INSTALL] Installing Python dependencies...
 echo.
-echo === Installing VietOCR (Vietnamese Transformer-based, 90-95%% accuracy) ===
-echo This may take 5-10 minutes for first-time installation
-echo Models will be downloaded on first run (~100MB)
+echo === Installing RapidOCR (Lightning Fast OCR, 90%%+ accuracy) ===
+echo This takes 1-2 minutes for installation
+echo ONNX-optimized models (~50MB) download on first run
 echo.
 cd python
 
-REM Install VietOCR (Vietnamese specialized)
-echo [1/2] Installing VietOCR with Transformer model...
-python -m pip install vietocr torch torchvision --quiet
+REM Install RapidOCR (ONNX-optimized, fast)
+echo [1/2] Installing RapidOCR with ONNX runtime...
+python -m pip install rapidocr-onnxruntime --quiet
 if %ERRORLEVEL% EQU 0 (
-    echo [OK] VietOCR installed successfully
-    echo [SUCCESS] Using VietOCR engine - 90-95%% accuracy for Vietnamese!
+    echo [OK] RapidOCR installed successfully
+    echo [SUCCESS] Using RapidOCR engine - 90%%+ accuracy, ~100ms processing!
 ) else (
-    echo [WARN] VietOCR installation failed. Will use Tesseract fallback.
+    echo [WARN] RapidOCR installation failed. Will use Tesseract fallback.
     echo [INFO] This is OK - Tesseract provides 85-88%% accuracy.
 )
 
@@ -102,10 +102,10 @@ cd ..
 echo [OK] All Python dependencies installed
 echo.
 echo === OCR Engine Info ===
-python -c "try: from vietocr.tool.predictor import Predictor; print('✓ Primary: VietOCR (90-95%% accuracy - Vietnamese Transformer)')" 2>nul || echo "○ Primary: VietOCR (not available)"
+python -c "try: from rapidocr_onnxruntime import RapidOCR; print('✓ Primary: RapidOCR (90%%+ accuracy, ~100ms, ONNX-optimized)')" 2>nul || echo "○ Primary: RapidOCR (not available)"
 python -c "try: import pytesseract; print('✓ Fallback: Tesseract (85-88%% accuracy)')" 2>nul || echo "○ Fallback: Tesseract (not available)"
 echo.
-echo [INFO] For VietOCR setup help: See VIETOCR_SETUP.md
+echo [INFO] For RapidOCR setup help: See RAPIDOCR_SETUP.md
 echo.
 
 echo ======================================

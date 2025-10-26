@@ -39,6 +39,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   exportRules: () => ipcRenderer.invoke('export-rules'),
   importRules: (merge) => ipcRenderer.invoke('import-rules', merge),
   openRulesFolder: () => ipcRenderer.invoke('open-rules-folder'),
+  generateKeywordVariants: (keyword, includeTypos) => ipcRenderer.invoke('generate-keyword-variants', keyword, includeTypos),
   
   // Platform info
   platform: process.platform,

@@ -1,63 +1,81 @@
 <analysis>
-The AI engineer's trajectory chronicles a complex evolution of the application from a web-only document scanner to a full-fledged Electron desktop app, with a continuous focus on optimizing OCR accuracy and stability for Vietnamese documents. Key challenges included navigating Windows-specific Python environment issues, diverse OCR engine compatibilities (Tesseract, PaddleOCR, VietOCR, RapidOCR, GPT-4 Vision), and Electron's IPC limitations. The core work involved implementing sequential naming, developing font height detection for title prioritization, and iteratively expanding/refining a 95-type rule-based classification system with typo variants. After repeated failures with local deep-learning OCR engines due to compatibility and verbose logging, the project pivoted towards integrating a robust cloud-based solution, culminating in the decision to use Google Document AI as the next step.
+The AI engineer's work spanned multiple iterative phases, transforming an Electron desktop OCR application for Vietnamese land documents. Initially, it involved enforcing a Tesseract-only OCR configuration, addressing previous issues with other engines. Subsequently, a comprehensive Rules Manager was implemented, enabling UI-driven rule creation, editing, deletion, import/export, and reset, including an auto-generate variants feature for keywords. Significant effort was dedicated to improving the UI/UX with modal forms for rule management and ensuring scan tab state persistence. A major focus shifted to simplifying application distribution, fixing Electron-builder configuration issues, and resolving critical Python path and Windows encoding problems within the packaged app. The work continuously integrated user feedback, culminating in efforts to create an all-in-one installer bundling Python and Tesseract.
 </analysis>
 
 <product_requirements>
-The application, originally a web-based document scanner for Vietnamese land-related images, aims to use LLMs for OCR and automated renaming with short codes. It supports single/batch scanning, history, and PDF export, targeting 30 concurrent users. Key objectives include LLM stability, enhanced folder scanning (), performance, deployment reliability, and cost optimization via a hybrid OCR (initially PaddleOCR + rules with GPT-4 fallback).
-
-The user explicitly requested a **Hybrid Desktop App** with two modes:
-1.  **Default: OCR+Rules (Offline)**: Free, aiming for 85-88% accuracy. The AI engineer initially implemented this using Tesseract, scanning the top 40% of documents, and a comprehensive rule classifier (supporting 95 document types with diacritic and diacritic-less keywords).
-2.  **Optional: Cloud Boost (Online)**: Paid, leverages GPT-4 for higher accuracy (93%+).
-The user also required **sequential naming logic** for multi-page documents to classify UNKNOWN pages based on preceding pages.
-Subsequently, the user requested the ability to detect **bold/large text for title prioritization**, a **debug view to display raw OCR text**, and a **better Vietnamese OCR tool** (leading to explorations of PaddleOCR, VietOCR, RapidOCR, and now Google Document AI) to enhance accuracy and reduce misclassifications, especially for diacritics.
+The application is a desktop document scanner for Vietnamese land-related images, designed for high-volume use. It aims to OCR and rename documents using short codes, supporting single and batch scanning, history, and PDF export. Key features requested and implemented include:
+- Default Offline OCR (Tesseract only) and Optional Cloud Boost (GPT-4 Vision).
+- Sequential naming for multi-page documents.
+- Title prioritization based on bold/large text.
+- Debug view for raw OCR text, image preview.
+- Inline short-code editing.
+- Folder scanning with tabbed results, incremental processing, and PDF merging.
+- UI/UX improvements (compact header, density switch, branding, splash screen).
+- Global OCR engine preference with a quick toggle and status display.
+- **Rules Manager**: UI for adding, editing, and deleting classification rules, importing/exporting JSON rules, resetting to defaults, and opening the rules folder.
+- **Auto-generate Keyword Variants**: Automatically create variants (diacritics, case, typos) for rule keywords.
+- **Persistent Scan Tab State**: The document scanning tab must maintain its state (progress, results) when switching to other tabs.
+- **Easy Installation**: Simplification of the application's installation process on other machines, including the creation of one-click installers and potentially bundling Python and Tesseract.
+- Improve existing  accuracy and add  to .
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Desktop Development**: Electron (frontend), React (UI), Python (local OCR/processing).
--   **OCR Engines**: Tesseract, PaddleOCR, VietOCR, RapidOCR, OpenAI GPT-4 Vision, Google Document AI.
--   **AI/LLM Integration**: GPT-4 Vision for Cloud Boost, rule-based classification.
--   **Inter-process Communication (IPC)**: Electron's /.
--   **Rule-based Classification**: Custom Python module for Vietnamese document typing.
--   **Environment/Deployment**: Windows OS compatibility (Python, Tesseract, PaddleOCR dependencies), , .
+- **Full-stack Desktop Development**: Electron (main/renderer process), React (UI), Python (local OCR/processing, rule classification).
+- **OCR Engines**: Tesseract (primary offline), OpenAI GPT-4 Vision (Cloud Boost).
+- **Inter-process Communication (IPC)**: Electron's /.
+- **Rule-based Classification**: Custom Python modules for document type classification.
+- **UI/UX**: Tailwind CSS, , React state management.
+- **Build/Distribution**: electron-builder, NSIS (Nullsoft Scriptable Install System).
+- **Python Environment Management**: , handling Windows encoding issues.
 </key_technical_concepts>
 
 <code_architecture>
 
--   : Handles web API requests, including the  endpoint for desktop app, utilizing  (3-layer fallback: OCR+Rules -> GPT-4 -> OCR+Rules Backup) to reduce UNKNOWN classifications.
--   : Manages Electron/React dependencies and scripts. Updated for  to use  or  for .
--   : Electron's main process. Implemented , ,  IPC handlers. Updated Python execution path for Windows. Enhanced stderr handling to log verbose output without failing IPC, and added a 30s timeout for OCR.
--   : Secure bridge for Electron's main/renderer processes. Exposes  with file selection, OCR processing, and URL management.
--   : Orchestrates local OCR. Modified to prioritize different OCR engines (PaddleOCR, VietOCR, RapidOCR successively, with Tesseract as fallback). Handles ,  for file paths, passes  to the classifier, and includes environment variables to suppress PaddlePaddle logs. Fixed an OCREngine not defined error during RapidOCR integration.
--   : Tesseract OCR logic. Created and implemented top 40% image cropping, Tesseract executable auto-location, and logic to extract font height. Currently serves as the fallback OCR engine.
--   : (NEW FILE) Created for PaddleOCR integration. Attempts were made to suppress verbose logging.
--   : (NEW FILE) Created for VietOCR integration.
--   : (NEW FILE) Created for RapidOCR integration, aiming for high speed and clean output.
--   : (Previously ) Comprehensive rule-based classifier for 95 Vietnamese document types. Updated with title priority scoring (2x weight for title keywords, 20% confidence boost), common OCR typo variants (giầy, chứng nhan, NHUQNG), and auto-enhanced 88 types with uppercase variants via . Weights adjusted for DDKBD, CCCD, HDCQ.
--   : Main UI for desktop scanning. Integrates /, Test Both functionality, and  logic for multi-page documents. Recently updated to include a **debug view for raw OCR text**.
--   : (NEW FILE) Displays side-by-side OCR results. Recently updated to include a **debug view for raw OCR text**.
--   : (NEW FILE) Helper script to add keyword variants.
--   : (NEW FILE) Script to automatically enhance all document type keywords with uppercase and typo variants.
--   : (NEW FILE) Backup of the  before batch enhancements.
--   , , : (NEW FILES) Installation and troubleshooting guides for PaddleOCR and VietOCR.
+- : Manages Electron/React dependencies and build configurations for . Modified to correct the entry point for the packaged app and simplify build config.
+- : Electron's main process. Handles IPC. Updated to add  helper and new IPC handlers for Rules Manager and keyword variant generation. Renamed for build process to .
+- : Secure bridge for renderer process. Updated to expose new IPC functions for Rules Manager and keyword variants.
+- : Orchestrates local OCR. Modified to strictly use Tesseract and implement robust Windows encoding/I/O handling. Updated to use merged rules from .
+- : Rule-based classifier. Modified to load rules dynamically from  and use  for classification.
+- : (NEW FILE) Python script to manage rules (get, save, reset, import, export). Crucial for Rules Manager feature. Updated for Windows encoding/I/O handling.
+- : (NEW FILE) Python script for automatically generating keyword variants (diacritics, case, typos). Integrated into Rules Manager. Updated for Windows encoding/I/O handling.
+- , : Simplified to only include Tesseract dependencies.
+- : Main React component. Now manages tab state () to persist  state. Updated to include a new Rules tab.
+- : Configuration UI. Updated to reflect Tesseract-only OCR.
+- : (NEW FILE) React UI component for managing classification rules. Implemented with modals for Add New Rule and Edit Rule, inline edit/delete buttons, and auto-generate variants integration.
+- : Copy of  used for packaging, with updated paths and  logic to resolve Python scripts correctly in the packaged app.
+- , , , , , : Extensive documentation and guides added/updated for all new features and distribution.
+- , 🚀 Starting build process for 90dayChonThanh...
+
+📋 Checking requirements...
+[0;32m✅ Node.js: v20.19.5[0m
+[0;32m✅ Yarn: 1.22.22[0m
+[0;32m✅ Python: Python 3.11.14[0m
+
+📦 Installing dependencies...
+yarn install v1.22.22
+[1/4] Resolving packages...
+success Already up-to-date.
+Done in 0.02s.
+
+🏗️  Building React app...
+yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.: Scripts for building the application, updated with menu selection logic and bug fixes.
+- : (NEW FILE) NSIS script for creating an all-in-one Windows installer.
 </code_architecture>
 
 <pending_tasks>
--   Monitor OpenAI quota/plan or balance for Emergent LLM Key.
--   Consider adding  to .
--   Migrate or pin React/Webpack versions to address peer dependency warnings.
--   Test the backend with 5-10 real images to validate the integrated Hybrid OCR.
--   Test the desktop app with multi-page documents to validate the sequential naming logic.
--   Fine-tune remaining document types in .
+- Implement the full logic for the all-in-one installer using  to bundle Python and Tesseract into the application's executable.
+- Fine-tune remaining document types in  (though  helps this).
+- Monitor OpenAI quota/plan or balance for Emergent LLM Key (if Cloud Boost is used).
+- Migrate or pin React/Webpack versions to address peer dependency warnings.
+- Test the backend with 5-10 real images to validate the integrated Hybrid OCR (specifically with the Tesseract-only change and Rules Manager).
+- Update icon for macOS (.icns).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing the user's need for a superior Vietnamese OCR tool, specifically one that could handle diacritics better and provide reliable output for the desktop application. This involved an iterative process of:
-1.  **Attempting PaddleOCR integration**: This failed due to  in the ARM64 container and later  compiler requirements on the user's Windows machine, along with unsuppressable C++ logs breaking Electron IPC.
-2.  **Attempting VietOCR integration**: This failed due to corrupt model file downloads ().
-3.  **Attempting RapidOCR integration**: While initially promising for speed, it failed to accurately recognize Vietnamese diacritics, leading to misclassifications.
-Due to these failures and the need for a stable, accurate solution, the conversation pivoted to evaluating **Google Document AI**. The AI engineer performed a comprehensive comparison of Google Document AI with other OCR engines, highlighting its high accuracy (~98%), excellent Vietnamese diacritics support, and cost-effectiveness (.50/1k pages). The user then explicitly decided to proceed with Google Document AI. The current immediate work involves calling the  agent to obtain the necessary playbook for integrating Google Document AI.
+Immediately before this summary request, the AI engineer was addressing the user's latest request to bundle Python and Tesseract directly into the application's installer for easier distribution. The previous work involved creating simple build scripts (, ) and distribution guides, but these still required users to install Python and Tesseract separately. To address this, the AI engineer started the implementation of an all-in-one installer. This involved creating , an NSIS script, which will define how Python, Tesseract, and the Electron application are packaged and installed silently. A corresponding guide, , was also created to document the process for developers. The next logical step is to complete the  script and integrate it into the build process to fully automate the inclusion of Python and Tesseract.
 </current_work>
 
 <optional_next_step>
-Process the integration playbook received from the  agent for Google Document AI and implement the integration.
+Complete the  script to bundle Python and Tesseract, then integrate it into the build process.
 </optional_next_step>

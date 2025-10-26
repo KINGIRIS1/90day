@@ -7,7 +7,7 @@ import requests
 import json
 
 def test_auth():
-    base_url = "https://docscan-desktop.preview.emergentagent.com/api"
+    base_url = "https://landocr-pro.preview.emergentagent.com/api"
     
     print("🔍 Testing setup-admin endpoint")
     

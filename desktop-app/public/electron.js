@@ -582,7 +582,7 @@ ipcMain.handle('get-rules', async () => {
 ipcMain.handle('save-rule', async (event, docType, ruleData) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     const ruleJson = JSON.stringify(ruleData);
     
     return new Promise((resolve, reject) => {
@@ -625,7 +625,7 @@ ipcMain.handle('save-rule', async (event, docType, ruleData) => {
 ipcMain.handle('delete-rule', async (event, docType) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'delete', docType]);
@@ -667,7 +667,7 @@ ipcMain.handle('delete-rule', async (event, docType) => {
 ipcMain.handle('reset-rules', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'reset']);
@@ -720,7 +720,7 @@ ipcMain.handle('export-rules', async () => {
     
     const exportPath = result.filePath;
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'export', exportPath]);
@@ -773,7 +773,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
     
     const importPath = result.filePaths[0];
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     const mergeFlag = mergeBool ? 'true' : 'false';
     
     return new Promise((resolve, reject) => {
@@ -816,7 +816,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
 ipcMain.handle('open-rules-folder', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const scriptPath = getPythonScriptPath('rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'folder']);

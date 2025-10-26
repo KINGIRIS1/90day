@@ -999,9 +999,9 @@ async def scan_document_public(
         # Create FULL image for preview
         full_image_base64 = resize_image_for_api(content, crop_top_only=False, max_size=1280)
         
-        # Crop and analyze
+        # Crop and analyze with HYBRID MODE (OCR+Rules first, GPT-4 fallback)
         cropped_image_base64 = resize_image_for_api(content, crop_top_only=True, max_size=800, crop_percentage=crop_percent)
-        analysis_result = await analyze_document_with_vision(cropped_image_base64)
+        analysis_result = await analyze_document_hybrid(cropped_image_base64, use_hybrid=True)
         
         # Create scan result (no user_id for public endpoint)
         scan_result = ScanResult(

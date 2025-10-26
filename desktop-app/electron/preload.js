@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Offline OCR processing
   processDocumentOffline: (filePath) => ipcRenderer.invoke('process-document-offline', filePath),
   
+  // Cloud Boost processing
+  processDocumentCloud: (filePath) => ipcRenderer.invoke('process-document-cloud', filePath),
+  
   // Config management
   getConfig: (key) => ipcRenderer.invoke('get-config', key),
   setConfig: (key, value) => ipcRenderer.invoke('set-config', key, value),

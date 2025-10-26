@@ -52,10 +52,23 @@ const DesktopScanner = () => {
     try {
       const folderPath = await window.electronAPI.selectFolder();
       if (folderPath) {
-        alert('Tính năng quét thư mục đang được phát triển. Hiện tại vui lòng chọn từng file.');
+        const res = await window.electronAPI.listFilesInFolder(folderPath);
+        if (res.success) {
+          const files = res.files.map(path => ({
+            path,
+            name: path.split(/[\\\/]/).pop(),
+            processed: false,
+            result: null
+          }));
+          setSelectedFiles(files);
+          setResults([]);
+        } else {
+          alert('Không đọc được thư mục: ' + res.error);
+        }
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
+      alert('Lỗi khi chọn thư mục: ' + error.message);
     }
   };
 

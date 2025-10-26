@@ -93,6 +93,7 @@ const DesktopScanner = () => {
 
     setProcessing(true);
     setResults([]);
+    setComparisons([]);
     setProgress({ current: 0, total: selectedFiles.length });
 
     const newResults = [];
@@ -116,6 +117,48 @@ const DesktopScanner = () => {
     }
 
     setResults(newResults);
+    setProcessing(false);
+  };
+
+  const handleTestBoth = async () => {
+    if (selectedFiles.length === 0) {
+      alert('Vui lòng chọn file trước!');
+      return;
+    }
+
+    if (!backendUrl) {
+      alert('Vui lòng cấu hình Backend URL trong Cài đặt trước!');
+      return;
+    }
+
+    setProcessing(true);
+    setResults([]);
+    setComparisons([]);
+    setCompareMode(true);
+    setProgress({ current: 0, total: selectedFiles.length * 2 }); // x2 vì chạy cả 2 modes
+
+    const newComparisons = [];
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      
+      // Process Offline
+      setProgress({ current: i * 2 + 1, total: selectedFiles.length * 2 });
+      const offlineResult = await processOffline(file);
+      
+      // Process Cloud Boost
+      setProgress({ current: i * 2 + 2, total: selectedFiles.length * 2 });
+      const cloudResult = await processCloudBoost(file);
+      
+      newComparisons.push({
+        fileName: file.name,
+        filePath: file.path,
+        offline: offlineResult,
+        cloud: cloudResult
+      });
+    }
+
+    setComparisons(newComparisons);
     setProcessing(false);
   };
 

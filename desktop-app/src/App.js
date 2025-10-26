@@ -77,7 +77,13 @@ function App() {
   const [isElectron, setIsElectron] = useState(false);
 
   useEffect(() => {
-    // Check if running in Electron
+    // Check if running in Electron or demo mode
+    const params = new URLSearchParams(window.location.search);
+    const isDemo = params.get('demo') === '1';
+    if (isDemo) {
+      setIsElectron(true); // enable UI for design demo
+      return;
+    }
     setIsElectron(window.electronAPI?.isElectron || false);
   }, []);
 

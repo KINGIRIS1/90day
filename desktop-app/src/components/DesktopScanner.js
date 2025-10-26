@@ -79,6 +79,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   const loadFolderLocally = async (folderPath) => {
+    // Analyze parent folder (per requirement): show summary and list subfolders as tabs
+    setParentFolder(folderPath);
+    const analysis = await window.electronAPI.analyzeParentFolder(folderPath);
+    if (analysis.success) {
+      setParentSummary(analysis.summary);
+      setChildTabs(analysis.subfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
+      setActiveChild(analysis.subfolders[0]?.path || null);
+    } else {
+      setParentSummary(null);
+      setChildTabs([]);
+      setActiveChild(null);
+    }
+
+    // Also list root-level files to selectedFiles (for single-batch processing if needed)
     const res = await window.electronAPI.listFilesInFolder(folderPath);
     if (res.success) {
       const files = res.files.map(path => ({

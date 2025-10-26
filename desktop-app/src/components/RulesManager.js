@@ -281,7 +281,7 @@ const RulesManager = () => {
       if (result.success) {
         showNotification(`Rule "${docType}" đã được tạo thành công!`, 'success');
         await loadRules();
-        setShowAddNew(false);
+        setShowAddNewModal(false);
         setSelectedRule(docType);
       } else {
         showNotification('Lỗi tạo rule: ' + result.error, 'error');
@@ -294,7 +294,7 @@ const RulesManager = () => {
   };
 
   const cancelAddNew = () => {
-    setShowAddNew(false);
+    setShowAddNewModal(false);
     setNewRuleData({
       docType: '',
       keywords: [],

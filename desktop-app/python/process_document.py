@@ -94,7 +94,7 @@ def main():
         print(json.dumps({
             "error": "Usage: python process_document.py <file_path>",
             "success": False
-        }))
+        }, ensure_ascii=True))
         sys.exit(1)
     
     file_path = sys.argv[1]

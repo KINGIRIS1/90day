@@ -3,6 +3,7 @@ import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 
 //
+/* Drag-drop removed per user request
 const DraggableItem = ({ id, label }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
   const style = {

@@ -25,32 +25,34 @@ if sys.platform == 'win32':
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    # Try RapidOCR first (BEST: Fast + Accurate + Clean)
+    # Default: Tesseract (stable offline engine)
     try:
-        from ocr_engine_rapidocr import OCREngine as RapidOCREngine
-        print("Trying RapidOCR (Lightning fast, 90%+ accuracy, ~100ms)", file=sys.stderr)
-        ocr_engine = RapidOCREngine()
+        from ocr_engine_tesseract import OCREngine as TesseractEngine
+        print("Using Tesseract OCR (default)", file=sys.stderr)
+        ocr_engine = TesseractEngine()
     except ImportError:
-        print("RapidOCR not available, trying alternatives", file=sys.stderr)
-        # Try VietOCR second (Vietnamese specialized, 90-95% accuracy)
+        print("Tesseract not available, trying alternatives", file=sys.stderr)
+        # Fallback 1: VietOCR (Vietnamese specialized)
         try:
             from ocr_engine_vietocr import OCREngine as VietOCREngine
-            print("Trying VietOCR (Vietnamese Transformer-based, 90-95% accuracy)", file=sys.stderr)
+            print("Trying VietOCR (Vietnamese Transformer-based)", file=sys.stderr)
             ocr_engine = VietOCREngine()
         except ImportError:
             print("VietOCR not available, trying alternatives", file=sys.stderr)
-            # Try Tesseract (good accuracy: 85-88%, reliable)
+            # Fallback 2: PaddleOCR (Vietnamese specialized)
             try:
-                from ocr_engine_tesseract import OCREngine
-                print("Using Tesseract OCR", file=sys.stderr)
-                ocr_engine = OCREngine()
+                from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
+                print("Trying PaddleOCR (Vietnamese specialized)", file=sys.stderr)
+                ocr_engine = PaddleOCREngine()
             except ImportError:
-                # Last resort options
+                print("PaddleOCR not available, trying alternatives", file=sys.stderr)
+                # Fallback 3: RapidOCR (only if installed)
                 try:
-                    from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
-                    print("Trying PaddleOCR (Vietnamese specialized, 90-95% accuracy)", file=sys.stderr)
-                    ocr_engine = PaddleOCREngine()
+                    from ocr_engine_rapidocr import OCREngine as RapidOCREngine
+                    print("Trying RapidOCR (optional fallback)", file=sys.stderr)
+                    ocr_engine = RapidOCREngine()
                 except ImportError:
+                    # Last resort: original PaddleOCR wrapper or EasyOCR
                     try:
                         from ocr_engine import OCREngine
                         print("Using PaddleOCR (original)", file=sys.stderr)
@@ -59,7 +61,7 @@ try:
                         from ocr_engine_easyocr import OCREngine
                         print("Using EasyOCR", file=sys.stderr)
                         ocr_engine = OCREngine()
-    
+
     from rule_classifier import RuleClassifier
 except ImportError as e:
     print(json.dumps({

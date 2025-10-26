@@ -244,6 +244,7 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === 'scanner' && (
           <DesktopScanner
+            enginePref={enginePref}
             onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
           />
         )}
@@ -251,12 +252,21 @@ function App() {
           activeTab === `folder-${idx}` && (
             <DesktopScanner
               key={f}
+              enginePref={enginePref}
               initialFolder={f}
               onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
             />
           )
         ))}
-        {activeTab === 'settings' && <Settings />}
+        {activeTab === 'settings' && (
+          <Settings
+            enginePref={enginePref}
+            onChangeEnginePref={async (val) => {
+              setEnginePref(val);
+              if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
+            }}
+          />
+        )}
       </main>
     </div>
   );

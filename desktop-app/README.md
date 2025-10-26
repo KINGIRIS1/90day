@@ -63,6 +63,32 @@ Lệnh này sẽ:
 
 ## 📦 Đóng gói ứng dụng
 
+### 🎁 All-in-One Installer (RECOMMENDED for Windows)
+
+**Tạo installer tự động cài đặt tất cả (Python + Tesseract + App):**
+
+```bash
+# Chạy script kiểm tra prerequisites
+check-prerequisites.bat
+
+# Nếu tất cả OK, build all-in-one installer
+build-allinone.bat
+```
+
+**Output:** `90dayChonThanh-AllInOne-Setup.exe` (~235MB)
+
+**Bao gồm:**
+- ✅ Python 3.11 (tự động cài)
+- ✅ Tesseract OCR với tiếng Việt (tự động cài)
+- ✅ Python packages (tự động cài)
+- ✅ 90dayChonThanh Desktop App
+
+**User chỉ cần:** Double-click → Đợi 5-10 phút → Done!
+
+📖 **Chi tiết:** Xem `BUILD_ALLINONE.md` và `ALLINONE_BUILD_CHECKLIST.md`
+
+---
+
 ### Build cho platform hiện tại
 
 ```bash
@@ -87,6 +113,21 @@ yarn electron-build --mac
 # Linux
 yarn electron-build --linux
 ```
+
+### Build script với menu
+
+```bash
+# Windows
+build.bat
+
+# Linux/macOS
+./build.sh
+```
+
+Chọn option:
+1. Windows installer (.exe)
+2. Portable version (ZIP)
+3. Both
 
 ## 📖 Hướng dẫn sử dụng
 

@@ -5,7 +5,7 @@ import InlineShortCodeEditor from './InlineShortCodeEditor';
 //
 /* Drag-drop removed per user request
 const DraggableItem = ({ id, label }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  // drag-drop removed
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
   };

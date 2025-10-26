@@ -152,6 +152,37 @@ ipcMain.handle('list-subfolders-in-folder', async (event, folderPath) => {
   }
 });
 
+ipcMain.handle('list-folder-tree', async (event, basePath, maxDepth = 5) => {
+  const fs = require('fs');
+  const path = require('path');
+
+  function buildTree(dirPath, depth) {
+    if (depth < 0) return null;
+    let children = [];
+    try {
+      const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+      for (const e of entries) {
+        if (e.isDirectory()) {
+          const childPath = path.join(dirPath, e.name);
+          const node = buildTree(childPath, depth - 1);
+          children.push({ path: childPath, name: e.name, children: node ? node.children : [] });
+        }
+      }
+    } catch (err) {
+      // Ignore permission errors
+    }
+    return { path: dirPath, name: path.basename(dirPath), children };
+  }
+
+  try {
+    const tree = buildTree(basePath, maxDepth);
+    return { success: true, tree };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+
       .filter((e) => e.isFile())
       .filter((e) => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name))
       .map((e) => path.join(folderPath, e.name));

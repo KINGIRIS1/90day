@@ -59,7 +59,7 @@ yarn electron-dev
    - Click **💾 Lưu**
    - Verify: Reload lại rules để xem thay đổi
 
-5. **Test Delete Rule:**
+6. **Test Delete Rule:**
    - Chọn rule vừa edit
    - Click **🗑️ Xóa**
    - Confirm trong dialog

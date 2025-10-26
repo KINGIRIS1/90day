@@ -47,6 +47,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setBackendUrl(url || '');
       const enabled = await api.getConfig('autoFallbackEnabled');
       setAutoFallbackEnabled(!!enabled);
+      const ep = await api.getConfig('enginePreference');
+      setEnginePref(ep || 'offline');
     };
     try { loadConfig(); } catch {}
   }, []);

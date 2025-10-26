@@ -109,15 +109,14 @@ ipcMain.handle('select-folder', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
   });
-  return result.filePaths[0];
+  return result.canceled ? null : (result.filePaths[0] || null);
+});
 
 ipcMain.handle('select-folders', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory', 'multiSelections']
   });
-  return result.filePaths || [];
-});
-
+  return result.canceled ? [] : (result.filePaths || []);
 });
 
 ipcMain.handle('select-files', async () => {

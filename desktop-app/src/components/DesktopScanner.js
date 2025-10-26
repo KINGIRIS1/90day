@@ -181,19 +181,46 @@ const DesktopScanner = () => {
     setComparisons([]);
     setCompareMode(true);
     setProgress({ current: 0, total: selectedFiles.length * 2 }); // x2 vì chạy cả 2 modes
+    setLastKnownType(null); // Reset
 
     const newComparisons = [];
+    let offlineLastKnown = null;
+    let cloudLastKnown = null;
 
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       
       // Process Offline
       setProgress({ current: i * 2 + 1, total: selectedFiles.length * 2 });
-      const offlineResult = await processOffline(file);
+      let offlineResult = await processOffline(file);
+      offlineResult = applySequentialNaming(offlineResult, offlineLastKnown);
+      
+      // Update offline last known
+      if (offlineResult.success && 
+          offlineResult.short_code !== 'UNKNOWN' && 
+          offlineResult.confidence >= 0.3) {
+        offlineLastKnown = {
+          doc_type: offlineResult.doc_type,
+          short_code: offlineResult.short_code,
+          confidence: offlineResult.confidence
+        };
+      }
       
       // Process Cloud Boost
       setProgress({ current: i * 2 + 2, total: selectedFiles.length * 2 });
-      const cloudResult = await processCloudBoost(file);
+      let cloudResult = await processCloudBoost(file);
+      cloudResult = applySequentialNaming(cloudResult, cloudLastKnown);
+      
+      // Update cloud last known
+      if (cloudResult.success && 
+          cloudResult.short_code !== 'UNKNOWN' && 
+          cloudResult.confidence >= 0.3) {
+        cloudLastKnown = {
+          doc_type: cloudResult.doc_type,
+          short_code: cloudResult.short_code,
+          confidence: cloudResult.confidence
+        };
+      }
       
       newComparisons.push({
         fileName: file.name,

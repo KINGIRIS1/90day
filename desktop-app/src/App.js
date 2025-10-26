@@ -80,6 +80,68 @@ import { useMemo } from 'react';
               )}
         {activeTab.startsWith('folder-') && (
           <FolderPicker baseFolder={folders[parseInt(activeTab.replace('folder-',''),10)]}
+const FolderPicker = ({ baseFolder, onConfirm }) => {
+  const [open, setOpen] = useState(false);
+  const [tree, setTree] = useState(null);
+  const [checked, setChecked] = useState({}); // path -> boolean
+
+  const loadTree = async () => {
+    if (!baseFolder) return;
+    const res = await window.electronAPI.listFolderTree(baseFolder, 6);
+    if (res.success) setTree(res.tree);
+  };
+
+  useEffect(() => { setOpen(false); setTree(null); setChecked({}); }, [baseFolder]);
+
+  const toggle = (p) => setChecked(prev => ({ ...prev, [p]: !prev[p] }));
+
+  const collectSelected = (node, acc=[]) => {
+    if (!node) return acc;
+    if (checked[node.path]) acc.push(node.path);
+    if (node.children) node.children.forEach(c => collectSelected(c, acc));
+    return acc;
+  };
+
+  const renderNode = (node, level=0) => {
+    if (!node) return null;
+    return (
+      <div key={node.path} style={{ marginLeft: level * 12 }} className="mb-1">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={!!checked[node.path]} onChange={() => toggle(node.path)} />
+          <span title={node.path}>📁 {node.name}</span>
+        </label>
+        {node.children && node.children.map(child => renderNode(child, level+1))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="mt-2">
+      <button onClick={() => { setOpen(!open); if (!tree) loadTree(); }} className="px-3 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200">
+        {open ? 'Ẩn chọn thư mục con' : 'Chọn thư mục con...'}
+      </button>
+      {open && (
+        <div className="mt-2 p-3 border rounded bg-white max-h-80 overflow-auto">
+          <div className="text-sm text-gray-600 mb-2">Thư mục gốc: {baseFolder}</div>
+          {tree ? renderNode(tree) : <div className="text-sm text-gray-500">Đang tải cây thư mục...</div>}
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              onClick={() => {
+                const selected = collectSelected(tree, []);
+                onConfirm(selected);
+              }}
+              className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            >
+              Thêm vào tab
+            </button>
+            <button onClick={() => setOpen(false)} className="px-3 py-2 bg-gray-200 rounded text-sm hover:bg-gray-300">Đóng</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
             onConfirm={(selected) => {
               const toAdd = selected.filter(fp => !folders.includes(fp));
               if (toAdd.length) setFolders(prev => [...prev, ...toAdd]);

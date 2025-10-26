@@ -516,5 +516,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     </div>
   );
 };
+      {/* Merge report for all child tabs */}
+      {childMergeReport.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="text-xs font-semibold text-green-800 mb-1">Đã lưu PDF:</div>
+          <div className="max-h-28 overflow-auto text-[11px] text-green-900 space-y-1">
+            {childMergeReport.map((ln, i) => (
+              <div key={i} className="truncate" title={ln}>{ln}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
 export default DesktopScanner;

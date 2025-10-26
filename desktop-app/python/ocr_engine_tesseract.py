@@ -27,9 +27,17 @@ class OCREngine:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(OCREngine, cls).__new__(cls)
-            # Set Tesseract path for Windows (if needed)
-            # Uncomment if Tesseract not in PATH:
-            # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+            # Set Tesseract path for Windows
+            # Auto-detect common installation paths
+            import os
+            possible_paths = [
+                r'C:\Program Files\Tesseract-OCR\tesseract.exe',
+                r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe',
+            ]
+            for path in possible_paths:
+                if os.path.exists(path):
+                    pytesseract.pytesseract.tesseract_cmd = path
+                    break
         return cls._instance
     
     def extract_text(self, image_path: str) -> str:

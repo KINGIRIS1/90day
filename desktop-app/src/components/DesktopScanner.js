@@ -580,6 +580,21 @@ const DesktopScanner = () => {
                     </div>
 
                   {!backendUrl && (
+      {/* Preview Modal */}
+      {selectedPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="relative bg-white p-2 rounded shadow-lg max-w-5xl max-h-[90vh]">
+            <button
+              onClick={() => setSelectedPreview(null)}
+              className="absolute -top-10 right-0 text-white text-2xl"
+            >
+              ✕
+            </button>
+            <img src={selectedPreview} alt="preview" className="max-w-[90vw] max-h-[85vh] object-contain" />
+          </div>
+        </div>
+      )}
+
                     <p className="text-xs text-red-600 mt-2">
                       Cần cấu hình Backend URL trong Cài đặt
                     </p>

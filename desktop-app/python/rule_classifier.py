@@ -531,39 +531,51 @@ DOCUMENT_RULES = {
         "keywords": [
             # Có dấu
             "hợp đồng chuyển nhượng", "hợp đồng tặng cho",
-            "chuyển nhượng quyền", "tặng cho quyền",
+            "chuyển nhượng quyền", "tặng cho quyền", "hợp đồng",
             # Không dấu
             "hop dong chuyen nhuong", "hop dong tang cho",
-            "chuyen nhuong quyen", "tang cho quyen"
+            "chuyen nhuong quyen", "tang cho quyen", "hop dong",
+            # Viết hoa
+            "HOP DONG", "CHUYEN NHUONG", "TANG CHO"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.1, "min_matches": 1
     },
     "HDBDG": {
         "keywords": [
             # Có dấu
             "hợp đồng mua bán", "bán đấu giá", "tài sản đấu giá",
+            "hợp đồng", "đấu giá",
             # Không dấu
-            "hop dong mua ban", "ban dau gia", "tai san dau gia"
+            "hop dong mua ban", "ban dau gia", "tai san dau gia",
+            "hop dong", "dau gia",
+            # Viết hoa
+            "HOP DONG MUA BAN", "DAU GIA"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.1, "min_matches": 1
     },
     "HDTHC": {
         "keywords": [
             # Có dấu
             "hợp đồng thế chấp", "thế chấp quyền", "thế chấp đất",
+            "hợp đồng", "thế chấp",
             # Không dấu
-            "hop dong the chap", "the chap quyen", "the chap dat"
+            "hop dong the chap", "the chap quyen", "the chap dat",
+            "hop dong", "the chap",
+            # Viết hoa
+            "HOP DONG THE CHAP", "THE CHAP"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.1, "min_matches": 1
     },
     "HDTCO": {
         "keywords": [
             # Có dấu
-            "hợp đồng thi công", "thi công xây dựng",
+            "hợp đồng thi công", "thi công xây dựng", "hợp đồng", "thi công",
             # Không dấu
-            "hop dong thi cong", "thi cong xay dung"
+            "hop dong thi cong", "thi cong xay dung", "hop dong", "thi cong",
+            # Viết hoa
+            "HOP DONG THI CONG", "THI CONG"
         ],
-        "weight": 0.9, "min_matches": 1
+        "weight": 1.0, "min_matches": 1
     },
     "HDTD": {
         "keywords": [

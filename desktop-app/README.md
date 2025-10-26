@@ -10,7 +10,7 @@
 - ✅ Hoàn toàn miễn phí
 - ✅ Bảo mật: Dữ liệu không rời khỏi máy tính
 - ✅ Độ chính xác: **85-88%**
-- ✅ Sử dụng PaddleOCR + Rule-based classification
+- ✅ Sử dụng Tesseract OCR + Rule-based classification
 
 ### ☁️ Cloud Boost (Tùy chọn)
 - ✅ Độ chính xác cao hơn: **93%+**

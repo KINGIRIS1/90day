@@ -15,7 +15,7 @@
   },
   "build": {
     "appId": "com.90daychonhanh.app",
-    "productName": "Land Document Scanner",
+    "productName": "90dayChonThanh",
     "files": [
       "build/**/*",
       "electron/**/*",

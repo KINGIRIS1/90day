@@ -72,20 +72,20 @@ echo.
 REM Install Python dependencies
 echo [INSTALL] Installing Python dependencies...
 echo.
-echo === Installing PaddleOCR (Vietnamese specialized, 90-95%% accuracy) ===
+echo === Installing VietOCR (Vietnamese Transformer-based, 90-95%% accuracy) ===
 echo This may take 5-10 minutes for first-time installation
-echo Models (~100MB) will be downloaded on first run
+echo Models will be downloaded on first run (~100MB)
 echo.
 cd python
 
-REM Install PaddleOCR (it will auto-install compatible PaddlePaddle)
-echo [1/2] Installing PaddleOCR with Vietnamese support...
-python -m pip install paddleocr --quiet
+REM Install VietOCR (Vietnamese specialized)
+echo [1/2] Installing VietOCR with Transformer model...
+python -m pip install vietocr torch torchvision --quiet
 if %ERRORLEVEL% EQU 0 (
-    echo [OK] PaddleOCR installed successfully
-    echo [SUCCESS] Using PaddleOCR engine - 90-95%% accuracy for Vietnamese!
+    echo [OK] VietOCR installed successfully
+    echo [SUCCESS] Using VietOCR engine - 90-95%% accuracy for Vietnamese!
 ) else (
-    echo [WARN] PaddleOCR installation failed. Will use Tesseract fallback.
+    echo [WARN] VietOCR installation failed. Will use Tesseract fallback.
     echo [INFO] This is OK - Tesseract provides 85-88%% accuracy.
 )
 
@@ -102,10 +102,10 @@ cd ..
 echo [OK] All Python dependencies installed
 echo.
 echo === OCR Engine Info ===
-python -c "try: from paddleocr import PaddleOCR; print('✓ Primary: PaddleOCR (90-95%% accuracy)')" 2>nul || echo "○ Primary: PaddleOCR (not available)"
+python -c "try: from vietocr.tool.predictor import Predictor; print('✓ Primary: VietOCR (90-95%% accuracy - Vietnamese Transformer)')" 2>nul || echo "○ Primary: VietOCR (not available)"
 python -c "try: import pytesseract; print('✓ Fallback: Tesseract (85-88%% accuracy)')" 2>nul || echo "○ Fallback: Tesseract (not available)"
 echo.
-echo [INFO] For PaddleOCR setup help: See PADDLEOCR_SETUP.md
+echo [INFO] For VietOCR setup help: See VIETOCR_SETUP.md
 echo.
 
 echo ======================================

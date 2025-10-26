@@ -363,6 +363,14 @@ File size: ~235 MB
 
 ### Lỗi Khi Build (Developer)
 
+**Lỗi: "can't open file icon.ico"**
+```
+Fix:
+1. Icon là optional - đã được comment trong installer.nsi
+2. Installer sẽ dùng icon mặc định của NSIS
+3. Nếu muốn custom icon, xem file ICON_GUIDE.md
+```
+
 **Lỗi: "NSIS not found"**
 ```
 Fix:

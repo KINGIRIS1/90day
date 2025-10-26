@@ -29,41 +29,50 @@
       {
         "from": "python",
         "to": "python",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "assets/icon.png"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "icon": "assets/icon.icns"
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "icon": "assets/icon.png",
       "category": "Utility"
     }
   },
   "dependencies": {
+    "axios": "^1.3.2",
+    "date-fns": "^2.29.3",
+    "electron-store": "^8.1.0",
+    "lucide-react": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
-    "axios": "^1.3.2",
-    "date-fns": "^2.29.3",
-    "lucide-react": "latest",
-    "tailwindcss": "^3.4.1",
-    "electron-store": "^8.1.0"
+    "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
-    "react-scripts": "5.0.1",
+    "autoprefixer": "^10.4.14",
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
-    "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.21"
+    "postcss": "^8.4.21",
+    "react-scripts": "5.0.1",
+    "wait-on": "^7.2.0"
   },
   "browserslist": {
     "production": [

@@ -594,6 +594,32 @@ const DesktopScanner = () => {
                         <div className="flex items-center space-x-2">
                           <span className="text-gray-600 text-sm">Tên file:</span>
                           <span className="text-sm font-medium break-all">{result.fileName}</span>
+      {/* Ordering Panel (Drag & Drop) */}
+      {orderingOpen && (
+        <ManualOrderPanel
+          onClose={() => setOrderingOpen(false)}
+          orderByShortCode={orderByShortCode}
+          results={results}
+          onApply={(newOrderMap) => setOrderByShortCode(newOrderMap)}
+          onMerge={async (shortCode, orderedFilePaths) => {
+            const payload = orderedFilePaths.map(fp => ({ filePath: fp, short_code: shortCode }));
+            const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
+            const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+            alert(`Gộp nhóm ${shortCode} xong. Thành công: ${okCount}/${(merged || []).length}.`);
+          }}
+          onMergeAll={async (newOrderMap) => {
+            // Flatten to payload preserving new order per group
+            const payload = [];
+            Object.entries(newOrderMap).forEach(([sc, arr]) => {
+              arr.forEach(fp => payload.push({ filePath: fp, short_code: sc }));
+            });
+            const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
+            const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+            alert(`Gộp tất cả nhóm xong. Thành công: ${okCount}/${(merged || []).length}.`);
+          }}
+        />
+      )}
+
                         </div>
                         <RenameInline oldPath={result.filePath} currentName={result.fileName} onRenamed={(newName, newPath)=>{
                           // Update state after rename

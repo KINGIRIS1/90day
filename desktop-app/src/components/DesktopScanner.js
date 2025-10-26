@@ -123,8 +123,10 @@ const DesktopScanner = () => {
     setResults([]);
     setComparisons([]);
     setProgress({ current: 0, total: selectedFiles.length });
+    setLastKnownType(null); // Reset at start of new batch
 
     const newResults = [];
+    let currentLastKnown = null;
 
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
@@ -137,10 +139,25 @@ const DesktopScanner = () => {
         result = await processOffline(file);
       }
 
+      // Apply sequential naming logic
+      const processedResult = applySequentialNaming(result, currentLastKnown);
+      
+      // Update last known type if this result is valid (not UNKNOWN)
+      if (processedResult.success && 
+          processedResult.short_code !== 'UNKNOWN' && 
+          processedResult.confidence >= 0.3) {
+        currentLastKnown = {
+          doc_type: processedResult.doc_type,
+          short_code: processedResult.short_code,
+          confidence: processedResult.confidence
+        };
+        setLastKnownType(currentLastKnown);
+      }
+
       newResults.push({
         fileName: file.name,
         filePath: file.path,
-        ...result
+        ...processedResult
       });
     }
 

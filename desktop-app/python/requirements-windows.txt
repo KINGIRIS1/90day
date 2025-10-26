@@ -1,11 +1,9 @@
 # Desktop App - Windows Version
-# Option 1: VietOCR (RECOMMENDED - 90-95% accuracy, Vietnamese specialized)
-vietocr
-torch>=1.9.0
-torchvision>=0.10.0
+# Option 1: RapidOCR (RECOMMENDED - Fast + Accurate + Clean)
+rapidocr-onnxruntime
 Pillow>=10.0.0
 
-# Option 2: Tesseract (FALLBACK - 85-88% accuracy, fastest)
+# Option 2: Tesseract (FALLBACK - reliable, 85-88% accuracy)
 pytesseract>=0.3.10
 # Note: Tesseract binary needs to be installed separately
 # Download from: https://github.com/UB-Mannheim/tesseract/wiki

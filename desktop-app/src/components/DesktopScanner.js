@@ -10,6 +10,8 @@ const DesktopScanner = () => {
   const [backendUrl, setBackendUrl] = useState('');
   const [compareMode, setCompareMode] = useState(false);
   const [comparisons, setComparisons] = useState([]);
+  const [selectedPreview, setSelectedPreview] = useState(null);
+
   const [lastKnownType, setLastKnownType] = useState(null); // Track last known doc type
   const [autoFallbackEnabled, setAutoFallbackEnabled] = useState(false);
   const [confirmFallbackOpen, setConfirmFallbackOpen] = useState(false);

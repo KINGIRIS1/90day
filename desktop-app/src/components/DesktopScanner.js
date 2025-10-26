@@ -446,6 +446,16 @@ const DesktopScanner = () => {
           >
             <span>📁</span>
             <span>Chọn file</span>
+                        {/* Zoomable preview */}
+                        {result.previewUrl && (
+                          <button
+                            onClick={() => setSelectedPreview(result.previewUrl)}
+                            className="mt-1 text-xs text-blue-600 hover:underline"
+                          >
+                            Phóng to ảnh
+                          </button>
+                        )}
+
           </button>
           <button
             onClick={handleSelectFolder}

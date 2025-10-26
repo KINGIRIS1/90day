@@ -17,7 +17,7 @@ import base64
 class FolderScanTester:
     def __init__(self):
         # Use the backend URL from frontend/.env
-        self.base_url = "https://vietdoc-ocr.preview.emergentagent.com/api"
+        self.base_url = "https://docscan-desktop.preview.emergentagent.com/api"
         self.admin_token = None
         self.tests_run = 0
         self.tests_passed = 0

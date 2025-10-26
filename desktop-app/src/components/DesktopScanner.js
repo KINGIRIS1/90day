@@ -69,7 +69,8 @@ const DesktopScanner = () => {
       return {
         success: false,
         error: 'Chưa cấu hình Backend URL. Vui lòng vào phần Cài đặt.',
-        method: 'cloud_boost_failed'
+        method: 'cloud_boost_failed',
+        errorType: 'CONFIG'
       };
     }
 
@@ -81,7 +82,8 @@ const DesktopScanner = () => {
       return {
         success: false,
         error: error.message,
-        method: 'cloud_boost_failed'
+        method: 'cloud_boost_failed',
+        errorType: 'OTHER'
       };
     }
   };

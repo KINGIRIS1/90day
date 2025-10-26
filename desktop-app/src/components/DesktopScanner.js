@@ -366,58 +366,32 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
       {/* Processing Options */}
       {selectedFiles.length > 0 && !processing && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Chọn phương thức xử lý</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Offline OCR Option */}
-            <button
-              onClick={() => handleProcessFiles(false)}
-              className="p-6 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all text-left group"
-            >
-              <div className="flex items-start space-x-3">
-                <div className="text-3xl">🔵</div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">Offline OCR + Rules</h3>
-                  <p className="text-sm text-gray-600 mb-2">Xử lý hoàn toàn offline, không tốn chi phí</p>
-                  {autoFallbackEnabled && (
-                    <p className="text-xs text-purple-700 mt-2">Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)</p>
-                  )}
-                </div>
-              </div>
-            </button>
-
-            {/* Cloud Boost Option */}
-            <button
-              onClick={() => handleProcessFiles(true)}
-              disabled={!backendUrl}
-              className="p-6 border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <div className="flex items-start space-x-3">
-                <div className="text-3xl">☁️</div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">Cloud Boost (GPT-4)</h3>
-                  <p className="text-sm text-gray-600 mb-2">Sử dụng AI để độ chính xác cao hơn</p>
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center text-purple-600">
-                      <span className="mr-1">✓</span>
-                      <span>Độ chính xác: 93%+</span>
-                    </div>
-                    <div className="flex items-center text-orange-600">
-                      <span className="mr-1">⚠</span>
-                      <span>Có phí (theo API usage)</span>
-                    </div>
-                    <div className="flex items-center text-orange-600">
-                      <span className="mr-1">⚠</span>
-                      <span>Cần kết nối internet</span>
-                    </div>
-                  </div>
-                  {!backendUrl && (
-                    <p className="text-xs text-red-600 mt-2">Cần cấu hình Backend URL trong Cài đặt</p>
-                  )}
-                </div>
-              </div>
-            </button>
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold text-gray-800">Chọn phương thức xử lý</div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleProcessFiles(false)}
+                className="px-3 py-2 text-sm border rounded-md hover:bg-blue-50 flex items-center gap-2"
+                title="Offline OCR + Rules (miễn phí)"
+              >
+                <span>🔵</span>
+                <span>Offline</span>
+              </button>
+              <button
+                onClick={() => handleProcessFiles(true)}
+                disabled={!backendUrl}
+                className="px-3 py-2 text-sm border rounded-md hover:bg-purple-50 disabled:opacity-50 flex items-center gap-2"
+                title="Cloud Boost (GPT-4)"
+              >
+                <span>☁️</span>
+                <span>Cloud</span>
+              </button>
+            </div>
           </div>
+          {autoFallbackEnabled && (
+            <div className="mt-2 text-xs text-purple-700">Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)</div>
+          )}
         </div>
       )}
 

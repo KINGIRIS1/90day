@@ -103,11 +103,12 @@ def main():
         print(json.dumps({
             "error": f"File not found: {file_path}",
             "success": False
-        }))
+        }, ensure_ascii=True))
         sys.exit(1)
     
     result = process_document(file_path)
-    print(json.dumps(result, ensure_ascii=False))
+    # Use ensure_ascii=True to avoid Windows encoding issues
+    print(json.dumps(result, ensure_ascii=True))
     
     sys.exit(0 if result.get('success') else 1)
 

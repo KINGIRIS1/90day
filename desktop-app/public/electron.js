@@ -66,15 +66,22 @@ function createWindow() {
 // Helper function to get Python path
 function getPythonPath() {
   if (isDev) {
-    // Development mode - try different Python commands based on platform
+    // Development mode - use system Python
     if (process.platform === 'win32') {
       return 'py'; // Windows py launcher
     } else {
       return 'python3'; // Linux/Mac
     }
   } else {
-    // Production mode
-    return path.join(process.resourcesPath, 'python', 'python3');
+    // Production mode - use system Python
+    // User must have Python installed
+    if (process.platform === 'win32') {
+      return 'python'; // Windows: python or py
+    } else if (process.platform === 'darwin') {
+      return 'python3'; // macOS
+    } else {
+      return 'python3'; // Linux
+    }
   }
 }
 

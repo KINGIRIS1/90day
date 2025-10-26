@@ -305,6 +305,13 @@ const RulesManager = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-2">
           <button
+            onClick={startAddNew}
+            disabled={loading}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          >
+            ➕ Thêm Rule Mới
+          </button>
+          <button
             onClick={loadRules}
             disabled={loading}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"

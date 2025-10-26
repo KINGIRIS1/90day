@@ -658,9 +658,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setOrderingOpen(true)}
-                className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                className="hidden"
               >
-                🧩 Sắp xếp thứ tự thủ công (drag‑drop)
+                
               </button>
               <button
                 onClick={async () => {

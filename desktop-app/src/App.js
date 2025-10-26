@@ -125,7 +125,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <img src="/brand-icon.png" alt="90dayChonThanh" className="w-10 h-10 rounded-lg object-cover" />
+              <img src="/brand-icon.png" alt="90dayChonThanh" className="w-8 h-8 rounded-lg object-cover" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">90dayChonThanh</h1>
                 <p className="text-xs text-gray-500">Desktop App - Offline First</p>

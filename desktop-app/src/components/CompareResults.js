@@ -49,6 +49,18 @@ const CompareResults = ({ offlineResult, cloudResult, fileName }) => {
             <div className="text-xs text-gray-500 mt-2">
               {offlineResult.accuracy_estimate}
             </div>
+            
+            {/* OCR Text Debug */}
+            {offlineResult.original_text && (
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs text-blue-600 hover:underline">
+                  🔍 Xem text OCR
+                </summary>
+                <div className="mt-1 p-2 bg-gray-50 border rounded text-xs max-h-24 overflow-y-auto">
+                  {offlineResult.original_text}
+                </div>
+              </details>
+            )}
           </div>
         </div>
 
@@ -73,6 +85,18 @@ const CompareResults = ({ offlineResult, cloudResult, fileName }) => {
             <div className="text-xs text-gray-500 mt-2">
               {cloudResult.accuracy_estimate}
             </div>
+            
+            {/* GPT Analysis Debug */}
+            {cloudResult.reasoning && (
+              <details className="mt-2">
+                <summary className="cursor-pointer text-xs text-purple-600 hover:underline">
+                  💡 Phân tích GPT-4
+                </summary>
+                <div className="mt-1 p-2 bg-gray-50 border rounded text-xs max-h-24 overflow-y-auto">
+                  {cloudResult.reasoning}
+                </div>
+              </details>
+            )}
           </div>
         </div>
       </div>

@@ -1,74 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
-
-//
-/* Drag-drop removed per user request
-const RenameInline = ({ oldPath, currentName, onRenamed }) => {
-  const [editing, setEditing] = useState(false);
-  const [baseName, setBaseName] = useState(currentName.replace(/\.[^/.]+$/, ''));
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-
-  const onSave = async () => {
-    setSaving(true);
-    setError('');
-    try {
-      const res = await window.electronAPI.renameFile(oldPath, baseName);
-      if (res.success) {
-        const newPathParts = res.newPath.split(/[\\\/]/);
-        const newName = newPathParts[newPathParts.length - 1];
-        onRenamed(newName, res.newPath);
-  const [density, setDensity] = useState('high'); // low=3, medium=4, high=5
-  const gridColsClass = density === 'high' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5' : density === 'low' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
-
-        setEditing(false);
-      } else {
-        setError(res.error || 'Đổi tên thất bại');
-      }
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="mt-2 p-2 border rounded bg-gray-50">
-      {!editing ? (
-        <button
-          onClick={() => setEditing(true)}
-          className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
-        >
-          ✏️ Chỉnh sửa tên
-        </button>
-      ) : (
-        <div className="flex items-center space-x-2">
-          <input
-            className="px-2 py-1 text-sm border rounded flex-1"
-            value={baseName}
-            onChange={(e) => setBaseName(e.target.value)}
-          />
-          <button
-            disabled={saving}
-            onClick={onSave}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            Lưu
-          </button>
-          <button
-            disabled={saving}
-            onClick={() => { setEditing(false); setBaseName(currentName.replace(/\.[^/.]+$/, '')); setError(''); }}
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-          >
-            Hủy
-          </button>
-        </div>
-      )}
-      {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
-    </div>
-  );
-};
 
 const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -79,10 +11,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [compareMode, setCompareMode] = useState(false);
   const [comparisons, setComparisons] = useState([]);
   const [selectedPreview, setSelectedPreview] = useState(null);
-  const [lastKnownType, setLastKnownType] = useState(null); // Track last known doc type
+  const [lastKnownType, setLastKnownType] = useState(null);
   const [autoFallbackEnabled, setAutoFallbackEnabled] = useState(false);
-  const [orderingOpen, setOrderingOpen] = useState(false);
-  const [orderByShortCode, setOrderByShortCode] = useState({}); // { SHORT: [filePath,...] }
+
+  // Grid density: low=3, medium=4, high=5 (default high per demo)
+  const [density, setDensity] = useState('high');
+  const gridColsClass = density === 'high'
+    ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+    : density === 'low'
+    ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
+    : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
   // Load backend URL and settings from config
   useEffect(() => {
@@ -93,7 +31,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setAutoFallbackEnabled(!!enabled);
     };
     loadConfig();
-  // Auto load and process when initialFolder is provided
+  }, []);
+
+  // Auto load and process when initialFolder is provided (for folder tabs)
   useEffect(() => {
     const autoLoad = async () => {
       if (initialFolder) {
@@ -111,9 +51,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     };
     autoLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialFolder]);
-
-  }, []);
 
   const handleSelectFiles = async () => {
     try {
@@ -134,22 +73,30 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
+  const loadFolderLocally = async (folderPath) => {
+    const res = await window.electronAPI.listFilesInFolder(folderPath);
+    if (res.success) {
+      const files = res.files.map(path => ({
+        path,
+        name: path.split(/[\\\/]/).pop(),
+        processed: false,
+        result: null
+      }));
+      setSelectedFiles(files);
+      setResults([]);
+    } else {
+      alert('Không đọc được thư mục: ' + res.error);
+    }
+  };
+
   const handleSelectFolder = async () => {
     try {
       const folderPath = await window.electronAPI.selectFolder();
       if (folderPath) {
-        const res = await window.electronAPI.listFilesInFolder(folderPath);
-        if (res.success) {
-          const files = res.files.map(path => ({
-            path,
-            name: path.split(/[\\\/]/).pop(),
-            processed: false,
-            result: null
-          }));
-          setSelectedFiles(files);
-          setResults([]);
+        if (onDisplayFolder) {
+          onDisplayFolder(folderPath);
         } else {
-          alert('Không đọc được thư mục: ' + res.error);
+          await loadFolderLocally(folderPath);
         }
       }
     } catch (error) {
@@ -182,7 +129,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
 
     try {
-      // Call Electron IPC to process with cloud
       const result = await window.electronAPI.processDocumentCloud(file.path);
       return result;
     } catch (error) {
@@ -196,15 +142,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   const applySequentialNaming = (result, lastType) => {
-    if (result.success && 
-        (result.short_code === 'UNKNOWN' || result.confidence < 0.3) && 
-        lastType) {
-      // Apply last known type
+    if (result.success && (result.short_code === 'UNKNOWN' || result.confidence < 0.3) && lastType) {
       return {
         ...result,
         doc_type: lastType.doc_type,
         short_code: lastType.short_code,
-        confidence: lastType.confidence * 0.9, // Slightly reduce confidence
+        confidence: lastType.confidence * 0.9,
         original_confidence: result.confidence,
         applied_sequential_logic: true,
         note: `Trang tiếp theo của ${lastType.short_code}`
@@ -223,11 +166,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     setResults([]);
     setComparisons([]);
     setProgress({ current: 0, total: selectedFiles.length });
-    setLastKnownType(null); // Reset at start of new batch
+    setLastKnownType(null);
 
     const newResults = [];
     let currentLastKnown = null;
-    const groupMap = {}; // short_code -> [filePath,...]
 
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
@@ -236,7 +178,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       let result;
       if (useCloudBoost) {
         result = await processCloudBoost(file);
-        // Fallback if cloud failed and setting enabled
         if (!result.success && autoFallbackEnabled && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
           const userConfirmed = window.confirm(`Cloud lỗi: ${result.error || result.errorType}. Bạn có muốn chuyển sang Offline (Tesseract) cho file "${file.name}" không?`);
           if (userConfirmed) {
@@ -247,10 +188,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         result = await processOffline(file);
       }
 
-      // Apply sequential naming logic
       const processedResult = applySequentialNaming(result, currentLastKnown);
 
-      // Update last known type if valid
       if (processedResult.success && processedResult.short_code !== 'UNKNOWN' && processedResult.confidence >= 0.3) {
         currentLastKnown = {
           doc_type: processedResult.doc_type,
@@ -259,45 +198,33 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
 
-      // Build preview for image/pdf
-      const displayName = file.name;
+      // Build preview (prefer data URL for Windows)
       let previewUrl = null;
       try {
         const toFileUrl = (p) => {
-          if (/^[A-Za-z]:\\/.test(p)) {
-            return 'file:///' + p.replace(/\\/g, '/');
+          if (/^[A-Za-z]:\\\\/.test(p)) {
+            return 'file:///' + p.replace(/\\\\/g, '/');
           }
           return 'file://' + p;
         };
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
-          // Try data URL to avoid file protocol/security issues
           previewUrl = await window.electronAPI.readImageDataUrl(file.path);
-          if (!previewUrl) {
-            previewUrl = toFileUrl(file.path);
-          }
+          if (!previewUrl) previewUrl = toFileUrl(file.path);
         } else if (/\.pdf$/i.test(file.name)) {
           previewUrl = null;
         }
       } catch {}
 
-      // Build order map
-      if (processedResult.success && processedResult.short_code) {
-        const sc = processedResult.short_code;
-        if (!groupMap[sc]) groupMap[sc] = [];
-        groupMap[sc].push(file.path);
-      }
-
       newResults.push({
-        fileName: displayName,
+        fileName: file.name,
         filePath: file.path,
         previewUrl,
-        isPdf: /\.pdf$/i.test(displayName),
+        isPdf: /\.pdf$/i.test(file.name),
         ...processedResult
       });
     }
 
     setResults(newResults);
-    setOrderByShortCode(groupMap);
     setProcessing(false);
   };
 
@@ -326,7 +253,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
 
-      // Offline
       setProgress({ current: i * 2 + 1, total: selectedFiles.length * 2 });
       let offlineResult = await processOffline(file);
       offlineResult = applySequentialNaming(offlineResult, offlineLastKnown);
@@ -338,7 +264,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
 
-      // Cloud
       setProgress({ current: i * 2 + 2, total: selectedFiles.length * 2 });
       let cloudResult = await processCloudBoost(file);
       cloudResult = applySequentialNaming(cloudResult, cloudLastKnown);
@@ -405,13 +330,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <span>Chọn file</span>
           </button>
           <button
-            onClick={async () => {
-              const folderPath = await window.electronAPI.selectFolder();
-              if (folderPath) {
-                if (onDisplayFolder) onDisplayFolder(folderPath);
-                else await handleSelectFolder();
-              }
-            }}
+            onClick={handleSelectFolder}
             disabled={processing}
             className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
@@ -432,38 +351,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <span>Chọn nhiều thư mục</span>
           </button>
         </div>
-
-        {selectedFiles.length > 0 && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 mb-2">
-              Đã chọn <span className="font-semibold">{selectedFiles.length}</span> file
-            </p>
-            <div className="max-h-32 overflow-y-auto space-y-1">
-              {selectedFiles.map((file, idx) => (
-                <div key={idx} className="text-xs text-gray-500 truncate">
-                  {file.name}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Process Folder Now toggle */}
-        {selectedFiles.length > 0 && (
-          <div className="mt-3 p-3 bg-gray-50 border rounded">
-            <label className="inline-flex items-center space-x-2 text-sm">
-              <input
-                type="checkbox"
-                onChange={async (e) => {
-                  if (e.target.checked) {
-                    await handleProcessFiles(false);
-                  }
-                }}
-              />
-              <span>Tự động xử lý ngay sau khi chọn thư mục (Process Folder Now)</span>
-            </label>
-          </div>
-        )}
       </div>
 
       {/* Processing Options */}
@@ -479,31 +366,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               <div className="flex items-start space-x-3">
                 <div className="text-3xl">🔵</div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    Offline OCR + Rules
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Xử lý hoàn toàn offline, không tốn chi phí
-                  </p>
+                  <h3 className="font-semibold text-gray-900 mb-1">Offline OCR + Rules</h3>
+                  <p className="text-sm text-gray-600 mb-2">Xử lý hoàn toàn offline, không tốn chi phí</p>
                   {autoFallbackEnabled && (
-                    <p className="text-xs text-purple-700 mt-2">
-                      Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)
-                    </p>
+                    <p className="text-xs text-purple-700 mt-2">Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)</p>
                   )}
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center text-green-600">
-                      <span className="mr-1">✓</span>
-                      <span>Độ chính xác: 85-88%</span>
-                    </div>
-                    <div className="flex items-center text-green-600">
-                      <span className="mr-1">✓</span>
-                      <span>Hoàn toàn miễn phí</span>
-                    </div>
-                    <div className="flex items-center text-green-600">
-                      <span className="mr-1">✓</span>
-                      <span>Bảo mật: Dữ liệu ở local</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </button>
@@ -517,12 +384,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               <div className="flex items-start space-x-3">
                 <div className="text-3xl">☁️</div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">
-                    Cloud Boost (GPT-4)
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Sử dụng AI để độ chính xác cao hơn
-                  </p>
+                  <h3 className="font-semibold text-gray-900 mb-1">Cloud Boost (GPT-4)</h3>
+                  <p className="text-sm text-gray-600 mb-2">Sử dụng AI để độ chính xác cao hơn</p>
                   <div className="space-y-1 text-xs">
                     <div className="flex items-center text-purple-600">
                       <span className="mr-1">✓</span>
@@ -538,9 +401,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                     </div>
                   </div>
                   {!backendUrl && (
-                    <p className="text-xs text-red-600 mt-2">
-                      Cần cấu hình Backend URL trong Cài đặt
-                    </p>
+                    <p className="text-xs text-red-600 mt-2">Cần cấu hình Backend URL trong Cài đặt</p>
                   )}
                 </div>
               </div>
@@ -554,38 +415,30 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-3 mb-4">
             <div className="processing-indicator">⚙️</div>
-            <span className="text-gray-700 font-medium">
-              Đang xử lý... ({progress.current}/{progress.total})
-            </span>
+            <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
-              style={{ width: `${(progress.current / progress.total) * 100}%` }}
-            />
+            <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${(progress.current / progress.total) * 100}%` }} />
           </div>
         </div>
       )}
 
-      {/* Merge and Ordering Controls */}
+      {/* Results */}
       {results.length > 0 && (
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-gray-600">Mật độ:</label>
-              <select
-                value={density}
-                onChange={(e) => setDensity(e.target.value)}
-                className="text-xs border rounded px-2 py-1"
-              >
-                <option value="high">Cao (5 cột)</option>
-                <option value="medium">Trung bình (4 cột)</option>
-                <option value="low">Thấp (3 cột)</option>
-              </select>
-            </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Kết quả ({results.length} tài liệu)</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              {/* Density switch */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">Mật độ:</label>
+                <select value={density} onChange={(e) => setDensity(e.target.value)} className="text-xs border rounded px-2 py-1">
+                  <option value="high">Cao (5 cột)</option>
+                  <option value="medium">Trung bình (4 cột)</option>
+                  <option value="low">Thấp (3 cột)</option>
+                </select>
+              </div>
+
               <button
                 onClick={async () => {
                   const payload = results
@@ -606,47 +459,45 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             </div>
           </div>
 
-          <div className="space-y-4">
-            {/* Grid view for results */}
-            <div className={`grid gap-3 ${gridColsClass}`}>
-              {results.map((result, idx) => (
-                <div key={idx} className="p-3 border rounded-lg bg-white">
-                  <div className="mb-2">
-                    {result.previewUrl ? (
-                      <img src={result.previewUrl} alt={result.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
-                    ) : (
-                      <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
-                        {result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
-                  <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                    {getMethodBadge(result.method)}
-                    <span className="ml-auto font-semibold">{(result.confidence * 100).toFixed(0)}%</span>
-                  </div>
-                  <div className="mt-2 text-xs text-gray-600">
-                    <div>Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
-                  </div>
-
-                  {/* Inline short_code rename (not filesystem) */}
-                  <div className="mt-2 p-2 bg-gray-50 border rounded">
-                    <InlineShortCodeEditor
-                      value={result.short_code}
-                      onChange={(newCode) => {
-                        setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r));
-                      }}
-                    />
-                  </div>
-
-                  {result.previewUrl && (
-                    <button onClick={() => setSelectedPreview(result.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">
-                      Phóng to ảnh
-                    </button>
+          {/* Grid view */}
+          <div className={`grid gap-3 ${gridColsClass}`}>
+            {results.map((result, idx) => (
+              <div key={idx} className="p-3 border rounded-lg bg-white">
+                <div className="mb-2">
+                  {result.previewUrl ? (
+                    <img src={result.previewUrl} alt={result.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
+                  ) : (
+                    <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
+                      {result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
+                <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
+                <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                  {getMethodBadge(result.method)}
+                  <span className="ml-auto font-semibold">{(result.confidence * 100).toFixed(0)}%</span>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  <div>Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
+                </div>
+
+                {/* Inline short_code rename (not filesystem) */}
+                <div className="mt-2 p-2 bg-gray-50 border rounded">
+                  <InlineShortCodeEditor
+                    value={result.short_code}
+                    onChange={(newCode) => {
+                      setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r));
+                    }}
+                  />
+                </div>
+
+                {result.previewUrl && (
+                  <button onClick={() => setSelectedPreview(result.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">
+                    Phóng to ảnh
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}

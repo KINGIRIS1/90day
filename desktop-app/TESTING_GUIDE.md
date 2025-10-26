@@ -70,17 +70,17 @@ yarn electron-dev
    - Chọn nơi lưu file
    - Verify: Mở file JSON để xem nội dung
 
-7. **Test Import:**
+8. **Test Import:**
    - Click **📥 Import (Merge)**
    - Chọn file JSON vừa export
    - Verify: Rules được load lại
 
-8. **Test Reset:**
+9. **Test Reset:**
    - Click **🔄 Reset Tất Cả**
    - Confirm trong dialog
    - Verify: Tất cả rules về mặc định
 
-9. **Test Open Folder:**
+10. **Test Open Folder:**
    - Click **📁 Mở Folder**
    - Verify: File explorer mở thư mục `~/.90daychonhanh/`
 

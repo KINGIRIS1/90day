@@ -177,6 +177,24 @@ A: Hiện tại chưa hỗ trợ thêm loại mới từ UI. Có thể edit file
 
 ## Ví dụ Thực Tế
 
+### Tạo rule cho loại tài liệu mới: "Hợp đồng Mua Bán"
+
+1. Click **➕ Thêm Rule Mới**
+2. Điền thông tin:
+   - **Mã:** HDMB
+   - **Weight:** 1.1
+   - **Min Matches:** 2
+   - **Keywords:** (thêm từng cái)
+     - "hợp đồng mua bán"
+     - "hop dong mua ban"
+     - "HOP DONG MUA BAN"
+     - "người mua"
+     - "người bán"
+     - "bên a"
+     - "bên b"
+3. Click **💾 Tạo Rule**
+4. Test bằng cách scan một ảnh hợp đồng mua bán
+
 ### Tăng độ chính xác cho GCNM
 
 1. Mở rule **GCNM**

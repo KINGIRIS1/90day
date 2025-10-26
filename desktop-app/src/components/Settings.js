@@ -1,4 +1,41 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
+const EnginePreferenceSetting = () => {
+  const [engine, setEngine] = useState('offline'); // 'offline' | 'cloud'
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const val = await window.electronAPI.getConfig('enginePreference');
+      setEngine(val || 'offline');
+    })();
+  }, []);
+
+  const save = async (val) => {
+    setEngine(val);
+    await window.electronAPI.setConfig('enginePreference', val);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="radio" name="enginePref" checked={engine === 'offline'} onChange={() => save('offline')} />
+          Offline (Tesseract)
+        </label>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="radio" name="enginePref" checked={engine === 'cloud'} onChange={() => save('cloud')} />
+          Cloud (GPT‑4)
+        </label>
+      </div>
+      {saved && <div className="text-xs text-green-700">✓ Đã lưu</div>}
+    </div>
+  );
+};
+
 
 const AutoFallbackSetting = () => {
   const [enabled, setEnabled] = useState(false);

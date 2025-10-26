@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // PDF merge
   mergeByShortCode: (items, options) => ipcRenderer.invoke('merge-by-short-code', items, options),
   chooseSavePath: (defaultName) => ipcRenderer.invoke('choose-save-path', defaultName),
+  readImageDataUrl: (filePath) => ipcRenderer.invoke('read-image-data-url', filePath),
 
   setBackendUrl: (url) => ipcRenderer.invoke('set-backend-url', url),
   

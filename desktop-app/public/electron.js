@@ -85,6 +85,17 @@ function getPythonPath() {
   }
 }
 
+// Helper function to get Python script path
+function getPythonScriptPath(scriptName) {
+  if (isDev) {
+    // Development mode - scripts in ../python/
+    return path.join(__dirname, '../python', scriptName);
+  } else {
+    // Production mode - scripts in resources/python/
+    return path.join(process.resourcesPath, 'python', scriptName);
+  }
+}
+
 // Initialize Python OCR engine
 function initPythonEngine() {
   const pythonPath = isDev

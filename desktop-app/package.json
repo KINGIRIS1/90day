@@ -1,5 +1,5 @@
 {
-  "name": "land-doc-scanner-desktop",
+  "name": "90daychonhanh-desktop",
   "version": "1.0.0",
   "description": "Desktop app for land document scanning with offline OCR and optional cloud boost",
   "main": "electron/main.js",

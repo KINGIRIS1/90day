@@ -18,7 +18,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   const [selectedPreview, setSelectedPreview] = useState(null);
   const [lastKnownType, setLastKnownType] = useState(null);
   const [autoFallbackEnabled, setAutoFallbackEnabled] = useState(false);
-  const [enginePref, setEnginePref] = useState('offline');
+  const [enginePref, setEnginePref] = useState(enginePrefProp || 'offline');
 
   // Grid density: low=3, medium=4, high=5
   const [density, setDensity] = useState('high');

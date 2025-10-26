@@ -452,6 +452,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               >
                 📚 Gộp tất cả tab con
               </button>
+      {/* Engine banner */}
+      <div className="bg-white rounded-lg shadow-sm p-3">
+        <div className="flex items-center justify-between text-sm">
+          <div>
+            <span className="text-gray-600">Phương thức quét hiện tại:</span>{' '}
+            {enginePref === 'cloud' ? (
+              <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">☁️ Cloud (GPT‑4)</span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-700">🔵 Offline (Tesseract)</span>
+            )}
+          </div>
+          <div className="text-xs text-gray-500">Có thể thay đổi trong Cài đặt → Tuỳ chọn Engine toàn cục</div>
+        </div>
+      </div>
+
             </div>
           </div>
           <div className="mt-3">

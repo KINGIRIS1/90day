@@ -4,6 +4,8 @@ import DesktopScanner from './components/DesktopScanner';
 import Settings from './components/Settings';
 
 function App() {
+import { useMemo } from 'react';
+
   const [activeTab, setActiveTab] = useState('scanner');
   const [isElectron, setIsElectron] = useState(false);
 

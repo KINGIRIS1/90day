@@ -476,6 +476,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             <h2 className="text-lg font-semibold text-gray-900">Kết quả ({results.length} tài liệu)</h2>
             <div className="flex items-center gap-3">
               {/* Density switch */}
+          <button
+            onClick={handleSelectParentFolder}
+            disabled={processing}
+            className="flex items-center space-x-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            <span>🗃️</span>
+            <span>Chọn thư mục LỚN</span>
+          </button>
+
               <div className="flex items-center gap-2">
                 <label className="text-xs text-gray-600">Mật độ:</label>
                 <select value={density} onChange={(e) => setDensity(e.target.value)} className="text-xs border rounded px-2 py-1">

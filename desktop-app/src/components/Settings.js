@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const EnginePreferenceSetting = ({ enginePref: propPref, onChangeEnginePref }) => {
-  const [engine, setEngine] = useState('offline'); // 'offline' | 'cloud'
+  const [engine, setEngine] = useState(propPref || 'offline'); // 'offline' | 'cloud'
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {

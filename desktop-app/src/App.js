@@ -58,6 +58,25 @@ import { useMemo } from 'react';
               >
                 📄 Quét tài liệu
               </button>
+              {/* Quick add subfolders of current folder to tabs */}
+              {activeTab.startsWith('folder-') && (
+                <button
+                  onClick={async () => {
+                    const idx = parseInt(activeTab.replace('folder-', ''), 10);
+                    const base = folders[idx];
+                    if (!base) return;
+                    const res = await window.electronAPI.listSubfoldersInFolder(base);
+                    if (res.success && res.folders?.length) {
+                      const toAdd = res.folders.filter(fp => !folders.includes(fp));
+                      if (toAdd.length) setFolders(prev => [...prev, ...toAdd]);
+                    }
+                  }}
+                  className="ml-2 px-3 py-2 rounded-md text-sm bg-gray-200 hover:bg-gray-300"
+                >
+                  ➕ Thêm thư mục con
+                </button>
+              )}
+
               {folders.map((f, idx) => (
                 <button
                   key={idx}

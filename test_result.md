@@ -71,11 +71,12 @@
 
 user_problem_statement: |
   Hybrid Desktop App with offline-first architecture:
-  - Default: OCR+Rules (85-88%, FREE, offline) using PaddleOCR
+  - Default: OCR+Rules (85-88%, FREE, offline) using Tesseract OCR (ONLY)
   - Optional: Cloud boost button (93%, có phí, online) using GPT-4
   - User tự chọn trade-off between privacy/cost vs accuracy
   - Electron + React + Python integration
   - Web app continues running in parallel
+  - NOTE: Changed from PaddleOCR/VietOCR/RapidOCR to Tesseract-only due to reliability issues
 
 backend:
   - task: "Python OCR Engine for Desktop"

@@ -636,144 +636,148 @@ const RulesManager = () => {
         </div>
       )}
 
-      {/* Add New Rule Form */}
-      {showAddNew && (
-        <div className="bg-white rounded-lg shadow-sm p-6 border-2 border-indigo-500">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              ➕ Tạo Rule Mới
-            </h3>
-            <div className="flex gap-2">
-              <button
-                onClick={handleCreateNewRule}
-                disabled={loading}
-                className="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 disabled:opacity-50"
-              >
-                💾 Tạo Rule
-              </button>
-              <button
-                onClick={cancelAddNew}
-                className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
-              >
-                ❌ Hủy
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mã Tài Liệu (Doc Type Code) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Ví dụ: GCNM, BMT, HSKT..."
-                value={newRuleData.docType}
-                onChange={(e) => setNewRuleData({ ...newRuleData, docType: e.target.value.toUpperCase() })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Mã ngắn gọn cho loại tài liệu (chữ hoa, không dấu, không có khoảng trắng)
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Weight (trọng số):
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                value={newRuleData.weight}
-                onChange={(e) => setNewRuleData({ ...newRuleData, weight: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Trọng số ưu tiên (khuyến nghị: 0.8 - 1.5)
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Min Matches (số keyword tối thiểu):
-              </label>
-              <input
-                type="number"
-                value={newRuleData.min_matches}
-                onChange={(e) => setNewRuleData({ ...newRuleData, min_matches: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Số keyword tối thiểu phải match (khuyến nghị: 1-3)
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Keywords <span className="text-red-500">*</span> ({newRuleData.keywords.length}):
-              </label>
-              
-              {/* Add keyword */}
-              <div className="flex gap-2 mb-3">
-                <input
-                  type="text"
-                  placeholder="Thêm keyword mới (có dấu, không dấu, chữ hoa...)"
-                  value={newRuleData.newKeyword}
-                  onChange={(e) => setNewRuleData({ ...newRuleData, newKeyword: e.target.value })}
-                  onKeyPress={(e) => e.key === 'Enter' && addKeywordToNew()}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                />
+      {/* Add New Rule Modal */}
+      {showAddNewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">
+                ➕ Tạo Rule Mới
+              </h3>
+              <div className="flex gap-2">
                 <button
-                  onClick={addKeywordToNew}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  onClick={handleCreateNewRule}
+                  disabled={loading}
+                  className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ➕ Thêm
+                  💾 Tạo Rule
+                </button>
+                <button
+                  onClick={cancelAddNew}
+                  className="px-4 py-2 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600"
+                >
+                  ✖ Hủy
                 </button>
               </div>
+            </div>
 
-              {/* Auto-generate variants button */}
-              <div className="mb-3">
-                <button
-                  onClick={generateVariantsForNew}
-                  disabled={loading || newRuleData.keywords.length === 0}
-                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  🤖 Tự động tạo variants (có dấu, không dấu, chữ hoa, typo...)
-                </button>
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mã Tài Liệu (Doc Type Code) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: GCNM, BMT, HSKT..."
+                  value={newRuleData.docType}
+                  onChange={(e) => setNewRuleData({ ...newRuleData, docType: e.target.value.toUpperCase() })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono"
+                />
                 <p className="mt-1 text-xs text-gray-500">
-                  Tự động tạo tất cả biến thể từ keywords hiện có. Tiết kiệm thời gian!
+                  Mã ngắn gọn cho loại tài liệu (chữ hoa, không dấu, không có khoảng trắng)
                 </p>
               </div>
 
-              {/* Keywords list */}
-              <div className="border border-gray-300 rounded-lg p-3 max-h-64 overflow-y-auto">
-                {newRuleData.keywords.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    Chưa có keyword nào. Vui lòng thêm ít nhất 1 keyword.
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {newRuleData.keywords.map((keyword, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-sm rounded"
-                      >
-                        {keyword}
-                        <button
-                          onClick={() => removeKeywordFromNew(idx)}
-                          className="text-red-600 hover:text-red-800 ml-1"
-                        >
-                          ✖
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Weight (trọng số):
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={newRuleData.weight}
+                  onChange={(e) => setNewRuleData({ ...newRuleData, weight: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Trọng số ưu tiên (khuyến nghị: 0.8 - 1.5)
+                </p>
               </div>
-              
-              <p className="mt-2 text-xs text-gray-600">
-                💡 Tips: Thêm cả variants có dấu, không dấu, chữ hoa, typo thường gặp
-              </p>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Min Matches (số keyword tối thiểu):
+                </label>
+                <input
+                  type="number"
+                  value={newRuleData.min_matches}
+                  onChange={(e) => setNewRuleData({ ...newRuleData, min_matches: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Số keyword tối thiểu phải match (khuyến nghị: 1-3)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Keywords <span className="text-red-500">*</span> ({newRuleData.keywords.length}):
+                </label>
+                
+                {/* Add keyword */}
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    placeholder="Thêm keyword mới (có dấu, không dấu, chữ hoa...)"
+                    value={newRuleData.newKeyword}
+                    onChange={(e) => setNewRuleData({ ...newRuleData, newKeyword: e.target.value })}
+                    onKeyPress={(e) => e.key === 'Enter' && addKeywordToNew()}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <button
+                    onClick={addKeywordToNew}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  >
+                    ➕ Thêm
+                  </button>
+                </div>
+
+                {/* Auto-generate variants button */}
+                <div className="mb-3">
+                  <button
+                    onClick={generateVariantsForNew}
+                    disabled={loading || newRuleData.keywords.length === 0}
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    🤖 Tự động tạo variants (có dấu, không dấu, chữ hoa, typo...)
+                  </button>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Tự động tạo tất cả biến thể từ keywords hiện có. Tiết kiệm thời gian!
+                  </p>
+                </div>
+
+                {/* Keywords list */}
+                <div className="border border-gray-300 rounded-lg p-3 max-h-64 overflow-y-auto">
+                  {newRuleData.keywords.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">
+                      Chưa có keyword nào. Vui lòng thêm ít nhất 1 keyword.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {newRuleData.keywords.map((keyword, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-sm rounded"
+                        >
+                          {keyword}
+                          <button
+                            onClick={() => removeKeywordFromNew(idx)}
+                            className="text-red-600 hover:text-red-800 ml-1"
+                          >
+                            ✖
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <p className="mt-2 text-xs text-gray-600">
+                  💡 Tips: Thêm cả variants có dấu, không dấu, chữ hoa, typo thường gặp
+                </p>
+              </div>
             </div>
           </div>
         </div>

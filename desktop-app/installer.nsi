@@ -18,7 +18,7 @@ RequestExecutionLevel admin
 
 ; Modern UI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "assets\icon.ico"
+; !define MUI_ICON "assets\icon.ico"  ; Comment out - icon optional
 !define MUI_WELCOMEPAGE_TITLE "Cài đặt ${APP_NAME}"
 !define MUI_WELCOMEPAGE_TEXT "Installer này sẽ tự động cài:$\n$\n• Python 3.11$\n• Tesseract OCR (Vietnamese)$\n• ${APP_NAME} Desktop App$\n$\nClick Next để bắt đầu."
 

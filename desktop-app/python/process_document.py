@@ -128,8 +128,14 @@ def main():
         sys.exit(1)
     
     result = process_document(file_path)
-    # Use ensure_ascii=True to avoid Windows encoding issues
-    print(json.dumps(result, ensure_ascii=True))
+    
+    # Output JSON with proper encoding
+    output = json.dumps(result, ensure_ascii=False)
+    
+    # Write to stdout and flush immediately
+    sys.stdout.write(output)
+    sys.stdout.write('\n')
+    sys.stdout.flush()
     
     sys.exit(0 if result.get('success') else 1)
 

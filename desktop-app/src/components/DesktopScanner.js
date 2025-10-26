@@ -424,6 +424,25 @@ const DesktopScanner = () => {
           </div>
         </div>
       )}
+
+      {/* Comparison Results */}
+      {comparisons.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            ⚖️ So Sánh Kết Quả ({comparisons.length} tài liệu)
+          </h2>
+          <div className="space-y-4">
+            {comparisons.map((comparison, idx) => (
+              <CompareResults
+                key={idx}
+                offlineResult={comparison.offline}
+                cloudResult={comparison.cloud}
+                fileName={comparison.fileName}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

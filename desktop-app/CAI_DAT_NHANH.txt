@@ -1,0 +1,100 @@
+========================================
+  90dayChonThanh Desktop App
+  Hướng Dẫn Cài Đặt Nhanh
+========================================
+
+📥 CÀI ĐẶT
+
+1. Double-click file:
+   90dayChonThanh-AllInOne-Setup.exe
+
+2. Nếu Windows hỏi "User Account Control"
+   → Click "Yes"
+
+3. Click "Next" → "I Agree" → "Next"
+
+4. Đợi 5-10 phút
+
+5. Click "Finish"
+
+6. Mở app từ icon Desktop
+
+========================================
+
+✨ TÍNH NĂNG
+
+• Quét offline miễn phí (85-88% accuracy)
+• Cloud Boost tùy chọn (93%+ accuracy)
+• Tự động phân loại tài liệu
+• Quét hàng loạt nhiều file
+• Xuất PDF
+• Quản lý rules
+
+========================================
+
+🚀 SỬ DỤNG
+
+1. Mở app
+
+2. Click "Scan Documents"
+
+3. Click "📂 Select File"
+
+4. Chọn ảnh cần quét
+
+5. Click "🔍 Process Offline"
+
+6. Xem kết quả và lưu
+
+========================================
+
+💡 LƯU Ý
+
+• Installer tự động cài:
+  - Python 3.11
+  - Tesseract OCR (tiếng Việt)
+  - 90dayChonThanh App
+
+• Không cần cài thêm gì
+
+• Hoàn toàn miễn phí
+
+========================================
+
+🔧 GỠ LỖI
+
+Nếu app không mở:
+→ Restart máy tính
+
+Nếu OCR không hoạt động:
+→ Kiểm tra ảnh có rõ nét không
+→ Thử ảnh khác
+
+Nếu vẫn lỗi:
+→ Reinstall app
+
+========================================
+
+📞 HỖ TRỢ
+
+Email: support@90daychonthanh.com
+Website: https://90daychonthanh.com
+
+========================================
+
+📖 TÀI LIỆU CHI TIẾT
+
+Xem file:
+HUONG_DAN_SU_DUNG_ALLINONE.md
+
+========================================
+
+✅ YÊU CẦU HỆ THỐNG
+
+• Windows 10/11 (64-bit)
+• 4GB RAM
+• 1GB dung lượng trống
+
+========================================
+
+Cảm ơn bạn đã sử dụng!

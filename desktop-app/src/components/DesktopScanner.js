@@ -70,14 +70,9 @@ const DesktopScanner = () => {
     }
 
     try {
-      const formData = new FormData();
-      // Note: In Electron, we need to read file and create Blob
-      // For now, return error asking user to configure
-      return {
-        success: false,
-        error: 'Cloud Boost đang được phát triển',
-        method: 'cloud_boost_not_ready'
-      };
+      // Call Electron IPC to process with cloud
+      const result = await window.electronAPI.processDocumentCloud(file.path);
+      return result;
     } catch (error) {
       return {
         success: false,

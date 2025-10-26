@@ -110,6 +110,14 @@ ipcMain.handle('select-folder', async () => {
     properties: ['openDirectory']
   });
   return result.filePaths[0];
+
+ipcMain.handle('select-folders', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory', 'multiSelections']
+  });
+  return result.filePaths || [];
+});
+
 });
 
 ipcMain.handle('select-files', async () => {

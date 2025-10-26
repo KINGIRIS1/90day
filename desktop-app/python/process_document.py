@@ -9,6 +9,12 @@ import json
 import os
 from pathlib import Path
 import io
+import warnings
+
+# Suppress warnings
+warnings.filterwarnings('ignore')
+os.environ['GLOG_minloglevel'] = '2'
+os.environ['FLAGS_use_mkldnn'] = '0'
 
 # Fix Windows console encoding for Vietnamese
 if sys.platform == 'win32':

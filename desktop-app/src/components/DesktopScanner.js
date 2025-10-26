@@ -131,6 +131,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   const handleSelectFiles = async () => {
     try {
+      if (!window.electronAPI) return;
       const filePaths = await window.electronAPI.selectFiles();
       if (filePaths && filePaths.length > 0) {
         const files = filePaths.map(path => ({

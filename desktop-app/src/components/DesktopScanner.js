@@ -34,6 +34,101 @@ const RenameInline = ({ oldPath, currentName, onRenamed }) => {
       setSaving(false);
     }
   };
+const DraggableItem = ({ id, label }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  const style = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className={`p-2 border rounded bg-white text-xs ${isDragging ? 'opacity-70' : ''}`}>
+      {label}
+    </div>
+  );
+};
+
+const SortableList = ({ items, labels, onReorder }) => {
+  return (
+    <DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
+      if (!over || active.id === over.id) return;
+      const oldIndex = items.indexOf(active.id);
+      const newIndex = items.indexOf(over.id);
+      onReorder(arrayMove(items, oldIndex, newIndex));
+    }}>
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        <div className="space-y-2">
+          {items.map((id) => (
+            <DraggableItem key={id} id={id} label={labels[id] || id} />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+};
+
+const ManualOrderPanel = ({ onClose, orderByShortCode, results, onApply, onMerge, onMergeAll }) => {
+  // Build labels map from results (filePath -> display label)
+  const labels = {};
+  results.forEach(r => { labels[r.filePath] = r.fileName; });
+  const [localMap, setLocalMap] = useState(orderByShortCode);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white w-[900px] max-h-[90vh] overflow-auto rounded shadow-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-gray-900">Sắp xếp thứ tự trang theo short_code</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <div className="space-y-6">
+          {Object.keys(localMap).length === 0 && (
+            <div className="text-sm text-gray-500">Chưa có nhóm short_code nào. Hãy chạy nhận dạng trước.</div>
+          )}
+
+          {Object.entries(localMap).map(([shortCode, paths]) => (
+            <div key={shortCode} className="border rounded p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="font-medium text-gray-800">Nhóm: {shortCode} ({paths.length} trang)</div>
+                <div className="space-x-2 text-sm">
+                  <button
+                    onClick={() => onMerge(shortCode, paths)}
+                    className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                  >
+                    Gộp nhóm này (auto save)
+                  </button>
+                </div>
+              </div>
+              <SortableList
+                items={paths}
+                labels={labels}
+                onReorder={(newOrder) => {
+                  setLocalMap(prev => ({ ...prev, [shortCode]: newOrder }));
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-xs text-gray-500">Kéo‑thả để thay đổi thứ tự trang trong từng nhóm.</div>
+          <div className="space-x-2">
+            <button
+              onClick={() => onApply(localMap)}
+              className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              Áp dụng thứ tự
+            </button>
+            <button
+              onClick={() => onMergeAll(localMap)}
+              className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Gộp tất cả nhóm (auto save)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
   return (
     <div className="mt-2 p-2 border rounded bg-gray-50">

@@ -736,13 +736,22 @@ DOCUMENT_RULES = {
             # Có dấu
             "hợp đồng chuyển nhượng", "hợp đồng tặng cho",
             "chuyển nhượng quyền", "tặng cho quyền", "hợp đồng",
+            "chuyển nhượng quyền sử dụng đất", "chuyển nhượng qsd",
             # Không dấu
             "hop dong chuyen nhuong", "hop dong tang cho",
             "chuyen nhuong quyen", "tang cho quyen", "hop dong",
-            # Viết hoa
-            "HOP DONG", "CHUYEN NHUONG", "TANG CHO"
+            "chuyen nhuong quyen su dung dat",
+            # Viết hoa (OCR thường đọc thành chữ hoa)
+            "HOP DONG", "CHUYEN NHUONG", "TANG CHO",
+            "HOP DONG CHUYEN NHUONG", "CHUYEN NHUONG QUYEN",
+            "CHUYEN NHUONG QUYEN SU DUNG DAT",
+            # OCR common typos (quan trọng!)
+            "NHUQNG", "CHUYEN NHUQNG", "HOP DONG CHUYEN NHUQNG",
+            "NHUONG", "CHUYEN NHUONG QUYEN SU' DUNG",
+            "chuyen nhuqng", "hop dong chuyen nhuqng"
         ],
-        "weight": 1.1, "min_matches": 1
+        "weight": 1.3,  # Tăng weight để ưu tiên hơn CCCD
+        "min_matches": 1
     },
     "HDBDG": {
         "keywords": [

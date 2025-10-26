@@ -19,9 +19,13 @@ function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
-    icon: path.join(__dirname, '../assets/icon.png')
+    icon: path.join(__dirname, isDev ? '../assets/icon.png' : '../assets/icon.png')
   });
-  splash.loadURL(`file://${path.join(__dirname, '../public/splash.html')}`);
+  
+  const splashPath = isDev 
+    ? `file://${path.join(__dirname, 'splash.html')}`
+    : `file://${path.join(__dirname, '../build/splash.html')}`;
+  splash.loadURL(splashPath);
 
   // Main window
   mainWindow = new BrowserWindow({
@@ -34,7 +38,7 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, '../assets/icon.png')
+    icon: path.join(__dirname, isDev ? '../assets/icon.png' : '../assets/icon.png')
   });
 
   // Load React app

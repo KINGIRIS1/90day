@@ -20,10 +20,19 @@
       "build/**/*",
       "electron/**/*",
       "python/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "electron",
+        "to": "electron",
+        "filter": ["**/*"]
+      }
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "assets",
+      "output": "dist"
     },
     "extraResources": [
       {

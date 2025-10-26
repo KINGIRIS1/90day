@@ -75,8 +75,8 @@ def process_document(file_path: str) -> dict:
     Returns classification result with confidence
     """
     try:
-        # Initialize engines
-        ocr_engine = OCREngine()
+        # Use already initialized engine from module level
+        # ocr_engine is already initialized in the try block above
         classifier = RuleClassifier()
         
         # Extract text using OCR (returns dict with full_text, title_text, avg_height)

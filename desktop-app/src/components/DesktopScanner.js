@@ -164,7 +164,7 @@ const RenameInline = ({ oldPath, currentName, onRenamed }) => {
   );
 };
 
-const DesktopScanner = () => {
+const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState([]);

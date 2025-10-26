@@ -193,11 +193,12 @@ ipcMain.handle('choose-save-path', async (event, defaultName) => {
   return result.filePath;
 });
 
-ipcMain.handle('merge-by-short-code', async (event, items) => {
+ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
   // items: [{filePath, short_code}]  -> group by short_code and output one pdf per short_code
+  // options: { autoSave: true }
   const fs = require('fs');
   const path = require('path');
-  const { PDFDocument, StandardFonts } = require('pdf-lib');
+  const { PDFDocument } = require('pdf-lib');
 
   const groups = items.reduce((acc, it) => {
     const key = it.short_code || 'UNKNOWN';
@@ -225,7 +226,7 @@ ipcMain.handle('merge-by-short-code', async (event, items) => {
           // Embed image, keep original size
           let img;
           if (ext === '.png') img = await outPdf.embedPng(bytes);
-          else img = await outPdf.embedJpg(bytes); // pdf-lib supports jpg; gif/bmp may need conversion, try jpg embed
+          else img = await outPdf.embedJpg(bytes);
           const { width, height } = img.size();
           const page = outPdf.addPage([width, height]);
           page.drawImage(img, { x: 0, y: 0, width, height });
@@ -236,16 +237,32 @@ ipcMain.handle('merge-by-short-code', async (event, items) => {
       }
 
       const pdfBytes = await outPdf.save();
-      // Ask save path per short_code per your naming rule: short_code.pdf
-      const savePath = await dialog.showSaveDialog(mainWindow, {
-        defaultPath: `${shortCode}.pdf`,
-        filters: [{ name: 'PDF', extensions: ['pdf'] }]
-      });
-      if (!savePath.canceled && savePath.filePath) {
-        fs.writeFileSync(savePath.filePath, pdfBytes);
-        results.push({ short_code: shortCode, path: savePath.filePath, count: filePaths.length, success: true });
+
+      let outputPath;
+      if (options.autoSave) {
+        // Save directly to the folder of the first file in the group
+        const firstDir = path.dirname(filePaths[0]);
+        outputPath = path.join(firstDir, `${shortCode}.pdf`);
+        // If exists, add numeric suffix
+        let count = 1;
+        while (fs.existsSync(outputPath)) {
+          outputPath = path.join(firstDir, `${shortCode}(${count}).pdf`);
+          count += 1;
+        }
+        fs.writeFileSync(outputPath, Buffer.from(pdfBytes));
+        results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true, autoSaved: true });
       } else {
-        results.push({ short_code: shortCode, canceled: true, success: false });
+        const savePath = await dialog.showSaveDialog(mainWindow, {
+          defaultPath: `${shortCode}.pdf`,
+          filters: [{ name: 'PDF', extensions: ['pdf'] }]
+        });
+        if (!savePath.canceled && savePath.filePath) {
+          fs.writeFileSync(savePath.filePath, pdfBytes);
+          outputPath = savePath.filePath;
+          results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true });
+        } else {
+          results.push({ short_code: shortCode, canceled: true, success: false });
+        }
       }
     } catch (err) {
       console.error('Merge error for', shortCode, err);

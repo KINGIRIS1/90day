@@ -131,5 +131,7 @@ if __name__ == "__main__":
     
     image_path = sys.argv[1]
     engine = OCREngine()
-    text = engine.extract_text(image_path)
-    print(f"Extracted text: {text}")
+    result = engine.extract_text(image_path)
+    print(f"Full text: {result['full_text']}")
+    print(f"\nTitle text (large font): {result['title_text']}")
+    print(f"\nAverage font height: {result['avg_height']:.1f}px")

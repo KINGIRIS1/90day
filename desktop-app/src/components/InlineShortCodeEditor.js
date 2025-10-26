@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 
 const InlineShortCodeEditor = ({ value, onChange }) => {
   const [editing, setEditing] = useState(false);
-  const [tempValue, setTempValue] = useState(value);
+  const [tempValue, setTempValue] = useState(value || '');
 
   const handleSave = () => {
-    onChange(tempValue);
+    const cleaned = (tempValue || '').trim().toUpperCase().slice(0, 32);
+    onChange(cleaned);
     setEditing(false);
   };
 

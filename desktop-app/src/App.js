@@ -251,26 +251,32 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {activeTab === 'scanner' && (
+        {/* Scanner tab - always rendered, just hidden when not active */}
+        <div style={{ display: activeTab === 'scanner' ? 'block' : 'none' }}>
           <DesktopScanner
             enginePref={enginePref}
             onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
           />
-        )}
+        </div>
+
+        {/* Folder tabs - always rendered, just hidden when not active */}
         {folders.map((f, idx) => (
-          activeTab === `folder-${idx}` && (
+          <div key={f} style={{ display: activeTab === `folder-${idx}` ? 'block' : 'none' }}>
             <DesktopScanner
-              key={f}
               enginePref={enginePref}
               initialFolder={f}
               onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
             />
-          )
+          </div>
         ))}
-        {activeTab === 'rules' && (
+
+        {/* Rules tab - always rendered, just hidden when not active */}
+        <div style={{ display: activeTab === 'rules' ? 'block' : 'none' }}>
           <RulesManager />
-        )}
-        {activeTab === 'settings' && (
+        </div>
+
+        {/* Settings tab - always rendered, just hidden when not active */}
+        <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
           <Settings
             enginePref={enginePref}
             onChangeEnginePref={async (val) => {
@@ -278,7 +284,7 @@ function App() {
               if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
             }}
           />
-        )}
+        </div>
       </main>
     </div>
   );

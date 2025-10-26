@@ -587,12 +587,14 @@ DOCUMENT_RULES = {
         "keywords": [
             # Có dấu
             "phiếu chuyển thông tin", "nghĩa vụ tài chính",
-            "chuyển thông tin",
+            "chuyển thông tin", "phiếu chuyển",
             # Không dấu
             "phieu chuyen thong tin", "nghia vu tai chinh",
-            "chuyen thong tin"
+            "chuyen thong tin", "phieu chuyen",
+            # Viết hoa
+            "PHIEU CHUYEN", "CHUYEN THONG TIN", "NGHIA VU TAI CHINH"
         ],
-        "weight": 0.9, "min_matches": 1
+        "weight": 1.0, "min_matches": 1
     },
     "PKTHS": {
         "keywords": [

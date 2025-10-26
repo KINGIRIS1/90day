@@ -203,7 +203,23 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
           console.error('Raw output:', result);
           console.error('Stderr logs:', errorLogs);
           reject(new Error(`Failed to parse OCR result: ${e.message}`));
+        }
+      } else {
+        console.error('Process exited with code:', code);
+        console.error('Stderr:', errorLogs);
+        reject(new Error(errorLogs || `OCR processing failed with code ${code}`));
+      }
+    });
 
+    // Add timeout (30 seconds for PaddleOCR)
+    setTimeout(() => {
+      childProcess.kill();
+      reject(new Error('OCR processing timeout (30s)'));
+    }, 30000);
+  });
+});
+
+// Choose save path (not used in autoSave flow but kept for future)
 ipcMain.handle('choose-save-path', async (event, defaultName) => {
   const result = await dialog.showSaveDialog(mainWindow, {
     defaultPath: defaultName,

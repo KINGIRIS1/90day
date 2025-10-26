@@ -534,6 +534,47 @@ async def analyze_document_hybrid(image_base64: str, use_hybrid: bool = True) ->
     
     # Step 2: Fallback to GPT-4 Vision (for 7% difficult cases)
     gpt_result = await analyze_document_with_vision(image_base64)
+    
+    # Step 3: If GPT-4 returns UNKNOWN/low confidence, try Rules as last resort
+    if gpt_result.get("short_code") == "UNKNOWN" or gpt_result.get("confidence", 0) < 0.5:
+        logger.warning(f"GPT-4 returned UNKNOWN or low confidence ({gpt_result.get('confidence')}), trying Rules as backup")
+        
+        try:
+            # Try OCR + Rules again as final fallback
+            import tempfile
+            import base64
+            from ocr_engine import extract_text_from_image
+            from rule_classifier import classify_by_rules, classify_document_name_from_code
+            
+            image_bytes = base64.b64decode(image_base64)
+            with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
+                temp_file.write(image_bytes)
+                temp_path = temp_file.name
+            
+            try:
+                text = extract_text_from_image(temp_path)
+                if text and len(text) > 10:
+                    result = classify_by_rules(text, confidence_threshold=0.2)  # Lower threshold for fallback
+                    
+                    if result["type"] != "UNKNOWN":
+                        # Rules found something! Use it
+                        full_name = classify_document_name_from_code(result["type"])
+                        logger.info(f"Rules backup success: {result['type']} with confidence {result['confidence']}")
+                        return {
+                            "detected_full_name": full_name,
+                            "short_code": result["type"],
+                            "confidence": result["confidence"],
+                            "method": "hybrid_rules_backup",
+                            "matched_keywords": result.get("matched_keywords", [])
+                        }
+            finally:
+                try:
+                    os.unlink(temp_path)
+                except:
+                    pass
+        except Exception as backup_error:
+            logger.warning(f"Rules backup also failed: {backup_error}")
+    
     gpt_result["method"] = "hybrid_gpt_fallback"
     return gpt_result
 

@@ -105,24 +105,38 @@ ipcMain.handle('select-files', async () => {
 
 ipcMain.handle('process-document-offline', async (event, filePath) => {
   return new Promise((resolve, reject) => {
-    const pythonPath = isDev ? 'python3' : path.join(process.resourcesPath, 'python', 'python3');
+    // Auto-detect Python command based on platform
+    let pythonPath;
+    if (isDev) {
+      // Development mode - try different Python commands
+      if (process.platform === 'win32') {
+        pythonPath = 'py'; // Windows py launcher
+      } else {
+        pythonPath = 'python3'; // Linux/Mac
+      }
+    } else {
+      // Production mode
+      pythonPath = path.join(process.resourcesPath, 'python', 'python3');
+    }
+    
     const scriptPath = isDev
       ? path.join(__dirname, '../python/process_document.py')
       : path.join(process.resourcesPath, 'python', 'process_document.py');
 
-    const process = spawn(pythonPath, [scriptPath, filePath]);
+    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath}`);
+    const childProcess = spawn(pythonPath, [scriptPath, filePath]);
     let result = '';
     let error = '';
 
-    process.stdout.on('data', (data) => {
+    childProcess.stdout.on('data', (data) => {
       result += data.toString();
     });
 
-    process.stderr.on('data', (data) => {
+    childProcess.stderr.on('data', (data) => {
       error += data.toString();
     });
 
-    process.on('close', (code) => {
+    childProcess.on('close', (code) => {
       if (code === 0) {
         try {
           resolve(JSON.parse(result));

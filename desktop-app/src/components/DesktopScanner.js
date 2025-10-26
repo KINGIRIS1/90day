@@ -60,33 +60,66 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const analyzeAndLoadFolder = async (folderPath) => {
     // Analyze parent and create child tabs + show root files list
     setParentFolder(folderPath);
+
+    // Try fast IPC analyze; if not available, fallback to manual listing
+    let analyzed = false;
     try {
-      const analysis = await window.electronAPI.analyzeParentFolder(folderPath);
-      if (analysis.success) {
-        setParentSummary(analysis.summary);
-        setChildTabs(analysis.subfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
-        setActiveChild(analysis.subfolders[0]?.path || null);
-      } else {
+      if (window.electronAPI.analyzeParentFolder) {
+        const analysis = await window.electronAPI.analyzeParentFolder(folderPath);
+        if (analysis && analysis.success) {
+          setParentSummary(analysis.summary);
+          setChildTabs(analysis.subfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
+          setActiveChild(analysis.subfolders[0]?.path || null);
+          analyzed = true;
+        }
+      }
+    } catch (e) {
+      // ignore, will fallback
+    }
+
+    if (!analyzed) {
+      // Fallback: manual compute summary and child tabs
+      try {
+        const subs = await window.electronAPI.listSubfoldersInFolder(folderPath);
+        const rootFiles = await window.electronAPI.listFilesInFolder(folderPath);
+        if (subs && subs.success && rootFiles && rootFiles.success) {
+          const subfolders = subs.folders || [];
+          const childWithCounts = [];
+          for (const sp of subfolders) {
+            const lf = await window.electronAPI.listFilesInFolder(sp);
+            const count = (lf && lf.success && lf.files) ? lf.files.length : 0;
+            childWithCounts.push({ name: sp.split(/[\\\/]/).pop(), path: sp, count, status: 'pending', results: [] });
+          }
+          setParentSummary({ subfolderCount: childWithCounts.length, rootFileCount: rootFiles.files.length });
+          setChildTabs(childWithCounts);
+          setActiveChild(childWithCounts[0]?.path || null);
+        } else {
+          setParentSummary(null);
+          setChildTabs([]);
+          setActiveChild(null);
+        }
+      } catch (e) {
         setParentSummary(null);
         setChildTabs([]);
         setActiveChild(null);
       }
-    } catch (e) {
-      setParentSummary(null);
-      setChildTabs([]);
-      setActiveChild(null);
     }
 
-    const res = await window.electronAPI.listFilesInFolder(folderPath);
-    if (res.success) {
-      const files = res.files.map(path => ({
-        path,
-        name: path.split(/[\\\/]/).pop(),
-        processed: false,
-        result: null
-      }));
-      setSelectedFiles(files);
-      setResults([]);
+    // Load root files list for optional batch processing
+    try {
+      const res = await window.electronAPI.listFilesInFolder(folderPath);
+      if (res && res.success) {
+        const files = res.files.map(path => ({
+          path,
+          name: path.split(/[\\\/]/).pop(),
+          processed: false,
+          result: null
+        }));
+        setSelectedFiles(files);
+        setResults([]);
+      }
+    } catch (e) {
+      // ignore
     }
   };
 

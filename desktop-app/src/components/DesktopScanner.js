@@ -37,15 +37,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [childScanImagesOnly, setChildScanImagesOnly] = useState(false);
   const stopRef = useRef(false);
 
-  // Load config
+  // Load config (guard electron)
   useEffect(() => {
     const loadConfig = async () => {
-      const url = await window.electronAPI.getBackendUrl();
+      const api = window.electronAPI;
+      if (!api) return;
+      const url = await api.getBackendUrl();
       setBackendUrl(url || '');
-      const enabled = await window.electronAPI.getConfig('autoFallbackEnabled');
+      const enabled = await api.getConfig('autoFallbackEnabled');
       setAutoFallbackEnabled(!!enabled);
     };
-    loadConfig();
+    try { loadConfig(); } catch {}
   }, []);
 
   // Auto process initialFolder

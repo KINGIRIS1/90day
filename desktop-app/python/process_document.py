@@ -19,19 +19,28 @@ if sys.platform == 'win32':
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    # Try Tesseract first (Lightweight, Windows-friendly)
+    # Try PaddleOCR first (best accuracy: 90-95%)
     try:
-        from ocr_engine_tesseract import OCREngine
-        print("Using Tesseract OCR", file=sys.stderr)
+        from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
+        print("Trying PaddleOCR (Vietnamese specialized, 90-95% accuracy)", file=sys.stderr)
+        ocr_engine = PaddleOCREngine()
     except ImportError:
-        # Try PaddleOCR (Linux/Mac)
+        print("PaddleOCR not available, using Tesseract", file=sys.stderr)
+        # Fall back to Tesseract (good accuracy: 85-88%)
         try:
-            from ocr_engine import OCREngine
-            print("Using PaddleOCR", file=sys.stderr)
+            from ocr_engine_tesseract import OCREngine
+            print("Using Tesseract OCR", file=sys.stderr)
+            ocr_engine = OCREngine()
         except ImportError:
-            # Fall back to EasyOCR (Windows with GPU/CPU)
-            from ocr_engine_easyocr import OCREngine
-            print("Using EasyOCR", file=sys.stderr)
+            # Last resort: Try EasyOCR
+            try:
+                from ocr_engine import OCREngine
+                print("Using PaddleOCR (original)", file=sys.stderr)
+                ocr_engine = OCREngine()
+            except ImportError:
+                from ocr_engine_easyocr import OCREngine
+                print("Using EasyOCR", file=sys.stderr)
+                ocr_engine = OCREngine()
     
     from rule_classifier import RuleClassifier
 except ImportError as e:

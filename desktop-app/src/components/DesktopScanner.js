@@ -11,6 +11,10 @@ const DesktopScanner = () => {
   const [compareMode, setCompareMode] = useState(false);
   const [comparisons, setComparisons] = useState([]);
   const [lastKnownType, setLastKnownType] = useState(null); // Track last known doc type
+  const [autoFallbackEnabled, setAutoFallbackEnabled] = useState(false);
+  const [confirmFallbackOpen, setConfirmFallbackOpen] = useState(false);
+  const fallbackDecisionRef = useRef(null);
+
   
   // Load backend URL from config
   React.useEffect(() => {

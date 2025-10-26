@@ -655,6 +655,19 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
       {/* Merge and Ordering Controls */}
       {results.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-600">Mật độ:</label>
+              <select
+                value={density}
+                onChange={(e) => setDensity(e.target.value)}
+                className="text-xs border rounded px-2 py-1"
+              >
+                <option value="high">Cao (5 cột)</option>
+                <option value="medium">Trung bình (4 cột)</option>
+                <option value="low">Thấp (3 cột)</option>
+              </select>
+            </div>
+
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-gray-900">Kết quả ({results.length} tài liệu)</h2>

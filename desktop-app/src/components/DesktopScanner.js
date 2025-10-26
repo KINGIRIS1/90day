@@ -112,7 +112,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
     // Load root files list for optional batch processing
     try {
-      const res = await window.electronAPI.listFilesInFolder(folderPath);
+      if (!window.electronAPI) return;
+    const res = await window.electronAPI.listFilesInFolder(folderPath);
       if (res && res.success) {
         const files = res.files.map(path => ({
           path,

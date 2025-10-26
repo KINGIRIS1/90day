@@ -70,7 +70,12 @@
 #====================================================================================================
 
 user_problem_statement: |
-  Document scanning application with direct folder scan and ZIP scan; LLM OpenAI primary + optional Emergent fallback. User reports AI key still error; need to capture current health details.
+  Hybrid Desktop App with offline-first architecture:
+  - Default: OCR+Rules (85-88%, FREE, offline) using PaddleOCR
+  - Optional: Cloud boost button (93%, có phí, online) using GPT-4
+  - User tự chọn trade-off between privacy/cost vs accuracy
+  - Electron + React + Python integration
+  - Web app continues running in parallel
 
 backend:
   - task: "LLM Health diagnosis"

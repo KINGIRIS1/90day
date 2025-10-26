@@ -521,7 +521,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       )}
     </div>
   );
-};
       {/* Merge report for all child tabs */}
       {childMergeReport.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm p-4">
@@ -533,6 +532,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
 
 
 export default DesktopScanner;

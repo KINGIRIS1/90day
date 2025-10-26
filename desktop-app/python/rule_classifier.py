@@ -10,14 +10,16 @@ DOCUMENT_RULES = {
     "GCNM": {
         "keywords": [
             # Có dấu
-            "giấy chứng nhận quyền sử dụng đất", "giấy chứng nhận",
+            "giấy chứng nhận quyền sử dụng đất", "giấy chứng nhận", "giầy chứng nhận",
             "quyền sử dụng đất", "quyền sở hữu", "tài sản gắn liền",
             "cộng hòa xã hội chủ nghĩa việt nam", "độc lập tự do hạnh phúc",
             "chi nhánh văn phòng đăng ký", "văn phòng đăng ký đất đai",
+            "chứng nhan", "chứng nhận",  # OCR common typos
             # Không dấu
-            "giay chung nhan", "quyen su dung dat", "quyen so huu",
+            "giay chung nhan", "giay chung nhan", "quyen su dung dat", "quyen so huu",
             "tai san gan lien", "cong hoa xa hoi chu nghia viet nam",
-            "doc lap tu do hanh phuc", "van phong dang ky dat dai"
+            "doc lap tu do hanh phuc", "van phong dang ky dat dai",
+            "chung nhan"  # OCR common typo without diacritics
         ],
         "weight": 1.5, "min_matches": 1
     },

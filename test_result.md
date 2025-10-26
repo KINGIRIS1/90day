@@ -134,10 +134,17 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      Please call GET {REACT_APP_BACKEND_URL}/api/llm/health and return the JSON including 'details'. We need to know if it's 401 (invalid key), 429 (rate limit), or other. Also confirm openai_available/emergent_available flags.
-  - agent: "testing"
-    message: |
-      DIAGNOSIS COMPLETE: Called GET /api/llm/health successfully. FULL JSON RESPONSE: {"status": "unhealthy", "provider": "none", "model": null, "openai_available": false, "emergent_available": false, "details": "openai: Error code: 429 - Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a; emergent: AuthenticationError"}. ROOT CAUSE: 429 rate limit on OpenAI API + Emergent auth failure. BOTH providers down. Document scanning will fail until rate limit resets or API plan upgraded.
-  - agent: "testing"
-    message: |
-      RE-TEST COMPLETE AFTER EMERGENT_LLM_KEY UPDATE: System status IMPROVED! Called GET /api/llm/health - Status: degraded, OpenAI: false, Emergent: true. FULL JSON: {"status": "degraded", "provider": "emergent", "model": "gpt-4o", "openai_available": false, "emergent_available": true, "details": "openai: Error code: 429 - Rate limit reached for gpt-4o-mini in organization org-aVxmtoYadWM8J3RXY1VJLj3a"}. RESULT: Emergent fallback now working! OpenAI still rate-limited but system functional in degraded mode. Document scanning should work using Emergent provider.
+      Phase 1 Complete: Desktop App Structure Created
+      ✅ Electron main process with IPC handlers
+      ✅ React UI with Scanner and Settings components
+      ✅ Python processing script (OCR + Rules)
+      ✅ Package.json with electron-builder config
+      ✅ Documentation (README + QUICK_START_VI)
+      
+      Next Steps:
+      1. Install Python dependencies: cd /app/desktop-app/python && pip3 install -r requirements.txt
+      2. Test Python script standalone
+      3. Run electron-dev mode to test full app
+      4. Verify offline OCR works with sample images
+      
+      Note: Web app (/app/frontend & /app/backend) remains untouched and runs in parallel.

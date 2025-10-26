@@ -136,16 +136,28 @@ function App() {
                 📄 Quét tài liệu
               </button>
               {folders.map((f, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveTab(`folder-${idx}`)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === `folder-${idx}` ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  title={f}
-                >
-                  📁 {basename(f)}
-                </button>
+                <div key={idx} className="flex items-center">
+                  <button
+                    onClick={() => setActiveTab(`folder-${idx}`)}
+                    className={`px-3 py-2 rounded-l-md text-sm font-medium transition-colors ${
+                      activeTab === `folder-${idx}` ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    title={f}
+                  >
+                    📁 {basename(f)}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFolders(prev => prev.filter((_, i) => i !== idx));
+                      // Adjust activeTab if removing current tab
+                      if (activeTab === `folder-${idx}`) setActiveTab('scanner');
+                    }}
+                    className={`px-2 py-2 rounded-r-md text-sm ${activeTab === `folder-${idx}` ? 'bg-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                    title="Đóng tab"
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
               <button
                 onClick={() => setActiveTab('settings')}

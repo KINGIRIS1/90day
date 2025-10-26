@@ -157,15 +157,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   const handleProcessFiles = async (useCloudBoost = false) => {
-    if (selectedFiles.length === 0) {
-      alert('Vui lòng chọn file trước!');
-      return;
+    let filesToProcess = selectedFiles;
+    if (!filesToProcess || filesToProcess.length === 0) {
+      const filePaths = await window.electronAPI.selectFiles();
+      if (filePaths && filePaths.length > 0) {
+        filesToProcess = filePaths.map(path => ({
+          path,
+          name: path.split(/[\\\/]/).pop(),
+          processed: false,
+          result: null
+        }));
+        setSelectedFiles(filesToProcess);
+      } else {
+        return;
+      }
     }
 
     setProcessing(true);
     setResults([]);
     setComparisons([]);
-    setProgress({ current: 0, total: selectedFiles.length });
+    setProgress({ current: 0, total: filesToProcess.length });
     setLastKnownType(null);
 
     const newResults = [];

@@ -476,6 +476,61 @@ const DesktopScanner = () => {
                       </div>
                     </div>
 
+                    {/* OCR Debug View - Collapsible */}
+                    {result.original_text && (
+                      <details className="mt-3">
+                        <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
+                          <span className="mr-2">🔍</span>
+                          <span>Xem text OCR đã đọc được (Debug)</span>
+                        </summary>
+                        <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2">
+                          {/* Full Text */}
+                          <div>
+                            <p className="text-xs font-semibold text-gray-700 mb-1">📄 Text đầy đủ:</p>
+                            <div className="p-2 bg-white border rounded text-xs text-gray-800 max-h-32 overflow-y-auto">
+                              {result.original_text || '(Không có text)'}
+                            </div>
+                          </div>
+                          
+                          {/* Title Text */}
+                          {result.title_text && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">🎯 Text tiêu đề (chữ to):</p>
+                              <div className="p-2 bg-yellow-50 border border-yellow-300 rounded text-xs text-gray-800">
+                                {result.title_text}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Reasoning */}
+                          {result.reasoning && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-700 mb-1">💡 Lý do phân loại:</p>
+                              <div className="p-2 bg-blue-50 border border-blue-300 rounded text-xs text-gray-800">
+                                {result.reasoning}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Font Height Info */}
+                          {result.avg_font_height && (
+                            <div className="flex items-center text-xs text-gray-600">
+                              <span className="mr-2">📏</span>
+                              <span>Chiều cao font trung bình: {result.avg_font_height}px</span>
+                            </div>
+                          )}
+
+                          {/* Title Boost Indicator */}
+                          {result.title_boost_applied && (
+                            <div className="flex items-center text-xs text-green-700">
+                              <span className="mr-2">⭐</span>
+                              <span>Title boost đã được áp dụng (+20% confidence)</span>
+                            </div>
+                          )}
+                        </div>
+                      </details>
+                    )}
+
                     {result.applied_sequential_logic && (
                       <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-xs text-blue-800 flex items-center">

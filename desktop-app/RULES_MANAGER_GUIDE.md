@@ -173,7 +173,7 @@ A: Kiểm tra file JSON có đúng format không. Xem ví dụ bằng cách Expo
 A: Click **🔄 Reset Tất Cả** hoặc xóa file `rules_overrides.json`.
 
 **Q: Có thể thêm loại tài liệu mới?**
-A: Hiện tại chưa hỗ trợ thêm loại mới từ UI. Có thể edit file JSON thủ công.
+A: ✅ Có! Click **➕ Thêm Rule Mới** để tạo loại tài liệu tùy chỉnh.
 
 ## Ví dụ Thực Tế
 

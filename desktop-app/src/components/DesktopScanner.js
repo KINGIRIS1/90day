@@ -492,23 +492,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="relative bg-white p-2 rounded shadow-lg max-w-5xl max-h-[90vh]">
             <button onClick={() => setSelectedPreview(null)} className="absolute -top-10 right-0 text-white text-2xl">✕</button>
-        {selectedFiles.length > 0 && (
-          <div className="mt-3">
-            <div className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-700">
-              <span className="mr-1">📦</span>
-              <span>Đã chọn {selectedFiles.length} file</span>
-            </div>
-            <details className="mt-2 text-xs text-gray-600">
-              <summary className="cursor-pointer select-none text-gray-700 hover:text-gray-900">Xem danh sách</summary>
-              <div className="mt-1 max-h-28 overflow-auto bg-white border rounded p-2">
-                {selectedFiles.map((f, i) => (
-                  <div key={i} className="truncate">• {f.name}</div>
-                ))}
-              </div>
-            </details>
-          </div>
-        )}
-
             <img src={selectedPreview} alt="preview" className="max-w-[90vw] max-h-[85vh] object-contain" />
           </div>
         </div>

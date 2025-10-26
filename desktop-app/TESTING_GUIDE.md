@@ -42,7 +42,17 @@ yarn electron-dev
    - Click vào bất kỳ rule nào (ví dụ: GCNM)
    - Xem chi tiết: weight, min_matches, keywords
 
-4. **Test Edit Rule:**
+4. **Test Add New Rule:** ⭐
+   - Click **➕ Thêm Rule Mới**
+   - Điền:
+     - Mã: TEST_DOC
+     - Weight: 1.0
+     - Min Matches: 1
+     - Keywords: "test keyword 1", "test keyword 2"
+   - Click **💾 Tạo Rule**
+   - Verify: Rule mới xuất hiện trong danh sách
+
+5. **Test Edit Rule:**
    - Click nút **✏️ Sửa**
    - Thay đổi weight (ví dụ: 1.5 → 1.6)
    - Thêm keyword mới: "sổ đỏ"

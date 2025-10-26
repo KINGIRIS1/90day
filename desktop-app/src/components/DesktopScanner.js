@@ -712,8 +712,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                     <span className="ml-auto font-semibold">{(result.confidence * 100).toFixed(0)}%</span>
                   </div>
                   <div className="mt-2 text-xs text-gray-600">
-                    <div><span className="text-gray-500">Loại:</span> {result.doc_type}</div>
-                    <div><span className="text-gray-500">Mã:</span> <span className="text-blue-600">{result.short_code}</span></div>
+                    <div>Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
                   </div>
 
                   {/* Inline short_code rename (not filesystem) */}

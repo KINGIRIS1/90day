@@ -37,15 +37,28 @@ class OCREngine:
         if cls._instance is None:
             cls._instance = super(OCREngine, cls).__new__(cls)
             # Initialize PaddleOCR with Vietnamese language
-            # use_angle_cls=True: Enable text direction detection
-            # show_log=False: Disable verbose logging
+            # Suppress all output to avoid Electron IPC issues
             try:
+                # Redirect stdout/stderr temporarily during initialization
+                old_stdout = sys.stdout
+                old_stderr = sys.stderr
+                sys.stdout = open(os.devnull, 'w')
+                sys.stderr = open(os.devnull, 'w')
+                
                 cls._ocr_model = PaddleOCR(
                     lang='vi',  # Vietnamese language
-                    use_textline_orientation=True,  # Detect rotated text (new parameter)
+                    use_textline_orientation=True,  # Detect rotated text
                 )
+                
+                # Restore stdout/stderr
+                sys.stdout = old_stdout
+                sys.stderr = old_stderr
+                
                 print("✅ PaddleOCR Vietnamese model loaded successfully", file=sys.stderr)
             except Exception as e:
+                # Restore stdout/stderr on error
+                sys.stdout = old_stdout
+                sys.stderr = old_stderr
                 print(f"⚠️ Error loading PaddleOCR: {e}", file=sys.stderr)
                 cls._ocr_model = None
         return cls._instance

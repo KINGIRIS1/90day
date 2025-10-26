@@ -18,20 +18,11 @@ const DraggableItem = ({ id, label }) => {
 
 const SortableList = ({ items, labels, onReorder }) => {
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={({ active, over }) => {
-      if (!over || active.id === over.id) return;
-      const oldIndex = items.indexOf(active.id);
-      const newIndex = items.indexOf(over.id);
-      onReorder(arrayMove(items, oldIndex, newIndex));
-    }}>
-      <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        <div className="space-y-2">
-          {items.map((id) => (
-            <DraggableItem key={id} id={id} label={labels[id] || id} />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <div className="space-y-2">
+      {items.map((id) => (
+        <div key={id} className="p-2 border rounded bg-white text-xs">{labels[id] || id}</div>
+      ))}
+    </div>
   );
 };
 

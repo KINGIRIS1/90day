@@ -78,29 +78,22 @@ echo Models (~100MB) will be downloaded on first run
 echo.
 cd python
 
-REM Try to install PaddleOCR first (best accuracy)
-echo [1/3] Installing PaddlePaddle...
-python -m pip install paddlepaddle>=3.0.0 --quiet
+REM Install PaddleOCR (it will auto-install compatible PaddlePaddle)
+echo [1/2] Installing PaddleOCR with Vietnamese support...
+python -m pip install paddleocr --quiet
 if %ERRORLEVEL% EQU 0 (
-    echo [OK] PaddlePaddle installed successfully
-    echo.
-    echo [2/3] Installing PaddleOCR...
-    python -m pip install paddleocr>=3.0.0 --quiet
-    if %ERRORLEVEL% EQU 0 (
-        echo [OK] PaddleOCR installed successfully
-        echo [SUCCESS] Using PaddleOCR engine - 90-95%% accuracy for Vietnamese!
-    ) else (
-        echo [WARN] PaddleOCR installation failed. Will use Tesseract fallback.
-    )
+    echo [OK] PaddleOCR installed successfully
+    echo [SUCCESS] Using PaddleOCR engine - 90-95%% accuracy for Vietnamese!
 ) else (
-    echo [WARN] PaddlePaddle installation failed. Will use Tesseract fallback.
+    echo [WARN] PaddleOCR installation failed. Will use Tesseract fallback.
+    echo [INFO] This is OK - Tesseract provides 85-88%% accuracy.
 )
 
 echo.
-echo [3/3] Installing other dependencies...
-python -m pip install -r requirements-windows.txt --quiet
+echo [2/2] Installing other dependencies...
+python -m pip install Pillow opencv-python-headless pytesseract --quiet
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Failed to install Python dependencies
+    echo [ERROR] Failed to install basic dependencies
     cd ..
     pause
     exit /b 1
@@ -109,9 +102,10 @@ cd ..
 echo [OK] All Python dependencies installed
 echo.
 echo === OCR Engine Info ===
-echo - Primary: PaddleOCR (90-95%% accuracy)
-echo - Fallback: Tesseract (85-88%% accuracy)
-echo - For setup help: See PADDLEOCR_SETUP.md
+python -c "try: from paddleocr import PaddleOCR; print('✓ Primary: PaddleOCR (90-95%% accuracy)')" 2>nul || echo "○ Primary: PaddleOCR (not available)"
+python -c "try: import pytesseract; print('✓ Fallback: Tesseract (85-88%% accuracy)')" 2>nul || echo "○ Fallback: Tesseract (not available)"
+echo.
+echo [INFO] For PaddleOCR setup help: See PADDLEOCR_SETUP.md
 echo.
 
 echo ======================================

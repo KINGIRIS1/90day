@@ -298,3 +298,36 @@ def classify_document_name_from_code(short_code: str) -> str:
         "BBKTHT": "Biên bản kiểm tra, xác minh hiện trạng sử dụng đất"
     }
     return code_to_name.get(short_code, "Không rõ loại tài liệu")
+
+
+class RuleClassifier:
+    """
+    Rule-based classifier wrapper class
+    """
+    
+    def __init__(self):
+        """Initialize classifier"""
+        pass
+    
+    def classify(self, text: str) -> dict:
+        """
+        Classify document using rules
+        
+        Args:
+            text: Extracted text from OCR
+            
+        Returns:
+            Dict with doc_type, confidence, short_code, reasoning
+        """
+        result = classify_by_rules(text, confidence_threshold=0.3)
+        
+        doc_type_code = result.get('type', 'UNKNOWN')
+        confidence = result.get('confidence', 0.0)
+        
+        return {
+            'doc_type': classify_document_name_from_code(doc_type_code),
+            'short_code': doc_type_code,
+            'confidence': confidence,
+            'reasoning': f"Matched keywords: {', '.join(result.get('matched_keywords', []))}"
+        }
+

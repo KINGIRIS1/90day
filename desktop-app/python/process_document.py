@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Standalone document processor for desktop app
 Combines OCR + Rule-based classification for offline processing
@@ -7,6 +8,12 @@ import sys
 import json
 import os
 from pathlib import Path
+import io
+
+# Fix Windows console encoding for Vietnamese
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))

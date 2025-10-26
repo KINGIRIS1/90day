@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CompareResults from './CompareResults';
+import InlineShortCodeEditor from './InlineShortCodeEditor';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDraggable } from '@dnd-kit/core';

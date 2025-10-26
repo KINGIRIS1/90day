@@ -96,8 +96,8 @@ class OCREngine:
             if text_with_heights:
                 avg_height = sum(item['height'] for item in text_with_heights) / len(text_with_heights)
                 
-                # Title threshold: 1.5x average height
-                title_threshold = avg_height * 1.5
+                # Title threshold: 1.3x average height (adjusted for better detection)
+                title_threshold = avg_height * 1.3
                 
                 # Extract title text (large font only)
                 title_parts = [

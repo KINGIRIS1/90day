@@ -398,6 +398,29 @@ const DesktopScanner = () => {
           <button
             onClick={handleSelectFiles}
             disabled={processing}
+          {/* Merge PDF by short_code */}
+          {results.length > 0 && (
+            <div className="mb-4">
+              <button
+                onClick={async () => {
+                  const payload = results
+                    .filter(r => r.success && r.short_code)
+                    .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+                  if (payload.length === 0) {
+                    alert('Không có trang hợp lệ để gộp.');
+                    return;
+                  }
+                  const merged = await window.electronAPI.mergeByShortCode(payload);
+                  const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+                  alert(`Đã xử lý gộp theo short_code. Thành công: ${okCount}/${(merged || []).length}.`);
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              >
+                📚 Gộp thành PDF theo short_code (toàn batch)
+              </button>
+            </div>
+          )}
+
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             <span>📁</span>

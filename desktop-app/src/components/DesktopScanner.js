@@ -354,6 +354,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               if (folderPaths && folderPaths.length) {
                 folderPaths.forEach(fp => onDisplayFolder && onDisplayFolder(fp));
               }
+        {selectedFiles.length > 0 && (
+          <div className="mt-3">
+            <span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-700">
+              <span className="mr-1">📦</span>
+              <span>Đã chọn {selectedFiles.length} file</span>
+            </span>
+          </div>
+        )}
+
             }}
             disabled={processing}
             className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"

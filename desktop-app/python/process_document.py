@@ -25,47 +25,14 @@ if sys.platform == 'win32':
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    # Default: Tesseract (stable offline engine)
-    try:
-        from ocr_engine_tesseract import OCREngine as TesseractEngine
-        print("Using Tesseract OCR (default)", file=sys.stderr)
-        ocr_engine = TesseractEngine()
-    except ImportError:
-        print("Tesseract not available, trying alternatives", file=sys.stderr)
-        # Fallback 1: VietOCR (Vietnamese specialized)
-        try:
-            from ocr_engine_vietocr import OCREngine as VietOCREngine
-            print("Trying VietOCR (Vietnamese Transformer-based)", file=sys.stderr)
-            ocr_engine = VietOCREngine()
-        except ImportError:
-            print("VietOCR not available, trying alternatives", file=sys.stderr)
-            # Fallback 2: PaddleOCR (Vietnamese specialized)
-            try:
-                from ocr_engine_paddleocr import OCREngine as PaddleOCREngine
-                print("Trying PaddleOCR (Vietnamese specialized)", file=sys.stderr)
-                ocr_engine = PaddleOCREngine()
-            except ImportError:
-                print("PaddleOCR not available, trying alternatives", file=sys.stderr)
-                # Fallback 3: RapidOCR (only if installed)
-                try:
-                    from ocr_engine_rapidocr import OCREngine as RapidOCREngine
-                    print("Trying RapidOCR (optional fallback)", file=sys.stderr)
-                    ocr_engine = RapidOCREngine()
-                except ImportError:
-                    # Last resort: original PaddleOCR wrapper or EasyOCR
-                    try:
-                        from ocr_engine import OCREngine
-                        print("Using PaddleOCR (original)", file=sys.stderr)
-                        ocr_engine = OCREngine()
-                    except ImportError:
-                        from ocr_engine_easyocr import OCREngine
-                        print("Using EasyOCR", file=sys.stderr)
-                        ocr_engine = OCREngine()
-
+    # Only Tesseract is enabled
+    from ocr_engine_tesseract import OCREngine as TesseractEngine
+    print("Using Tesseract OCR (only engine enabled)", file=sys.stderr)
+    ocr_engine = TesseractEngine()
     from rule_classifier import RuleClassifier
 except ImportError as e:
     print(json.dumps({
-        "error": f"Failed to import modules: {str(e)}",
+        "error": f"Missing dependency for Tesseract OCR: {str(e)}",
         "success": False
     }, ensure_ascii=True), file=sys.stderr)
     sys.exit(1)

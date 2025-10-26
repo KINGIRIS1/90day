@@ -514,6 +514,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       {/* Processing Progress */}
       {processing && (
         <div className="bg-white rounded-lg shadow-sm p-6">
+        {/* Parent folder summary (under folder selection) */}
+        {parentFolder && parentSummary && (
+          <div className="mt-3 text-xs text-gray-700">
+            Thư mục: <span className="font-medium">{parentFolder}</span> •
+            <span className="ml-2">{parentSummary.subfolderCount} thư mục con</span> •
+            <span className="ml-2">{parentSummary.rootFileCount} file ở cấp gốc</span>
+          </div>
+        )}
+
           <div className="flex items-center space-x-3 mb-4">
             <div className="processing-indicator">⚙️</div>
             <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>

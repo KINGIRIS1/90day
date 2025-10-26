@@ -219,6 +219,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     setProgress({ current: 0, total: filesToProcess.length });
     setLastKnownType(null);
 
+    const enginePref = await window.electronAPI.getConfig('enginePreference');
+
     const newResults = [];
     let currentLastKnown = null;
 
@@ -227,7 +229,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setProgress({ current: i + 1, total: filesToProcess.length });
 
       let result;
-      if (useCloudBoost) {
+      const preferCloud = enginePref === 'cloud';
+      if (preferCloud) {
         result = await processCloudBoost(file);
         if (!result.success && autoFallbackEnabled && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
           const userConfirmed = window.confirm(`Cloud lỗi: ${result.error || result.errorType}. Chuyển sang Offline (Tesseract) cho "${file.name}"?`);

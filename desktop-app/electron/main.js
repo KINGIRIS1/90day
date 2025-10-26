@@ -167,3 +167,45 @@ ipcMain.handle('set-backend-url', (event, url) => {
   store.set('backendUrl', url);
   return true;
 });
+
+ipcMain.handle('process-document-cloud', async (event, filePath) => {
+  const FormData = require('form-data');
+  const axios = require('axios');
+  const fs = require('fs');
+  
+  return new Promise(async (resolve, reject) => {
+    try {
+      const backendUrl = store.get('backendUrl', '');
+      
+      if (!backendUrl) {
+        reject(new Error('Backend URL not configured'));
+        return;
+      }
+      
+      // Create form data
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+      
+      // Call backend API
+      const response = await axios.post(`${backendUrl}/scan-document`, form, {
+        headers: {
+          ...form.getHeaders(),
+        },
+        timeout: 30000 // 30 seconds
+      });
+      
+      resolve({
+        success: true,
+        method: 'cloud_boost',
+        doc_type: response.data.detected_full_name,
+        short_code: response.data.short_code,
+        confidence: response.data.confidence_score,
+        accuracy_estimate: '93%+',
+        original_text: response.data.detected_full_name
+      });
+      
+    } catch (error) {
+      reject(new Error(error.message || 'Cloud Boost failed'));
+    }
+  });
+});

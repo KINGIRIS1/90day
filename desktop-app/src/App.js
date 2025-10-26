@@ -76,6 +76,15 @@ import { useMemo } from 'react';
                   ➕ Thêm thư mục con
                 </button>
               )}
+        {activeTab.startsWith('folder-') && (
+          <FolderPicker baseFolder={folders[parseInt(activeTab.replace('folder-',''),10)]}
+            onConfirm={(selected) => {
+              const toAdd = selected.filter(fp => !folders.includes(fp));
+              if (toAdd.length) setFolders(prev => [...prev, ...toAdd]);
+            }}
+          />
+        )}
+
 
               {folders.map((f, idx) => (
                 <button

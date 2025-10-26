@@ -257,40 +257,49 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {/* Scanner tab - always rendered, just hidden when not active */}
-        <div style={{ display: activeTab === 'scanner' ? 'block' : 'none' }}>
-          <DesktopScanner
-            enginePref={enginePref}
-            onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
-          />
-        </div>
-
-        {/* Folder tabs - always rendered, just hidden when not active */}
-        {folders.map((f, idx) => (
-          <div key={f} style={{ display: activeTab === `folder-${idx}` ? 'block' : 'none' }}>
+        {/* Scanner tab - always rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('scanner') && (
+          <div style={{ display: activeTab === 'scanner' ? 'block' : 'none' }}>
             <DesktopScanner
               enginePref={enginePref}
-              initialFolder={f}
               onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
             />
           </div>
-        ))}
+        )}
 
-        {/* Rules tab - always rendered, just hidden when not active */}
-        <div style={{ display: activeTab === 'rules' ? 'block' : 'none' }}>
-          <RulesManager />
-        </div>
+        {/* Folder tabs - rendered after first visit, just hidden when not active */}
+        {folders.map((f, idx) => {
+          const tabKey = `folder-${idx}`;
+          return visitedTabs.has(tabKey) ? (
+            <div key={f} style={{ display: activeTab === tabKey ? 'block' : 'none' }}>
+              <DesktopScanner
+                enginePref={enginePref}
+                initialFolder={f}
+                onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
+              />
+            </div>
+          ) : null;
+        })}
 
-        {/* Settings tab - always rendered, just hidden when not active */}
-        <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
-          <Settings
-            enginePref={enginePref}
-            onChangeEnginePref={async (val) => {
-              setEnginePref(val);
-              if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
-            }}
-          />
-        </div>
+        {/* Rules tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('rules') && (
+          <div style={{ display: activeTab === 'rules' ? 'block' : 'none' }}>
+            <RulesManager />
+          </div>
+        )}
+
+        {/* Settings tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('settings') && (
+          <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
+            <Settings
+              enginePref={enginePref}
+              onChangeEnginePref={async (val) => {
+                setEnginePref(val);
+                if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
+              }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

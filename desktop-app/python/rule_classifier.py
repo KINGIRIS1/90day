@@ -1669,7 +1669,8 @@ class RuleClassifier:
         Returns:
             Classification result with doc_type, confidence, and reasoning
         """
-        result = classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
+        # Use instance rules instead of global DOCUMENT_RULES
+        result = self._classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
         
         doc_type_code = result.get('type', 'UNKNOWN')
         confidence = result.get('confidence', 0.0)
@@ -1690,4 +1691,82 @@ class RuleClassifier:
             'confidence': confidence,
             'reasoning': reasoning,
             'title_boost': title_boost
+        }
+    
+    def _classify_by_rules(self, text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
+        """
+        Internal method: Classify document using instance rules
+        
+        Args:
+            text: Full OCR text
+            title_text: Text extracted from large fonts
+            confidence_threshold: Minimum confidence threshold
+            
+        Returns:
+            Classification result with type, confidence, and matched keywords
+        """
+        text_normalized = normalize_text(text)
+        title_normalized = normalize_text(title_text) if title_text else ""
+        
+        scores = {}
+        matched_keywords_dict = {}
+        title_boost_applied = {}
+        
+        for doc_type, rules in self.rules.items():
+            keywords = rules.get("keywords", [])
+            weight = rules.get("weight", 1.0)
+            min_matches = rules.get("min_matches", 1)
+            
+            matched = []
+            title_matches = 0
+            
+            for keyword in keywords:
+                keyword_normalized = normalize_text(keyword)
+                
+                # Check if keyword is in title (large font) - gets 2x weight
+                if title_normalized and keyword_normalized in title_normalized:
+                    matched.append(f"{keyword} [TITLE]")
+                    title_matches += 1
+                # Check if keyword is in full text
+                elif keyword_normalized in text_normalized:
+                    matched.append(keyword)
+            
+            if len(matched) >= min_matches:
+                # Base score from matched keywords
+                base_score = len(matched) * weight
+                
+                # Boost score for title matches (2x multiplier)
+                title_boost = title_matches * weight * 2.0
+                
+                # Final score = base + title boost
+                score = base_score + title_boost
+                
+                scores[doc_type] = score
+                matched_keywords_dict[doc_type] = matched
+                title_boost_applied[doc_type] = title_matches > 0
+        
+        if not scores:
+            return {
+                "type": "UNKNOWN",
+                "confidence": 0.0,
+                "matched_keywords": [],
+                "title_boost": False
+            }
+        
+        best_type = max(scores, key=scores.get)
+        max_score = scores[best_type]
+        
+        # Calculate confidence with title boost consideration
+        total_possible_score = len(self.rules[best_type].get("keywords", [])) * self.rules[best_type].get("weight", 1.0)
+        confidence = min(max_score / (total_possible_score * 2), 1.0) if total_possible_score > 0 else 0.0
+        
+        # Boost confidence if title matches found
+        if title_boost_applied.get(best_type, False):
+            confidence = min(confidence * 1.2, 1.0)  # 20% confidence boost for title matches
+        
+        return {
+            "type": best_type,
+            "confidence": confidence,
+            "matched_keywords": matched_keywords_dict[best_type],
+            "title_boost": title_boost_applied.get(best_type, False)
         }

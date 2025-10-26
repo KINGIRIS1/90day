@@ -12,7 +12,13 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    from ocr_engine import OCREngine
+    # Try PaddleOCR first (Linux/Mac)
+    try:
+        from ocr_engine import OCREngine
+    except ImportError:
+        # Fall back to EasyOCR (Windows)
+        from ocr_engine_easyocr import OCREngine
+    
     from rule_classifier import RuleClassifier
 except ImportError as e:
     print(json.dumps({

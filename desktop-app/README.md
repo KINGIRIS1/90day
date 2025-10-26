@@ -35,12 +35,20 @@ yarn install
 
 ### Bước 2: Cài đặt dependencies Python
 
+**Cài đặt Tesseract OCR Binary:**
+
+- **Windows:** Download và cài từ [UB-Mannheim Tesseract](https://github.com/UB-Mannheim/tesseract/wiki). Đảm bảo chọn Vietnamese language pack khi cài đặt.
+- **macOS:** `brew install tesseract tesseract-lang`
+- **Linux:** `sudo apt-get install tesseract-ocr tesseract-ocr-vie`
+
+**Cài đặt Python packages:**
+
 ```bash
 cd python
 pip install -r requirements.txt
 ```
 
-**Lưu ý:** Cài đặt PaddleOCR có thể mất vài phút.
+**Lưu ý:** Cài đặt rất nhanh, chỉ cần 2 packages nhẹ (pytesseract + Pillow).
 
 ### Bước 3: Chạy ở chế độ development
 

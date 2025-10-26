@@ -428,10 +428,43 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                         <div className="mb-1">{r.previewUrl ? (<img src={r.previewUrl} alt={r.fileName} className="w-full h-32 object-contain border rounded bg-gray-50" />) : (<div className="w-full h-32 flex items-center justify-center border rounded text-[10px] text-gray-500 bg-gray-50">{r.isPdf ? 'PDF' : 'Không có preview'}</div>)}</div>
                         <div className="text-[11px] font-medium truncate" title={r.fileName}>{r.fileName}</div>
                         <div className="text-[10px] text-gray-600 mt-1">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
+                        <div className="mt-2 p-1 bg-gray-50 border rounded">
+                          <InlineShortCodeEditor
+                            value={r.short_code}
+                            onChange={(newCode) => {
+                              setChildTabs(prev => prev.map((ct, j) => {
+                                if (j !== childTabs.findIndex(x => x.path === t.path)) return ct;
+                                const newRes = [...(ct.results || [])];
+                                newRes[idx] = { ...newRes[idx], short_code: newCode };
+                                return { ...ct, results: newRes };
+                              }));
+                            }}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
-                  {t.status !== 'done' && (<button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="mt-3 px-3 py-2 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Quét thư mục này</button>)}
+                  <div className="mt-3 flex items-center gap-2">
+                    {t.status !== 'done' && (
+                      <button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="px-3 py-2 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Quét thư mục này</button>
+                    )}
+                    {(t.results && t.results.length > 0) && (
+                      <button
+                        onClick={async () => {
+                          const payload = (t.results || [])
+                            .filter(r => r.success && r.short_code)
+                            .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+                          if (payload.length === 0) { alert('Không có trang hợp lệ để gộp.'); return; }
+                          const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
+                          const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+                          alert(`Đã gộp PDF theo short_code cho thư mục "${t.name}". Thành công: ${okCount}/${(merged || []).length}.`);
+                        }}
+                        className="px-3 py-2 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+                      >
+                        📚 Gộp PDF theo short_code (tab này)
+                      </button>
+                    )}
+                  </div>
                 </div>
               )
             ))}

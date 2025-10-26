@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import CompareResults from './CompareResults';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useDroppable, useDraggable } from '@dnd-kit/core';
+
 
 const RenameInline = ({ oldPath, currentName, onRenamed }) => {
   const [editing, setEditing] = useState(false);

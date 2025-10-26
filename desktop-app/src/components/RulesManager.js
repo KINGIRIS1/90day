@@ -525,110 +525,120 @@ const RulesManager = () => {
         </div>
       )}
 
-      {/* Edit Rule */}
+      {/* Edit Rule Modal */}
       {editingRule && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Chỉnh sửa: {editingRule.docType}
-            </h3>
-            <div className="flex gap-2">
-              <button
-                onClick={handleSaveRule}
-                disabled={loading}
-                className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
-              >
-                💾 Lưu
-              </button>
-              <button
-                onClick={() => setEditingRule(null)}
-                className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
-              >
-                ❌ Hủy
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Weight (trọng số):
-              </label>
-              <input
-                type="number"
-                step="0.1"
-                value={editingRule.weight}
-                onChange={(e) => setEditingRule({ ...editingRule, weight: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Min Matches (số keyword tối thiểu):
-              </label>
-              <input
-                type="number"
-                value={editingRule.min_matches}
-                onChange={(e) => setEditingRule({ ...editingRule, min_matches: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Keywords ({editingRule.keywords.length}):
-              </label>
-              
-              {/* Add keyword */}
-              <div className="flex gap-2 mb-3">
-                <input
-                  type="text"
-                  placeholder="Thêm keyword mới..."
-                  value={editingRule.newKeyword}
-                  onChange={(e) => setEditingRule({ ...editingRule, newKeyword: e.target.value })}
-                  onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-xl font-semibold text-gray-900">
+                ✏️ Chỉnh sửa: {editingRule.docType}
+              </h3>
+              <div className="flex gap-2">
                 <button
-                  onClick={addKeyword}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  onClick={handleSaveRule}
+                  disabled={loading}
+                  className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  ➕ Thêm
+                  💾 Lưu
+                </button>
+                <button
+                  onClick={() => setEditingRule(null)}
+                  className="px-4 py-2 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600"
+                >
+                  ✖ Hủy
                 </button>
               </div>
+            </div>
 
-              {/* Auto-generate variants button */}
-              <div className="mb-3">
-                <button
-                  onClick={generateVariantsForEdit}
-                  disabled={loading || editingRule.keywords.length === 0}
-                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  🤖 Tự động tạo variants (có dấu, không dấu, chữ hoa, typo...)
-                </button>
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Weight (trọng số):
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={editingRule.weight}
+                  onChange={(e) => setEditingRule({ ...editingRule, weight: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
                 <p className="mt-1 text-xs text-gray-500">
-                  Tự động tạo tất cả biến thể từ keywords hiện có
+                  Trọng số ưu tiên (khuyến nghị: 0.5 - 2.0)
                 </p>
               </div>
 
-              {/* Keywords list */}
-              <div className="border border-gray-300 rounded-lg p-3 max-h-64 overflow-y-auto">
-                <div className="flex flex-wrap gap-2">
-                  {editingRule.keywords.map((keyword, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded"
-                    >
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(idx)}
-                        className="text-red-600 hover:text-red-800 ml-1"
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Min Matches (số keyword tối thiểu):
+                </label>
+                <input
+                  type="number"
+                  value={editingRule.min_matches}
+                  onChange={(e) => setEditingRule({ ...editingRule, min_matches: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Số keyword tối thiểu phải match (khuyến nghị: 1-3)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Keywords ({editingRule.keywords.length}):
+                </label>
+                
+                {/* Add keyword */}
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    placeholder="Thêm keyword mới..."
+                    value={editingRule.newKeyword}
+                    onChange={(e) => setEditingRule({ ...editingRule, newKeyword: e.target.value })}
+                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={addKeyword}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    ➕ Thêm
+                  </button>
+                </div>
+
+                {/* Auto-generate variants button */}
+                <div className="mb-3">
+                  <button
+                    onClick={generateVariantsForEdit}
+                    disabled={loading || editingRule.keywords.length === 0}
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    🤖 Tự động tạo variants (có dấu, không dấu, chữ hoa, typo...)
+                  </button>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Tự động tạo tất cả biến thể từ keywords hiện có
+                  </p>
+                </div>
+
+                {/* Keywords list */}
+                <div className="border border-gray-300 rounded-lg p-3 max-h-64 overflow-y-auto">
+                  <div className="flex flex-wrap gap-2">
+                    {editingRule.keywords.map((keyword, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded"
                       >
-                        ✖
-                      </button>
-                    </span>
-                  ))}
+                        {keyword}
+                        <button
+                          onClick={() => removeKeyword(idx)}
+                          className="text-red-600 hover:text-red-800 ml-1"
+                        >
+                          ✖
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

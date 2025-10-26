@@ -175,11 +175,15 @@ python3 --version
 python --version
 ```
 
-### PaddleOCR install lỗi
+### Tesseract OCR không hoạt động
 ```bash
-# Cài từng package riêng
-pip install paddlepaddle
-pip install paddleocr
+# Kiểm tra Tesseract đã cài chưa
+tesseract --version
+
+# Nếu chưa có:
+# Windows: Download từ https://github.com/UB-Mannheim/tesseract/wiki
+# macOS: brew install tesseract tesseract-lang
+# Linux: sudo apt-get install tesseract-ocr tesseract-ocr-vie
 ```
 
 ### Electron không mở được

@@ -11,7 +11,7 @@ const FolderPicker = ({ baseFolder, onConfirm }) => {
 
   const loadTree = async () => {
     if (!baseFolder) return;
-    const res = await window.electronAPI.listFolderTree(baseFolder, 6);
+    const res = await window.electronAPI.listFolderTree(baseFolder);
     if (res.success) setTree(res.tree);
   };
 

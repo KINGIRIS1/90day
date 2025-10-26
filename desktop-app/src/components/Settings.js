@@ -40,8 +40,6 @@ const AutoFallbackSetting = () => {
   );
 };
 
-import React, { useState, useEffect } from 'react';
-
 const Settings = () => {
   const [backendUrl, setBackendUrl] = useState('');
   const [saved, setSaved] = useState(false);
@@ -109,15 +107,15 @@ const Settings = () => {
               </p>
             </div>
           )}
+        </div>
+      </div>
+
       {/* Auto-fallback setting */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Tuỳ chọn Auto‑fallback
         </h2>
         <AutoFallbackSetting />
-      </div>
-
-        </div>
       </div>
 
       {/* App Information */}

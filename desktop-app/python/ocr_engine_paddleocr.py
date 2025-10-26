@@ -34,8 +34,6 @@ class OCREngine:
                 cls._ocr_model = PaddleOCR(
                     lang='vi',  # Vietnamese language
                     use_textline_orientation=True,  # Detect rotated text (new parameter)
-                    show_log=False,  # Reduce noise in logs
-                    # use_gpu parameter removed in v3+
                 )
                 print("✅ PaddleOCR Vietnamese model loaded successfully", file=sys.stderr)
             except Exception as e:

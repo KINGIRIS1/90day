@@ -16,10 +16,12 @@ DOCUMENT_RULES = {
             "độc lập tự do hạnh phúc",
             "gcn quyền sử dụng",
             "quyền sở hữu",
-            "chứng nhận quyền"
+            "chứng nhận quyền",
+            "chi nhánh văn phòng đăng ký",  # NEW - Very specific to GCN
+            "văn phòng đăng ký đất đai"     # NEW - Very specific to GCN
         ],
-        "weight": 1.0,
-        "min_matches": 1  # Reduced from 2
+        "weight": 1.5,  # Increased from 1.0 - Higher priority
+        "min_matches": 1
     },
     "BMT": {
         "keywords": [

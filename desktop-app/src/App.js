@@ -87,6 +87,15 @@ function App() {
     }
     setIsElectron(window.electronAPI?.isElectron || false);
   }, []);
+  useEffect(() => {
+    const loadPref = async () => {
+      if (!window.electronAPI) return;
+      const ep = await window.electronAPI.getConfig('enginePreference');
+      setEnginePref(ep || 'offline');
+    };
+    loadPref();
+  }, []);
+
 
   const basename = (p) => {
     if (!p) return '';

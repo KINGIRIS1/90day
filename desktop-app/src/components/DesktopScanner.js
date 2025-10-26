@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import CompareResults from './CompareResults';
 
 const DesktopScanner = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -7,6 +8,8 @@ const DesktopScanner = () => {
   const [results, setResults] = useState([]);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [backendUrl, setBackendUrl] = useState('');
+  const [compareMode, setCompareMode] = useState(false);
+  const [comparisons, setComparisons] = useState([]);
   
   // Load backend URL from config
   React.useEffect(() => {

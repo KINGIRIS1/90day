@@ -15,9 +15,16 @@ try:
     # Try PaddleOCR first (Linux/Mac)
     try:
         from ocr_engine import OCREngine
+        print("Using PaddleOCR", file=sys.stderr)
     except ImportError:
-        # Fall back to EasyOCR (Windows)
-        from ocr_engine_easyocr import OCREngine
+        # Try EasyOCR (Windows with GPU/CPU)
+        try:
+            from ocr_engine_easyocr import OCREngine
+            print("Using EasyOCR", file=sys.stderr)
+        except ImportError:
+            # Fall back to Tesseract (Lightweight, Windows-friendly)
+            from ocr_engine_tesseract import OCREngine
+            print("Using Tesseract OCR", file=sys.stderr)
     
     from rule_classifier import RuleClassifier
 except ImportError as e:

@@ -2,14 +2,15 @@
   "name": "90daychonhanh-desktop",
   "version": "1.0.0",
   "description": "Desktop app for land document scanning with offline OCR and optional cloud boost",
-  "main": "electron/main.js",
+  "main": "public/electron.js",
+  "homepage": ".",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "electron": "electron .",
     "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
     "electron-dev-win": "concurrently \"set BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-pack": "electron-builder --dir",
+    "electron-pack": "yarn build && electron-builder --dir",
     "electron-build": "yarn build && electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },

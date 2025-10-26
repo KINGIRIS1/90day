@@ -10,6 +10,7 @@ const DesktopScanner = () => {
   const [backendUrl, setBackendUrl] = useState('');
   const [compareMode, setCompareMode] = useState(false);
   const [comparisons, setComparisons] = useState([]);
+  const [lastKnownType, setLastKnownType] = useState(null); // Track last known doc type
   
   // Load backend URL from config
   React.useEffect(() => {

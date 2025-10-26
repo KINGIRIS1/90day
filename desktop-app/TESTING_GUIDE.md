@@ -5,6 +5,12 @@
 ✅ **Fixed:** `getPythonPath is not defined` error
 - Đã thêm helper function `getPythonPath()` vào `electron/main.js`
 
+✅ **Fixed:** `UnicodeEncodeError` on Windows
+- Đã thêm UTF-8 encoding fix cho Windows console trong `rules_manager.py`
+- Hỗ trợ đầy đủ tiếng Việt có dấu trên Windows
+
+> **Note for Windows users:** Xem thêm `WINDOWS_NOTES.md` để biết chi tiết về setup và troubleshooting
+
 ## Test Python Backend (✅ All Passed)
 
 ```bash

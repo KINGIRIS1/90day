@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import './App.css';
 import DesktopScanner from './components/DesktopScanner';
 import Settings from './components/Settings';

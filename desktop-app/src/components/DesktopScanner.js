@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 
-const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
+const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePrefProp }) => {
   // Core selection and results
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processing, setProcessing] = useState(false);

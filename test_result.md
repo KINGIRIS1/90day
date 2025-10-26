@@ -90,7 +90,30 @@ backend:
         agent: "main"
         comment: "Created Python processing script that uses PaddleOCR + Rule Classifier for offline document processing. Returns JSON with doc_type, confidence, short_code. Needs testing with real images."
 
-frontend: []
+frontend:
+  - task: "Desktop App - Electron + React"
+    implemented: true
+    working: "NA"
+    file: "/app/desktop-app/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Created Electron desktop app with React UI. Features: file/folder picker, offline OCR processing, cloud boost option, settings page. IPC communication via preload.js. Needs testing in electron-dev mode."
+  
+  - task: "Desktop Scanner Component"
+    implemented: true
+    working: "NA"
+    file: "/app/desktop-app/src/components/DesktopScanner.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Main scanning UI with two processing modes: Offline OCR (free, 85-88%) and Cloud Boost (paid, 93%+). Shows confidence bars, method badges, and recommendations. Needs electron testing."
 
 metadata:
   created_by: "main_agent"

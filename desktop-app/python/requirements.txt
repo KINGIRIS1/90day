@@ -1,9 +1,12 @@
-# PaddleOCR và dependencies
-paddleocr==2.7.0.3
-Pillow>=10.0.0
-opencv-python-headless>=4.8.0
+# Tesseract OCR - Ultra-lightweight version
+# Chỉ cần 2 packages nhẹ, không cần PyTorch hay deep learning models
 
-# Lưu ý: PaddlePaddle cần cài riêng tùy platform
-# Windows CPU: python -m pip install paddlepaddle
-# Linux/Mac: pip install paddlepaddle
-# Xem thêm: https://www.paddlepaddle.org.cn/install/quick
+pytesseract>=0.3.10
+Pillow>=10.0.0
+
+# Lưu ý: Cần cài Tesseract binary riêng
+# Windows: https://github.com/UB-Mannheim/tesseract/wiki
+# Mac: brew install tesseract tesseract-lang
+# Linux: sudo apt-get install tesseract-ocr tesseract-ocr-vie
+# 
+# Sau khi cài, Tesseract sẽ tự động detect

@@ -324,7 +324,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         ⚠️ {method}
       </span>
     );
-  };  // Progressive scanning controls for a parent folder
+  };  //
   const [parentFolder, setParentFolder] = useState(null);
   const [childTabs, setChildTabs] = useState([]); // { name, path, status: 'pending'|'scanning'|'done', results: [] }
   const [activeChild, setActiveChild] = useState(null);

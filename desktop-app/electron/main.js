@@ -182,30 +182,39 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
         return;
       }
       
+      console.log(`Cloud Boost: Uploading ${filePath} to ${backendUrl}`);
+      
       // Create form data
       const form = new FormData();
       form.append('file', fs.createReadStream(filePath));
       
       // Call backend API
-      const response = await axios.post(`${backendUrl}/scan-document`, form, {
+      const response = await axios.post(`${backendUrl}/api/scan-document`, form, {
         headers: {
           ...form.getHeaders(),
         },
         timeout: 30000 // 30 seconds
       });
       
+      console.log('Cloud Boost response:', response.data);
+      
+      // Map backend response to frontend format
+      const backendData = response.data;
+      
       resolve({
         success: true,
         method: 'cloud_boost',
-        doc_type: response.data.detected_full_name,
-        short_code: response.data.short_code,
-        confidence: response.data.confidence_score,
+        doc_type: backendData.detected_full_name || 'Không rõ',
+        short_code: backendData.short_code || 'UNKNOWN',
+        confidence: backendData.confidence_score || 0,  // Important: confidence_score not confidence
         accuracy_estimate: '93%+',
-        original_text: response.data.detected_full_name
+        original_text: backendData.detected_full_name || '',
+        recommend_cloud_boost: false  // Already using cloud boost
       });
       
     } catch (error) {
-      reject(new Error(error.message || 'Cloud Boost failed'));
+      console.error('Cloud Boost error:', error);
+      reject(new Error(error.response?.data?.detail || error.message || 'Cloud Boost failed'));
     }
   });
 });

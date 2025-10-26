@@ -198,6 +198,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const handleProcessFiles = async (useCloudBoost = false) => {
     let filesToProcess = selectedFiles;
     if (!filesToProcess || filesToProcess.length === 0) {
+      if (!window.electronAPI) return;
       const filePaths = await window.electronAPI.selectFiles();
       if (filePaths && filePaths.length > 0) {
         filesToProcess = filePaths.map(path => ({

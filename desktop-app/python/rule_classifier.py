@@ -1631,10 +1631,32 @@ def classify_document_name_from_code(short_code: str) -> str:
 
 
 class RuleClassifier:
-    """Rule-based classifier wrapper class"""
+    """Rule-based classifier wrapper class with rules override support"""
     
-    def __init__(self):
-        pass
+    def __init__(self, use_overrides=True):
+        """
+        Initialize classifier
+        
+        Args:
+            use_overrides: If True, load rules from rules_manager (default + overrides)
+        """
+        self.use_overrides = use_overrides
+        self.rules = self._load_rules()
+    
+    def _load_rules(self) -> dict:
+        """Load rules (with overrides if enabled)"""
+        if self.use_overrides:
+            try:
+                # Try to import rules_manager and get merged rules
+                import rules_manager
+                return rules_manager.get_rules()
+            except Exception as e:
+                # Fallback to default rules if something goes wrong
+                import sys
+                print(f"Warning: Could not load rule overrides, using defaults: {e}", file=sys.stderr)
+                return DOCUMENT_RULES
+        else:
+            return DOCUMENT_RULES
     
     def classify(self, text: str, title_text: str = None) -> dict:
         """

@@ -22,6 +22,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
     : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
+  const [parentFolder, setParentFolder] = useState(null);
+  const [parentSummary, setParentSummary] = useState(null); // { subfolderCount, rootFileCount }
+  const [childTabs, setChildTabs] = useState([]); // [{ name, path, count, status, results }]
+  const [activeChild, setActiveChild] = useState(null);
+
   // Load backend URL and settings from config
   useEffect(() => {
     const loadConfig = async () => {

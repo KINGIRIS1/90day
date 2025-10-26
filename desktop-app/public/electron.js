@@ -866,7 +866,7 @@ ipcMain.handle('open-rules-folder', async () => {
 ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos = true) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = path.join(__dirname, '../python/keyword_variants.py');
+    const scriptPath = getPythonScriptPath('keyword_variants.py');
     const typosFlag = includeTypos ? 'true' : 'false';
     
     return new Promise((resolve, reject) => {

@@ -189,12 +189,18 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
   const axios = require('axios');
   const fs = require('fs');
   
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     try {
       const backendUrl = store.get('backendUrl', '');
       
       if (!backendUrl) {
-        reject(new Error('Backend URL not configured'));
+        resolve({
+          success: false,
+          method: 'cloud_boost_failed',
+          error: 'Backend URL not configured',
+          status: null,
+          errorType: 'CONFIG'
+        });
         return;
       }
       
@@ -230,7 +236,21 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
       
     } catch (error) {
       console.error('Cloud Boost error:', error);
-      reject(new Error(error.response?.data?.detail || error.message || 'Cloud Boost failed'));
+      const status = error.response?.status || null;
+      let errorType = 'OTHER';
+      if (error.code === 'ECONNABORTED') errorType = 'TIMEOUT';
+      else if (error.code === 'ECONNREFUSED' || !error.response) errorType = 'NETWORK';
+      else if (status === 401 || status === 403) errorType = 'UNAUTHORIZED';
+      else if (status === 402 || status === 429) errorType = 'QUOTA';
+      else if (status && status >= 500) errorType = 'SERVER';
+
+      resolve({
+        success: false,
+        method: 'cloud_boost_failed',
+        error: error.response?.data?.detail || error.message || 'Cloud Boost failed',
+        status,
+        errorType
+      });
     }
   });
 });

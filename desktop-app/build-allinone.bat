@@ -55,11 +55,29 @@ REM Build Electron app
 echo [4/5] Building Electron app...
 if not exist "dist\win-unpacked" (
     echo Building React + Electron...
-    call yarn build >nul 2>nul
-    call yarn electron-pack >nul 2>nul
+    call yarn build
+    if errorlevel 1 (
+        echo [ERROR] React build failed
+        pause
+        exit /b 1
+    )
+    call yarn electron-pack
+    if errorlevel 1 (
+        echo [ERROR] Electron pack failed
+        pause
+        exit /b 1
+    )
     echo [OK] Electron app built
 ) else (
     echo [OK] Using existing build
+)
+
+REM Verify dist folder exists and has content
+if not exist "dist\win-unpacked\*.exe" (
+    echo [ERROR] Electron app not found in dist\win-unpacked\
+    echo Please build the app first with: yarn electron-pack
+    pause
+    exit /b 1
 )
 
 REM Create LICENSE if not exists

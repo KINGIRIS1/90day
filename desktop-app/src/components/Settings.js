@@ -15,7 +15,8 @@ const EnginePreferenceSetting = ({ enginePref: propPref, onChangeEnginePref }) =
 
   const save = async (val) => {
     setEngine(val);
-    await window.electronAPI.setConfig('enginePreference', val);
+    if (onChangeEnginePref) await onChangeEnginePref(val);
+    else if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };

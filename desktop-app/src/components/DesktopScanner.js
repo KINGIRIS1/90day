@@ -568,6 +568,66 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                     return;
                   }
                   const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
+      {/* Child tabs for parent folder scan (created after selecting folder) */}
+      {parentFolder && childTabs.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-2 overflow-auto">
+            {childTabs.map((t) => (
+              <button
+                key={t.path}
+                onClick={() => setActiveChild(t.path)}
+                className={`px-3 py-2 text-xs rounded-md border ${activeChild === t.path ? 'bg-gray-100 border-gray-400' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'}`}
+              >
+                {t.name}
+                <span className="ml-2">
+                  {t.status !== 'done' ? '…' : '✓'}
+                </span>
+              </button>
+            ))}
+            <button
+              onClick={async () => {
+                for (const tab of childTabs) {
+                  if (tab.status !== 'done') await scanChildFolder(tab.path);
+                }
+              }}
+              className="ml-auto px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Quét tất cả thư mục con
+            </button>
+          </div>
+          <div className="mt-3">
+            {childTabs.map((t) => (
+              activeChild === t.path && (
+                <div key={t.path}>
+                  <div className={`grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`}>
+                    {(t.results || []).map((r, idx) => (
+                      <div key={idx} className="p-2 border rounded bg-white">
+                        <div className="mb-1">
+                          {r.previewUrl ? (
+                            <img src={r.previewUrl} alt={r.fileName} className="w-full h-32 object-contain border rounded bg-gray-50" />
+                          ) : (
+                            <div className="w-full h-32 flex items-center justify-center border rounded text-[10px] text-gray-500 bg-gray-50">
+                              {r.isPdf ? 'PDF' : 'Không có preview'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-[11px] font-medium truncate" title={r.fileName}>{r.fileName}</div>
+                        <div className="text-[10px] text-gray-600 mt-1">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
+                      </div>
+                    ))}
+                  </div>
+                  {t.status !== 'done' && (
+                    <button onClick={() => scanChildFolder(t.path)} className="mt-3 px-3 py-2 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+                      Quét thư mục này
+                    </button>
+                  )}
+                </div>
+              )
+            ))}
+          </div>
+        </div>
+      )}
+
                   const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
                   alert(`Đã xử lý gộp theo short_code và lưu tự động. Thành công: ${okCount}/${(merged || []).length}.`);
                 }}

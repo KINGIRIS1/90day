@@ -267,6 +267,9 @@ function App() {
             />
           )
         ))}
+        {activeTab === 'rules' && (
+          <RulesManager />
+        )}
         {activeTab === 'settings' && (
           <Settings
             enginePref={enginePref}

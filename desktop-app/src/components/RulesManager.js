@@ -7,6 +7,14 @@ const RulesManager = () => {
   const [editingRule, setEditingRule] = useState(null);
   const [notification, setNotification] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddNew, setShowAddNew] = useState(false);
+  const [newRuleData, setNewRuleData] = useState({
+    docType: '',
+    keywords: [],
+    weight: 1.0,
+    min_matches: 1,
+    newKeyword: ''
+  });
 
   // Load rules on mount
   useEffect(() => {

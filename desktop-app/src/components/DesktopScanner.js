@@ -19,7 +19,7 @@ const RenameInline = ({ oldPath, currentName, onRenamed }) => {
         const newPathParts = res.newPath.split(/[\\\/]/);
         const newName = newPathParts[newPathParts.length - 1];
         onRenamed(newName, res.newPath);
-  const [density, setDensity] = useState('medium'); // low=3, medium=4, high=5
+  const [density, setDensity] = useState('high'); // low=3, medium=4, high=5
   const gridColsClass = density === 'high' ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5' : density === 'low' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
         setEditing(false);

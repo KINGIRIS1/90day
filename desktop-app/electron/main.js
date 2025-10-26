@@ -14,6 +14,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
+    title: '90dayChonThanh',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

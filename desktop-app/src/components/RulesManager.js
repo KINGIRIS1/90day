@@ -446,21 +446,52 @@ const RulesManager = () => {
             {filteredRules.map(docType => (
               <div
                 key={docType}
-                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                className={`p-3 border rounded-lg transition-colors ${
                   selectedRule === docType 
                     ? 'border-blue-500 bg-blue-50' 
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
-                onClick={() => setSelectedRule(docType)}
               >
-                <div className="flex justify-between items-start">
-                  <div className="font-mono font-bold text-gray-900">{docType}</div>
-                  <div className="text-xs text-gray-500">
-                    weight: {rules[docType].weight || 1.0}
+                <div className="flex justify-between items-start mb-2">
+                  <div 
+                    className="font-mono font-bold text-gray-900 cursor-pointer flex-1"
+                    onClick={() => setSelectedRule(docType)}
+                  >
+                    {docType}
+                  </div>
+                  <div className="flex gap-1 ml-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEdit(docType);
+                      }}
+                      className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
+                      title="Sửa"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRule(docType);
+                      }}
+                      className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
+                      title="Xóa"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
-                <div className="text-xs text-gray-600 mt-1">
-                  {rules[docType].keywords?.length || 0} keywords
+                <div 
+                  className="cursor-pointer"
+                  onClick={() => setSelectedRule(docType)}
+                >
+                  <div className="text-xs text-gray-500 mb-1">
+                    weight: {rules[docType].weight || 1.0}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {rules[docType].keywords?.length || 0} keywords
+                  </div>
                 </div>
               </div>
             ))}

@@ -118,6 +118,34 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           await loadFolderLocally(folderPath);
         }
       }
+  // Progressive scan for child tab - incremental results
+  const scanChildFolder = async (childPath) => {
+    const idx = childTabs.findIndex(t => t.path === childPath);
+    if (idx < 0) return;
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'scanning' } : t));
+
+    const listing = await window.electronAPI.listFilesInFolder(childPath);
+    if (!listing.success) {
+      setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'pending' } : t));
+      return;
+    }
+
+    const files = listing.files.map(p => ({ path: p, name: p.split(/[\\\/]/).pop() }));
+    const childResults = [];
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      const r = await processOffline(f);
+      let previewUrl = null;
+      try {
+        if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name)) previewUrl = await window.electronAPI.readImageDataUrl(f.path);
+      } catch {}
+      childResults.push({ fileName: f.name, filePath: f.path, previewUrl, isPdf: /\.pdf$/i.test(f.name), ...r });
+      setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
+    }
+
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done' } : t));
+  };
+
     } catch (error) {
       console.error('Error selecting folder:', error);
       alert('Lỗi khi chọn thư mục: ' + error.message);

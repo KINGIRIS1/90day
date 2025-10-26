@@ -1,12 +1,9 @@
 # Desktop App - Windows Version
-# Option 1: RapidOCR (RECOMMENDED - Fast + Accurate + Clean)
-rapidocr-onnxruntime
+# Tesseract OCR Only (Reliable, 85-88% accuracy)
+
+pytesseract>=0.3.10
 Pillow>=10.0.0
 
-# Option 2: Tesseract (FALLBACK - reliable, 85-88% accuracy)
-pytesseract>=0.3.10
 # Note: Tesseract binary needs to be installed separately
 # Download from: https://github.com/UB-Mannheim/tesseract/wiki
-
-# Common dependencies
-opencv-python-headless>=4.8.0
+# Make sure to install Vietnamese language pack during installation

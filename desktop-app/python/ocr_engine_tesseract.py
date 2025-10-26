@@ -43,6 +43,7 @@ class OCREngine:
     def extract_text(self, image_path: str) -> str:
         """
         Extract text from image using Tesseract
+        Only scan top 40% of image for better accuracy
         
         Args:
             image_path: Path to image file
@@ -54,9 +55,16 @@ class OCREngine:
             # Open image
             image = Image.open(image_path)
             
+            # Get image dimensions
+            width, height = image.size
+            
+            # Crop to top 40% of image (where document title/type is)
+            crop_height = int(height * 0.4)  # Top 40%
+            cropped_image = image.crop((0, 0, width, crop_height))
+            
             # Extract text with Vietnamese language
             # lang='vie' for Vietnamese, 'eng' for English
-            text = pytesseract.image_to_string(image, lang='vie+eng')
+            text = pytesseract.image_to_string(cropped_image, lang='vie+eng')
             
             return text.strip()
             

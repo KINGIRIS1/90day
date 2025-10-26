@@ -188,8 +188,8 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
       const form = new FormData();
       form.append('file', fs.createReadStream(filePath));
       
-      // Call backend API
-      const response = await axios.post(`${backendUrl}/api/scan-document`, form, {
+      // Call backend API (public endpoint - no auth required)
+      const response = await axios.post(`${backendUrl}/api/scan-document-public`, form, {
         headers: {
           ...form.getHeaders(),
         },

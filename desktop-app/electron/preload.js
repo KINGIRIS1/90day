@@ -31,6 +31,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   setBackendUrl: (url) => ipcRenderer.invoke('set-backend-url', url),
   
+  // Rules Manager
+  getRules: () => ipcRenderer.invoke('get-rules'),
+  saveRule: (docType, ruleData) => ipcRenderer.invoke('save-rule', docType, ruleData),
+  deleteRule: (docType) => ipcRenderer.invoke('delete-rule', docType),
+  resetRules: () => ipcRenderer.invoke('reset-rules'),
+  exportRules: () => ipcRenderer.invoke('export-rules'),
+  importRules: (merge) => ipcRenderer.invoke('import-rules', merge),
+  openRulesFolder: () => ipcRenderer.invoke('open-rules-folder'),
+  
   // Platform info
   platform: process.platform,
   isElectron: true

@@ -309,22 +309,6 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
   return results;
 });
 
-        }
-      } else {
-        console.error('Process exited with code:', code);
-        console.error('Stderr:', errorLogs);
-        reject(new Error(errorLogs || `OCR processing failed with code ${code}`));
-      }
-    });
-
-    // Add timeout (30 seconds for PaddleOCR)
-    setTimeout(() => {
-      childProcess.kill();
-      reject(new Error('OCR processing timeout (30s)'));
-    }, 30000);
-  });
-});
-
 ipcMain.handle('get-config', (event, key) => {
   return store.get(key);
 });

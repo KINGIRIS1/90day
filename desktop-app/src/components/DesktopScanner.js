@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 
-// Small draggable item used in manual ordering panel
+//
 const DraggableItem = ({ id, label }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
   const style = {

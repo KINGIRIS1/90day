@@ -173,14 +173,16 @@ def generate_variants_for_keywords(keywords: List[str], include_typos: bool = Tr
 
 # CLI interface
 if __name__ == "__main__":
-    import sys
     import json
     
     if len(sys.argv) < 2:
-        print(json.dumps({
+        error_msg = json.dumps({
             "error": "Usage: python keyword_variants.py <keyword> [include_typos]",
             "success": False
-        }))
+        }, ensure_ascii=False)
+        sys.stdout.write(error_msg)
+        sys.stdout.write('\n')
+        sys.stdout.flush()
         sys.exit(1)
     
     keyword = sys.argv[1]
@@ -188,15 +190,22 @@ if __name__ == "__main__":
     
     try:
         variants = generate_all_variants(keyword, include_typos)
-        print(json.dumps({
+        output = json.dumps({
             "success": True,
             "keyword": keyword,
             "variants": variants,
             "count": len(variants)
-        }, ensure_ascii=False, indent=2))
+        }, ensure_ascii=False, indent=2)
+        sys.stdout.write(output)
+        sys.stdout.write('\n')
+        sys.stdout.flush()
     except Exception as e:
-        print(json.dumps({
+        error_msg = json.dumps({
             "success": False,
             "error": str(e)
-        }))
+        }, ensure_ascii=False)
+        sys.stdout.write(error_msg)
+        sys.stdout.write('\n')
+        sys.stdout.flush()
         sys.exit(1)
+

@@ -583,6 +583,77 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
             {childTabs.map((t) => (
               <button
                 key={t.path}
+      {/* Child tabs for parent folder scan (created after selecting folder) */}
+      {parentFolder && childTabs.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center gap-2 overflow-auto">
+            {childTabs.map((t) => (
+              <button
+                key={t.path}
+                onClick={() => setActiveChild(t.path)}
+                className={`px-3 py-2 text-xs rounded-md border ${activeChild === t.path ? 'bg-gray-100 border-gray-400' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'}`}
+              >
+                {t.name} ({t.count})
+                <span className="ml-2">
+                  {t.status !== 'done' ? '…' : '✓'}
+                </span>
+              </button>
+            ))}
+            <div className="ml-auto flex items-center gap-2">
+              <label className="text-xs text-gray-600 inline-flex items-center gap-1">
+                <input type="checkbox" checked={childScanImagesOnly} onChange={(e) => setChildScanImagesOnly(e.target.checked)} />
+                Bỏ qua PDF (chỉ quét ảnh)
+              </label>
+              <button onClick={() => { stopRef.current = true; setTimeout(()=> (stopRef.current=false), 0); }} className="px-3 py-2 text-xs rounded-md bg-red-600 text-white hover:bg-red-700">
+                Dừng quét
+              </button>
+              <button
+                onClick={async () => {
+                  stopRef.current = false;
+                  for (const tab of childTabs) {
+                    if (stopRef.current) break;
+                    if (tab.status !== 'done') await scanChildFolder(tab.path);
+                  }
+                }}
+                className="px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Quét tất cả thư mục con
+              </button>
+            </div>
+          </div>
+          <div className="mt-3">
+            {childTabs.map((t) => (
+              activeChild === t.path && (
+                <div key={t.path}>
+                  <div className={`grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`}>
+                    {(t.results || []).map((r, idx) => (
+                      <div key={idx} className="p-2 border rounded bg-white">
+                        <div className="mb-1">
+                          {r.previewUrl ? (
+                            <img src={r.previewUrl} alt={r.fileName} className="w-full h-32 object-contain border rounded bg-gray-50" />
+                          ) : (
+                            <div className="w-full h-32 flex items-center justify-center border rounded text-[10px] text-gray-500 bg-gray-50">
+                              {r.isPdf ? 'PDF' : 'Không có preview'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-[11px] font-medium truncate" title={r.fileName}>{r.fileName}</div>
+                        <div className="text-[10px] text-gray-600 mt-1">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
+                      </div>
+                    ))}
+                  </div>
+                  {t.status !== 'done' && (
+                    <button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="mt-3 px-3 py-2 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+                      Quét thư mục này
+                    </button>
+                  )}
+                </div>
+              )
+            ))}
+          </div>
+        </div>
+      )}
+
                 onClick={() => setActiveChild(t.path)}
                 className={`px-3 py-2 text-xs rounded-md border ${activeChild === t.path ? 'bg-gray-100 border-gray-400' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'}`}
               >

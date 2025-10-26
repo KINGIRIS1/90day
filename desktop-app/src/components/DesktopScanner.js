@@ -213,8 +213,10 @@ const DesktopScanner = () => {
       }
 
       newResults.push({
-        fileName: file.name,
+        fileName: displayName,
         filePath: file.path,
+        previewUrl,
+        isPdf: /\.pdf$/i.test(displayName),
         ...processedResult
       });
     }

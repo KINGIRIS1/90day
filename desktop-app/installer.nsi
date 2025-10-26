@@ -70,7 +70,8 @@ Section "Main Application" SecMain
     
     ; Copy app files
     DetailPrint "Đang cài ${APP_NAME}..."
-    File /r "dist\win-unpacked\*.*"
+    ; Copy all files and folders from win-unpacked
+    File /r "dist\win-unpacked\*"
     
     ; Create shortcuts
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"

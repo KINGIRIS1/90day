@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Backend URL for cloud boost
   getBackendUrl: () => ipcRenderer.invoke('get-backend-url'),
   // PDF merge
-  mergeByShortCode: (items) => ipcRenderer.invoke('merge-by-short-code', items),
+  mergeByShortCode: (items, options) => ipcRenderer.invoke('merge-by-short-code', items, options),
   chooseSavePath: (defaultName) => ipcRenderer.invoke('choose-save-path', defaultName),
 
   setBackendUrl: (url) => ipcRenderer.invoke('set-backend-url', url),

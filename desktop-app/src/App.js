@@ -131,7 +131,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
             {/* Engine banner + toggle quick switch */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="text-xs text-gray-600">Engine:</div>
               {enginePref === 'cloud' ? (
                 <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">☁️ Cloud</span>

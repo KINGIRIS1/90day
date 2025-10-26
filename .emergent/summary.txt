@@ -1,116 +1,79 @@
 <analysis>
-The AI engineer's recent work focused on resolving deployment and functional issues. Initially, the challenge was persistent build errors on Railway, like pip: command not found, which required iterative adjustments to  and  for proper Python environment and package management, including  downgrade. Following successful backend deployment, an  during admin setup pointed to incorrect  and missing environment variables, eventually prompting a migration to MongoDB Atlas. Post-migration, admin setup worked, but a critical LLM-related error () emerged during document analysis, indicating an issue with the LLM API key. A frontend bug causing page jumps during filename editing was identified and fixed by adding  in . The LLM key issue remains the primary unresolved problem, with the user considering Gemini.
+The AI engineer's trajectory involved a significant expansion, shifting from a web-only application to a full-fledged Electron Desktop App, while simultaneously enhancing the backend's OCR capabilities. The initial focus was on establishing the desktop app's React/Electron/Python architecture, addressing numerous environment-specific (Windows Python, npm vs. yarn,  syntax) and dependency challenges (, , ). A major pivot occurred in local OCR engine selection, moving from PaddleOCR to EasyOCR and finally Tesseract due to Windows compatibility. Subsequent efforts focused on refining the OCR rule classification for Vietnamese documents, expanding the rule set from 13 to 95 types, incorporating diacritic-less keywords, and introducing partial image scanning. The latest work integrated Cloud Boost functionality, fixed authentication issues, and implemented a sophisticated 3-layer hybrid OCR fallback in the backend, culminating in sequential naming logic for multi-page documents in the desktop frontend.
 </analysis>
 
 <product_requirements>
-The application is a document scanning tool for land-related images, utilizing OpenAI GPT-4 Vision (via Emergent LLM Key) for OCR and automated renaming with Vietnamese short codes, followed by PDF export (single, merged, smart merging). It supports batch processing, scan history with editing, and performance optimizations. Recent enhancements include large-scale folder scanning with ZIP uploads, sequential processing, robust JWT authentication (user registration, admin approval, admin panel), session-grouped history, and stricter naming conventions. The primary objective is production deployment on platforms like Railway (and later Render.com) to support up to 30 concurrent users.
+The application, originally a web-based document scanner for Vietnamese land-related images, aims to use LLMs for OCR and automated renaming with short codes. It supports single/batch scanning, history, and PDF export, targeting 30 concurrent users. Key objectives include LLM stability, enhanced folder scanning (e.g., ), performance, deployment reliability, and cost optimization via a hybrid OCR (PaddleOCR + rules with GPT-4 fallback).
+
+Recently, the user explicitly requested a **Hybrid Desktop App** with two modes:
+1.  **Default: OCR+Rules (Offline)**: Free, works offline, aiming for 85-88% accuracy. The AI engineer implemented this using Tesseract OCR, configured to scan only the top 40% of documents, and a comprehensive rule classifier (now supporting 95 document types with diacritic and diacritic-less keywords).
+2.  **Optional: Cloud Boost (Online)**: Paid, leverages GPT-4 for higher accuracy (93%+). This mode integrates with the existing backend.
+Additionally, the user emphasized the need for **sequential naming logic** for multi-page documents, where a page without a clear title inherits the classification from the preceding page until a new title is identified.
 </product_requirements>
 
 <key_technical_concepts>
--   **Full-stack Development**: React (frontend), FastAPI (backend), MongoDB (database, including Atlas).
--   **AI/OCR**: OpenAI GPT-4 Vision, Emergent LLM Key.
--   **Authentication**: JWT, bcrypt, Pydantic.
--   **Deployment**: Railway, Nixpacks, Procfile, Docker, Render.com.
--   **Python Environment**: , 
-Usage:   
-  pip <command> [options]
-
-Commands:
-  install                     Install packages.
-  lock                        Generate a lock file.
-  download                    Download packages.
-  uninstall                   Uninstall packages.
-  freeze                      Output installed packages in requirements format.
-  inspect                     Inspect the python environment.
-  list                        List installed packages.
-  show                        Show information about installed packages.
-  check                       Verify installed packages have compatible dependencies.
-  config                      Manage local and global configuration.
-  search                      Search PyPI for packages.
-  cache                       Inspect and manage pip's wheel cache.
-  index                       Inspect information available from package indexes.
-  wheel                       Build wheels from your requirements.
-  hash                        Compute hashes of package archives.
-  completion                  A helper command used for command completion.
-  debug                       Show information useful for debugging.
-  help                        Show help for commands.
-
-General Options:
-  -h, --help                  Show help.
-  --debug                     Let unhandled exceptions propagate outside the
-                              main subroutine, instead of logging them to
-                              stderr.
-  --isolated                  Run pip in an isolated mode, ignoring
-                              environment variables and user configuration.
-  --require-virtualenv        Allow pip to only run in a virtual environment;
-                              exit with an error otherwise.
-  --python <python>           Run pip with the specified Python interpreter.
-  -v, --verbose               Give more output. Option is additive, and can be
-                              used up to 3 times.
-  -V, --version               Show version and exit.
-  -q, --quiet                 Give less output. Option is additive, and can be
-                              used up to 3 times (corresponding to WARNING,
-                              ERROR, and CRITICAL logging levels).
-  --log <path>                Path to a verbose appending log.
-  --no-input                  Disable prompting for input.
-  --keyring-provider <keyring_provider>
-                              Enable the credential lookup via the keyring
-                              library if user input is allowed. Specify which
-                              mechanism to use [auto, disabled, import,
-                              subprocess]. (default: auto)
-  --proxy <proxy>             Specify a proxy in the form
-                              scheme://[user:passwd@]proxy.server:port.
-  --retries <retries>         Maximum attempts to establish a new HTTP
-                              connection. (default: 5)
-  --timeout <sec>             Set the socket timeout (default 15 seconds).
-  --exists-action <action>    Default action when a path already exists:
-                              (s)witch, (i)gnore, (w)ipe, (b)ackup, (a)bort.
-  --trusted-host <hostname>   Mark this host or host:port pair as trusted,
-                              even though it does not have valid or any HTTPS.
-  --cert <path>               Path to PEM-encoded CA certificate bundle. If
-                              provided, overrides the default. See 'SSL
-                              Certificate Verification' in pip documentation
-                              for more information.
-  --client-cert <path>        Path to SSL client certificate, a single file
-                              containing the private key and the certificate
-                              in PEM format.
-  --cache-dir <dir>           Store the cache data in <dir>.
-  --no-cache-dir              Disable the cache.
-  --disable-pip-version-check
-                              Don't periodically check PyPI to determine
-                              whether a new version of pip is available for
-                              download. Implied with --no-index.
-  --no-color                  Suppress colored output.
-  --use-feature <feature>     Enable new functionality, that may be backward
-                              incompatible.
-  --use-deprecated <feature>  Enable deprecated functionality, that will be
-                              removed in the future.
-  --resume-retries <resume_retries>
-                              Maximum attempts to resume or restart an
-                              incomplete download. (default: 5), .
--   **Web Technologies**: CORS, , Shadcn UI.
+-   **Full-stack Desktop Development**: Electron (frontend shell), React (UI), Python (backend logic for local OCR).
+-   **OCR Engines**: Tesseract, EasyOCR, PaddleOCR (with Windows compatibility challenges).
+-   **AI/LLM Integration**: OpenAI GPT-4 Vision (for Cloud Boost), Hybrid OCR (Backend: PaddleOCR/GPT-4 fallback, Frontend: Tesseract/EasyOCR local).
+-   **Inter-process Communication (IPC)**: Electron's  and  for secure communication between React and Python.
+-   **Rule-based Classification**: Custom Python module for Vietnamese document type detection using keywords and confidence scoring.
+-   **Environment/Deployment**: Windows OS specific considerations (Python path, build tools, command syntax).
 </key_technical_concepts>
 
 <code_architecture>
 
--   : Crucial for Railway builds, configured Python environment, virtual environment activation,  installation, and  start command.
--   : Python dependencies.  was downgraded to  for Python 3.10 compatibility.
--   : Main UI for document scanning. Modified to add  to , , and an input field's  to prevent page jumps.
--   : Defines process commands for Railway. Updated to  for correct service startup.
--   , : Railway deployment configurations. Removed  commands to allow automatic service detection.
+-   : Core backend API.
+    -   **Importance**: Handles web API requests, including OCR processing.
+    -   **Changes**: Created  endpoint (bypassing authentication) to serve the desktop app. Modified this public endpoint to use  which incorporates a 3-layer fallback logic (OCR+Rules -> GPT-4 -> OCR+Rules Backup) to reduce UNKNOWN classifications.
+-   : Rule-based document classification for the original backend.
+    -   **Importance**: Classifies documents based on keywords.
+    -   **Changes**: Initially refined for 13 types, later replaced by  for desktop app to support 95 types.
+-   : Electron/React dependencies and scripts.
+    -   **Importance**: Defines the desktop app's build and runtime environment.
+    -   **Changes**: Added Electron, React, , , , , . Modified  script to use  or rely on  for .
+-   : Environment variables for the desktop app.
+    -   **Importance**: Used to set  to prevent browser opening during yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command..
+    -   **Changes**: Created and added .
+-   : Electron's main process.
+    -   **Importance**: Manages native OS interactions, window creation, and IPC.
+    -   **Changes**: Implemented ,  (calling local Python), and  (calling backend API) IPC handlers. Updated Python execution path to use  launcher on Windows.
+-   : Secure bridge between Electron's main and renderer processes.
+    -   **Importance**: Exposes controlled APIs to the renderer process.
+    -   **Changes**: Added  with , , , , .
+-   : Main Python script for local OCR.
+    -   **Importance**: Orchestrates local OCR and rule classification.
+    -   **Changes**: Modified to prioritize  on Windows, handle  by ensuring  outputs , and integrates the  class. Handles  for file paths.
+-   : Implements Tesseract OCR logic.
+    -   **Importance**: Provides local Tesseract OCR functionality.
+    -   **Changes**: Created. Implemented cropping of the top 40% of the image to improve classification accuracy, and logic to automatically locate Tesseract executable.
+-   : (NEW FILE) Comprehensive rule-based classifier.
+    -   **Importance**: Contains classification rules for 95 Vietnamese document types.
+    -   **Changes**: Created with a massive list of document types, including diacritic and diacritic-less keywords, weights, and minimum match thresholds. Replaced the simpler .
+-   : Main UI for desktop scanning.
+    -   **Importance**: User interface for file selection, OCR processing, and result display.
+    -   **Changes**: Integrated  and  calls. Added Test Both functionality. Implemented  logic to inherit classification for subsequent UNKNOWN pages.
+-   : Settings UI for the desktop app.
+    -   **Importance**: Allows users to configure settings like the backend URL.
+    -   **Changes**: Added input for Backend URL and saving logic.
+-   : (NEW FILE) Component to compare OCR results.
+    -   **Importance**: Displays side-by-side results from Offline and Cloud Boost.
+    -   **Changes**: Created to show detailed classification and confidence.
 </code_architecture>
 
 <pending_tasks>
--   Resolve the  error, indicating an issue with LLM API key configuration.
--   Address user's difficulty with using and securely managing LLM API keys.
--   Debug the  error.
+-   Monitor OpenAI quota/plan or balance for Emergent LLM Key.
+-   Consider adding  to .
+-   Migrate or pin React/Webpack versions to address peer dependency warnings.
+-   Test the backend with 5-10 real images to validate the integrated Hybrid OCR.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was focused on two main issues. The primary, unresolved problem is the  error occurring during document analysis. This error suggests a misconfiguration or invalidity of the LLM API key (either  or a user-provided OpenAI key), resulting in a  response object. The  had been retrieved previously, and the user was advised on environment variable settings, but mistakenly exposed an OpenAI key multiple times. Concurrently, a frontend bug causing the page to jump when editing filenames was reported. This bug was successfully fixed by modifying  to include  in ,  functions, and the  event handler for the filename input. The frontend fix is complete, leaving the LLM key issue as the main pending item.
+Immediately before this summary request, the AI engineer completed the implementation of the **sequential naming logic** within the desktop application. This feature addresses the issue where multi-page documents might have a title only on the first page, leading to UNKNOWN classifications for subsequent pages. The  function, implemented in , iterates through the processed document results. If a page is classified as UNKNOWN and a preceding page had a valid  (document type), the current UNKNOWN page inherits the  and  from the last known classification. This logic is applied to both Offline OCR and Cloud Boost results, ensuring consistent classification for multi-page documents. UI updates were also made to reflect when sequential naming has been applied.
+
+This work was a direct response to the user's request: vẫn UNKNOWN với các trang không tìm được tiêu đề. xem lại quy tắc đặt tên với các trang tiếp theo ví dụ GCN có 2 trang trang 1 có tiêu đề trang 2 không thì trang 2 là GCN quét được tiêu đề tiếp theo là DDKBD có 4 trang thì trang 1 là DDKBD trang 2 3 4 cũng là DDKBD cho đến khi tìm được tiêu đề tiếp theo.
 </current_work>
 
 <optional_next_step>
-Wait for the user to confirm their choice for the LLM API key (EMERGENT_LLM_KEY, their Gemini key, or their OpenAI key).
+Test the desktop app with multi-page documents to validate the sequential naming logic.
 </optional_next_step>
-

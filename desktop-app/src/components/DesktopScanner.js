@@ -156,6 +156,18 @@ const DesktopScanner = () => {
       // If using Cloud and it failed with common cloud errors, optionally prompt fallback
       if (useCloudBoost && (!result.success) && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
         if (autoFallbackEnabled) {
+      // Build preview for image/pdf
+      let previewUrl = null;
+      try {
+        if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
+          // For local files, Electron renderer can show via file:// path
+          previewUrl = `file://${file.path}`;
+        } else if (/\.pdf$/i.test(file.name)) {
+          // Simple icon/label for PDF; previewing PDF inline would require extra libs
+          previewUrl = null; // Keep null, show generic PDF badge
+        }
+      } catch {}
+
           // Show confirm dialog if user requested confirmation (C)
           const doConfirm = true; // UI choice C requires a dialog
           if (doConfirm) {

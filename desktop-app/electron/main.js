@@ -126,27 +126,43 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath}`);
     const childProcess = spawn(pythonPath, [scriptPath, filePath]);
     let result = '';
-    let error = '';
+    let errorLogs = '';
 
     childProcess.stdout.on('data', (data) => {
       result += data.toString();
     });
 
     childProcess.stderr.on('data', (data) => {
-      error += data.toString();
+      const message = data.toString();
+      // Log stderr for debugging but don't fail on warnings
+      console.log('[Python stderr]:', message);
+      errorLogs += message;
     });
 
     childProcess.on('close', (code) => {
       if (code === 0) {
         try {
-          resolve(JSON.parse(result));
+          // Parse only the JSON output from stdout
+          const jsonResult = JSON.parse(result);
+          resolve(jsonResult);
         } catch (e) {
-          reject(new Error('Failed to parse OCR result'));
+          console.error('JSON parse error:', e);
+          console.error('Raw output:', result);
+          console.error('Stderr logs:', errorLogs);
+          reject(new Error(`Failed to parse OCR result: ${e.message}`));
         }
       } else {
-        reject(new Error(error || 'OCR processing failed'));
+        console.error('Process exited with code:', code);
+        console.error('Stderr:', errorLogs);
+        reject(new Error(errorLogs || `OCR processing failed with code ${code}`));
       }
     });
+
+    // Add timeout (30 seconds for PaddleOCR)
+    setTimeout(() => {
+      childProcess.kill();
+      reject(new Error('OCR processing timeout (30s)'));
+    }, 30000);
   });
 });
 

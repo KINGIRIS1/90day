@@ -19,15 +19,14 @@
     "productName": "90dayChonThanh",
     "files": [
       "build/**/*",
-      "electron/**/*",
-      "python/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "public/electron.js",
+      "public/preload.js",
+      "python/**/*"
     ],
-    "extraFiles": [
+    "extraResources": [
       {
-        "from": "electron",
-        "to": "electron",
+        "from": "python",
+        "to": "python",
         "filter": ["**/*"]
       }
     ],

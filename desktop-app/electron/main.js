@@ -202,6 +202,29 @@ ipcMain.handle('rename-file', async (event, oldPath, newBaseName) => {
     fs.renameSync(oldPath, newPath);
     return { success: true, newPath };
   } catch (err) {
+
+ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const entries = fs.readdirSync(folderPath, { withFileTypes: true });
+    const files = entries.filter(e => e.isFile()).filter(e => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name));
+    const dirs = entries.filter(e => e.isDirectory());
+    const subfolders = dirs.map(d => {
+      const subPath = path.join(folderPath, d.name);
+      let count = 0;
+      try {
+        const subEntries = fs.readdirSync(subPath, { withFileTypes: true });
+        count = subEntries.filter(e => e.isFile()).filter(e => /\.(jpg|jpeg|png|gif|bmp|tiff|pdf)$/i.test(e.name)).length;
+      } catch {}
+      return { path: subPath, name: d.name, fileCount: count };
+    });
+    return { success: true, summary: { subfolderCount: subfolders.length, rootFileCount: files.length }, subfolders };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
     return { success: false, error: err.message };
   }
 });

@@ -496,3 +496,331 @@ ipcMain.handle('read-image-data-url', async (event, filePath) => {
   }
 });
 
+
+// ===== Rules Manager IPC Handlers =====
+
+// Get all rules (merged default + overrides)
+ipcMain.handle('get-rules', async () => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'get']);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const rules = JSON.parse(output);
+            resolve({ success: true, rules });
+          } catch (e) {
+            reject(new Error(`Failed to parse rules: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Rules manager failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Rules fetch timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Save a single rule
+ipcMain.handle('save-rule', async (event, docType, ruleData) => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const ruleJson = JSON.stringify(ruleData);
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'save', docType, ruleJson]);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Save rule failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Save rule timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Delete a rule (revert to default)
+ipcMain.handle('delete-rule', async (event, docType) => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'delete', docType]);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Delete rule failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Delete rule timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Reset all rules to defaults
+ipcMain.handle('reset-rules', async () => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'reset']);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Reset rules failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Reset rules timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Export rules to file
+ipcMain.handle('export-rules', async () => {
+  try {
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Export Rules',
+      defaultPath: 'rules-export.json',
+      filters: [{ name: 'JSON Files', extensions: ['json'] }]
+    });
+    
+    if (result.canceled) {
+      return { success: false, message: 'Export cancelled' };
+    }
+    
+    const exportPath = result.filePath;
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'export', exportPath]);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Export failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Export timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Import rules from file
+ipcMain.handle('import-rules', async (event, mergeBool = true) => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Import Rules',
+      filters: [{ name: 'JSON Files', extensions: ['json'] }],
+      properties: ['openFile']
+    });
+    
+    if (result.canceled) {
+      return { success: false, message: 'Import cancelled' };
+    }
+    
+    const importPath = result.filePaths[0];
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    const mergeFlag = mergeBool ? 'true' : 'false';
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'import', importPath, mergeFlag]);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve(result);
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Import failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Import timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Open rules folder in file explorer
+ipcMain.handle('open-rules-folder', async () => {
+  try {
+    const pythonPath = getPythonPath();
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
+    
+    return new Promise((resolve, reject) => {
+      const childProcess = spawn(pythonPath, [scriptPath, 'folder']);
+      let output = '';
+      let errorOutput = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+      
+      childProcess.on('close', async (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            if (result.success && result.path) {
+              // Open folder in file explorer
+              const { shell } = require('electron');
+              await shell.openPath(result.path);
+              resolve({ success: true, message: `Opened ${result.path}` });
+            } else {
+              reject(new Error('Failed to get folder path'));
+            }
+          } catch (e) {
+            reject(new Error(`Failed to parse result: ${e.message}`));
+          }
+        } else {
+          reject(new Error(`Get folder failed: ${errorOutput}`));
+        }
+      });
+      
+      setTimeout(() => {
+        childProcess.kill();
+        reject(new Error('Get folder timeout'));
+      }, 10000);
+    });
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+

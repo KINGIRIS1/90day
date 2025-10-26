@@ -305,6 +305,28 @@ const DesktopScanner = () => {
               </div>
             </button>
           </div>
+
+          {/* Test Both Button */}
+          {backendUrl && (
+            <div className="mt-4">
+              <button
+                onClick={handleTestBoth}
+                className="w-full p-4 border-2 border-green-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all"
+              >
+                <div className="flex items-center justify-center space-x-3">
+                  <span className="text-2xl">⚖️</span>
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-900">
+                      So Sánh Cả Hai Phương Pháp
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Test cả Offline và Cloud Boost để so sánh kết quả
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       )}
 

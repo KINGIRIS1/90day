@@ -89,7 +89,25 @@ import { useMemo } from 'react';
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {activeTab === 'scanner' && <DesktopScanner />}
+        {activeTab === 'scanner' && (
+          <DesktopScanner
+            onDisplayFolder={(folderPath) => {
+              setFolders(prev => prev.includes(folderPath) ? prev : [...prev, folderPath]);
+              setActiveTab(`folder-${folders.length}`);
+            }}
+          />
+        )}
+        {folders.map((f, idx) => (
+          activeTab === `folder-${idx}` && (
+            <DesktopScanner key={f}
+              initialFolder={f}
+              onDisplayFolder={(folderPath) => {
+                setFolders(prev => prev.includes(folderPath) ? prev : [...prev, folderPath]);
+                setActiveTab(`folder-${folders.length}`);
+              }}
+            />
+          )
+        ))}
         {activeTab === 'settings' && <Settings />}
       </main>
     </div>

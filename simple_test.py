@@ -12,7 +12,7 @@ def test_llm_health():
     
     try:
         response = requests.get(
-            "https://land-scanner-1.preview.emergentagent.com/api/llm/health", 
+            "https://smartdocscan-4.preview.emergentagent.com/api/llm/health", 
             timeout=30
         )
         
@@ -62,7 +62,7 @@ def test_endpoints_exist():
         try:
             # Use HEAD request to check if endpoint exists without processing
             response = requests.head(
-                f"https://land-scanner-1.preview.emergentagent.com/api/{endpoint}",
+                f"https://smartdocscan-4.preview.emergentagent.com/api/{endpoint}",
                 timeout=10
             )
             

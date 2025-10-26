@@ -12,6 +12,9 @@ const RenameInline = ({ oldPath, currentName, onRenamed }) => {
     setSaving(true);
     setError('');
     try {
+  const [orderingOpen, setOrderingOpen] = useState(false);
+  const [orderByShortCode, setOrderByShortCode] = useState({}); // { SHORT: [filePath,...] }
+
       const res = await window.electronAPI.renameFile(oldPath, baseName);
       if (res.success) {
         const newPathParts = res.newPath.split(/[\\\/]/);

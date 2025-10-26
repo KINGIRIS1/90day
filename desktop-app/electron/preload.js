@@ -4,6 +4,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // File/Folder selection
   selectFolder: () => ipcRenderer.invoke('select-folder'),
+  selectFolders: () => ipcRenderer.invoke('select-folders'),
   selectFiles: () => ipcRenderer.invoke('select-files'),
   listFilesInFolder: (folderPath) => ipcRenderer.invoke('list-files-in-folder', folderPath),
   renameFile: (oldPath, newBaseName) => ipcRenderer.invoke('rename-file', oldPath, newBaseName),

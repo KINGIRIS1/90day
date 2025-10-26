@@ -1,9 +1,18 @@
 # Desktop App - Windows Version
-# Sử dụng EasyOCR thay vì PaddleOCR (Windows-compatible)
-
-easyocr>=1.7.0
+# Option 1: PaddleOCR (RECOMMENDED - 90-95% accuracy for Vietnamese)
+paddleocr>=3.0.0
+paddlepaddle>=3.0.0
 Pillow>=10.0.0
 opencv-python-headless>=4.8.0
-numpy>=1.24.0
-torch>=2.0.0
-torchvision>=0.15.0
+
+# Option 2: Tesseract (FALLBACK - 85-88% accuracy)
+pytesseract>=0.3.10
+# Note: Tesseract binary needs to be installed separately
+# Download from: https://github.com/UB-Mannheim/tesseract/wiki
+
+# Option 3: EasyOCR (ALTERNATIVE - slower but good accuracy)
+# Uncomment if you want to use EasyOCR instead:
+# easyocr>=1.7.0
+# numpy>=1.24.0
+# torch>=2.0.0
+# torchvision>=0.15.0

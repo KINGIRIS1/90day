@@ -10,6 +10,12 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 import shutil
+import io
+
+# Fix Windows console encoding for Vietnamese
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 # Get user data path from environment or use default
 USER_DATA_PATH = os.environ.get('USER_DATA_PATH', str(Path.home() / '.90daychonhanh'))

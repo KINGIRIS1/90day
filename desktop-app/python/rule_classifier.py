@@ -306,14 +306,18 @@ DOCUMENT_RULES = {
     },
     "CCCD": {
         "keywords": [
-            # Có dấu
+            # Có dấu - phải có keyword chính xác
             "căn cước công dân", "cccd", "thẻ căn cước", "căn cước",
+            "số căn cước", "thẻ cccd",
             # Không dấu
             "can cuoc cong dan", "the can cuoc", "can cuoc",
+            "so can cuoc", "the cccd",
             # Viết hoa
-            "CAN CUOC CONG DAN", "CCCD", "THE CAN CUOC"
+            "CAN CUOC CONG DAN", "CCCD", "THE CAN CUOC",
+            "SO CAN CUOC"
         ],
-        "weight": 1.3, "min_matches": 1
+        "weight": 1.0,  # Giảm weight để tránh false positive
+        "min_matches": 1
     },
     "DS15": {
         "keywords": [

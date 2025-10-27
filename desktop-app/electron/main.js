@@ -69,8 +69,16 @@ function getPythonPath() {
       return 'python3'; // Linux/Mac
     }
   } else {
-    // Production mode
-    return path.join(process.resourcesPath, 'python', 'python3');
+    // Production mode - use system Python
+    // Try multiple commands to find working Python
+    if (process.platform === 'win32') {
+      // Windows: try py, python, python3
+      return 'py'; // Windows py launcher is most reliable
+    } else if (process.platform === 'darwin') {
+      return 'python3'; // macOS
+    } else {
+      return 'python3'; // Linux
+    }
   }
 }
 

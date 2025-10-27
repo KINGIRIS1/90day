@@ -1987,7 +1987,10 @@ class RuleClassifier:
     
     def _classify_by_rules(self, text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
         """
-        Internal method: Classify document using instance rules
+        Internal method: Call global classify_by_rules with Hybrid logic
+        """
+        # Call the new hybrid classification function
+        return classify_by_rules(text, title_text, confidence_threshold)
         
         Args:
             text: Full OCR text

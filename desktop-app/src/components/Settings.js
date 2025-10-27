@@ -290,20 +290,21 @@ const Settings = () => {
             <strong>1. OCR Engine:</strong> Chọn công cụ OCR phù hợp:
           </p>
           <ul className="ml-6 space-y-1 list-disc">
-            <li><strong>Tesseract:</strong> Đa năng, nhanh, nhẹ - phù hợp cho hầu hết các tài liệu</li>
-            <li><strong>VietOCR:</strong> Chuyên cho tiếng Việt, độ chính xác cao hơn (90-95%) - cần cài đặt riêng</li>
+            <li><strong>Tesseract:</strong> Nhanh nhất (0.5-1s), đa ngôn ngữ, phù hợp cho bulk processing</li>
+            <li><strong>VietOCR:</strong> Cân bằng (1-2s), chuyên tiếng Việt, accuracy 90-95%</li>
+            <li><strong>EasyOCR:</strong> Chính xác nhất (10-11s), tốt cho documents quan trọng, accuracy 90-92%</li>
           </ul>
           <p className="mt-3">
             <strong>2. Offline OCR (Mặc định):</strong> Xử lý hoàn toàn trên máy tính của bạn,
-            không cần internet, miễn phí, độ chính xác 85-88%.
+            không cần internet, miễn phí.
           </p>
           <p>
             <strong>3. Cloud Boost:</strong> Sử dụng GPT-4 để độ chính xác cao hơn (93%+),
             cần kết nối internet và có phí sử dụng API.
           </p>
           <p className="mt-3 pt-3 border-t border-blue-200">
-            <strong>💡 Gợi ý:</strong> Dùng Offline OCR trước, nếu độ tin cậy thấp
-            thì dùng Cloud Boost cho các file quan trọng.
+            <strong>💡 Gợi ý:</strong> Dùng EasyOCR hoặc VietOCR cho daily use, nếu độ tin cậy thấp
+            thì dùng Cloud Boost cho các file cực kỳ quan trọng.
           </p>
         </div>
       </div>

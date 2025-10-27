@@ -82,15 +82,15 @@ user_problem_statement: |
 backend:
   - task: "Python OCR Engine for Desktop"
     implemented: true
-    working: "NA"
+    working: "needs_testing"
     file: "/app/desktop-app/python/process_document.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: "true"
+      - working: "needs_testing"
         agent: "main"
-        comment: "Updated to use Tesseract OCR exclusively. Removed PaddleOCR, VietOCR, RapidOCR, EasyOCR fallbacks. Script confirmed loading successfully with message 'Using Tesseract OCR (only engine enabled)'."
+        comment: "Updated to support BOTH Tesseract and VietOCR engines. User can select engine in Settings UI. Added ocr_engine_type parameter to process_document.py. VietOCR auto-installed and verified on user's Python 3.12 environment."
 
 frontend:
   - task: "Desktop App - Electron + React"

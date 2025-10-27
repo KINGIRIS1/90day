@@ -164,6 +164,8 @@ const Settings = () => {
       const engineType = await window.electronAPI.getConfig('ocrEngineType');
       if (engineType === 'vietocr') {
         setOcrEngine('VietOCR (Transformer)');
+      } else if (engineType === 'easyocr') {
+        setOcrEngine('EasyOCR');
       } else {
         setOcrEngine('Tesseract OCR');
       }

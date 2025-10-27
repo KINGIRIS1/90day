@@ -6,6 +6,15 @@ High accuracy (90-95%) for Vietnamese documents
 import sys
 import os
 from PIL import Image
+import warnings
+
+# Suppress all warnings including VietOCR model download messages
+warnings.filterwarnings('ignore')
+os.environ['PYTHONWARNINGS'] = 'ignore'
+
+# Redirect VietOCR's stdout to stderr to prevent JSON corruption
+import io
+_original_stdout = sys.stdout
 
 try:
     from vietocr.tool.predictor import Predictor
@@ -14,6 +23,9 @@ except ImportError as e:
     print(f"Missing dependency: {e}", file=sys.stderr)
     print("Install with: pip install vietocr", file=sys.stderr)
     sys.exit(1)
+finally:
+    # Restore stdout
+    sys.stdout = _original_stdout
 
 
 class OCREngine:

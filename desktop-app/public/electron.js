@@ -290,7 +290,12 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
     const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType], {
-      encoding: 'utf8'
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PYTHONIOENCODING: 'utf-8',
+        PYTHONUTF8: '1'
+      }
     });
     let result = '';
     let errorLogs = '';

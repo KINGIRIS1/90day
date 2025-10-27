@@ -1690,14 +1690,18 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         
         if best_similarity >= 0.8:
             # HIGH CONFIDENCE - Direct match based on title
-            doc_name = get_document_name(best_template_match)
+            doc_name = classify_document_name_from_code(best_template_match)
             return {
                 "type": best_template_match,
+                "doc_type": doc_name,
+                "short_code": best_template_match,
                 "confidence": best_similarity,
-                "matched_keywords": [f"Title match: {best_similarity:.0%}"],
+                "matched_keywords": [f"Title fuzzy match: {best_similarity:.0%}"],
                 "title_boost": True,
-                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity)",
-                "method": "fuzzy_title_match"
+                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity) [TIER 1: FUZZY MATCH]",
+                "method": "fuzzy_title_match",
+                "accuracy_estimate": "95%+",
+                "recommend_cloud_boost": False  # Very confident, no need for cloud boost
             }
         
         elif best_similarity >= 0.5:

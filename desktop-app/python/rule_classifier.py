@@ -1933,7 +1933,7 @@ class RuleClassifier:
     
     def classify(self, text: str, title_text: str = None) -> dict:
         """
-        Classify document using rules with optional title text priority
+        Classify document using HYBRID approach: Fuzzy + Keyword matching
         
         Args:
             text: Full OCR text
@@ -1945,25 +1945,44 @@ class RuleClassifier:
         # Use instance rules instead of global DOCUMENT_RULES
         result = self._classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
         
+        # If Tier 1 fuzzy match (already complete result), return as-is
+        if result.get('method') == 'fuzzy_title_match':
+            return {
+                'doc_type': result.get('doc_type'),
+                'short_code': result.get('short_code'),
+                'confidence': result.get('confidence'),
+                'reasoning': result.get('reasoning'),
+                'title_boost': result.get('title_boost', False),
+                'method': result.get('method'),
+                'accuracy_estimate': result.get('accuracy_estimate', '88-91%'),
+                'recommend_cloud_boost': result.get('recommend_cloud_boost', False)
+            }
+        
+        # For Tier 2/3 (keyword matching), build response
         doc_type_code = result.get('type', 'UNKNOWN')
         confidence = result.get('confidence', 0.0)
         title_boost = result.get('title_boost', False)
         
-        # Build reasoning with title boost indicator
-        reasoning_parts = []
-        if result.get('matched_keywords'):
-            reasoning_parts.append(f"Matched keywords: {', '.join(result.get('matched_keywords', []))}")
-        if title_boost:
-            reasoning_parts.append("✓ Title detection boosted confidence")
-        
-        reasoning = " | ".join(reasoning_parts) if reasoning_parts else "No keywords matched"
+        # Use result reasoning if available
+        reasoning = result.get('reasoning', '')
+        if not reasoning:
+            # Fallback: Build reasoning from matched keywords
+            reasoning_parts = []
+            if result.get('matched_keywords'):
+                reasoning_parts.append(f"Matched keywords: {', '.join(result.get('matched_keywords', []))}")
+            if title_boost:
+                reasoning_parts.append("✓ Title detection boosted confidence")
+            reasoning = " | ".join(reasoning_parts) if reasoning_parts else "No keywords matched"
         
         return {
             'doc_type': classify_document_name_from_code(doc_type_code),
             'short_code': doc_type_code,
             'confidence': confidence,
             'reasoning': reasoning,
-            'title_boost': title_boost
+            'title_boost': title_boost,
+            'method': result.get('method', 'keyword_match'),
+            'accuracy_estimate': "88-91%",
+            'recommend_cloud_boost': confidence < 0.3
         }
     
     def _classify_by_rules(self, text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:

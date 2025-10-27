@@ -62,7 +62,7 @@ class OCREngine:
         Returns:
             Dict with:
                 - full_text: All extracted text
-                - title_text: Text from title area (top 40%)
+                - title_text: Text from title area (top 35%)
                 - avg_height: Average font height estimate
         """
         if self._reader is None:

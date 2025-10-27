@@ -1,9 +1,35 @@
 """
-COMPLETE Rule-based classifier for Vietnamese land documents
-95 document types with full Vietnamese keyword support
+COMPLETE Rule-based classifier for Vietnamese land documents with Smart Scoring
+- Required keywords in title for disambiguation
+- Keyword specificity scoring (specific keywords > generic keywords)
+- Auto-exclude when required keywords missing
 """
 import re
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
+
+# NEW: Document type configuration with required title keywords
+DOCUMENT_TYPE_CONFIG = {
+    "GCNM": {
+        "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "giay chung nhan"],
+        "weight": 1.5
+    },
+    "HDCQ": {
+        "required_in_title": ["hợp đồng", "HỢP ĐỒNG", "HỢP ĐỎNG", "hop dong"],
+        "weight": 1.6
+    },
+    "GUQ": {
+        "required_in_title": ["giấy ủy quyền", "GIẤY ỦY QUYỀN", "giay uy quyen"],
+        "weight": 1.7
+    },
+    "DDKBD": {
+        "required_in_title": ["đơn đăng ký", "ĐƠN ĐĂNG KÝ", "don dang ky", "đăng ký biến động"],
+        "weight": 1.2
+    },
+    "BMT": {
+        "required_in_title": ["bản đồ", "BẢN ĐỒ", "ban do", "bản vẽ"],
+        "weight": 1.1
+    },
+}
 
 # COMPLETE Document type rules - 95 types
 DOCUMENT_RULES = {

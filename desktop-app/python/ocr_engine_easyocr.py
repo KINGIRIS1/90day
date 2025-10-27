@@ -99,7 +99,7 @@ class OCREngine:
             # paragraph=False: Faster, detect individual lines
             # width_ths=0.7: Group nearby text (reduce fragments)
             # decoder='greedy': Faster than beamsearch
-            print(f"🔍 Running EasyOCR on top 40% of image...", file=sys.stderr)
+            print(f"🔍 Running EasyOCR on top 35% of image...", file=sys.stderr)
             
             result = self._reader.readtext(
                 image_array,

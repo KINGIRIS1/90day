@@ -1665,12 +1665,11 @@ def check_required_keywords_in_title(doc_type: str, title_text: str, config: Dic
 
 def classify_by_rules(text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
     """
-    Classify document using rules with Smart Scoring
+    HYBRID CLASSIFICATION: Fuzzy title matching + Keyword fallback
     
-    Features:
-    - Required keywords in title (auto-exclude if missing)
-    - Keyword specificity scoring (specific > generic)
-    - Title boost (3x multiplier)
+    Tier 1: Title similarity >= 80% → High confidence (instant match)
+    Tier 2: Title similarity >= 50% → Check keywords for confirmation
+    Tier 3: Title similarity < 50% → Pure keyword matching
     
     Args:
         text: Full OCR text
@@ -1678,19 +1677,45 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         confidence_threshold: Minimum confidence threshold
         
     Returns:
-        Classification result with type, confidence, and matched keywords
+        Classification result with type, confidence, and method used
     """
     text_normalized = normalize_text(text)
     title_normalized = normalize_text(title_text) if title_text else ""
     
+    # ==================================================================
+    # TIER 1: FUZZY TITLE MATCHING (>= 80% similarity)
+    # ==================================================================
+    if title_text:
+        best_template_match, best_similarity = find_best_template_match(title_text, TITLE_TEMPLATES)
+        
+        if best_similarity >= 0.8:
+            # HIGH CONFIDENCE - Direct match based on title
+            doc_name = get_document_name(best_template_match)
+            return {
+                "type": best_template_match,
+                "confidence": best_similarity,
+                "matched_keywords": [f"Title match: {best_similarity:.0%}"],
+                "title_boost": True,
+                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity)",
+                "method": "fuzzy_title_match"
+            }
+        
+        elif best_similarity >= 0.5:
+            # MEDIUM CONFIDENCE - Verify with keywords
+            # Continue to Tier 2...
+            pass
+    
+    # ==================================================================
+    # TIER 2 & 3: KEYWORD MATCHING (with or without title boost)
+    # ==================================================================
     scores = {}
     matched_keywords_dict = {}
     title_boost_applied = {}
+    fuzzy_score_boost = {}
     
     for doc_type, rules in DOCUMENT_RULES.items():
-        # STEP 1: Check required keywords in title
+        # Check required keywords in title
         if not check_required_keywords_in_title(doc_type, title_text, DOCUMENT_TYPE_CONFIG):
-            # Required keyword missing in title → Skip this doc type
             continue
         
         keywords = rules["keywords"]
@@ -1703,24 +1728,26 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         
         for keyword in keywords:
             keyword_normalized = normalize_text(keyword)
-            
-            # Calculate keyword specificity (how unique this keyword is)
             specificity = calculate_keyword_specificity(keyword, DOCUMENT_RULES)
             
-            # Check if keyword is in title (large font)
             if title_normalized and keyword_normalized in title_normalized:
                 matched.append(f"{keyword} [TITLE]")
                 title_matches += 1
-                # Title match: weight × specificity × 3.0 (title boost)
                 total_score += weight * specificity * 3.0
-                
-            # Check if keyword is in full text
             elif keyword_normalized in text_normalized:
                 matched.append(keyword)
-                # Body match: weight × specificity × 1.0
                 total_score += weight * specificity * 1.0
         
         if len(matched) >= min_matches:
+            # TIER 2 BONUS: If doc type has good title similarity (50-80%), boost score
+            if title_text and doc_type in TITLE_TEMPLATES:
+                doc_templates = TITLE_TEMPLATES[doc_type]
+                max_sim = max(calculate_similarity(title_text, t) for t in doc_templates)
+                if max_sim >= 0.5:
+                    fuzzy_boost = max_sim * 10  # 50% = +5 points, 70% = +7 points
+                    total_score += fuzzy_boost
+                    fuzzy_score_boost[doc_type] = max_sim
+            
             scores[doc_type] = total_score
             matched_keywords_dict[doc_type] = matched
             title_boost_applied[doc_type] = title_matches > 0

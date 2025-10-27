@@ -254,7 +254,7 @@ const Settings = () => {
           </div>
           <div className="flex justify-between py-2 border-b">
             <span className="text-gray-600">OCR Engine:</span>
-            <span className="font-medium text-gray-900">Tesseract OCR</span>
+            <span className="font-medium text-gray-900">{ocrEngine}</span>
           </div>
           <div className="flex justify-between py-2">
             <span className="text-gray-600">Cloud Boost:</span>

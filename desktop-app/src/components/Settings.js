@@ -209,6 +209,17 @@ const Settings = () => {
         <EnginePreferenceSetting />
       </div>
 
+      {/* OCR Engine Type Selection */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          🔍 Chọn OCR Engine (Offline)
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Chọn công cụ OCR để xử lý ảnh trong chế độ offline
+        </p>
+        <OCREngineTypeSetting />
+      </div>
+
       {/* Auto-fallback setting */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Tuỳ chọn Auto‑fallback</h2>

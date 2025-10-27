@@ -438,12 +438,15 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
       
       console.log(`Cloud Boost: Uploading ${filePath} to ${backendUrl}`);
       
+      // Normalize backend URL (remove trailing slash if exists)
+      const normalizedUrl = backendUrl.replace(/\/$/, '');
+      
       // Create form data
       const form = new FormData();
       form.append('file', fs.createReadStream(filePath));
       
       // Call backend API (public endpoint - no auth required)
-      const response = await axios.post(`${backendUrl}/api/scan-document-public`, form, {
+      const response = await axios.post(`${normalizedUrl}/api/scan-document-public`, form, {
         headers: {
           ...form.getHeaders(),
         },

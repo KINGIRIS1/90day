@@ -1486,6 +1486,67 @@ def normalize_text(text: str) -> str:
     return text.strip()
 
 
+def calculate_keyword_specificity(keyword: str, all_rules: Dict) -> float:
+    """
+    Calculate how specific a keyword is
+    
+    Specificity = 1.0 / (number of doc types using this keyword)
+    
+    Returns:
+        float: Multiplier (1.0 = very specific, 0.1 = very generic)
+    """
+    keyword_norm = normalize_text(keyword)
+    usage_count = 0
+    
+    for doc_type, rules in all_rules.items():
+        keywords = rules.get("keywords", [])
+        for kw in keywords:
+            if normalize_text(kw) == keyword_norm or keyword_norm in normalize_text(kw):
+                usage_count += 1
+                break  # Count each doc type only once
+    
+    if usage_count == 0:
+        return 1.0
+    
+    # Specificity: fewer types use it = more specific = higher score
+    # 1 type: 2.0x, 2 types: 1.0x, 5 types: 0.4x, 10+ types: 0.2x
+    if usage_count == 1:
+        return 2.0
+    elif usage_count == 2:
+        return 1.0
+    elif usage_count <= 5:
+        return 0.6
+    else:
+        return 0.3
+
+
+def check_required_keywords_in_title(doc_type: str, title_text: str, config: Dict) -> bool:
+    """
+    Check if document type's required keywords appear in title
+    
+    Returns:
+        bool: True if required keywords found (or no requirement), False otherwise
+    """
+    if doc_type not in config:
+        return True  # No requirement = pass
+    
+    required = config[doc_type].get("required_in_title", [])
+    if not required:
+        return True  # No requirement = pass
+    
+    if not title_text:
+        return False  # Has requirement but no title = fail
+    
+    title_norm = normalize_text(title_text)
+    
+    # Check if ANY of the required keywords is in title
+    for req_kw in required:
+        if normalize_text(req_kw) in title_norm:
+            return True
+    
+    return False
+
+
 def classify_by_rules(text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
     """
     Classify document using rules with Vietnamese keywords

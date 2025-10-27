@@ -64,8 +64,11 @@ Section "Main Application" SecMain
         DetailPrint "Tesseract đã cài"
     ${EndIf}
     
-    ; Install pip packages
+    ; Install pip packages (ensure using correct Python)
     DetailPrint "Đang cài Python packages..."
+    ; Try multiple methods to ensure packages are installed
+    nsExec::ExecToLog 'python -m pip install pytesseract Pillow'
+    nsExec::ExecToLog 'py -m pip install pytesseract Pillow'
     nsExec::ExecToLog 'pip install pytesseract Pillow'
     
     ; Copy app files

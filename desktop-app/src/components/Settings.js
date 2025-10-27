@@ -39,6 +39,60 @@ const EnginePreferenceSetting = ({ enginePref: propPref, onChangeEnginePref }) =
 };
 
 
+const OCREngineTypeSetting = () => {
+  const [engineType, setEngineType] = useState('tesseract');
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const val = await window.electronAPI.getConfig('ocrEngineType');
+      setEngineType(val || 'tesseract');
+    })();
+  }, []);
+
+  const save = async (val) => {
+    setEngineType(val);
+    await window.electronAPI.setConfig('ocrEngineType', val);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-col gap-3">
+        <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+          <input 
+            type="radio" 
+            name="ocrEngineType" 
+            value="tesseract"
+            checked={engineType === 'tesseract'} 
+            onChange={() => save('tesseract')} 
+          />
+          <div>
+            <div className="font-medium">Tesseract OCR</div>
+            <div className="text-xs text-gray-500">Nhanh, nhẹ, hỗ trợ đa ngôn ngữ (bao gồm tiếng Việt)</div>
+          </div>
+        </label>
+        <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+          <input 
+            type="radio" 
+            name="ocrEngineType" 
+            value="vietocr"
+            checked={engineType === 'vietocr'} 
+            onChange={() => save('vietocr')} 
+          />
+          <div>
+            <div className="font-medium">VietOCR (Transformer)</div>
+            <div className="text-xs text-gray-500">Chuyên cho tiếng Việt, độ chính xác cao (90-95%), cần cài đặt riêng</div>
+          </div>
+        </label>
+      </div>
+      {saved && <div className="text-xs text-green-700 mt-2">✓ Đã lưu</div>}
+    </div>
+  );
+};
+
+
 const AutoFallbackSetting = () => {
   const [enabled, setEnabled] = useState(false);
   const [saved, setSaved] = useState(false);

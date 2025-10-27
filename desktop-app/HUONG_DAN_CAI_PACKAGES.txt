@@ -1,0 +1,65 @@
+========================================
+  SỬA LỖI: Missing pytesseract
+========================================
+
+Nếu app báo lỗi:
+"Missing dependency: No module named 'pytesseract'"
+
+CÁCH SỬA (2 PHÚT):
+
+1. Mở Command Prompt as Administrator:
+   - Click phải Start Menu
+   - Gõ "cmd"
+   - Click phải "Command Prompt"
+   - Chọn "Run as administrator"
+
+2. Chạy lệnh này:
+
+   py -m pip install pytesseract Pillow
+
+3. Đợi cài đặt hoàn tất (30 giây)
+
+4. Restart app
+
+5. Done! App sẽ hoạt động!
+
+========================================
+
+KIỂM TRA:
+
+Để kiểm tra packages đã cài chưa:
+
+   py -m pip show pytesseract
+   py -m pip show Pillow
+
+Nếu thấy thông tin package → Đã cài ✓
+
+========================================
+
+NẾU VẪN LỖI:
+
+Thử các lệnh thay thế:
+
+   python -m pip install pytesseract Pillow
+
+Hoặc:
+
+   pip install pytesseract Pillow
+
+========================================
+
+SCRIPT TỰ ĐỘNG:
+
+Chạy file này để kiểm tra môi trường:
+
+   check-python-env.bat
+
+Sẽ hiển thị Python versions và packages.
+
+========================================
+
+HỖ TRỢ:
+
+Email: support@90daychonthanh.com
+
+========================================

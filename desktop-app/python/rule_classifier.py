@@ -1550,10 +1550,78 @@ DOCUMENT_RULES = {
 
 
 def normalize_text(text: str) -> str:
-    """Normalize Vietnamese text for matching"""
+    """Normalize Vietnamese text for matching (lowercase + clean whitespace)"""
     text = text.lower()
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
+
+
+def calculate_uppercase_ratio(text: str) -> float:
+    """
+    Calculate ratio of uppercase letters in text
+    
+    Vietnamese administrative documents:
+    - Titles: 80-100% uppercase (e.g., "GIẤY CHỨNG NHẬN")
+    - Body: 10-30% uppercase (proper nouns only)
+    
+    Returns:
+        float: Ratio of uppercase letters (0.0 to 1.0)
+    """
+    if not text:
+        return 0.0
+    
+    # Count Vietnamese letters (exclude numbers, punctuation)
+    letters = [c for c in text if c.isalpha()]
+    if not letters:
+        return 0.0
+    
+    uppercase_count = sum(1 for c in letters if c.isupper())
+    return uppercase_count / len(letters)
+
+
+def is_title_text(text: str, uppercase_threshold: float = 0.7) -> bool:
+    """
+    Check if text appears to be a title based on uppercase ratio
+    
+    Vietnamese titles typically have 70%+ uppercase letters
+    
+    Args:
+        text: Text to check
+        uppercase_threshold: Minimum uppercase ratio to be considered title (default 0.7)
+    
+    Returns:
+        bool: True if likely a title, False otherwise
+    """
+    ratio = calculate_uppercase_ratio(text)
+    return ratio >= uppercase_threshold
+
+
+def get_case_aware_score_multiplier(text: str) -> float:
+    """
+    Get score multiplier based on uppercase ratio (case-aware scoring)
+    
+    Multipliers based on Vietnamese administrative document conventions:
+    - 80-100% uppercase: 2.0x (definitely title)
+    - 70-80% uppercase: 1.5x (likely title)
+    - 50-70% uppercase: 1.2x (mixed, some title elements)
+    - 30-50% uppercase: 1.0x (normal body with proper nouns)
+    - <30% uppercase: 0.8x (mostly body text)
+    
+    Returns:
+        float: Score multiplier
+    """
+    ratio = calculate_uppercase_ratio(text)
+    
+    if ratio >= 0.8:
+        return 2.0  # Definitely title (80-100% uppercase)
+    elif ratio >= 0.7:
+        return 1.5  # Likely title (70-80% uppercase)
+    elif ratio >= 0.5:
+        return 1.2  # Mixed (50-70% uppercase)
+    elif ratio >= 0.3:
+        return 1.0  # Normal body (30-50% uppercase)
+    else:
+        return 0.8  # Mostly lowercase body (<30% uppercase)
 
 
 def calculate_similarity(str1: str, str2: str) -> float:

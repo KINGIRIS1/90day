@@ -96,11 +96,20 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
             ocr_engine = vietocr_engine
             engine_name = "VietOCR"
             print(f"🔍 Using VietOCR engine", file=sys.stderr)
+        elif ocr_engine_type == 'easyocr' and easyocr_engine is not None:
+            ocr_engine = easyocr_engine
+            engine_name = "EasyOCR"
+            print(f"🔍 Using EasyOCR engine", file=sys.stderr)
         else:
+            # Default to Tesseract or fallback
             ocr_engine = tesseract_engine
             engine_name = "Tesseract"
+            
+            # Show fallback message if non-Tesseract was requested
             if ocr_engine_type == 'vietocr' and vietocr_engine is None:
                 print(f"⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+            elif ocr_engine_type == 'easyocr' and easyocr_engine is None:
+                print(f"⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
             else:
                 print(f"🔍 Using Tesseract engine", file=sys.stderr)
         

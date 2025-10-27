@@ -52,7 +52,7 @@ class OCREngine:
         Extract text from image using EasyOCR with optimizations
         
         Optimizations:
-        1. Crop to top 40% (title area only)
+        1. Crop to top 35% (title area only)
         2. Resize if too large (max 1920px width)
         3. Use optimized parameters for speed
         

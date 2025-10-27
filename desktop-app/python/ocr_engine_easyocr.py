@@ -113,29 +113,27 @@ class OCREngine:
             
             # Extract text from results
             full_text_parts = []
-            high_confidence_parts = []
             
+            # Since we already cropped to top 25%, ALL text extracted IS title text
             for detection in result:
                 bbox, text, confidence = detection
                 full_text_parts.append(text)
-                
-                # Consider high confidence text for title (>0.5)
-                if confidence > 0.5:
-                    high_confidence_parts.append(text)
             
             full_text = ' '.join(full_text_parts)
             
-            # Use high confidence text as title, fallback to all text
-            title_text = ' '.join(high_confidence_parts) if high_confidence_parts else full_text
+            # Important: Since we cropped to top 25%, all extracted text is from title area
+            # Use the same text for both full_text and title_text
+            title_text = full_text
             
             # Estimate font height (rough approximation based on image size)
             avg_height = 50 if len(full_text) > 0 else 0
             
             print(f"📝 Extracted text length: {len(full_text)} chars", file=sys.stderr)
+            print(f"🎯 Title text: {title_text[:100]}...", file=sys.stderr)  # Show first 100 chars
             
             return {
                 'full_text': full_text,
-                'title_text': title_text,
+                'title_text': title_text,  # Same as full_text since we cropped to title area
                 'avg_height': avg_height
             }
             

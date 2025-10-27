@@ -330,6 +330,10 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
           }
           
           const jsonResult = JSON.parse(jsonLine);
+          
+          // Log the actual extracted text to verify encoding
+          console.log('📝 Original text extracted:', jsonResult.original_text?.substring(0, 100));
+          
           resolve(jsonResult);
         } catch (e) {
           console.error('JSON parse error:', e);

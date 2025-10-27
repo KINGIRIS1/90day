@@ -10,24 +10,44 @@ from typing import Dict, Tuple, List
 # NEW: Document type configuration with required title keywords
 DOCUMENT_TYPE_CONFIG = {
     "GCNM": {
-        "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "giay chung nhan"],
+        "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "giay chung nhan", "chứng nhận"],
         "weight": 1.5
+    },
+    "GCNC": {
+        "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "bản chính", "BẢN CHÍNH"],
+        "weight": 1.4
     },
     "HDCQ": {
         "required_in_title": ["hợp đồng", "HỢP ĐỒNG", "HỢP ĐỎNG", "hop dong"],
         "weight": 1.6
     },
+    "HDBDG": {
+        "required_in_title": ["hợp đồng", "HỢP ĐỒNG", "hop dong", "mua bán"],
+        "weight": 1.5
+    },
+    "HDUQ": {
+        "required_in_title": ["hợp đồng", "HỢP ĐỒNG", "ủy quyền"],
+        "weight": 1.5
+    },
     "GUQ": {
-        "required_in_title": ["giấy ủy quyền", "GIẤY ỦY QUYỀN", "giay uy quyen"],
+        "required_in_title": ["giấy ủy quyền", "GIẤY ỦY QUYỀN", "giay uy quyen", "ủy quyền"],
         "weight": 1.7
     },
     "DDKBD": {
-        "required_in_title": ["đơn đăng ký", "ĐƠN ĐĂNG KÝ", "don dang ky", "đăng ký biến động"],
+        "required_in_title": ["đơn đăng ký", "ĐƠN ĐĂNG KÝ", "don dang ky", "đăng ký biến động", "biến động"],
         "weight": 1.2
     },
     "BMT": {
-        "required_in_title": ["bản đồ", "BẢN ĐỒ", "ban do", "bản vẽ"],
+        "required_in_title": ["bản đồ", "BẢN ĐỒ", "ban do", "bản vẽ", "bản vẽ"],
         "weight": 1.1
+    },
+    "CCCD": {
+        "required_in_title": ["căn cước", "CĂN CƯỚC", "can cuoc", "căn cước công dân"],
+        "weight": 1.0
+    },
+    "CMND": {
+        "required_in_title": ["chứng minh", "CHỨNG MINH", "chung minh", "chứng minh nhân dân"],
+        "weight": 1.0
     },
 }
 

@@ -72,12 +72,13 @@
 user_problem_statement: |
   Hybrid Desktop App with offline-first architecture:
   - Default: OCR+Rules (85-88%, FREE, offline) using Tesseract OCR
-  - Optional: VietOCR engine (90-95%, FREE, offline, Vietnamese specialized) - User can switch in Settings
+  - Optional: EasyOCR engine (90-92%, FREE, offline, ~10-11s/page, optimized) - User can switch in Settings
+  - Optional: VietOCR engine (90-95%, FREE, offline, Vietnamese specialized, 1-2s/page) - User can switch in Settings
   - Optional: Cloud boost button (93%, có phí, online) using GPT-4
-  - User tự chọn OCR engine (Tesseract vs VietOCR) và trade-off between privacy/cost vs accuracy
+  - User tự chọn OCR engine (Tesseract / EasyOCR / VietOCR) và trade-off between speed vs accuracy
   - Electron + React + Python integration
   - Web app continues running in parallel
-  - UI toggle in Settings to choose between Tesseract and VietOCR
+  - UI toggle in Settings to choose between 3 OCR engines
 
 backend:
   - task: "Python OCR Engine for Desktop"

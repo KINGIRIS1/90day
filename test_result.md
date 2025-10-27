@@ -95,27 +95,39 @@ backend:
 frontend:
   - task: "Desktop App - Electron + React"
     implemented: true
-    working: "NA"
+    working: "needs_testing"
     file: "/app/desktop-app/src/App.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: "NA"
+      - working: "needs_testing"
         agent: "main"
-        comment: "Created Electron desktop app with React UI. Features: file/folder picker, offline OCR processing, cloud boost option, settings page. IPC communication via preload.js. Needs testing in electron-dev mode."
+        comment: "Created Electron desktop app with React UI. Features: file/folder picker, offline OCR processing, cloud boost option, settings page with OCR engine selection. IPC communication via preload.js. Needs testing in electron-dev mode."
   
   - task: "Desktop Scanner Component"
     implemented: true
-    working: "NA"
+    working: "needs_testing"
     file: "/app/desktop-app/src/components/DesktopScanner.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: "NA"
+      - working: "needs_testing"
         agent: "main"
-        comment: "Main scanning UI with two processing modes: Offline OCR (free, 85-88%) and Cloud Boost (paid, 93%+). Shows confidence bars, method badges, and recommendations. Needs electron testing."
+        comment: "Main scanning UI with two processing modes: Offline OCR (free, 85-95% depending on engine) and Cloud Boost (paid, 93%+). Shows confidence bars, method badges, and recommendations. Needs electron testing."
+  
+  - task: "Settings - OCR Engine Selection"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/desktop-app/src/components/Settings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Added new UI section for OCR engine selection. Users can choose between Tesseract (fast, 85-88%) and VietOCR (Vietnamese specialized, 90-95%). Preference saved via electron-store. Dynamic display of selected engine in App Info section."
 
 metadata:
   created_by: "main_agent"

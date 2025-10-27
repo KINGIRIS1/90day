@@ -11,6 +11,14 @@ Pillow>=10.0.0
 # torch>=2.0.0
 # torchvision>=0.15.0
 
+# EasyOCR - Optional Vietnamese OCR Engine (Recommended)
+# Cân bằng giữa accuracy (90-92%) và ease of use
+# Tốc độ: ~10-11s/page với optimization
+# Uncomment dòng dưới để cài:
+# easyocr>=1.7.0
+# torch>=2.0.0
+# torchvision>=0.15.0
+
 # Lưu ý: Cần cài Tesseract binary riêng
 # Windows: https://github.com/UB-Mannheim/tesseract/wiki
 # Mac: brew install tesseract tesseract-lang

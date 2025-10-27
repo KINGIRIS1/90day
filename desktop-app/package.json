@@ -8,8 +8,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "electron": "electron .",
-    "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-dev-win": "concurrently \"set BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3001 && electron .\"",
+    "electron-dev-win": "concurrently \"set BROWSER=none && yarn start\" \"wait-on http://localhost:3001 && electron .\"",
     "electron-pack": "yarn build && electron-builder --dir",
     "electron-build": "yarn build && electron-builder",
     "postinstall": "electron-builder install-app-deps"

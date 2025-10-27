@@ -268,6 +268,9 @@ ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
 
 ipcMain.handle('process-document-offline', async (event, filePath) => {
   return new Promise((resolve, reject) => {
+    // Get OCR engine preference from store (default: tesseract)
+    const ocrEngineType = store.get('ocrEngineType', 'tesseract');
+    
     // Auto-detect Python command based on platform
     let pythonPath;
     if (isDev) {
@@ -286,8 +289,8 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       ? getPythonScriptPath('process_document.py')
       : getPythonScriptPath('process_document.py');
 
-    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath}`);
-    const childProcess = spawn(pythonPath, [scriptPath, filePath]);
+    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
+    const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType]);
     let result = '';
     let errorLogs = '';
 

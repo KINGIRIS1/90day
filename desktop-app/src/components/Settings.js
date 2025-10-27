@@ -70,7 +70,7 @@ const OCREngineTypeSetting = () => {
           />
           <div>
             <div className="font-medium">Tesseract OCR</div>
-            <div className="text-xs text-gray-500">Nhanh, nhẹ, hỗ trợ đa ngôn ngữ (bao gồm tiếng Việt)</div>
+            <div className="text-xs text-gray-500">Nhanh nhất (0.5-1s), đa ngôn ngữ, accuracy 85-88%</div>
           </div>
         </label>
         <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
@@ -83,7 +83,20 @@ const OCREngineTypeSetting = () => {
           />
           <div>
             <div className="font-medium">VietOCR (Transformer)</div>
-            <div className="text-xs text-gray-500">Chuyên cho tiếng Việt, độ chính xác cao (90-95%), cần cài đặt riêng</div>
+            <div className="text-xs text-gray-500">Cân bằng (1-2s), chuyên tiếng Việt, accuracy 90-95%, cần cài đặt riêng</div>
+          </div>
+        </label>
+        <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+          <input 
+            type="radio" 
+            name="ocrEngineType" 
+            value="easyocr"
+            checked={engineType === 'easyocr'} 
+            onChange={() => save('easyocr')} 
+          />
+          <div>
+            <div className="font-medium">EasyOCR ⭐ Recommended</div>
+            <div className="text-xs text-gray-500">Chính xác cao (10-11s), tiếng Việt tốt, accuracy 90-92%, cần cài đặt riêng</div>
           </div>
         </label>
       </div>

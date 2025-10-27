@@ -754,7 +754,7 @@ DOCUMENT_RULES = {
             "NHUONG", "CHUYEN NHUONG QUYEN SU' DUNG",
             "chuyen nhuqng", "hop dong chuyen nhuqng"
         ],
-        "weight": 1.3,  # Tăng weight để ưu tiên hơn CCCD
+        "weight": 1.6,  # Tăng weight cao hơn GCNM (1.5) để ưu tiên khi title match
         "min_matches": 1
     },
     "HDBDG": {

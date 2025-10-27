@@ -100,27 +100,44 @@ config['device'] = 'cuda:0'  # Requires NVIDIA GPU + CUDA
 
 ## 🚀 Usage in Desktop App
 
-Desktop app automatically uses VietOCR if installed:
+Desktop app allows you to **choose between Tesseract and VietOCR** in Settings:
 
-### Priority Order:
+### How to Switch OCR Engine:
+
+1. Open **Settings** tab in the desktop app
+2. Find section **"🔍 Chọn OCR Engine (Offline)"**
+3. Select your preferred engine:
+   - **Tesseract OCR**: Fast, lightweight, multi-language
+   - **VietOCR (Transformer)**: Vietnamese specialized, 90-95% accuracy
+4. Your choice is saved automatically
+
+### Engine Priority:
+
 ```
-1. VietOCR (90-95%, Vietnamese specialized) ← Best choice
-2. Tesseract (85-88%, fallback)
-3. PaddleOCR (90-95%, but verbose logs)
+User Selection (Settings) → Tesseract OR VietOCR
+                             ↓
+                    Auto-fallback if selected engine fails
 ```
 
 ### First Run:
 
-On first OCR processing:
+On first OCR processing with VietOCR:
 - VietOCR downloads pretrained model (~100MB)
 - Takes ~1-2 minutes
 - Cached for subsequent runs
 
 ### Expected Output:
 
+**When using VietOCR:**
 ```
-Trying VietOCR (Vietnamese Transformer-based, 90-95% accuracy)
+🔍 Using VietOCR engine
 ✅ VietOCR Transformer model loaded successfully
+```
+
+**When using Tesseract:**
+```
+🔍 Using Tesseract engine
+✅ Tesseract OCR loaded
 ```
 
 ---

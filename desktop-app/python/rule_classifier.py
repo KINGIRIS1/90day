@@ -1488,8 +1488,8 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
             # Base score from matched keywords
             base_score = len(matched) * weight
             
-            # Boost score for title matches (2x multiplier)
-            title_boost = title_matches * weight * 2.0
+            # Boost score for title matches (3x multiplier for strong title indicators)
+            title_boost = title_matches * weight * 3.0
             
             # Final score = base + title boost
             score = base_score + title_boost

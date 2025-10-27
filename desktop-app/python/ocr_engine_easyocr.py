@@ -78,8 +78,8 @@ class OCREngine:
             image = Image.open(image_path)
             width, height = image.size
             
-            # OPTIMIZATION 1: Crop to top 40% (where document title/type is)
-            crop_height = int(height * 0.4)
+            # OPTIMIZATION 1: Crop to top 35% (where document title/type is)
+            crop_height = int(height * 0.35)
             cropped_image = image.crop((0, 0, width, crop_height))
             
             # OPTIMIZATION 2: Resize if too large (max 1920px width)

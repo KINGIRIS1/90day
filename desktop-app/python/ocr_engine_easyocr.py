@@ -21,7 +21,7 @@ class OCREngine:
     EasyOCR Engine - Optimized for Vietnamese documents
     - 90-92% accuracy for Vietnamese text
     - Optimized for speed (crop + resize + parameters)
-    - Focus on title area (top 40%)
+    - Focus on title area (top 35%)
     """
     
     _instance = None

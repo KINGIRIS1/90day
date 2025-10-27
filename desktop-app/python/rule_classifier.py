@@ -1820,9 +1820,19 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
             if title_normalized and keyword_normalized in title_normalized:
                 matched.append(f"{keyword} [TITLE]")
                 title_matches += 1
-                total_score += weight * specificity * 3.0
+                
+                # Case-aware scoring: Check if keyword appears in UPPERCASE in original title
+                # Find the keyword in original title_text (case-sensitive)
+                if title_text:
+                    # Get case-aware multiplier for the matched keyword context
+                    case_multiplier = get_case_aware_score_multiplier(title_text)
+                    total_score += weight * specificity * 3.0 * case_multiplier
+                else:
+                    total_score += weight * specificity * 3.0
+                    
             elif keyword_normalized in text_normalized:
                 matched.append(keyword)
+                # Body match: weight × specificity × 1.0 (no case bonus for body)
                 total_score += weight * specificity * 1.0
         
         if len(matched) >= min_matches:

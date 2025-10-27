@@ -1652,7 +1652,18 @@ def calculate_similarity_with_case_awareness(str1: str, str2: str) -> Tuple[floa
         case_aware_similarity = max(base_similarity - case_penalty, 0.0)
     
     return base_similarity, case_aware_similarity
+
+
+def calculate_similarity(str1: str, str2: str) -> float:
     """
+    Calculate string similarity ratio (for backward compatibility)
+    Returns case-aware similarity
+    """
+    _, case_aware_sim = calculate_similarity_with_case_awareness(str1, str2)
+    return case_aware_sim
+
+
+def find_best_template_match(title_text: str, templates: Dict[str, List[str]]) -> Tuple[str, float, dict]:
     Calculate string similarity ratio using SequenceMatcher
     
     Args:

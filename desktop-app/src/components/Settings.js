@@ -96,7 +96,7 @@ const OCREngineTypeSetting = () => {
           />
           <div>
             <div className="font-medium">EasyOCR ⭐ Recommended</div>
-            <div className="text-xs text-gray-500">Chính xác cao (10-11s), tiếng Việt tốt, accuracy 90-92%, cần cài đặt riêng</div>
+            <div className="text-xs text-gray-500">Chính xác cao (7-8s), tiếng Việt tốt, accuracy 90-92%, cần cài đặt riêng</div>
           </div>
         </label>
       </div>

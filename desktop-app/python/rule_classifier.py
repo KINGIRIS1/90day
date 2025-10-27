@@ -1771,11 +1771,26 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     if title_boost_applied.get(best_type, False):
         confidence = min(confidence * 1.2, 1.0)  # 20% confidence boost for title matches
     
+    # Build reasoning
+    reasoning_parts = []
+    reasoning_parts.append(f"Matched keywords: {', '.join(matched_keywords_dict[best_type][:10])}")
+    
+    if best_type in fuzzy_score_boost:
+        fuzzy_sim = fuzzy_score_boost[best_type]
+        reasoning_parts.append(f"| 📊 Title similarity: {fuzzy_sim:.0%} (Tier 2 bonus applied)")
+    
+    if title_boost_applied.get(best_type, False):
+        reasoning_parts.append("| ✓ Title detection boosted confidence [TITLE DETECTED ✓]")
+    
+    reasoning = " ".join(reasoning_parts)
+    
     return {
         "type": best_type,
         "confidence": confidence,
         "matched_keywords": matched_keywords_dict[best_type],
-        "title_boost": title_boost_applied.get(best_type, False)
+        "title_boost": title_boost_applied.get(best_type, False),
+        "reasoning": reasoning,
+        "method": "keyword_match" if best_type not in fuzzy_score_boost else "hybrid_match"
     }
 
 

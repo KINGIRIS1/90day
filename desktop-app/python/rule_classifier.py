@@ -1756,17 +1756,32 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     if title_text:
         best_template_match, best_similarity = find_best_template_match(title_text, TITLE_TEMPLATES)
         
-        if best_similarity >= 0.8:
+        # Check if title is in UPPERCASE (Vietnamese admin document standard)
+        title_uppercase_ratio = calculate_uppercase_ratio(title_text)
+        is_uppercase_title = title_uppercase_ratio >= 0.7
+        
+        # Adjust threshold based on case:
+        # - UPPERCASE titles (70%+ uppercase): Use 80% threshold (strict)
+        # - Mixed/lowercase: Use 85% threshold (more strict to avoid false positives)
+        similarity_threshold = 0.8 if is_uppercase_title else 0.85
+        
+        if best_similarity >= similarity_threshold:
             # HIGH CONFIDENCE - Direct match based on title
             doc_name = classify_document_name_from_code(best_template_match)
+            
+            # Boost confidence for UPPERCASE titles (more reliable)
+            confidence = best_similarity
+            if is_uppercase_title:
+                confidence = min(confidence * 1.05, 1.0)  # 5% boost for uppercase
+            
             return {
                 "type": best_template_match,
                 "doc_type": doc_name,
                 "short_code": best_template_match,
-                "confidence": best_similarity,
-                "matched_keywords": [f"Title fuzzy match: {best_similarity:.0%}"],
+                "confidence": confidence,
+                "matched_keywords": [f"Title fuzzy match: {best_similarity:.0%} (Uppercase: {title_uppercase_ratio:.0%})"],
                 "title_boost": True,
-                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity) [TIER 1: FUZZY MATCH]",
+                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity, {title_uppercase_ratio:.0%} uppercase) [TIER 1: FUZZY MATCH]",
                 "method": "fuzzy_title_match",
                 "accuracy_estimate": "95%+",
                 "recommend_cloud_boost": False  # Very confident, no need for cloud boost

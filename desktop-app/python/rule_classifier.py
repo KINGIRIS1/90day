@@ -672,14 +672,21 @@ DOCUMENT_RULES = {
         "keywords": [
             # Có dấu
             "giấy ủy quyền", "ủy quyền", "người được ủy quyền",
+            "tôi tên là", "tôi là", "được ủy quyền",
             # Không dấu
             "giay uy quyen", "uy quyen", "nguoi duoc uy quyen",
+            "toi ten la", "toi la", "duoc uy quyen",
             # Viết hoa (auto-generated)
             "GIẤY ỦY QUYỀN",
             "ỦY QUYỀN",
-            "NGƯỜI ĐƯỢC ỦY QUYỀN"
+            "NGƯỜI ĐƯỢC ỦY QUYỀN",
+            "TÔI TÊN LÀ", "TÔI LÀ", "ĐƯỢC ỦY QUYỀN",
+            # OCR typos
+            "GIẤY UY QUYỀN", "GIẤY ỦY QUYEN", 
+            "UY QUYEN", "UY QUYỀN", "Ủ'Y QUYỀN"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.7,  # Cao hơn HDCQ (1.6) để ưu tiên khi title match "GIẤY ỦY QUYỀN"
+        "min_matches": 1
     },
     "GXNDKLD": {
         "keywords": [

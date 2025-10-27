@@ -136,6 +136,7 @@ const AutoFallbackSetting = () => {
 const Settings = () => {
   const [backendUrl, setBackendUrl] = useState('');
   const [saved, setSaved] = useState(false);
+  const [ocrEngine, setOcrEngine] = useState('Tesseract OCR');
 
   useEffect(() => {
     loadSettings();
@@ -145,6 +146,14 @@ const Settings = () => {
     try {
       const url = await window.electronAPI.getBackendUrl();
       setBackendUrl(url || '');
+      
+      // Load OCR engine type
+      const engineType = await window.electronAPI.getConfig('ocrEngineType');
+      if (engineType === 'vietocr') {
+        setOcrEngine('VietOCR (Transformer)');
+      } else {
+        setOcrEngine('Tesseract OCR');
+      }
     } catch (error) {
       console.error('Error loading settings:', error);
     }

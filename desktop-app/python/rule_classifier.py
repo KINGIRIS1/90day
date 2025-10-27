@@ -1,11 +1,61 @@
 """
 COMPLETE Rule-based classifier for Vietnamese land documents with Smart Scoring
-- Required keywords in title for disambiguation
-- Keyword specificity scoring (specific keywords > generic keywords)
-- Auto-exclude when required keywords missing
+- HYBRID APPROACH: Fuzzy title matching (80%+) → Keyword fallback
+- Tier 1: Title similarity >= 80% → High confidence
+- Tier 2: Title similarity >= 50% → Check keywords
+- Tier 3: Title similarity < 50% → Pure keyword matching
 """
 import re
 from typing import Dict, Tuple, List
+from difflib import SequenceMatcher
+
+# Title templates for fuzzy matching (các mẫu title chuẩn)
+TITLE_TEMPLATES = {
+    "GCNM": [
+        "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT QUYỀN SỞ HỮU NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT",
+        "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT",
+        "GIẤY CHỨNG NHẬN",
+        "GIAY CHUNG NHAN QUYEN SU DUNG DAT"
+    ],
+    "HDCQ": [
+        "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT",
+        "HỢP ĐỒNG CHUYỂN NHƯỢNG",
+        "HOP DONG CHUYEN NHUONG QUYEN SU DUNG DAT",
+        "HOP DONG CHUYEN NHUONG"
+    ],
+    "GUQ": [
+        "GIẤY UỶ QUYỀN",
+        "GIẤY ỦY QUYỀN",
+        "GIAY UY QUYEN"
+    ],
+    "DDKBD": [
+        "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI TÀI SẢN GẮN LIỀN VỚI ĐẤT",
+        "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG",
+        "DON DANG KY BIEN DONG"
+    ],
+    "BMT": [
+        "BẢN ĐỒ ĐỊA CHÍNH",
+        "BẢN ĐỒ THỬA ĐẤT",
+        "BẢN ĐỒ",
+        "BAN DO DIA CHINH"
+    ],
+    "CCCD": [
+        "CĂN CƯỚC CÔNG DÂN",
+        "CAN CUOC CONG DAN"
+    ],
+    "CMND": [
+        "CHỨNG MINH NHÂN DÂN",
+        "CHUNG MINH NHAN DAN"
+    ],
+    "HDBDG": [
+        "HỢP ĐỒNG MUA BÁN",
+        "HOP DONG MUA BAN"
+    ],
+    "GCNC": [
+        "GIẤY CHỨNG NHẬN BẢN CHÍNH",
+        "GIAY CHUNG NHAN BAN CHINH"
+    ],
+}
 
 # NEW: Document type configuration with required title keywords
 DOCUMENT_TYPE_CONFIG = {

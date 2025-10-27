@@ -263,13 +263,13 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         pythonPath = 'python3'; // Linux/Mac
       }
     } else {
-      // Production mode
-      pythonPath = path.join(process.resourcesPath, 'python', 'python3');
+      // Production mode - use system Python
+      pythonPath = getPythonPath();
     }
     
     const scriptPath = isDev
       ? path.join(__dirname, '../python/process_document.py')
-      : path.join(process.resourcesPath, 'python', 'process_document.py');
+      : getPythonScriptPath('process_document.py');
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath}`);
     const childProcess = spawn(pythonPath, [scriptPath, filePath]);

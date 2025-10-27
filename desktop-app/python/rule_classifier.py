@@ -1556,6 +1556,52 @@ def normalize_text(text: str) -> str:
     return text.strip()
 
 
+def calculate_similarity(str1: str, str2: str) -> float:
+    """
+    Calculate string similarity ratio using SequenceMatcher
+    
+    Args:
+        str1: First string (e.g., extracted title)
+        str2: Second string (e.g., template title)
+    
+    Returns:
+        float: Similarity ratio (0.0 to 1.0)
+    """
+    # Normalize both strings
+    s1 = normalize_text(str1)
+    s2 = normalize_text(str2)
+    
+    # Use SequenceMatcher for fuzzy matching
+    return SequenceMatcher(None, s1, s2).ratio()
+
+
+def find_best_template_match(title_text: str, templates: Dict[str, List[str]]) -> Tuple[str, float]:
+    """
+    Find best matching document type based on title templates
+    
+    Args:
+        title_text: Extracted title from document
+        templates: Dict of doc_type -> list of title templates
+    
+    Returns:
+        Tuple[str, float]: (best_doc_type, best_similarity_score)
+    """
+    if not title_text:
+        return None, 0.0
+    
+    best_match = None
+    best_score = 0.0
+    
+    for doc_type, template_list in templates.items():
+        for template in template_list:
+            similarity = calculate_similarity(title_text, template)
+            if similarity > best_score:
+                best_score = similarity
+                best_match = doc_type
+    
+    return best_match, best_score
+
+
 def calculate_keyword_specificity(keyword: str, all_rules: Dict) -> float:
     """
     Calculate how specific a keyword is

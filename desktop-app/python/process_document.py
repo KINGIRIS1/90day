@@ -142,12 +142,13 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({
-            "error": "Usage: python process_document.py <file_path>",
+            "error": "Usage: python process_document.py <file_path> [ocr_engine_type]",
             "success": False
         }, ensure_ascii=True))
         sys.exit(1)
     
     file_path = sys.argv[1]
+    ocr_engine_type = sys.argv[2] if len(sys.argv) > 2 else 'tesseract'
     
     if not file_path or not os.path.exists(file_path):
         error_msg = json.dumps({
@@ -159,7 +160,7 @@ def main():
         sys.stdout.flush()
         sys.exit(1)
     
-    result = process_document(file_path)
+    result = process_document(file_path, ocr_engine_type)
     
     # Output JSON with proper encoding
     output = json.dumps(result, ensure_ascii=False)

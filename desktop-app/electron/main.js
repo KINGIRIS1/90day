@@ -259,9 +259,9 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     // Auto-detect Python command based on platform
     let pythonPath;
     if (isDev) {
-      // Development mode - try different Python commands
+      // Development mode - use python command directly
       if (process.platform === 'win32') {
-        pythonPath = 'py'; // Windows py launcher
+        pythonPath = 'python'; // Windows - use 'python' command
       } else {
         pythonPath = 'python3'; // Linux/Mac
       }

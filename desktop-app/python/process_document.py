@@ -118,6 +118,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
         return {
             "success": True,
             "method": "offline_ocr",
+            "ocr_engine": engine_name,
             "original_text": extracted_text,
             "title_text": title_text,
             "avg_font_height": round(avg_height, 1),

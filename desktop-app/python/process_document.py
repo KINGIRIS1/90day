@@ -198,8 +198,9 @@ def main():
     
     result = process_document(file_path, ocr_engine_type)
     
-    # Output JSON with proper encoding
-    output = json.dumps(result, ensure_ascii=False)
+    # Output JSON with ASCII encoding (Unicode will be escaped like \uXXXX)
+    # This ensures safe transmission through process pipes
+    output = json.dumps(result, ensure_ascii=True, indent=None)
     
     # Write to stdout and flush immediately
     sys.stdout.write(output)

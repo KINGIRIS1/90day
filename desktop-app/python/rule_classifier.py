@@ -752,7 +752,14 @@ DOCUMENT_RULES = {
             # OCR common typos (quan trọng!)
             "NHUQNG", "CHUYEN NHUQNG", "HOP DONG CHUYEN NHUQNG",
             "NHUONG", "CHUYEN NHUONG QUYEN SU' DUNG",
-            "chuyen nhuqng", "hop dong chuyen nhuqng"
+            "chuyen nhuqng", "hop dong chuyen nhuqng",
+            # EasyOCR specific typos
+            "HỢP ĐỎNG", "ĐỎNG", "hop dong", "HOP ĐỎNG",
+            "CHUYỂN NHƯONG", "NHƯONG", "chuyen nhuong",
+            "HỢP ĐỎNG CHUYỂN NHƯỢNG", "HỢP ĐỎNG CHUYỂN NHƯONG",
+            "QUYẺN", "QUYỀN", "quyen", "QUYẺN SỬ DỤNG",
+            # More variants
+            "hợp đỏng", "đỏng", "chuyển nhưong", "nhưong"
         ],
         "weight": 1.6,  # Tăng weight cao hơn GCNM (1.5) để ưu tiên khi title match
         "min_matches": 1

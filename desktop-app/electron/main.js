@@ -84,13 +84,11 @@ function getPythonPath() {
 
 // Initialize Python OCR engine
 function initPythonEngine() {
-  const pythonPath = isDev
-    ? 'python3'
-    : path.join(process.resourcesPath, 'python', 'python3');
+  const pythonPath = getPythonPath();
   
   const scriptPath = isDev
     ? path.join(__dirname, '../python/ocr_engine.py')
-    : path.join(process.resourcesPath, 'python', 'ocr_engine.py');
+    : getPythonScriptPath('ocr_engine.py');
 
   pythonProcess = spawn(pythonPath, [scriptPath]);
 

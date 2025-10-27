@@ -1549,11 +1549,16 @@ def check_required_keywords_in_title(doc_type: str, title_text: str, config: Dic
 
 def classify_by_rules(text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
     """
-    Classify document using rules with Vietnamese keywords
+    Classify document using rules with Smart Scoring
+    
+    Features:
+    - Required keywords in title (auto-exclude if missing)
+    - Keyword specificity scoring (specific > generic)
+    - Title boost (3x multiplier)
     
     Args:
         text: Full OCR text
-        title_text: Text extracted from large fonts (titles/headers) - gets 2x priority
+        title_text: Text extracted from large fonts (titles/headers)
         confidence_threshold: Minimum confidence threshold
         
     Returns:
@@ -1567,35 +1572,40 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     title_boost_applied = {}
     
     for doc_type, rules in DOCUMENT_RULES.items():
+        # STEP 1: Check required keywords in title
+        if not check_required_keywords_in_title(doc_type, title_text, DOCUMENT_TYPE_CONFIG):
+            # Required keyword missing in title → Skip this doc type
+            continue
+        
         keywords = rules["keywords"]
         weight = rules.get("weight", 1.0)
         min_matches = rules.get("min_matches", 1)
         
         matched = []
         title_matches = 0
+        total_score = 0.0
         
         for keyword in keywords:
             keyword_normalized = normalize_text(keyword)
             
-            # Check if keyword is in title (large font) - gets 2x weight
+            # Calculate keyword specificity (how unique this keyword is)
+            specificity = calculate_keyword_specificity(keyword, DOCUMENT_RULES)
+            
+            # Check if keyword is in title (large font)
             if title_normalized and keyword_normalized in title_normalized:
                 matched.append(f"{keyword} [TITLE]")
                 title_matches += 1
+                # Title match: weight × specificity × 3.0 (title boost)
+                total_score += weight * specificity * 3.0
+                
             # Check if keyword is in full text
             elif keyword_normalized in text_normalized:
                 matched.append(keyword)
+                # Body match: weight × specificity × 1.0
+                total_score += weight * specificity * 1.0
         
         if len(matched) >= min_matches:
-            # Base score from matched keywords
-            base_score = len(matched) * weight
-            
-            # Boost score for title matches (3x multiplier for strong title indicators)
-            title_boost = title_matches * weight * 3.0
-            
-            # Final score = base + title boost
-            score = base_score + title_boost
-            
-            scores[doc_type] = score
+            scores[doc_type] = total_score
             matched_keywords_dict[doc_type] = matched
             title_boost_applied[doc_type] = title_matches > 0
     

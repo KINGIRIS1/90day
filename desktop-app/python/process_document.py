@@ -45,13 +45,32 @@ try:
     try:
         from ocr_engine_vietocr import OCREngine as VietOCREngine
         vietocr_engine = VietOCREngine()
-        print("✅ Both Tesseract and VietOCR engines loaded", file=sys.stderr)
+        print("✅ VietOCR engine loaded", file=sys.stderr)
     except ImportError as viet_import_error:
         print(f"⚠️ VietOCR not installed: {viet_import_error}", file=sys.stderr)
-        print("✅ Tesseract OCR loaded (VietOCR disabled - will auto-fallback)", file=sys.stderr)
     except Exception as viet_error:
         print(f"⚠️ VietOCR initialization failed: {viet_error}", file=sys.stderr)
-        print("✅ Tesseract OCR loaded (VietOCR disabled - will auto-fallback)", file=sys.stderr)
+    
+    # Try to import and initialize EasyOCR (optional)
+    easyocr_engine = None
+    EasyOCREngine = None
+    
+    try:
+        from ocr_engine_easyocr import OCREngine as EasyOCREngine
+        easyocr_engine = EasyOCREngine()
+        print("✅ EasyOCR engine loaded", file=sys.stderr)
+    except ImportError as easy_import_error:
+        print(f"⚠️ EasyOCR not installed: {easy_import_error}", file=sys.stderr)
+    except Exception as easy_error:
+        print(f"⚠️ EasyOCR initialization failed: {easy_error}", file=sys.stderr)
+    
+    # Summary of loaded engines
+    engines_loaded = ["Tesseract"]
+    if vietocr_engine:
+        engines_loaded.append("VietOCR")
+    if easyocr_engine:
+        engines_loaded.append("EasyOCR")
+    print(f"✅ OCR Engines loaded: {', '.join(engines_loaded)}", file=sys.stderr)
     
 except ImportError as e:
     print(json.dumps({

@@ -1,81 +1,63 @@
 <analysis>
-The AI engineer's work spanned multiple iterative phases, transforming an Electron desktop OCR application for Vietnamese land documents. Initially, it involved enforcing a Tesseract-only OCR configuration, addressing previous issues with other engines. Subsequently, a comprehensive Rules Manager was implemented, enabling UI-driven rule creation, editing, deletion, import/export, and reset, including an auto-generate variants feature for keywords. Significant effort was dedicated to improving the UI/UX with modal forms for rule management and ensuring scan tab state persistence. A major focus shifted to simplifying application distribution, fixing Electron-builder configuration issues, and resolving critical Python path and Windows encoding problems within the packaged app. The work continuously integrated user feedback, culminating in efforts to create an all-in-one installer bundling Python and Tesseract.
+The previous AI engineer's work involved a multi-faceted iterative process, focusing initially on building and debugging an all-in-one Electron installer. Key challenges included resolving NSIS icon errors, ensuring correct file copying within the installer, and fixing  privilege issues on Windows by disabling code signing. A significant portion of the work revolved around robustly configuring the Python environment for the packaged Electron app, addressing  missing dependency errors and hardcoded Python paths in  and . Concurrently, the engineer handled a port conflict request by updating build scripts and Electron configuration. The most recent efforts culminated in successfully installing and verifying VietOCR, a Vietnamese OCR engine, into the designated Python 3.12 environment, setting the stage for its integration into the application's OCR pipeline.
 </analysis>
 
 <product_requirements>
-The application is a desktop document scanner for Vietnamese land-related images, designed for high-volume use. It aims to OCR and rename documents using short codes, supporting single and batch scanning, history, and PDF export. Key features requested and implemented include:
+The application is a desktop document scanner for Vietnamese land-related images, designed for high-volume use. It aims to OCR and rename documents using short codes, supporting single and batch scanning, history, and PDF export. Key features implemented or requested include:
 - Default Offline OCR (Tesseract only) and Optional Cloud Boost (GPT-4 Vision).
-- Sequential naming for multi-page documents.
-- Title prioritization based on bold/large text.
-- Debug view for raw OCR text, image preview.
-- Inline short-code editing.
-- Folder scanning with tabbed results, incremental processing, and PDF merging.
-- UI/UX improvements (compact header, density switch, branding, splash screen).
-- Global OCR engine preference with a quick toggle and status display.
-- **Rules Manager**: UI for adding, editing, and deleting classification rules, importing/exporting JSON rules, resetting to defaults, and opening the rules folder.
-- **Auto-generate Keyword Variants**: Automatically create variants (diacritics, case, typos) for rule keywords.
-- **Persistent Scan Tab State**: The document scanning tab must maintain its state (progress, results) when switching to other tabs.
-- **Easy Installation**: Simplification of the application's installation process on other machines, including the creation of one-click installers and potentially bundling Python and Tesseract.
+- Rules Manager for UI-driven classification rule management (add, edit, delete, import/export, reset, auto-generate keyword variants).
+- Persistent Scan Tab State.
+- **Easy Installation**: Simplified all-in-one installer bundling Python and Tesseract.
 - Improve existing  accuracy and add  to .
+- **Port Conflict Resolution**: Change the development server port from 3000 (used by another app) to 3001.
+- **Enhanced OCR**: Explore and integrate VietOCR for improved Vietnamese language OCR accuracy.
 </product_requirements>
 
 <key_technical_concepts>
-- **Full-stack Desktop Development**: Electron (main/renderer process), React (UI), Python (local OCR/processing, rule classification).
-- **OCR Engines**: Tesseract (primary offline), OpenAI GPT-4 Vision (Cloud Boost).
-- **Inter-process Communication (IPC)**: Electron's /.
-- **Rule-based Classification**: Custom Python modules for document type classification.
-- **UI/UX**: Tailwind CSS, , React state management.
-- **Build/Distribution**: electron-builder, NSIS (Nullsoft Scriptable Install System).
-- **Python Environment Management**: , handling Windows encoding issues.
+- **Electron**: Desktop application framework.
+- **React**: Frontend UI development.
+- **Python**: Backend for OCR, rule classification.
+- **Tesseract**: Primary offline OCR engine.
+- **NSIS (Nullsoft Scriptable Install System)**: Windows installer creation.
+- ****: Packaging and building Electron apps.
+- **/**: Electron inter-process communication.
+- ****: Python wrapper for Tesseract.
+- **VietOCR**: Transformer-based Vietnamese OCR library.
+- **PyTorch**: Deep learning framework, dependency for VietOCR.
 </key_technical_concepts>
 
 <code_architecture>
 
-- : Manages Electron/React dependencies and build configurations for . Modified to correct the entry point for the packaged app and simplify build config.
-- : Electron's main process. Handles IPC. Updated to add  helper and new IPC handlers for Rules Manager and keyword variant generation. Renamed for build process to .
-- : Secure bridge for renderer process. Updated to expose new IPC functions for Rules Manager and keyword variants.
-- : Orchestrates local OCR. Modified to strictly use Tesseract and implement robust Windows encoding/I/O handling. Updated to use merged rules from .
-- : Rule-based classifier. Modified to load rules dynamically from  and use  for classification.
-- : (NEW FILE) Python script to manage rules (get, save, reset, import, export). Crucial for Rules Manager feature. Updated for Windows encoding/I/O handling.
-- : (NEW FILE) Python script for automatically generating keyword variants (diacritics, case, typos). Integrated into Rules Manager. Updated for Windows encoding/I/O handling.
-- , : Simplified to only include Tesseract dependencies.
-- : Main React component. Now manages tab state () to persist  state. Updated to include a new Rules tab.
-- : Configuration UI. Updated to reflect Tesseract-only OCR.
-- : (NEW FILE) React UI component for managing classification rules. Implemented with modals for Add New Rule and Edit Rule, inline edit/delete buttons, and auto-generate variants integration.
-- : Copy of  used for packaging, with updated paths and  logic to resolve Python scripts correctly in the packaged app.
-- , , , , , : Extensive documentation and guides added/updated for all new features and distribution.
-- , 🚀 Starting build process for 90dayChonThanh...
-
-📋 Checking requirements...
-[0;32m✅ Node.js: v20.19.5[0m
-[0;32m✅ Yarn: 1.22.22[0m
-[0;32m✅ Python: Python 3.11.14[0m
-
-📦 Installing dependencies...
-yarn install v1.22.22
-[1/4] Resolving packages...
-success Already up-to-date.
-Done in 0.02s.
-
-🏗️  Building React app...
-yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.: Scripts for building the application, updated with menu selection logic and bug fixes.
-- : (NEW FILE) NSIS script for creating an all-in-one Windows installer.
+- : Updated for  configuration to skip code signing () and for development server port change ().
+- : Modified to include  for React development server.
+- : Created with  for higher precedence in React Scripts.
+- : Electron's main process. Modified to load React app on . Extensively updated to use robust Python path resolution (, , ) instead of hardcoded  paths, affecting , , and  handlers. Also, normalized backend URL for API calls.
+- : Copy of  used for packaging. Received identical updates to  for port, Python path resolution, and URL normalization.
+- : NSIS script for all-in-one installer. Modified to comment out icon loading () and fix file copying from  (using  instead of  for folders). Also updated Python package installation command () for better targeting.
+- : Build script for the all-in-one installer. Enhanced with better error checking for Electron app packaging.
+- : (NEW) Script to build the Electron app (yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.) separately for debugging.
+- : (NEW) Script to start the Electron development environment with the explicitly set port (3001).
+- : Orchestrates local OCR. Currently set to use Tesseract. Future updates will integrate VietOCR.
+- : (EXISTING) Contains the VietOCR engine implementation, ready for integration.
+- Numerous new Markdown and batch files were created for documentation, guides, and troubleshooting related to the installer, build process, and specific errors encountered (e.g., , , ).
 </code_architecture>
 
 <pending_tasks>
-- Implement the full logic for the all-in-one installer using  to bundle Python and Tesseract into the application's executable.
-- Fine-tune remaining document types in  (though  helps this).
+- Implement the full logic for the all-in-one installer using  to bundle Python and Tesseract into the application's executable (NSIS build is pending successful packaging of Electron app).
+- Fine-tune remaining document types in .
 - Monitor OpenAI quota/plan or balance for Emergent LLM Key (if Cloud Boost is used).
 - Migrate or pin React/Webpack versions to address peer dependency warnings.
 - Test the backend with 5-10 real images to validate the integrated Hybrid OCR (specifically with the Tesseract-only change and Rules Manager).
 - Update icon for macOS (.icns).
+- Implement license/activation key feature.
+- Integrate VietOCR into  and potentially add a UI toggle.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing the user's latest request to bundle Python and Tesseract directly into the application's installer for easier distribution. The previous work involved creating simple build scripts (, ) and distribution guides, but these still required users to install Python and Tesseract separately. To address this, the AI engineer started the implementation of an all-in-one installer. This involved creating , an NSIS script, which will define how Python, Tesseract, and the Electron application are packaged and installed silently. A corresponding guide, , was also created to document the process for developers. The next logical step is to complete the  script and integrate it into the build process to fully automate the inclusion of Python and Tesseract.
+Immediately before this summary, the AI engineer was focused on enabling VietOCR as an alternative or supplementary OCR engine. The  script was confirmed to exist, and after several debugging steps related to Python versions (VietOCR being incompatible with Python 3.13, but available for Python 3.12), VietOCR was successfully installed into the user's Python 3.12 environment. A direct test using  resulted in successful model download and text extraction, confirming VietOCR's operational status. The application had previously been thoroughly debugged for various build and runtime issues, including: fixing  for correct file bundling, resolving  privilege errors by disabling code signing, addressing Python path resolution ( error) in the packaged Electron app by eliminating all hardcoded paths in  and , and correcting a double slash in the backend API URL. The Electron app is now working correctly with Tesseract OCR, and the VietOCR engine is installed and validated on the user's machine, ready for integration.
 </current_work>
 
 <optional_next_step>
-Complete the  script to bundle Python and Tesseract, then integrate it into the build process.
+Integrate VietOCR into  by modifying it to use .
 </optional_next_step>

@@ -56,17 +56,33 @@ except ImportError as e:
     sys.exit(1)
 
 
-def process_document(file_path: str) -> dict:
+def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict:
     """
     Process a document using OCR + Rules with font height detection
+    
+    Args:
+        file_path: Path to the image file
+        ocr_engine_type: 'tesseract' or 'vietocr' (default: 'tesseract')
+    
     Returns classification result with confidence
     """
     try:
-        # Use already initialized engine from module level
-        # ocr_engine is already initialized in the try block above
+        # Select OCR engine based on preference
+        if ocr_engine_type == 'vietocr' and vietocr_engine is not None:
+            ocr_engine = vietocr_engine
+            engine_name = "VietOCR"
+            print(f"🔍 Using VietOCR engine", file=sys.stderr)
+        else:
+            ocr_engine = tesseract_engine
+            engine_name = "Tesseract"
+            if ocr_engine_type == 'vietocr' and vietocr_engine is None:
+                print(f"⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+            else:
+                print(f"🔍 Using Tesseract engine", file=sys.stderr)
+        
         classifier = RuleClassifier()
         
-        # Extract text using OCR (returns dict with full_text, title_text, avg_height)
+        # Extract text using selected OCR engine (returns dict with full_text, title_text, avg_height)
         ocr_result = ocr_engine.extract_text(file_path)
         
         # Handle both old format (string) and new format (dict) for backward compatibility

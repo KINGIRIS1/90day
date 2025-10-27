@@ -47,7 +47,9 @@
       "target": [
         "nsis"
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "sign": null,
+      "signingHashAlgorithms": null
     },
     "mac": {
       "target": [

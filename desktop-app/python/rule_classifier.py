@@ -1624,7 +1624,34 @@ def get_case_aware_score_multiplier(text: str) -> float:
         return 0.8  # Mostly lowercase body (<30% uppercase)
 
 
-def calculate_similarity(str1: str, str2: str) -> float:
+def calculate_similarity_with_case_awareness(str1: str, str2: str) -> Tuple[float, float]:
+    """
+    Calculate string similarity with case awareness bonus
+    
+    Returns:
+        Tuple[float, float]: (base_similarity, case_aware_similarity)
+        
+    Vietnamese admin documents: UPPERCASE titles are more reliable
+    """
+    # Base similarity (case-insensitive)
+    s1_norm = normalize_text(str1)
+    s2_norm = normalize_text(str2)
+    base_similarity = SequenceMatcher(None, s1_norm, s2_norm).ratio()
+    
+    # Case awareness bonus
+    uppercase_ratio = calculate_uppercase_ratio(str1)
+    
+    # If title is UPPERCASE (70%+), it's more reliable → boost similarity
+    if uppercase_ratio >= 0.7:
+        # 70-80%: +2% boost, 80-90%: +3% boost, 90-100%: +5% boost
+        case_bonus = 0.02 + (uppercase_ratio - 0.7) * 0.1  # Max +5%
+        case_aware_similarity = min(base_similarity + case_bonus, 1.0)
+    else:
+        # Lowercase/mixed case: penalize slightly to require higher base similarity
+        case_penalty = (0.7 - uppercase_ratio) * 0.05  # Max -3.5%
+        case_aware_similarity = max(base_similarity - case_penalty, 0.0)
+    
+    return base_similarity, case_aware_similarity
     """
     Calculate string similarity ratio using SequenceMatcher
     

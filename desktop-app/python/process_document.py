@@ -31,26 +31,31 @@ if sys.platform == 'win32':
 sys.path.insert(0, os.path.dirname(__file__))
 
 try:
-    # Import both OCR engines
+    # Always import Tesseract (required)
     from ocr_engine_tesseract import OCREngine as TesseractEngine
-    from ocr_engine_vietocr import OCREngine as VietOCREngine
     from rule_classifier import RuleClassifier
     
-    # Initialize both engines
+    # Initialize Tesseract engine
     tesseract_engine = TesseractEngine()
-    vietocr_engine = None
     
-    # Try to initialize VietOCR (may fail if not installed)
+    # Try to import and initialize VietOCR (optional)
+    vietocr_engine = None
+    VietOCREngine = None
+    
     try:
+        from ocr_engine_vietocr import OCREngine as VietOCREngine
         vietocr_engine = VietOCREngine()
         print("✅ Both Tesseract and VietOCR engines loaded", file=sys.stderr)
+    except ImportError as viet_import_error:
+        print(f"⚠️ VietOCR not installed: {viet_import_error}", file=sys.stderr)
+        print("✅ Tesseract OCR loaded (VietOCR disabled - will auto-fallback)", file=sys.stderr)
     except Exception as viet_error:
-        print(f"⚠️ VietOCR not available: {viet_error}", file=sys.stderr)
-        print("✅ Tesseract OCR loaded (VietOCR disabled)", file=sys.stderr)
+        print(f"⚠️ VietOCR initialization failed: {viet_error}", file=sys.stderr)
+        print("✅ Tesseract OCR loaded (VietOCR disabled - will auto-fallback)", file=sys.stderr)
     
 except ImportError as e:
     print(json.dumps({
-        "error": f"Missing OCR dependencies: {str(e)}",
+        "error": f"Missing Tesseract OCR dependencies: {str(e)}",
         "success": False
     }, ensure_ascii=True), file=sys.stderr)
     sys.exit(1)

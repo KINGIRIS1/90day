@@ -8,19 +8,22 @@ import sys
 import json
 import os
 from pathlib import Path
-import io
 import warnings
 
-# Force UTF-8 encoding for all I/O
+# Force UTF-8 encoding BEFORE any other imports
+import io
+
+# Reconfigure stdout/stderr for UTF-8
 if sys.platform == 'win32':
-    # Set Windows console to UTF-8
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
-    # Also set default encoding
-    if hasattr(sys, '_MEIPASS'):
-        # Running in PyInstaller bundle
-        os.environ['PYTHONIOENCODING'] = 'utf-8'
+    try:
+        # Wrap binary buffers with UTF-8 text wrappers
+        if hasattr(sys.stdout, 'buffer'):
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+        if hasattr(sys.stderr, 'buffer'):
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+    except Exception as e:
+        # Fallback - already wrapped or other issue
+        pass
 
 # Suppress warnings
 warnings.filterwarnings('ignore')

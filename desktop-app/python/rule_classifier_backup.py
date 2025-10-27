@@ -19,7 +19,18 @@ DOCUMENT_RULES = {
             "giay chung nhan", "giay chung nhan", "quyen su dung dat", "quyen so huu",
             "tai san gan lien", "cong hoa xa hoi chu nghia viet nam",
             "doc lap tu do hanh phuc", "van phong dang ky dat dai",
-            "chung nhan"  # OCR common typo without diacritics
+            "chung nhan"  # OCR common typo without diacritics,
+            # Viết hoa (auto-generated)
+            "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT",
+            "GIẤY CHỨNG NHẬN",
+            "GIẦY CHỨNG NHẬN",
+            "QUYỀN SỬ DỤNG ĐẤT",
+            "QUYỀN SỞ HỮU",
+            "TÀI SẢN GẮN LIỀN",
+            "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM",
+            "ĐỘC LẬP TỰ DO HẠNH PHÚC",
+            "CHI NHÁNH VĂN PHÒNG ĐĂNG KÝ",
+            "VĂN PHÒNG ĐĂNG KÝ ĐẤT ĐAI"
         ],
         "weight": 1.5, "min_matches": 1
     },
@@ -71,7 +82,13 @@ DOCUMENT_RULES = {
             "bản vẽ thi công", "hoàn thành thi công",
             # Không dấu
             "ban ve hoan cong", "hoan cong", "cong trinh xay dung",
-            "ban ve thi cong", "hoan thanh thi cong"
+            "ban ve thi cong", "hoan thanh thi cong",
+            # Viết hoa (auto-generated)
+            "BẢN VẼ HOÀN CÔNG",
+            "HOÀN CÔNG",
+            "CÔNG TRÌNH XÂY DỰNG",
+            "BẢN VẼ THI CÔNG",
+            "HOÀN THÀNH THI CÔNG"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -82,7 +99,15 @@ DOCUMENT_RULES = {
             "mặt bằng", "mặt tiền", "mặt cắt",
             # Không dấu
             "ban ve nha", "mat bang nha", "thiet ke nha", "kien truc nha",
-            "mat bang", "mat tien", "mat cat"
+            "mat bang", "mat tien", "mat cat",
+            # Viết hoa (auto-generated)
+            "BẢN VẼ NHÀ",
+            "MẶT BẰNG NHÀ",
+            "THIẾT KẾ NHÀ",
+            "KIẾN TRÚC NHÀ",
+            "MẶT BẰNG",
+            "MẶT TIỀN",
+            "MẶT CẮT"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -93,7 +118,12 @@ DOCUMENT_RULES = {
             "kê khai đất đai", "kê khai diện tích",
             # Không dấu
             "bang ke khai dien tich", "dien tich dang su dung",
-            "ke khai dat dai", "ke khai dien tich"
+            "ke khai dat dai", "ke khai dien tich",
+            # Viết hoa (auto-generated)
+            "BẢNG KÊ KHAI DIỆN TÍCH",
+            "DIỆN TÍCH ĐANG SỬ DỤNG",
+            "KÊ KHAI ĐẤT ĐAI",
+            "KÊ KHAI DIỆN TÍCH"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -104,7 +134,13 @@ DOCUMENT_RULES = {
             "liệt kê", "bảng liệt kê",
             # Không dấu
             "danh sach", "cap giay", "thua dat cap giay",
-            "liet ke", "bang liet ke"
+            "liet ke", "bang liet ke",
+            # Viết hoa (auto-generated)
+            "DANH SÁCH",
+            "CẤP GIẤY",
+            "THỬA ĐẤT CẤP GIẤY",
+            "LIỆT KÊ",
+            "BẢNG LIỆT KÊ"
         ],
         "weight": 0.8, "min_matches": 1
     },
@@ -115,7 +151,13 @@ DOCUMENT_RULES = {
             "hội đồng đấu giá", "trúng đấu giá",
             # Không dấu
             "bien ban ban dau gia", "dau gia tai san", "ban dau gia",
-            "hoi dong dau gia", "trung dau gia"
+            "hoi dong dau gia", "trung dau gia",
+            # Viết hoa (auto-generated)
+            "BIÊN BẢN BÁN ĐẤU GIÁ",
+            "ĐẤU GIÁ TÀI SẢN",
+            "BÁN ĐẤU GIÁ",
+            "HỘI ĐỒNG ĐẤU GIÁ",
+            "TRÚNG ĐẤU GIÁ"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -126,7 +168,13 @@ DOCUMENT_RULES = {
             "bàn giao thực địa", "giao nhận",
             # Không dấu
             "bien ban ban giao", "ban giao dat", "thuc dia",
-            "ban giao thuc dia", "giao nhan"
+            "ban giao thuc dia", "giao nhan",
+            # Viết hoa (auto-generated)
+            "BIÊN BẢN BÀN GIAO",
+            "BÀN GIAO ĐẤT",
+            "THỰC ĐỊA",
+            "BÀN GIAO THỰC ĐỊA",
+            "GIAO NHẬN"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -137,7 +185,12 @@ DOCUMENT_RULES = {
             "biên bản hội đồng", "đăng ký lần đầu",
             # Không dấu
             "hoi dong dang ky", "dang ky dat dai lan dau",
-            "bien ban hoi dong", "dang ky lan dau"
+            "bien ban hoi dong", "dang ky lan dau",
+            # Viết hoa (auto-generated)
+            "HỘI ĐỒNG ĐĂNG KÝ",
+            "ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU",
+            "BIÊN BẢN HỘI ĐỒNG",
+            "ĐĂNG KÝ LẦN ĐẦU"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -148,7 +201,12 @@ DOCUMENT_RULES = {
             "kiểm tra nghiệm thu", "hội đồng nghiệm thu",
             # Không dấu
             "bien ban nghiem thu", "nghiem thu cong trinh",
-            "kiem tra nghiem thu", "hoi dong nghiem thu"
+            "kiem tra nghiem thu", "hoi dong nghiem thu",
+            # Viết hoa (auto-generated)
+            "BIÊN BẢN NGHIỆM THU",
+            "NGHIỆM THU CÔNG TRÌNH",
+            "KIỂM TRA NGHIỆM THU",
+            "HỘI ĐỒNG NGHIỆM THU"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -159,7 +217,12 @@ DOCUMENT_RULES = {
             "biên bản kiểm tra", "chỉnh sửa thông tin",
             # Không dấu
             "kiem tra sai sot", "sai sot tren giay chung nhan",
-            "bien ban kiem tra", "chinh sua thong tin"
+            "bien ban kiem tra", "chinh sua thong tin",
+            # Viết hoa (auto-generated)
+            "KIỂM TRA SAI SÓT",
+            "SAI SÓT TRÊN GIẤY CHỨNG NHẬN",
+            "BIÊN BẢN KIỂM TRA",
+            "CHỈNH SỬA THÔNG TIN"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -170,7 +233,12 @@ DOCUMENT_RULES = {
             "sử dụng đất hiện trạng", "kiểm tra thực địa",
             # Không dấu
             "xac minh hien trang", "kiem tra hien trang",
-            "su dung dat hien trang", "kiem tra thuc dia"
+            "su dung dat hien trang", "kiem tra thuc dia",
+            # Viết hoa (auto-generated)
+            "XÁC MINH HIỆN TRẠNG",
+            "KIỂM TRA HIỆN TRẠNG",
+            "SỬ DỤNG ĐẤT HIỆN TRẠNG",
+            "KIỂM TRA THỰC ĐỊA"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -179,7 +247,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "kết thúc công khai", "công bố di chúc", "biên bản di chúc",
             # Không dấu
-            "ket thuc cong khai", "cong bo di chuc", "bien ban di chuc"
+            "ket thuc cong khai", "cong bo di chuc", "bien ban di chuc",
+            # Viết hoa (auto-generated)
+            "KẾT THÚC CÔNG KHAI",
+            "CÔNG BỐ DI CHÚC",
+            "BIÊN BẢN DI CHÚC"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -190,7 +262,13 @@ DOCUMENT_RULES = {
             "kết quả kiểm tra", "cấp gcn",
             # Không dấu
             "ket thuc thong bao", "niem yet cong khai", "kiem tra ho so",
-            "ket qua kiem tra", "cap gcn"
+            "ket qua kiem tra", "cap gcn",
+            # Viết hoa (auto-generated)
+            "KẾT THÚC THÔNG BÁO",
+            "NIÊM YẾT CÔNG KHAI",
+            "KIỂM TRA HỒ SƠ",
+            "KẾT QUẢ KIỂM TRA",
+            "CẤP GCN"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -201,7 +279,12 @@ DOCUMENT_RULES = {
             "mất giấy chứng nhận",
             # Không dấu
             "ket thuc thong bao", "niem yet cong khai", "mat gcn",
-            "mat giay chung nhan"
+            "mat giay chung nhan",
+            # Viết hoa (auto-generated)
+            "KẾT THÚC THÔNG BÁO",
+            "NIÊM YẾT CÔNG KHAI",
+            "MẤT GCN",
+            "MẤT GIẤY CHỨNG NHẬN"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -212,27 +295,40 @@ DOCUMENT_RULES = {
             "biên lai nộp thuế",
             # Không dấu
             "bien lai thu thue", "thue su dung dat", "phi nong nghiep",
-            "bien lai nop thue"
+            "bien lai nop thue",
+            # Viết hoa (auto-generated)
+            "BIÊN LAI THU THUẾ",
+            "THUẾ SỬ DỤNG ĐẤT",
+            "PHI NÔNG NGHIỆP",
+            "BIÊN LAI NỘP THUẾ"
         ],
         "weight": 1.0, "min_matches": 1
     },
     "CCCD": {
         "keywords": [
-            # Có dấu
+            # Có dấu - phải có keyword chính xác
             "căn cước công dân", "cccd", "thẻ căn cước", "căn cước",
+            "số căn cước", "thẻ cccd",
             # Không dấu
             "can cuoc cong dan", "the can cuoc", "can cuoc",
+            "so can cuoc", "the cccd",
             # Viết hoa
-            "CAN CUOC CONG DAN", "CCCD", "THE CAN CUOC"
+            "CAN CUOC CONG DAN", "CCCD", "THE CAN CUOC",
+            "SO CAN CUOC"
         ],
-        "weight": 1.3, "min_matches": 1
+        "weight": 1.0,  # Giảm weight để tránh false positive
+        "min_matches": 1
     },
     "DS15": {
         "keywords": [
             # Có dấu
             "danh sách chủ sử dụng", "các thửa đất", "mẫu 15",
             # Không dấu
-            "danh sach chu su dung", "cac thua dat", "mau 15"
+            "danh sach chu su dung", "cac thua dat", "mau 15",
+            # Viết hoa (auto-generated)
+            "DANH SÁCH CHỦ SỬ DỤNG",
+            "CÁC THỬA ĐẤT",
+            "MẪU 15"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -241,7 +337,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "danh sách công khai", "hồ sơ cấp giấy", "cnqsdđ",
             # Không dấu
-            "danh sach cong khai", "ho so cap giay", "cnqsdd"
+            "danh sach cong khai", "ho so cap giay", "cnqsdd",
+            # Viết hoa (auto-generated)
+            "DANH SÁCH CÔNG KHAI",
+            "HỒ SƠ CẤP GIẤY",
+            "CNQSDĐ"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -250,7 +350,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "di chúc", "lập di chúc", "người lập di chúc",
             # Không dấu
-            "di chuc", "lap di chuc", "nguoi lap di chuc"
+            "di chuc", "lap di chuc", "nguoi lap di chuc",
+            # Viết hoa (auto-generated)
+            "DI CHÚC",
+            "LẬP DI CHÚC",
+            "NGƯỜI LẬP DI CHÚC"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -259,7 +363,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "đơn cam kết", "giấy cam kết", "cam kết",
             # Không dấu
-            "don cam ket", "giay cam ket", "cam ket"
+            "don cam ket", "giay cam ket", "cam ket",
+            # Viết hoa (auto-generated)
+            "ĐƠN CAM KẾT",
+            "GIẤY CAM KẾT",
+            "CAM KẾT"
         ],
         "weight": 0.8, "min_matches": 1
     },
@@ -290,7 +398,11 @@ DOCUMENT_RULES = {
             "tài sản gắn liền với đất",
             # Không dấu
             "don dang ky dat dai", "dang ky dat dai",
-            "tai san gan lien voi dat"
+            "tai san gan lien voi dat",
+            # Viết hoa (auto-generated)
+            "ĐƠN ĐĂNG KÝ ĐẤT ĐAI",
+            "ĐĂNG KÝ ĐẤT ĐAI",
+            "TÀI SẢN GẮN LIỀN VỚI ĐẤT"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -301,7 +413,12 @@ DOCUMENT_RULES = {
             "chuyển hình thức giao đất",
             # Không dấu
             "de nghi chuyen hinh thuc", "giao dat", "cho thue dat",
-            "chuyen hinh thuc giao dat"
+            "chuyen hinh thuc giao dat",
+            # Viết hoa (auto-generated)
+            "ĐỀ NGHỊ CHUYỂN HÌNH THỨC",
+            "GIAO ĐẤT",
+            "CHO THUÊ ĐẤT",
+            "CHUYỂN HÌNH THỨC GIAO ĐẤT"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -312,7 +429,12 @@ DOCUMENT_RULES = {
             "cho thuê đất", "chuyển mục đích",
             # Không dấu
             "de nghi dieu chinh", "quyet dinh giao dat",
-            "cho thue dat", "chuyen muc dich"
+            "cho thue dat", "chuyen muc dich",
+            # Viết hoa (auto-generated)
+            "ĐỀ NGHỊ ĐIỀU CHỈNH",
+            "QUYẾT ĐỊNH GIAO ĐẤT",
+            "CHO THUÊ ĐẤT",
+            "CHUYỂN MỤC ĐÍCH"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -323,7 +445,12 @@ DOCUMENT_RULES = {
             "thuế thu nhập cá nhân", "miễn giảm thuế",
             # Không dấu
             "de nghi mien giam", "le phi truoc ba",
-            "thue thu nhap ca nhan", "mien giam thue"
+            "thue thu nhap ca nhan", "mien giam thue",
+            # Viết hoa (auto-generated)
+            "ĐỀ NGHỊ MIỄN GIẢM",
+            "LỆ PHÍ TRƯỚC BẠ",
+            "THUẾ THU NHẬP CÁ NHÂN",
+            "MIỄN GIẢM THUẾ"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -334,7 +461,11 @@ DOCUMENT_RULES = {
             "đất đa mục đích",
             # Không dấu
             "de nghi su dung dat", "ket hop da muc dich",
-            "dat da muc dich"
+            "dat da muc dich",
+            # Viết hoa (auto-generated)
+            "ĐỀ NGHỊ SỬ DỤNG ĐẤT",
+            "KẾT HỢP ĐA MỤC ĐÍCH",
+            "ĐẤT ĐA MỤC ĐÍCH"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -343,7 +474,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "đơn xác nhận", "giấy xác nhận", "xác nhận",
             # Không dấu
-            "don xac nhan", "giay xac nhan", "xac nhan"
+            "don xac nhan", "giay xac nhan", "xac nhan",
+            # Viết hoa (auto-generated)
+            "ĐƠN XÁC NHẬN",
+            "GIẤY XÁC NHẬN",
+            "XÁC NHẬN"
         ],
         "weight": 0.7, "min_matches": 1
     },
@@ -354,7 +489,11 @@ DOCUMENT_RULES = {
             "chuyển mục đích sử dụng đất",
             # Không dấu
             "don xin chuyen muc dich", "de nghi chuyen muc dich",
-            "chuyen muc dich su dung dat"
+            "chuyen muc dich su dung dat",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN CHUYỂN MỤC ĐÍCH",
+            "ĐỀ NGHỊ CHUYỂN MỤC ĐÍCH",
+            "CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -365,7 +504,11 @@ DOCUMENT_RULES = {
             "đề nghị gia hạn",
             # Không dấu
             "don xin gia han", "gia han su dung dat",
-            "de nghi gia han"
+            "de nghi gia han",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN GIA HẠN",
+            "GIA HẠN SỬ DỤNG ĐẤT",
+            "ĐỀ NGHỊ GIA HẠN"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -376,7 +519,11 @@ DOCUMENT_RULES = {
             "đơn xin cho thuê đất",
             # Không dấu
             "don xin giao dat", "de nghi giao dat",
-            "don xin cho thue dat"
+            "don xin cho thue dat",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN GIAO ĐẤT",
+            "ĐỀ NGHỊ GIAO ĐẤT",
+            "ĐƠN XIN CHO THUÊ ĐẤT"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -387,7 +534,12 @@ DOCUMENT_RULES = {
             "tách thửa đất", "hợp thửa đất",
             # Không dấu
             "don xin tach thua", "don xin hop thua",
-            "tach thua dat", "hop thua dat"
+            "tach thua dat", "hop thua dat",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN TÁCH THỬA",
+            "ĐƠN XIN HỢP THỬA",
+            "TÁCH THỬA ĐẤT",
+            "HỢP THỬA ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -398,7 +550,11 @@ DOCUMENT_RULES = {
             "đổi gcn",
             # Không dấu
             "don xin cap doi", "cap doi giay chung nhan",
-            "doi gcn"
+            "doi gcn",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN CẤP ĐỔI",
+            "CẤP ĐỔI GIẤY CHỨNG NHẬN",
+            "ĐỔI GCN"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -409,7 +565,12 @@ DOCUMENT_RULES = {
             "dự án đầu tư", "điều chỉnh thời hạn",
             # Không dấu
             "don xin dieu chinh", "thoi han su dung dat",
-            "du an dau tu", "dieu chinh thoi han"
+            "du an dau tu", "dieu chinh thoi han",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN ĐIỀU CHỈNH",
+            "THỜI HẠN SỬ DỤNG ĐẤT",
+            "DỰ ÁN ĐẦU TƯ",
+            "ĐIỀU CHỈNH THỜI HẠN"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -420,7 +581,12 @@ DOCUMENT_RULES = {
             "đất nông nghiệp", "xác nhận lại thời hạn",
             # Không dấu
             "don xin xac nhan", "thoi han su dung dat",
-            "dat nong nghiep", "xac nhan lai thoi han"
+            "dat nong nghiep", "xac nhan lai thoi han",
+            # Viết hoa (auto-generated)
+            "ĐƠN XIN XÁC NHẬN",
+            "THỜI HẠN SỬ DỤNG ĐẤT",
+            "ĐẤT NÔNG NGHIỆP",
+            "XÁC NHẬN LẠI THỜI HẠN"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -429,7 +595,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy chứng nhận kết hôn", "kết hôn", "hôn nhân",
             # Không dấu
-            "giay chung nhan ket hon", "ket hon", "hon nhan"
+            "giay chung nhan ket hon", "ket hon", "hon nhan",
+            # Viết hoa (auto-generated)
+            "GIẤY CHỨNG NHẬN KẾT HÔN",
+            "KẾT HÔN",
+            "HÔN NHÂN"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -440,7 +610,12 @@ DOCUMENT_RULES = {
             "các khoản nộp", "xác nhận nộp thuế",
             # Không dấu
             "giay de nghi xac nhan", "nop vao ngan sach",
-            "cac khoan nop", "xac nhan nop thue"
+            "cac khoan nop", "xac nhan nop thue",
+            # Viết hoa (auto-generated)
+            "GIẤY ĐỀ NGHỊ XÁC NHẬN",
+            "NỘP VÀO NGÂN SÁCH",
+            "CÁC KHOẢN NỘP",
+            "XÁC NHẬN NỘP THUẾ"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -449,7 +624,9 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy khai sinh", "khai sinh", "gks",
             # Không dấu
-            "giay khai sinh", "khai sinh"
+            "giay khai sinh", "khai sinh",
+            # Viết hoa (auto-generated)
+            "GIẤY KHAI SINH"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -458,7 +635,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy nộp tiền", "nộp vào ngân sách", "ngân sách nhà nước",
             # Không dấu
-            "giay nop tien", "nop vao ngan sach", "ngan sach nha nuoc"
+            "giay nop tien", "nop vao ngan sach", "ngan sach nha nuoc",
+            # Viết hoa (auto-generated)
+            "GIẤY NỘP TIỀN",
+            "NỘP VÀO NGÂN SÁCH",
+            "NGÂN SÁCH NHÀ NƯỚC"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -467,7 +648,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy sang nhượng đất", "sang nhượng", "chuyển nhượng đất",
             # Không dấu
-            "giay sang nhuong dat", "sang nhuong", "chuyen nhuong dat"
+            "giay sang nhuong dat", "sang nhuong", "chuyen nhuong dat",
+            # Viết hoa (auto-generated)
+            "GIẤY SANG NHƯỢNG ĐẤT",
+            "SANG NHƯỢNG",
+            "CHUYỂN NHƯỢNG ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -476,7 +661,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy tờ liên quan", "tài liệu kèm theo",
             # Không dấu
-            "giay to lien quan", "tai lieu kem theo"
+            "giay to lien quan", "tai lieu kem theo",
+            # Viết hoa (auto-generated)
+            "GIẤY TỜ LIÊN QUAN",
+            "TÀI LIỆU KÈM THEO"
         ],
         "weight": 0.6, "min_matches": 1
     },
@@ -484,10 +672,21 @@ DOCUMENT_RULES = {
         "keywords": [
             # Có dấu
             "giấy ủy quyền", "ủy quyền", "người được ủy quyền",
+            "tôi tên là", "tôi là", "được ủy quyền",
             # Không dấu
-            "giay uy quyen", "uy quyen", "nguoi duoc uy quyen"
+            "giay uy quyen", "uy quyen", "nguoi duoc uy quyen",
+            "toi ten la", "toi la", "duoc uy quyen",
+            # Viết hoa (auto-generated)
+            "GIẤY ỦY QUYỀN",
+            "ỦY QUYỀN",
+            "NGƯỜI ĐƯỢC ỦY QUYỀN",
+            "TÔI TÊN LÀ", "TÔI LÀ", "ĐƯỢC ỦY QUYỀN",
+            # OCR typos
+            "GIẤY UY QUYỀN", "GIẤY ỦY QUYEN", 
+            "UY QUYEN", "UY QUYỀN", "Ủ'Y QUYỀN"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.7,  # Cao hơn HDCQ (1.6) để ưu tiên khi title match "GIẤY ỦY QUYỀN"
+        "min_matches": 1
     },
     "GXNDKLD": {
         "keywords": [
@@ -496,7 +695,11 @@ DOCUMENT_RULES = {
             "xác nhận đăng ký",
             # Không dấu
             "giay xac nhan dang ky lan dau", "dang ky lan dau",
-            "xac nhan dang ky"
+            "xac nhan dang ky",
+            # Viết hoa (auto-generated)
+            "GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU",
+            "ĐĂNG KÝ LẦN ĐẦU",
+            "XÁC NHẬN ĐĂNG KÝ"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -505,7 +708,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "giấy phép xây dựng", "phép xây dựng", "giấy phép",
             # Không dấu
-            "giay phep xay dung", "phep xay dung", "giay phep"
+            "giay phep xay dung", "phep xay dung", "giay phep",
+            # Viết hoa (auto-generated)
+            "GIẤY PHÉP XÂY DỰNG",
+            "PHÉP XÂY DỰNG",
+            "GIẤY PHÉP"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -514,7 +721,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "hoá đơn", "hóa đơn", "gtgt", "giá trị gia tăng",
             # Không dấu
-            "hoa don", "gia tri gia tang"
+            "hoa don", "gia tri gia tang",
+            # Viết hoa (auto-generated)
+            "HOÁ ĐƠN",
+            "HÓA ĐƠN",
+            "GIÁ TRỊ GIA TĂNG"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -523,7 +734,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "hoàn thành", "bồi thường hỗ trợ", "công tác bồi thường",
             # Không dấu
-            "hoan thanh", "boi thuong ho tro", "cong tac boi thuong"
+            "hoan thanh", "boi thuong ho tro", "cong tac boi thuong",
+            # Viết hoa (auto-generated)
+            "HOÀN THÀNH",
+            "BỒI THƯỜNG HỖ TRỢ",
+            "CÔNG TÁC BỒI THƯỜNG"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -532,13 +747,29 @@ DOCUMENT_RULES = {
             # Có dấu
             "hợp đồng chuyển nhượng", "hợp đồng tặng cho",
             "chuyển nhượng quyền", "tặng cho quyền", "hợp đồng",
+            "chuyển nhượng quyền sử dụng đất", "chuyển nhượng qsd",
             # Không dấu
             "hop dong chuyen nhuong", "hop dong tang cho",
             "chuyen nhuong quyen", "tang cho quyen", "hop dong",
-            # Viết hoa
-            "HOP DONG", "CHUYEN NHUONG", "TANG CHO"
+            "chuyen nhuong quyen su dung dat",
+            # Viết hoa (OCR thường đọc thành chữ hoa)
+            "HOP DONG", "CHUYEN NHUONG", "TANG CHO",
+            "HOP DONG CHUYEN NHUONG", "CHUYEN NHUONG QUYEN",
+            "CHUYEN NHUONG QUYEN SU DUNG DAT",
+            # OCR common typos (quan trọng!)
+            "NHUQNG", "CHUYEN NHUQNG", "HOP DONG CHUYEN NHUQNG",
+            "NHUONG", "CHUYEN NHUONG QUYEN SU' DUNG",
+            "chuyen nhuqng", "hop dong chuyen nhuqng",
+            # EasyOCR specific typos
+            "HỢP ĐỎNG", "ĐỎNG", "hop dong", "HOP ĐỎNG",
+            "CHUYỂN NHƯONG", "NHƯONG", "chuyen nhuong",
+            "HỢP ĐỎNG CHUYỂN NHƯỢNG", "HỢP ĐỎNG CHUYỂN NHƯONG",
+            "QUYẺN", "QUYỀN", "quyen", "QUYẺN SỬ DỤNG",
+            # More variants
+            "hợp đỏng", "đỏng", "chuyển nhưong", "nhưong"
         ],
-        "weight": 1.1, "min_matches": 1
+        "weight": 1.6,  # Tăng weight cao hơn GCNM (1.5) để ưu tiên khi title match
+        "min_matches": 1
     },
     "HDBDG": {
         "keywords": [
@@ -582,7 +813,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "hợp đồng thuê đất", "thuê đất", "điều chỉnh hợp đồng",
             # Không dấu
-            "hop dong thue dat", "thue dat", "dieu chinh hop dong"
+            "hop dong thue dat", "thue dat", "dieu chinh hop dong",
+            # Viết hoa (auto-generated)
+            "HỢP ĐỒNG THUÊ ĐẤT",
+            "THUÊ ĐẤT",
+            "ĐIỀU CHỈNH HỢP ĐỒNG"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -591,7 +826,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "hợp đồng ủy quyền", "ủy quyền",
             # Không dấu
-            "hop dong uy quyen", "uy quyen"
+            "hop dong uy quyen", "uy quyen",
+            # Viết hoa (auto-generated)
+            "HỢP ĐỒNG ỦY QUYỀN",
+            "ỦY QUYỀN"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -613,7 +851,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "phiếu kiểm tra", "kiểm tra hồ sơ",
             # Không dấu
-            "phieu kiem tra", "kiem tra ho so"
+            "phieu kiem tra", "kiem tra ho so",
+            # Viết hoa (auto-generated)
+            "PHIẾU KIỂM TRA",
+            "KIỂM TRA HỒ SƠ"
         ],
         "weight": 0.8, "min_matches": 1
     },
@@ -622,7 +863,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "phiếu lấy ý kiến", "khu dân cư", "ý kiến dân",
             # Không dấu
-            "phieu lay y kien", "khu dan cu", "y kien dan"
+            "phieu lay y kien", "khu dan cu", "y kien dan",
+            # Viết hoa (auto-generated)
+            "PHIẾU LẤY Ý KIẾN",
+            "KHU DÂN CƯ",
+            "Ý KIẾN DÂN"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -631,7 +876,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "phiếu xác nhận", "kết quả đo đạc", "đo đạc",
             # Không dấu
-            "phieu xac nhan", "ket qua do dac", "do dac"
+            "phieu xac nhan", "ket qua do dac", "do dac",
+            # Viết hoa (auto-generated)
+            "PHIẾU XÁC NHẬN",
+            "KẾT QUẢ ĐO ĐẠC",
+            "ĐO ĐẠC"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -642,7 +891,12 @@ DOCUMENT_RULES = {
             "quyền sử dụng đất",
             # Không dấu
             "phieu yeu cau", "dang ky bien phap", "bao dam",
-            "quyen su dung dat"
+            "quyen su dung dat",
+            # Viết hoa (auto-generated)
+            "PHIẾU YÊU CẦU",
+            "ĐĂNG KÝ BIỆN PHÁP",
+            "BẢO ĐẢM",
+            "QUYỀN SỬ DỤNG ĐẤT"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -651,7 +905,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "phiếu yêu cầu", "đăng ký thay đổi", "biện pháp bảo đảm",
             # Không dấu
-            "phieu yeu cau", "dang ky thay doi", "bien phap bao dam"
+            "phieu yeu cau", "dang ky thay doi", "bien phap bao dam",
+            # Viết hoa (auto-generated)
+            "PHIẾU YÊU CẦU",
+            "ĐĂNG KÝ THAY ĐỔI",
+            "BIỆN PHÁP BẢO ĐẢM"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -660,7 +918,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "phiếu yêu cầu", "xóa đăng ký", "biện pháp bảo đảm",
             # Không dấu
-            "phieu yeu cau", "xoa dang ky", "bien phap bao dam"
+            "phieu yeu cau", "xoa dang ky", "bien phap bao dam",
+            # Viết hoa (auto-generated)
+            "PHIẾU YÊU CẦU",
+            "XÓA ĐĂNG KÝ",
+            "BIỆN PHÁP BẢO ĐẢM"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -669,7 +931,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "mã qr", "quét mã", "qr code",
             # Không dấu
-            "ma qr", "quet ma", "qr code"
+            "ma qr", "quet ma", "qr code",
+            # Viết hoa (auto-generated)
+            "MÃ QR",
+            "QUÉT MÃ"
         ],
         "weight": 1.2, "min_matches": 1
     },
@@ -680,7 +945,11 @@ DOCUMENT_RULES = {
             "chuyển mục đích sử dụng",
             # Không dấu
             "quyet dinh", "cho phep chuyen muc dich",
-            "chuyen muc dich su dung"
+            "chuyen muc dich su dung",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "CHO PHÉP CHUYỂN MỤC ĐÍCH",
+            "CHUYỂN MỤC ĐÍCH SỬ DỤNG"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -691,7 +960,12 @@ DOCUMENT_RULES = {
             "tách thửa đất",
             # Không dấu
             "quyet dinh", "cho phep tach", "hop thua",
-            "tach thua dat"
+            "tach thua dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "CHO PHÉP TÁCH",
+            "HỢP THỬA",
+            "TÁCH THỬA ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -702,7 +976,12 @@ DOCUMENT_RULES = {
             "cho thuê đất",
             # Không dấu
             "quyet dinh", "chuyen hinh thuc", "giao dat",
-            "cho thue dat"
+            "cho thue dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "CHUYỂN HÌNH THỨC",
+            "GIAO ĐẤT",
+            "CHO THUÊ ĐẤT"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -711,7 +990,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "điều chỉnh quyết định", "giao đất",
             # Không dấu
-            "quyet dinh", "dieu chinh quyet dinh", "giao dat"
+            "quyet dinh", "dieu chinh quyet dinh", "giao dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "ĐIỀU CHỈNH QUYẾT ĐỊNH",
+            "GIAO ĐẤT"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -720,7 +1003,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "điều chỉnh thời hạn", "dự án đầu tư",
             # Không dấu
-            "quyet dinh", "dieu chinh thoi han", "du an dau tu"
+            "quyet dinh", "dieu chinh thoi han", "du an dau tu",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "ĐIỀU CHỈNH THỜI HẠN",
+            "DỰ ÁN ĐẦU TƯ"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -729,7 +1016,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "gia hạn", "hết thời hạn",
             # Không dấu
-            "quyet dinh", "gia han", "het thoi han"
+            "quyet dinh", "gia han", "het thoi han",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "GIA HẠN",
+            "HẾT THỜI HẠN"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -738,7 +1029,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "giao đất", "cho thuê đất",
             # Không dấu
-            "quyet dinh", "giao dat", "cho thue dat"
+            "quyet dinh", "giao dat", "cho thue dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "GIAO ĐẤT",
+            "CHO THUÊ ĐẤT"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -747,7 +1042,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "hủy giấy chứng nhận", "hủy gcn",
             # Không dấu
-            "quyet dinh", "huy giay chung nhan", "huy gcn"
+            "quyet dinh", "huy giay chung nhan", "huy gcn",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "HỦY GIẤY CHỨNG NHẬN",
+            "HỦY GCN"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -756,7 +1055,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "phê duyệt", "bồi thường", "tái định cư",
             # Không dấu
-            "quyet dinh", "phe duyet", "boi thuong", "tai dinh cu"
+            "quyet dinh", "phe duyet", "boi thuong", "tai dinh cu",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "PHÊ DUYỆT",
+            "BỒI THƯỜNG",
+            "TÁI ĐỊNH CƯ"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -765,7 +1069,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "phê duyệt", "điều chỉnh quy hoạch",
             # Không dấu
-            "quyet dinh", "phe duyet", "dieu chinh quy hoach"
+            "quyet dinh", "phe duyet", "dieu chinh quy hoach",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "PHÊ DUYỆT",
+            "ĐIỀU CHỈNH QUY HOẠCH"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -774,7 +1082,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "phê duyệt", "đơn giá",
             # Không dấu
-            "quyet dinh", "phe duyet", "don gia"
+            "quyet dinh", "phe duyet", "don gia",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "PHÊ DUYỆT",
+            "ĐƠN GIÁ"
         ],
         "weight": 0.8, "min_matches": 2
     },
@@ -783,7 +1095,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "thi hành án", "đơn yêu cầu",
             # Không dấu
-            "quyet dinh", "thi hanh an", "don yeu cau"
+            "quyet dinh", "thi hanh an", "don yeu cau",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "THI HÀNH ÁN",
+            "ĐƠN YÊU CẦU"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -792,7 +1108,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "thu hồi đất",
             # Không dấu
-            "quyet dinh", "thu hoi dat"
+            "quyet dinh", "thu hoi dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "THU HỒI ĐẤT"
         ],
         "weight": 1.1, "min_matches": 1
     },
@@ -801,7 +1120,10 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "hình thức sử dụng đất",
             # Không dấu
-            "quyet dinh", "hinh thuc su dung dat"
+            "quyet dinh", "hinh thuc su dung dat",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "HÌNH THỨC SỬ DỤNG ĐẤT"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -810,7 +1132,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "quyết định", "xử phạt", "vi phạm",
             # Không dấu
-            "quyet dinh", "xu phat", "vi pham"
+            "quyet dinh", "xu phat", "vi pham",
+            # Viết hoa (auto-generated)
+            "QUYẾT ĐỊNH",
+            "XỬ PHẠT",
+            "VI PHẠM"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -819,7 +1145,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "sơ đồ", "dự kiến tách thửa", "tách thửa",
             # Không dấu
-            "so do", "du kien tach thua", "tach thua"
+            "so do", "du kien tach thua", "tach thua",
+            # Viết hoa (auto-generated)
+            "SƠ ĐỒ",
+            "DỰ KIẾN TÁCH THỬA",
+            "TÁCH THỬA"
         ],
         "weight": 0.9, "min_matches": 1
     },
@@ -828,7 +1158,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "thông báo", "cập nhật", "chỉnh lý", "biến động",
             # Không dấu
-            "thong bao", "cap nhat", "chinh ly", "bien dong"
+            "thong bao", "cap nhat", "chinh ly", "bien dong",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "CẬP NHẬT",
+            "CHỈNH LÝ",
+            "BIẾN ĐỘNG"
         ],
         "weight": 0.8, "min_matches": 2
     },
@@ -837,7 +1172,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "thông báo", "công bố", "công khai", "di chúc",
             # Không dấu
-            "thong bao", "cong bo", "cong khai", "di chuc"
+            "thong bao", "cong bo", "cong khai", "di chuc",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "CÔNG BỐ",
+            "CÔNG KHAI",
+            "DI CHÚC"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -848,7 +1188,12 @@ DOCUMENT_RULES = {
             "tiền sử dụng đất",
             # Không dấu
             "thong bao thue", "truoc ba", "thu nhap ca nhan",
-            "tien su dung dat"
+            "tien su dung dat",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO THUẾ",
+            "TRƯỚC BẠ",
+            "THU NHẬP CÁ NHÂN",
+            "TIỀN SỬ DỤNG ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -857,7 +1202,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "thông báo", "gcn bị mất", "niêm yết",
             # Không dấu
-            "thong bao", "gcn bi mat", "niem yet"
+            "thong bao", "gcn bi mat", "niem yet",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "GCN BỊ MẤT",
+            "NIÊM YẾT"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -868,7 +1217,13 @@ DOCUMENT_RULES = {
             "cấp gcn",
             # Không dấu
             "thong bao", "cong khai", "ket qua", "tham tra",
-            "cap gcn"
+            "cap gcn",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "CÔNG KHAI",
+            "KẾT QUẢ",
+            "THẨM TRA",
+            "CẤP GCN"
         ],
         "weight": 0.8, "min_matches": 3
     },
@@ -877,7 +1232,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "thông báo", "niêm yết", "mất gcn",
             # Không dấu
-            "thong bao", "niem yet", "mat gcn"
+            "thong bao", "niem yet", "mat gcn",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "NIÊM YẾT",
+            "MẤT GCN"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -886,7 +1245,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "thông báo", "xác nhận", "hoàn thành", "nghĩa vụ tài chính",
             # Không dấu
-            "thong bao", "xac nhan", "hoan thanh", "nghia vu tai chinh"
+            "thong bao", "xac nhan", "hoan thanh", "nghia vu tai chinh",
+            # Viết hoa (auto-generated)
+            "THÔNG BÁO",
+            "XÁC NHẬN",
+            "HOÀN THÀNH",
+            "NGHĨA VỤ TÀI CHÍNH"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -895,7 +1259,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "tờ khai thuế", "trước bạ", "tncn", "tiền sử dụng đất",
             # Không dấu
-            "to khai thue", "truoc ba", "tien su dung dat"
+            "to khai thue", "truoc ba", "tien su dung dat",
+            # Viết hoa (auto-generated)
+            "TỜ KHAI THUẾ",
+            "TRƯỚC BẠ",
+            "TIỀN SỬ DỤNG ĐẤT"
         ],
         "weight": 1.0, "min_matches": 1
     },
@@ -906,7 +1274,12 @@ DOCUMENT_RULES = {
             "chuyển mục đích",
             # Không dấu
             "to trinh", "giao dat", "cho thue dat",
-            "chuyen muc dich"
+            "chuyen muc dich",
+            # Viết hoa (auto-generated)
+            "TỜ TRÌNH",
+            "GIAO ĐẤT",
+            "CHO THUÊ ĐẤT",
+            "CHUYỂN MỤC ĐÍCH"
         ],
         "weight": 0.8, "min_matches": 1
     },
@@ -915,7 +1288,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "tờ trình", "đăng ký đất đai", "ubnd xã",
             # Không dấu
-            "to trinh", "dang ky dat dai", "ubnd xa"
+            "to trinh", "dang ky dat dai", "ubnd xa",
+            # Viết hoa (auto-generated)
+            "TỜ TRÌNH",
+            "ĐĂNG KÝ ĐẤT ĐAI",
+            "UBND XÃ"
         ],
         "weight": 0.8, "min_matches": 2
     },
@@ -924,7 +1301,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "văn bản", "cam kết", "tài sản riêng",
             # Không dấu
-            "van ban", "cam ket", "tai san rieng"
+            "van ban", "cam ket", "tai san rieng",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "CAM KẾT",
+            "TÀI SẢN RIÊNG"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -933,7 +1314,11 @@ DOCUMENT_RULES = {
             # Có dấu
             "văn bản", "chấp thuận", "chuyển mục đích",
             # Không dấu
-            "van ban", "chap thuan", "chuyen muc dich"
+            "van ban", "chap thuan", "chuyen muc dich",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "CHẤP THUẬN",
+            "CHUYỂN MỤC ĐÍCH"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -944,7 +1329,14 @@ DOCUMENT_RULES = {
             "thuê", "góp vốn",
             # Không dấu
             "van ban", "de nghi", "chap thuan", "chuyen nhuong",
-            "thue", "gop von"
+            "thue", "gop von",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "ĐỀ NGHỊ",
+            "CHẤP THUẬN",
+            "CHUYỂN NHƯỢNG",
+            "THUÊ",
+            "GÓP VỐN"
         ],
         "weight": 0.8, "min_matches": 3
     },
@@ -955,7 +1347,13 @@ DOCUMENT_RULES = {
             "phương án sử dụng đất",
             # Không dấu
             "van ban", "de nghi", "tham dinh", "phe duyet",
-            "phuong an su dung dat"
+            "phuong an su dung dat",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "ĐỀ NGHỊ",
+            "THẨM ĐỊNH",
+            "PHÊ DUYỆT",
+            "PHƯƠNG ÁN SỬ DỤNG ĐẤT"
         ],
         "weight": 0.8, "min_matches": 3
     },
@@ -964,7 +1362,13 @@ DOCUMENT_RULES = {
             # Có dấu
             "văn bản", "thỏa thuận", "phân chia", "di sản", "thừa kế",
             # Không dấu
-            "van ban", "thoa thuan", "phan chia", "di san", "thua ke"
+            "van ban", "thoa thuan", "phan chia", "di san", "thua ke",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "THỎA THUẬN",
+            "PHÂN CHIA",
+            "DI SẢN",
+            "THỪA KẾ"
         ],
         "weight": 0.9, "min_matches": 3
     },
@@ -975,7 +1379,12 @@ DOCUMENT_RULES = {
             "hộ gia đình",
             # Không dấu
             "van ban", "thoa thuan", "quyen su dung dat",
-            "ho gia dinh"
+            "ho gia dinh",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "THỎA THUẬN",
+            "QUYỀN SỬ DỤNG ĐẤT",
+            "HỘ GIA ĐÌNH"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -986,7 +1395,13 @@ DOCUMENT_RULES = {
             "thửa đất liền kề",
             # Không dấu
             "van ban", "thoa thuan", "cham dut", "quyen han che",
-            "thua dat lien ke"
+            "thua dat lien ke",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "THỎA THUẬN",
+            "CHẤM DỨT",
+            "QUYỀN HẠN CHẾ",
+            "THỬA ĐẤT LIỀN KỀ"
         ],
         "weight": 0.9, "min_matches": 3
     },
@@ -997,7 +1412,13 @@ DOCUMENT_RULES = {
             "thửa đất liền kề",
             # Không dấu
             "van ban", "thoa thuan", "xac lap", "quyen han che",
-            "thua dat lien ke"
+            "thua dat lien ke",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "THỎA THUẬN",
+            "XÁC LẬP",
+            "QUYỀN HẠN CHẾ",
+            "THỬA ĐẤT LIỀN KỀ"
         ],
         "weight": 0.9, "min_matches": 3
     },
@@ -1006,7 +1427,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "văn bản", "từ chối", "nhận di sản", "thừa kế",
             # Không dấu
-            "van ban", "tu choi", "nhan di san", "thua ke"
+            "van ban", "tu choi", "nhan di san", "thua ke",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "TỪ CHỐI",
+            "NHẬN DI SẢN",
+            "THỪA KẾ"
         ],
         "weight": 0.9, "min_matches": 2
     },
@@ -1015,7 +1441,12 @@ DOCUMENT_RULES = {
             # Có dấu
             "văn bản", "phân chia", "tài sản chung", "vợ chồng",
             # Không dấu
-            "van ban", "phan chia", "tai san chung", "vo chong"
+            "van ban", "phan chia", "tai san chung", "vo chong",
+            # Viết hoa (auto-generated)
+            "VĂN BẢN",
+            "PHÂN CHIA",
+            "TÀI SẢN CHUNG",
+            "VỢ CHỒNG"
         ],
         "weight": 0.9, "min_matches": 2
     }
@@ -1071,8 +1502,8 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
             # Base score from matched keywords
             base_score = len(matched) * weight
             
-            # Boost score for title matches (2x multiplier)
-            title_boost = title_matches * weight * 2.0
+            # Boost score for title matches (3x multiplier for strong title indicators)
+            title_boost = title_matches * weight * 3.0
             
             # Final score = base + title boost
             score = base_score + title_boost
@@ -1214,10 +1645,32 @@ def classify_document_name_from_code(short_code: str) -> str:
 
 
 class RuleClassifier:
-    """Rule-based classifier wrapper class"""
+    """Rule-based classifier wrapper class with rules override support"""
     
-    def __init__(self):
-        pass
+    def __init__(self, use_overrides=True):
+        """
+        Initialize classifier
+        
+        Args:
+            use_overrides: If True, load rules from rules_manager (default + overrides)
+        """
+        self.use_overrides = use_overrides
+        self.rules = self._load_rules()
+    
+    def _load_rules(self) -> dict:
+        """Load rules (with overrides if enabled)"""
+        if self.use_overrides:
+            try:
+                # Try to import rules_manager and get merged rules
+                import rules_manager
+                return rules_manager.get_rules()
+            except Exception as e:
+                # Fallback to default rules if something goes wrong
+                import sys
+                print(f"Warning: Could not load rule overrides, using defaults: {e}", file=sys.stderr)
+                return DOCUMENT_RULES
+        else:
+            return DOCUMENT_RULES
     
     def classify(self, text: str, title_text: str = None) -> dict:
         """
@@ -1230,7 +1683,8 @@ class RuleClassifier:
         Returns:
             Classification result with doc_type, confidence, and reasoning
         """
-        result = classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
+        # Use instance rules instead of global DOCUMENT_RULES
+        result = self._classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
         
         doc_type_code = result.get('type', 'UNKNOWN')
         confidence = result.get('confidence', 0.0)
@@ -1251,4 +1705,82 @@ class RuleClassifier:
             'confidence': confidence,
             'reasoning': reasoning,
             'title_boost': title_boost
+        }
+    
+    def _classify_by_rules(self, text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
+        """
+        Internal method: Classify document using instance rules
+        
+        Args:
+            text: Full OCR text
+            title_text: Text extracted from large fonts
+            confidence_threshold: Minimum confidence threshold
+            
+        Returns:
+            Classification result with type, confidence, and matched keywords
+        """
+        text_normalized = normalize_text(text)
+        title_normalized = normalize_text(title_text) if title_text else ""
+        
+        scores = {}
+        matched_keywords_dict = {}
+        title_boost_applied = {}
+        
+        for doc_type, rules in self.rules.items():
+            keywords = rules.get("keywords", [])
+            weight = rules.get("weight", 1.0)
+            min_matches = rules.get("min_matches", 1)
+            
+            matched = []
+            title_matches = 0
+            
+            for keyword in keywords:
+                keyword_normalized = normalize_text(keyword)
+                
+                # Check if keyword is in title (large font) - gets 2x weight
+                if title_normalized and keyword_normalized in title_normalized:
+                    matched.append(f"{keyword} [TITLE]")
+                    title_matches += 1
+                # Check if keyword is in full text
+                elif keyword_normalized in text_normalized:
+                    matched.append(keyword)
+            
+            if len(matched) >= min_matches:
+                # Base score from matched keywords
+                base_score = len(matched) * weight
+                
+                # Boost score for title matches (2x multiplier)
+                title_boost = title_matches * weight * 2.0
+                
+                # Final score = base + title boost
+                score = base_score + title_boost
+                
+                scores[doc_type] = score
+                matched_keywords_dict[doc_type] = matched
+                title_boost_applied[doc_type] = title_matches > 0
+        
+        if not scores:
+            return {
+                "type": "UNKNOWN",
+                "confidence": 0.0,
+                "matched_keywords": [],
+                "title_boost": False
+            }
+        
+        best_type = max(scores, key=scores.get)
+        max_score = scores[best_type]
+        
+        # Calculate confidence with title boost consideration
+        total_possible_score = len(self.rules[best_type].get("keywords", [])) * self.rules[best_type].get("weight", 1.0)
+        confidence = min(max_score / (total_possible_score * 2), 1.0) if total_possible_score > 0 else 0.0
+        
+        # Boost confidence if title matches found
+        if title_boost_applied.get(best_type, False):
+            confidence = min(confidence * 1.2, 1.0)  # 20% confidence boost for title matches
+        
+        return {
+            "type": best_type,
+            "confidence": confidence,
+            "matched_keywords": matched_keywords_dict[best_type],
+            "title_boost": title_boost_applied.get(best_type, False)
         }

@@ -45,6 +45,10 @@ class OCREngine:
             cls._instance = super(OCREngine, cls).__new__(cls)
             # Initialize VietOCR with Transformer model
             try:
+                # Temporarily redirect stdout to suppress VietOCR messages
+                old_stdout = sys.stdout
+                sys.stdout = io.StringIO()
+                
                 # Load config - vgg_transformer is the best model
                 config = Cfg.load_config_from_name('vgg_transformer')
                 
@@ -57,8 +61,13 @@ class OCREngine:
                 # Initialize predictor
                 cls._predictor = Predictor(config)
                 
+                # Restore stdout
+                sys.stdout = old_stdout
+                
                 print("✅ VietOCR Transformer model loaded successfully", file=sys.stderr)
             except Exception as e:
+                # Restore stdout in case of error
+                sys.stdout = old_stdout
                 print(f"⚠️ Error loading VietOCR: {e}", file=sys.stderr)
                 cls._predictor = None
         return cls._instance

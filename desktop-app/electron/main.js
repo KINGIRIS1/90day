@@ -274,26 +274,42 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       : getPythonScriptPath('process_document.py');
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
-    const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType]);
+    const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType], {
+      encoding: 'utf8'
+    });
     let result = '';
     let errorLogs = '';
 
+    childProcess.stdout.setEncoding('utf8');
+    childProcess.stderr.setEncoding('utf8');
+
     childProcess.stdout.on('data', (data) => {
-      result += data.toString();
+      result += data;
     });
 
     childProcess.stderr.on('data', (data) => {
-      const message = data.toString();
       // Log stderr for debugging but don't fail on warnings
-      console.log('[Python stderr]:', message);
-      errorLogs += message;
+      console.log('[Python stderr]:', data);
+      errorLogs += data;
     });
 
     childProcess.on('close', (code) => {
       if (code === 0) {
         try {
-          // Parse only the JSON output from stdout
-          const jsonResult = JSON.parse(result);
+          // Extract JSON from output (skip any non-JSON lines)
+          const lines = result.trim().split('\n');
+          let jsonLine = lines[lines.length - 1]; // Get last line (should be JSON)
+          
+          // If last line doesn't start with {, try to find JSON line
+          if (!jsonLine.trim().startsWith('{')) {
+            jsonLine = lines.find(line => line.trim().startsWith('{'));
+          }
+          
+          if (!jsonLine) {
+            throw new Error('No JSON found in output');
+          }
+          
+          const jsonResult = JSON.parse(jsonLine);
           resolve(jsonResult);
         } catch (e) {
           console.error('JSON parse error:', e);

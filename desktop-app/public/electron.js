@@ -74,9 +74,10 @@ function getPythonPath() {
     }
   } else {
     // Production mode - use system Python
-    // User must have Python installed
+    // Try multiple commands to find working Python
     if (process.platform === 'win32') {
-      return 'python'; // Windows: python or py
+      // Windows: try py, python, python3
+      return 'py'; // Windows py launcher is most reliable
     } else if (process.platform === 'darwin') {
       return 'python3'; // macOS
     } else {

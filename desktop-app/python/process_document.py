@@ -11,21 +11,21 @@ from pathlib import Path
 import io
 import warnings
 
+# Force UTF-8 encoding for all I/O
+if sys.platform == 'win32':
+    # Set Windows console to UTF-8
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+    # Also set default encoding
+    if hasattr(sys, '_MEIPASS'):
+        # Running in PyInstaller bundle
+        os.environ['PYTHONIOENCODING'] = 'utf-8'
+
 # Suppress warnings
 warnings.filterwarnings('ignore')
 os.environ['GLOG_minloglevel'] = '2'
 os.environ['FLAGS_use_mkldnn'] = '0'
-
-# Fix Windows console encoding for Vietnamese
-# Keep reference to prevent garbage collection
-_stdout = None
-_stderr = None
-
-if sys.platform == 'win32':
-    _stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
-    _stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', line_buffering=True)
-    sys.stdout = _stdout
-    sys.stderr = _stderr
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))

@@ -292,7 +292,7 @@ const Settings = () => {
           <ul className="ml-6 space-y-1 list-disc">
             <li><strong>Tesseract:</strong> Nhanh nhất (0.5-1s), đa ngôn ngữ, phù hợp cho bulk processing</li>
             <li><strong>VietOCR:</strong> Cân bằng (1-2s), chuyên tiếng Việt, accuracy 90-95%</li>
-            <li><strong>EasyOCR:</strong> Chính xác nhất (10-11s), tốt cho documents quan trọng, accuracy 90-92%</li>
+            <li><strong>EasyOCR:</strong> Chính xác nhất (7-8s), tốt cho documents quan trọng, accuracy 90-92%</li>
           </ul>
           <p className="mt-3">
             <strong>2. Offline OCR (Mặc định):</strong> Xử lý hoàn toàn trên máy tính của bạn,

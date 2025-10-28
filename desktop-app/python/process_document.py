@@ -101,16 +101,16 @@ def extract_document_title_from_text(text: str) -> str:
     """
     import re
     
-    # Common title patterns (case insensitive)
+    # Common title patterns (case insensitive, flexible with spaces/typos)
     title_patterns = [
-        r'(ĐƠN\s+ĐĂNG\s+KÝ\s+BIẾN\s+ĐỘNG[^.]*)',
-        r'(HỢP\s+ĐỒNG\s+CHUYỂN\s+NHƯỢNG[^.]*)',
-        r'(HỢP\s+ĐỒNG\s+ỦY\s+QUYỀN[^.]*)',
-        r'(GIẤY\s+CHỨNG\s+NHẬN\s+QUYỀN\s+SỬ\s+DỤNG\s+ĐẤT[^.]*)',
-        r'(GIẤY\s+ỦY\s+QUYỀN[^.]*)',
-        r'(QUYẾT\s+ĐỊNH[^.]*)',
-        r'(ĐƠN\s+XIN[^.]*)',
-        r'(BIÊN\s+BẢN[^.]*)',
+        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EẾ]N\s+[ĐD][OỘ]NG[^.]{0,100})',
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EỂ]N\s+NH[UƯ][OỢ]NG[^.]{0,100})',
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EỀ]N[^.]{0,100})',
+        r'(GI[AẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EỀ]N\s+S[UỬ]\s+D[UỤ]NG\s+[ĐD][AẤ]T[^.]{0,100})',
+        r'(GI[AẤ]Y\s+[UỦ]\s*Y\s+QUY[EỀ]N[^.]{0,80})',
+        r'(QUY[EẾ]T\s+[ĐD][IỊ]NH[^.]{0,80})',
+        r'(Đ[OƠ]N\s+XIN[^.]{0,80})',
+        r'(BI[EÊ]N\s+B[AẢ]N[^.]{0,80})',
     ]
     
     for pattern in title_patterns:

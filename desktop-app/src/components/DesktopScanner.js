@@ -489,6 +489,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         </div>
       )}
 
+      {/* Paused State */}
+      {isPaused && remainingFiles.length > 0 && (
+        <div className="bg-orange-50 rounded-xl shadow-sm p-4 border border-orange-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">⏸️</span>
+              <div>
+                <div className="text-orange-900 font-medium">Đã tạm dừng</div>
+                <div className="text-sm text-orange-700">
+                  Đã quét: {results.length} files • Còn lại: {remainingFiles.length} files
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Results Grid */}
       {results.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">

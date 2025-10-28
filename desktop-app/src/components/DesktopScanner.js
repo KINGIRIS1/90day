@@ -263,7 +263,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       }
 
       const processedResult = applySequentialNaming(result, currentLastKnown);
-      if (processedResult.success && processedResult.short_code !== 'UNKNOWN' && processedResult.confidence >= 0.3) {
+      
+      // Update last known type only if this is a genuine classification (not a fallback)
+      // Don't update if we used previous classification due to low quality title
+      if (processedResult.success && 
+          processedResult.short_code !== 'UNKNOWN' && 
+          processedResult.confidence >= 0.3 &&
+          !processedResult.low_quality_title_detected) {
         currentLastKnown = {
           doc_type: processedResult.doc_type,
           short_code: processedResult.short_code,

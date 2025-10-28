@@ -2038,7 +2038,8 @@ def classify_document_name_from_code(short_code: str) -> str:
         "CDLK": "Văn bản thoả thuận về việc chấm dứt quyền hạn chế",
         "HCLK": "Văn bản thỏa thuận về việc xác lập quyền hạn chế",
         "VBTC": "Văn bản từ chối nhận di sản thừa kế",
-        "PCTSVC": "Văn bản phân chia tài sản chung vợ chồng"
+        "PCTSVC": "Văn bản phân chia tài sản chung vợ chồng",
+        "USE_PREVIOUS": "Sử dụng phân loại trang trước"
     }
     return code_to_name.get(short_code, "Không rõ loại tài liệu")
 

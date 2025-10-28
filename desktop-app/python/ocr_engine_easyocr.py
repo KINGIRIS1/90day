@@ -52,7 +52,7 @@ class OCREngine:
         Extract text from image using EasyOCR with optimizations
         
         Optimizations:
-        1. Crop to top 40% (title area - ensures document titles at 15-20%)
+        1. SMART CROP (like Cloud): 50% for single page, 65% for 2-page spread
         2. Resize if too large (max 1920px width)
         3. Use optimized parameters for speed
         
@@ -62,7 +62,7 @@ class OCREngine:
         Returns:
             Dict with:
                 - full_text: All extracted text
-                - title_text: Text from title area (top 40%)
+                - title_text: Text from title area (smart cropped)
                 - avg_height: Average font height estimate
         """
         if self._reader is None:
@@ -78,10 +78,22 @@ class OCREngine:
             image = Image.open(image_path)
             width, height = image.size
             
-            # OPTIMIZATION 1: Crop to top 40% (where document title/type is)
-            # Increased from 35% to 40% to ensure we capture full document titles
-            # Vietnamese admin doc titles can be at 15-20% from top
-            crop_height = int(height * 0.40)
+            # SMART CROP LOGIC (giống Cloud backend)
+            # Detect aspect ratio to determine document format
+            aspect_ratio = width / height
+            
+            if aspect_ratio > 1.35:
+                # 2-page horizontal spread or wide format
+                # Title may be at 40-60%, use 65% crop
+                crop_percent = 0.65
+                print(f"→ Detected 2-page/wide format (aspect {aspect_ratio:.2f}) → Using 65% crop", file=sys.stderr)
+            else:
+                # Single page portrait
+                # Title typically at 15-25%, use 50% crop to be safe
+                crop_percent = 0.50
+                print(f"→ Detected single page (aspect {aspect_ratio:.2f}) → Using 50% crop", file=sys.stderr)
+            
+            crop_height = int(height * crop_percent)
             cropped_image = image.crop((0, 0, width, crop_height))
             
             # OPTIMIZATION 2: Resize if too large (max 1920px width)

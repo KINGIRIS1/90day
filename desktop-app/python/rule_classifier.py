@@ -7,8 +7,11 @@ COMPLETE Rule-based classifier for Vietnamese land documents with Smart Scoring
 """
 import re
 import sys
+import os
+import json
 from typing import Dict, Tuple, List
 from difflib import SequenceMatcher
+from pathlib import Path
 
 # Title templates for fuzzy matching (các mẫu title chuẩn)
 TITLE_TEMPLATES = {

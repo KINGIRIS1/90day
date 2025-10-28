@@ -1,9 +1,9 @@
 <analysis>
-The AI engineer's work primarily focused on enhancing the desktop application's Vietnamese OCR and document classification capabilities. Key efforts included resolving a  in  and subsequently addressing various classification inaccuracies. A significant iteration involved implementing and then removing a Low Quality Title Detection Rule based on user feedback. The engineer then facilitated the integration of a Railway backend URL into the Electron app. Following this, extensive debugging of the classification engine ( and ) was performed, fixing issues where EasyOCR's output, including typos and reading order, led to incorrect title extraction and document classification. This involved refining regex patterns to be highly flexible with Vietnamese diacritics and character sequences, increasing image crop area for title detection, and strengthening logic to reject non-title text. The immediate next step involves improving the existing fuzzy matching approach to reduce reliance on strict regex patterns.
+The AI engineer's work spanned enhancing Vietnamese OCR document classification, integrating a Railway backend, and fixing numerous classification inaccuracies stemming from OCR typos and inconsistent title detection. Initial efforts focused on refining regex patterns, adjusting image crop areas for title extraction, and implementing rules to discard low-quality titles. A major recent task involved successfully improving the classification of Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) by lowering the fuzzy matching threshold to 75% and adding specific, flexible regex patterns to  and . Subsequently, the engineer shifted to addressing build and environment issues reported by the user, specifically  errors related to Python execution paths during local development and with the packaged Electron app. The current focus is on building and delivering a new App-only Windows installer to resolve these Python path issues and incorporate the latest classification logic, while also troubleshooting local development environment setup problems reported by the user.
 </analysis>
 
 <product_requirements>
-The application is a high-volume desktop document scanner for Vietnamese land-related images, designed for OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users require default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is needed. Core requirements included easy installation (all-in-one installer), improving  accuracy, port conflict resolution (dev server 3000 to 3001), and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. A critical need is accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền), especially with OCR typos, addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. The application also needs robust handling of sequential documents where titles might be absent or of low quality.
+The application is a desktop document scanner for Vietnamese land-related images, designed for OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users need default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is required. Key requirements include easy installation (all-in-one installer), improving  accuracy, resolving port conflicts, and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. Accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền) is critical, especially with OCR typos, addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. Robust handling of sequential documents with absent or low-quality titles is also required.
 </product_requirements>
 
 <key_technical_concepts>
@@ -12,37 +12,24 @@ The application is a high-volume desktop document scanner for Vietnamese land-re
 - **Python**: Backend for OCR and rule classification.
 - **Tesseract, VietOCR, EasyOCR**: OCR engines.
 - **NSIS**: Windows installer creation.
-- **/**: Electron inter-process communication.
 - **Fuzzy Matching**: Levenshtein distance for text similarity.
 - **Regex**: Pattern matching for text extraction.
 </key_technical_concepts>
 
 <code_architecture>
 
-- : The main Electron process script.
-    - **Changes:** Updated to use  and  to manage the backend URL dynamically. It was updated to default to the Railway URL  for the Cloud Boost feature.
-- : The packaged version of .
-    - **Changes:** Received identical updates to handle the backend URL configuration.
+- : Main Electron process. Updated for dynamic backend URL management and defaulted to Railway URL.
+- : Packaged version of . Mirrored updates for backend URL configuration.
 - : Orchestrates local OCR and document processing.
-    - **Changes:**
-        - Fixed Unicode garbling by setting  and ensuring  uses  encoding on Windows.
-        - Introduced  function to robustly find document titles using flexible regex patterns, prioritizing central titles over page headers, and accounting for various OCR typos and Vietnamese diacritics. This function is used to populate .
-        - Expanded regex patterns for Vietnamese characters (E, O, U variations) and character sequences (e.g., ) within  to handle OCR inaccuracies more effectively.
-        - Reordered title patterns to prioritize  over  to resolve classification conflicts.
-- : Contains EasyOCR implementation.
-    - **Changes:** Increased  for title detection from 25% to 35%, and then to 40% to capture titles that might be lower on the page, like ĐƠN ĐĂNG KÝ BIẾN ĐỘNG.
-- : The core classification logic.
-    - **Changes:**
-        - Resolved .
-        - Implemented and then reverted a Low Quality Title Detection Rule ( short code), which aimed to use sequential naming for low uppercase/low confidence titles.
-        - Added templates for  (Hợp đồng ủy quyền).
-        - Introduced  to remove common administrative headers before classification.
-        - Modified  to set  if its uppercase ratio is below 70%, effectively ignoring non-uppercase titles for fuzzy matching. This prevents incorrect classifications like Giấy chứng nhận quyền sử dụng đất being mistaken for a true title on a continuation page.
-        - Added  for potential debug warnings.
-- : Frontend component handling document scanning.
-    - **Changes:** Logic for handling the Low Quality Title Detection Rule ( flag) was added to  and then removed, reverting to the original sequential naming logic.
-- : New documentation file detailing how to set up the backend on Railway and configure the desktop app.
-- , , , , , , , : New documentation files explaining various fixes, rules, and comparisons.
+    - **Changes**: Fixed Unicode garbling. Introduced  with flexible regex for Vietnamese diacritics and character sequences. Expanded regex for E, O, U variations. Reordered  over  patterns. Added  specific patterns for robust detection.
+- : EasyOCR implementation.
+    - **Changes**: Increased  for title detection from 25% to 35%, then to 40%.
+- : Core classification logic.
+    - **Changes**: Resolved . Reverted Low Quality Title Detection Rule. Added  templates. Introduced . Set  if uppercase ratio is below 70%. **Most recent changes:** Lowered fuzzy matching confidence threshold from 80% to 75% for Tier-1 matches. Added specific rules, required keywords, and title templates for  (Giấy tiếp nhận hồ sơ và hẹn trả kết quả) to  and .
+- : Frontend scanning component.
+    - **Changes**: Logic for Low Quality Title Detection Rule () was added and then removed.
+- : Documentation file.
+    - **Changes**: Updated to reflect the new 75% fuzzy matching rule.
 </code_architecture>
 
 <pending_tasks>
@@ -57,18 +44,13 @@ The application is a high-volume desktop document scanner for Vietnamese land-re
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was addressing a user-reported issue where HỢP ĐỒNG ỦY QUYỀN was incorrectly classified as HDCQ. This led to a detailed debugging process focusing on the  for title pattern extraction. The root causes identified were:
-1.  Missing Vietnamese character variations (e.g.,  for ,  for ) in the regex character classes within .
-2.  Complex character sequences like UỶ (composed of U and a separate diacritic Ỷ) were not correctly matched by simpler patterns.
+Immediately prior to this summary, the AI engineer successfully implemented an improvement for classifying Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ), lowering the fuzzy matching confidence threshold to 75% in  and adding specific, flexible regex patterns for GTLQ in both  and  to handle common OCR typos. This was verified with synthetic tests. The engineer then summarized this feature addition and asked about frontend testing.
 
-The AI engineer implemented the following fixes in :
--   Expanded regex character classes for  to include all their Vietnamese diacritical variants (, ).
--   Refined the pattern for ỦY to  to handle various forms including , , , .
--   Ensured the order of  prioritizes more specific document types like  over potentially broader ones like  to prevent early, incorrect matches.
-
-After these fixes, all specific test cases for HỢP ĐỒNG ỦY QUYỀN and its variations passed successfully. The current problem-solving trajectory, prompted by the user's frustration with constant pattern fixes for OCR typos, has shifted towards leveraging and improving the existing fuzzy matching capabilities in . The AI engineer has identified the relevant section in  to potentially adjust the fuzzy matching threshold, with the goal of making the classification system more resilient to OCR inaccuracies without requiring continuous regex updates.
+However, the user reported an error Lỗi and uploaded an image of a  error, indicating issues with running the Electron app (and later, local dev). The AI engineer diagnosed this as Python executable path issues within the Electron build environment (old builds bundle Python, new code expects system Python) and also in the local development setup (Yarn's  failing to find ). The user opted for a new App-only Windows installer build. The AI engineer has been in a dialogue with the user to confirm build specifications (Windows 10/11 64-bit, App-only, Tesseract, Installer .exe, version 1.1.0, Google Drive sharing) and is currently in the process of building this installer while simultaneously troubleshooting the user's local development environment issues related to  and  during yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. commands.
 </current_work>
 
 <optional_next_step>
-Reduce the fuzzy matching confidence threshold in  from 80% to 75% to improve flexibility with OCR typos.
+The next step is to assist the user in resolving the  error in their local development environment by providing  (running commands in separate CMD terminals) or  (PowerShell syntax).
 </optional_next_step>

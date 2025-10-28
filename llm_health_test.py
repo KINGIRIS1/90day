@@ -17,7 +17,7 @@ import sys
 class LLMHealthTester:
     def __init__(self):
         # Get backend URL from frontend .env
-        self.base_url = "https://vietdocscanner.preview.emergentagent.com/api"
+        self.base_url = "https://land-doc-ocr.preview.emergentagent.com/api"
         self.token = None
         self.test_results = []
         

@@ -129,7 +129,7 @@ echo [STEP 4/6] Building React frontend...
 echo ================================================================================
 echo.
 
-call yarn build
+call %YARN_CMD% build
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to build React frontend
     pause
@@ -142,7 +142,7 @@ echo [STEP 5/6] Building Electron App...
 echo ================================================================================
 echo.
 
-call yarn electron-build
+call %YARN_CMD% electron-build
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to build Electron app
     pause

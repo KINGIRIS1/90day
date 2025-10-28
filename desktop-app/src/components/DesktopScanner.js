@@ -350,43 +350,34 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* File Selection */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Chọn tài liệu</h2>
-        <div className="flex flex-wrap gap-3">
-          <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <h2 className="text-base font-semibold text-gray-900 mb-3">Chọn tài liệu</h2>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm">
             <span>📁</span><span>Chọn file</span>
           </button>
-          <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
+          <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm">
             <span>📂</span><span>Chọn thư mục</span>
           </button>
+          {selectedFiles.length > 0 && !processing && (
+            <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ml-auto">
+              <span>🚀</span><span>Bắt đầu quét</span>
+            </button>
+          )}
         </div>
         {selectedFiles.length > 0 && (
-          <div className="mt-3"><span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-700"><span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file</span></div>
+          <div className="mt-2"><span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"><span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file</span></div>
         )}
         {parentFolder && parentSummary && (
-          <div className="mt-3 text-xs text-gray-700">
+          <div className="mt-2 text-xs text-gray-700">
             Thư mục: <span className="font-medium">{parentFolder}</span> •
             <span className="ml-2">{parentSummary.subfolderCount} thư mục con</span> •
             <span className="ml-2">{parentSummary.rootFileCount} file ở cấp gốc</span>
           </div>
         )}
       </div>
-
-      {/* Processing Options */}
-      {selectedFiles.length > 0 && !processing && (
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-gray-800">Chọn phương thức xử lý</div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => handleProcessFiles(false)} className="px-3 py-2 text-sm border rounded-md hover:bg-blue-50 flex items-center gap-2" title="Offline OCR + Rules (miễn phí)"><span>🔵</span><span>Offline</span></button>
-              <button onClick={() => handleProcessFiles(true)} disabled={!backendUrl} className="px-3 py-2 text-sm border rounded-md hover:bg-purple-50 disabled:opacity-50 flex items-center gap-2" title="Cloud Boost (GPT-4)"><span>☁️</span><span>Cloud</span></button>
-            </div>
-          </div>
-          {autoFallbackEnabled && (<div className="mt-2 text-xs text-purple-700">Auto‑fallback: BẬT (sẽ hỏi xác nhận nếu Cloud lỗi)</div>)}
-        </div>
-      )}
 
       {/* Processing Progress */}
       {processing && (

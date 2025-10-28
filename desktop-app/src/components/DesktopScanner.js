@@ -663,36 +663,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                 )}
               </button>
             ))}
-            <div className="ml-auto flex items-center gap-2">
-              <label className="text-xs text-gray-600 inline-flex items-center gap-1">
-                <input type="checkbox" checked={childScanImagesOnly} onChange={(e) => setChildScanImagesOnly(e.target.checked)} />Bỏ qua PDF (chỉ quét ảnh)
-              </label>
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-gray-600">Mật độ:</label>
-                <select value={density} onChange={(e) => setDensity(e.target.value)} className="text-xs border rounded px-2 py-1">
-                  <option value="high">Cao (5 cột)</option>
-                  <option value="medium">Trung bình (4 cột)</option>
-                  <option value="low">Thấp (3 cột)</option>
-                </select>
-              </div>
-              <button 
-                onClick={() => { 
-                  stopRef.current = true; 
-                  setTimeout(() => (stopRef.current = false), 100);
-                }} 
-                className="px-4 py-2.5 text-xs rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all shadow-sm hover:shadow-md font-medium"
-              >
-                ⏹️ Dừng quét
-              </button>
-              <button onClick={async () => { stopRef.current = false; for (const tab of childTabs) { if (stopRef.current) break; if (tab.status !== 'done') await scanChildFolder(tab.path); } }} className="px-4 py-2.5 text-xs rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm hover:shadow-md font-medium">Quét tất cả thư mục con</button>
-              <button
-                onClick={() => setShowMergeModal(true)}
-                className="px-4 py-2.5 text-xs rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm hover:shadow-md font-medium"
-              >
-                📚 Gộp tất cả tab con
-              </button>
-            </div>
           </div>
+          
+          {/* Tab content */}
           <div className="mt-3">
             {childTabs.map((t) => (
               activeChild === t.path && (

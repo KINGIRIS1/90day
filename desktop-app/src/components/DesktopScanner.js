@@ -535,14 +535,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                   stopRef.current = true; 
                   setTimeout(() => (stopRef.current = false), 100);
                 }} 
-                className="px-3 py-2 text-xs rounded-md bg-red-600 text-white hover:bg-red-700"
+                className="px-4 py-2.5 text-xs rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all shadow-sm hover:shadow-md font-medium"
               >
                 ⏹️ Dừng quét
               </button>
-              <button onClick={async () => { stopRef.current = false; for (const tab of childTabs) { if (stopRef.current) break; if (tab.status !== 'done') await scanChildFolder(tab.path); } }} className="px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Quét tất cả thư mục con</button>
+              <button onClick={async () => { stopRef.current = false; for (const tab of childTabs) { if (stopRef.current) break; if (tab.status !== 'done') await scanChildFolder(tab.path); } }} className="px-4 py-2.5 text-xs rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm hover:shadow-md font-medium">Quét tất cả thư mục con</button>
               <button
                 onClick={() => setShowMergeModal(true)}
-                className="px-3 py-2 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+                className="px-4 py-2.5 text-xs rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm hover:shadow-md font-medium"
               >
                 📚 Gộp tất cả tab con
               </button>

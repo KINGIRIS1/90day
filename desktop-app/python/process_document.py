@@ -122,7 +122,8 @@ def extract_document_title_from_text(text: str) -> str:
         r'(GI[AÁẤ]Y\s+CH[UƯÚÙỦŨỤỨỪỬỮỰ]NG\s+NH[AẬ]N\s+QUY[EÊÉÈẾỀỂỄỆ]N\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',
         
         # GIẤY ỦY QUYỀN
-        r'(GI[AÁẤ]Y\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
+        # Flexible with: ỦY, UỶ, Ủ Y
+        r'(GI[AÁẤ]Y\s+(?:[UỦ][\sỶ]*Y|UY)\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
         
         # QUYẾT ĐỊNH
         r'(QUY[EÊÉÈẾỀỂỄỆ]T\s+[ĐD][IỊ]NH(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',

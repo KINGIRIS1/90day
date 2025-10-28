@@ -792,6 +792,20 @@ DOCUMENT_RULES = {
         ],
         "weight": 1.2, "min_matches": 2
     },
+    "BNHS": {
+        "keywords": [
+            # Có dấu
+            "biên nhận hồ sơ", "biên nhận", "đã nhận hồ sơ",
+            "phiếu biên nhận", "nhận hồ sơ từ",
+            # Không dấu
+            "bien nhan ho so", "bien nhan", "da nhan ho so",
+            "phieu bien nhan", "nhan ho so tu",
+            # Viết hoa
+            "BIÊN NHẬN HỒ SƠ", "BIÊN NHẬN", "ĐÃ NHẬN HỒ SƠ",
+            "PHIẾU BIÊN NHẬN", "NHẬN HỒ SƠ"
+        ],
+        "weight": 1.0, "min_matches": 1
+    },
     "GUQ": {
         "keywords": [
             # Có dấu

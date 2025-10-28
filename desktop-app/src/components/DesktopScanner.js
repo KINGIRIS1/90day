@@ -279,7 +279,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         // Check stop after async operation
         if (stopRef.current) {
           console.log('❌ Scan stopped after cloud boost at file', i);
-          break;
+          setRemainingFiles(filesToProcess.slice(i));
+          setIsPaused(true);
+          setProcessing(false);
+          return;
         }
         
         if (!result.success && autoFallbackEnabled && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {

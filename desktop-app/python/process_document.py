@@ -21,7 +21,7 @@ if sys.platform == 'win32':
             sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
         if hasattr(sys.stderr, 'buffer'):
             sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
-    except Exception as e:
+    except Exception:
         # Fallback - already wrapped or other issue
         pass
 
@@ -169,11 +169,11 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
         if ocr_engine_type == 'vietocr' and vietocr_engine is not None:
             ocr_engine = vietocr_engine
             engine_name = "VietOCR"
-            print(f"🔍 Using VietOCR engine", file=sys.stderr)
+            print("🔍 Using VietOCR engine", file=sys.stderr)
         elif ocr_engine_type == 'easyocr' and easyocr_engine is not None:
             ocr_engine = easyocr_engine
             engine_name = "EasyOCR"
-            print(f"🔍 Using EasyOCR engine", file=sys.stderr)
+            print("🔍 Using EasyOCR engine", file=sys.stderr)
         else:
             # Default to Tesseract or fallback
             ocr_engine = tesseract_engine
@@ -181,11 +181,11 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
             
             # Show fallback message if non-Tesseract was requested
             if ocr_engine_type == 'vietocr' and vietocr_engine is None:
-                print(f"⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+                print("⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
             elif ocr_engine_type == 'easyocr' and easyocr_engine is None:
-                print(f"⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+                print("⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
             else:
-                print(f"🔍 Using Tesseract engine", file=sys.stderr)
+                print("🔍 Using Tesseract engine", file=sys.stderr)
         
         classifier = RuleClassifier()
         
@@ -219,7 +219,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
         if extracted_title:
             print(f"✅ Extracted title via pattern: {extracted_title[:80]}...", file=sys.stderr)
         else:
-            print(f"⚠️ No title pattern found in full text", file=sys.stderr)
+            print("⚠️ No title pattern found in full text", file=sys.stderr)
         
         # Priority:
         # 1. If we found a title via patterns → use it

@@ -408,9 +408,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       {/* Processing Progress with Animation */}
       {processing && (
         <div className="bg-white rounded-lg shadow-sm p-4">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="animate-spin text-2xl">⚙️</div>
-            <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin text-2xl">⚙️</div>
+              <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>
+            </div>
+            <button 
+              onClick={() => { 
+                stopRef.current = true; 
+                setTimeout(() => (stopRef.current = false), 100);
+              }} 
+              className="px-3 py-2 text-sm rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
+            >
+              ⏹️ Dừng quét
+            </button>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" style={{ width: `${(progress.current / progress.total) * 100}%` }}>

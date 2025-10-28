@@ -45,19 +45,36 @@ exit /b 1
 %NODE_CMD% --version
 echo [OK] Node.js found
 
-REM Check Yarn
-where yarn >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Yarn not found!
-    echo Installing Yarn...
-    npm install -g yarn
-    if %ERRORLEVEL% NEQ 0 (
-        echo [ERROR] Failed to install Yarn
-        pause
-        exit /b 1
-    )
+REM Check Yarn - Try multiple methods
+set YARN_CMD=
+
+REM Method 1: Check if 'yarn' command works
+yarn --version >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set YARN_CMD=yarn
+    goto :yarn_found
 )
-yarn --version
+
+REM Method 2: Try npm path
+if exist "C:\Users\%USERNAME%\AppData\Roaming\npm\yarn.cmd" (
+    set YARN_CMD="C:\Users\%USERNAME%\AppData\Roaming\npm\yarn.cmd"
+    goto :yarn_found
+)
+
+REM Not found - install it
+echo [WARNING] Yarn not found!
+echo Installing Yarn...
+%NODE_CMD% -e "console.log('Installing Yarn globally...')"
+call npm install -g yarn
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Failed to install Yarn
+    pause
+    exit /b 1
+)
+set YARN_CMD=yarn
+
+:yarn_found
+%YARN_CMD% --version
 echo [OK] Yarn found
 
 REM Check Python

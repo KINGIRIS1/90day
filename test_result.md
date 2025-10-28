@@ -141,10 +141,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Test Python OCR engine standalone with sample images"
-    - "Test Electron app startup and UI"
-    - "Test offline OCR flow end-to-end"
-    - "Test cloud boost configuration and flow"
+    - "Giảm ngưỡng fuzzy từ 80% xuống 75% và xác nhận không gây nhầm lẫn"
+    - "Bổ sung nhận dạng GTLQ (Giấy tiếp nhận hồ sơ và hẹn trả kết quả)"
+    - "Test Python OCR engine standalone với 2 ảnh mẫu người dùng gửi (EasyOCR)"
+    - "Kiểm tra ưu tiên HDUQ > HDCQ trong fuzzy title"
   stuck_tasks: []
   test_all: false
   test_priority: "desktop_app_first"
@@ -152,68 +152,30 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      ✅ VietOCR INTEGRATION COMPLETE - User Can Choose OCR Engine!
+      ✅ CẬP NHẬT PHÂN LOẠI: Giảm ngưỡng fuzzy 80% → 75% + Thêm quy tắc GTLQ
       
-      🎯 FEATURE IMPLEMENTED:
-      ✅ Both Tesseract and VietOCR engines supported in process_document.py
-      ✅ New Settings UI section: "🔍 Chọn OCR Engine (Offline)"
-      ✅ Radio buttons to switch between Tesseract and VietOCR
-      ✅ User preference saved via electron-store (ocrEngineType)
-      ✅ Dynamic display in App Info showing selected engine
-      ✅ Auto-fallback if VietOCR selected but not installed
+      🎯 THAY ĐỔI CHÍNH:
+      - Giảm ngưỡng fuzzy Tier-1: 0.80 → 0.75 (giữ cổng CHỮ HOA ≥70%)
+      - Thêm template tiêu đề GTLQ và từ khóa đặc trưng ("TIẾP NHẬN", "HẸN TRẢ", ...)
+      - Cập nhật bộ lọc header + ưu tiên khớp regex/chính xác trước fuzzy
+      - Cập nhật tài liệu: STRICT_80_PERCENT_RULE.md → ngưỡng 75%
       
       📦 FILES MODIFIED:
-      1. /app/desktop-app/python/process_document.py
-         - Import both Tesseract and VietOCR engines
-         - Added ocr_engine_type parameter (default: 'tesseract')
-         - Engine selection logic with fallback
-         - Returns engine name in result
+      1. /app/desktop-app/python/rule_classifier.py
+         - Ngưỡng fuzzy Tier-1 0.75
+         - TITLE_TEMPLATES thêm GTLQ
+         - DOCUMENT_TYPE_CONFIG thêm yêu cầu từ khóa cho GTLQ
+         - DOCUMENT_RULES thêm khối từ khóa GTLQ
+         - code_to_name: GTLQ → "Giấy tiếp nhận hồ sơ và hẹn trả kết quả"
+      2. /app/desktop-app/python/process_document.py
+         - Bổ sung pattern bắt tiêu đề GTLQ trong extract_document_title_from_text
+      3. /app/desktop-app/STRICT_80_PERCENT_RULE.md
+         - Cập nhật lý do hạ ngưỡng 75%
       
-      2. /app/desktop-app/electron/main.js
-         - Read ocrEngineType from electron-store
-         - Pass to Python script as argument
+      🧪 TEST DỰ KIẾN:
+      - Chạy process_document.py <đường_dẫn_ảnh> easyocr trên 2 ảnh mẫu của người dùng
+      - Synthetic tests đảm bảo HDUQ không bị nhận thành HDCQ khi có lỗi OCR nhỏ
       
-      3. /app/desktop-app/public/electron.js
-         - Same changes as main.js for production build
-      
-      4. /app/desktop-app/src/components/Settings.js
-         - New component: OCREngineTypeSetting
-         - Radio buttons: Tesseract vs VietOCR
-         - Description of each engine
-         - Auto-save preference
-         - Dynamic OCR engine display in App Info
-         - Updated Usage Guide
-      
-      5. /app/desktop-app/python/requirements.txt
-         - Added VietOCR as optional dependency (commented)
-         - Instructions on how to enable
-      
-      6. /app/desktop-app/VIETOCR_SETUP.md
-         - Updated with new UI toggle instructions
-      
-      🎨 UI FEATURES:
-      - Clear engine descriptions in Vietnamese
-      - Tesseract: "Nhanh, nhẹ, hỗ trợ đa ngôn ngữ"
-      - VietOCR: "Chuyên cho tiếng Việt, độ chính xác cao (90-95%)"
-      - Green checkmark on save
-      - Dynamic engine name in App Info section
-      
-      🔧 TECHNICAL DETAILS:
-      - VietOCR already verified installed on user's Python 3.12
-      - Test command worked: py -3.12 ocr_engine_vietocr.py "test.jpg"
-      - Both engines use same interface (extract_text returns dict)
-      - Graceful fallback if VietOCR import fails
-      - Clear console logs show which engine is being used
-      
-      ⏭️ NEXT STEPS:
-      1. Test in development mode (yarn start + yarn electron-dev)
-      2. Test switching between engines in Settings
-      3. Test OCR with both engines
-      4. Verify persistence of preference
-      5. Test packaged app
-      
-      📝 USER TESTING REQUIRED:
-      - Switch between Tesseract and VietOCR in Settings
-      - Process document with each engine
-      - Verify accuracy difference (VietOCR should be 90-95% vs Tesseract 85-88%)
-      - Check if engine name shows correctly in results
+      📌 LƯU Ý:
+      - Không đổi .env hay URL; không hardcode backend URL.
+      - Sẽ hỏi người dùng trước khi chạy frontend automated tests.

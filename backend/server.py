@@ -145,7 +145,6 @@ DOCUMENT_TYPES = {
     "Phiếu chuyển thông tin nghĩa vụ tài chính": "PCT",
     "Phiếu chuyển thông tin để xác định nghĩa vụ tài chính": "PCT",
     "Giấy tiếp nhận hồ sơ và hẹn trả kết quả": "GTLQ",
-    "Biên nhận hồ sơ": "BNHS",
     "Phiếu kiểm tra hồ sơ": "PKTHS",
     "Phiếu lấy ý kiến khu dân cư": "PLYKDC",
     "Phiếu xác nhận kết quả đo đạc": "PXNKQDD",

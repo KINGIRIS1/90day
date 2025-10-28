@@ -30,6 +30,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
 
   // Parent folder analysis + child tabs
   const [childMergeReport, setChildMergeReport] = useState([]); // lines of saved PDFs across tabs
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [mergeOption, setMergeOption] = useState('root'); // 'root' or 'new'
+  const [mergeSuffix, setMergeSuffix] = useState('_merged');
 
   const [parentFolder, setParentFolder] = useState(null);
   const [parentSummary, setParentSummary] = useState(null); // { subfolderCount, rootFileCount }

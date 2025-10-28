@@ -362,6 +362,17 @@ const RulesManager = () => {
         <h2 className="text-2xl font-semibold text-gray-900 mb-4">
           📋 Quản Lý Rules Phân Loại
         </h2>
+        
+        {/* Info Banner */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <span className="text-blue-600 text-lg">ℹ️</span>
+            <div className="text-sm text-blue-800">
+              <strong>Thay đổi có hiệu lực ngay lập tức!</strong> Khi bạn thêm/sửa/xóa rules, các file scan tiếp theo sẽ áp dụng rules mới <strong>mà không cần khởi động lại app</strong>.
+            </div>
+          </div>
+        </div>
+        
         <p className="text-sm text-gray-600 mb-4">
           Quản lý các quy tắc phân loại tài liệu. Bạn có thể thêm/sửa keywords, điều chỉnh trọng số, và quản lý các quy tắc tùy chỉnh.
         </p>

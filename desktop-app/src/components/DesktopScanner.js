@@ -593,8 +593,30 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         </div>
       )}
 
+      {/* FOLDER SCAN TAB */}
+      {activeTab === 'folders' && (
+        <>
+          {/* Folder Selection */}
+          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+            <h2 className="text-base font-semibold text-gray-900 mb-3">Quét Thư Mục</h2>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={handleSelectFolder} disabled={processing || childTabs.some(t => t.status === 'scanning')} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
+                <span>📂</span><span>Chọn thư mục</span>
+              </button>
+            </div>
+            {parentFolder && parentSummary && (
+              <div className="mt-2 text-xs text-gray-700">
+                Thư mục: <span className="font-medium">{parentFolder}</span> •
+                <span className="ml-2">{parentSummary.subfolderCount} thư mục con</span> •
+                <span className="ml-2">{parentSummary.rootFileCount} file ở cấp gốc</span>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       {/* Child tabs for parent folder scan */}
-      {parentFolder && childTabs.length > 0 && (
+      {activeTab === 'folders' && parentFolder && childTabs.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
           {/* Control buttons - MOVED TO TOP */}
           <div className="flex items-center justify-between mb-3">

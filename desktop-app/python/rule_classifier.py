@@ -487,11 +487,9 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         if best_similarity2 > best_similarity1:
             best_template_match = best_template_match2
             best_similarity = best_similarity2
-            title_used = cleaned_title
         else:
             best_template_match = best_template_match1
             best_similarity = best_similarity1
-            title_used = title_text
         
         # Check if title is in UPPERCASE (Vietnamese admin document standard)
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)

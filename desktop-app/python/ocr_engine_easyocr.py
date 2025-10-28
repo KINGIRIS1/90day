@@ -135,7 +135,8 @@ class OCREngine:
             
             full_text = ' '.join(full_text_parts)
             
-            # Important: Since we cropped to top 25%, all extracted text is from title area
+            # Important: Since we smart cropped to title area (50-65%), 
+            # all extracted text is from title area
             # Use the same text for both full_text and title_text
             title_text = full_text
             

@@ -1840,17 +1840,20 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         is_uppercase_title = title_uppercase_ratio >= 0.7
         
-        # Strict threshold: 80% for all uppercase titles
-        similarity_threshold = 0.8
-        
-        if best_similarity >= similarity_threshold:
+        # CRITICAL RULE: Vietnamese admin titles MUST be uppercase (70%+)
+        # If similarity is high BUT uppercase is low → This is NOT a real title!
+        # It's likely a mention in body text (e.g., "Giấy chứng nhận..." trong hợp đồng)
+        if best_similarity >= 0.8 and title_uppercase_ratio < 0.7:
+            # High similarity but low uppercase → Skip fuzzy match, use keywords instead
+            print(f"⚠️ Skipping fuzzy match: High similarity ({best_similarity:.0%}) but low uppercase ({title_uppercase_ratio:.0%})", file=sys.stderr)
+            # Fall through to keyword matching
+        elif best_similarity >= 0.8 and is_uppercase_title:
             # HIGH CONFIDENCE - Direct match based on title
             doc_name = classify_document_name_from_code(best_template_match)
             
             # Boost confidence for UPPERCASE titles (more reliable)
             confidence = best_similarity
-            if is_uppercase_title:
-                confidence = min(confidence * 1.05, 1.0)  # 5% boost for uppercase
+            confidence = min(confidence * 1.05, 1.0)  # 5% boost for uppercase
             
             return {
                 "type": best_template_match,

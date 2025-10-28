@@ -102,19 +102,17 @@ def extract_document_title_from_text(text: str) -> str:
     import re
     
     # Common title patterns (case insensitive, flexible with OCR errors)
-    # Stop at lowercase text or certain punctuation
+    # IMPORTANT: Order matters! More specific patterns should come first
+    # [EÊÉÈẾỀỂỄỆ] covers all E variants (E, Ê with 5 tones: acute, grave, hook, tilde, dot)
     title_patterns = [
         # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
-        # Flexible with: BIÉN, BIẾN, BIEN, etc.
-        # [EÊÉÈẾỀỂỄỆ] covers all E variants (E, Ê with 5 tones)
         r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OỘ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OỚ]I\s+[ĐD][AÁẤ]T)?)',
         
-        # HỢP ĐỒNG CHUYỂN NHƯỢNG
-        # CHUYỂN needs Ể, NHƯỢNG needs Ư and Ợ
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯỨ][OỢỠ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
-        
-        # HỢP ĐỒNG ỦY QUYỀN
+        # HỢP ĐỒNG ỦY QUYỀN (check BEFORE HDCQ - more specific)
         r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
+        
+        # HỢP ĐỒNG CHUYỂN NHƯỢNG (check AFTER HDUQ)
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯỨ][OỢỠ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
         
         # GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT
         r'(GI[AÁẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EÊÉÈẾỀỂỄỆ]N\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',

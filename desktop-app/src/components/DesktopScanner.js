@@ -185,16 +185,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   };
 
   const applySequentialNaming = (result, lastType) => {
-    if (result.success && (result.short_code === 'UNKNOWN' || result.confidence < 0.3) && lastType) {
-      return {
-        ...result,
-        doc_type: lastType.doc_type,
-        short_code: lastType.short_code,
-        confidence: lastType.confidence * 0.9,
-        original_confidence: result.confidence,
-        applied_sequential_logic: true,
-        note: `Trang tiếp theo của ${lastType.short_code}`
-      };
+    // Apply sequential naming if:
+    // 1. Current result is UNKNOWN
+    // 2. Low confidence (< 0.5) - might be a page without clear title
+    // 3. No title detected (indicated by low confidence or missing title_text)
+    // This mimics Cloud behavior: if page has no title, use previous short_code
+    if (result.success && lastType) {
+      const shouldUseSequential = 
+        result.short_code === 'UNKNOWN' || 
+        result.confidence < 0.5 ||
+        (result.title_text && result.title_text.length < 10); // Very short/no title
+      
+      if (shouldUseSequential) {
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.6, lastType.confidence * 0.9), // Maintain reasonable confidence
+          original_confidence: result.confidence,
+          applied_sequential_logic: true,
+          note: `Trang tiếp theo của ${lastType.short_code} (không có tiêu đề rõ ràng)`
+        };
+      }
     }
     return result;
   };

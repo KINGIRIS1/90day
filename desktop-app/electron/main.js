@@ -401,13 +401,35 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
 
       let outputPath;
       if (options.autoSave) {
-        // Save directly to the folder of the first file in the group
-        const firstDir = path.dirname(filePaths[0]);
-        outputPath = path.join(firstDir, `${shortCode}.pdf`);
+        // Determine target directory based on mergeMode
+        let targetDir;
+        
+        if (options.mergeMode === 'new' && options.parentFolder) {
+          // Create new folder: parentFolder + suffix
+          const parentDir = path.dirname(options.parentFolder);
+          const baseName = path.basename(options.parentFolder);
+          const newFolderName = baseName + (options.mergeSuffix || '_merged');
+          targetDir = path.join(parentDir, newFolderName);
+          
+          // Create folder if doesn't exist
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+          }
+        } else {
+          // Default: Save to folder of first file (original behavior)
+          // Or if mergeMode === 'root', save to parentFolder
+          if (options.mergeMode === 'root' && options.parentFolder) {
+            targetDir = options.parentFolder;
+          } else {
+            targetDir = path.dirname(filePaths[0]);
+          }
+        }
+        
+        outputPath = path.join(targetDir, `${shortCode}.pdf`);
         // If exists, add numeric suffix
         let count = 1;
         while (fs.existsSync(outputPath)) {
-          outputPath = path.join(firstDir, `${shortCode}(${count}).pdf`);
+          outputPath = path.join(targetDir, `${shortCode}(${count}).pdf`);
           count += 1;
         }
         fs.writeFileSync(outputPath, Buffer.from(pdfBytes));

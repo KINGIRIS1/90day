@@ -1,7 +1,7 @@
 {
   "name": "90daychonhanh-desktop",
-  "version": "1.0.0",
-  "description": "Desktop app for land document scanning with offline OCR and optional cloud boost",
+  "version": "1.1.0",
+  "description": "Desktop app for land document scanning with offline OCR and optional cloud boost - v1.1.0 with Smart Crop & Improved Classification",
   "main": "public/electron.js",
   "homepage": ".",
   "scripts": {

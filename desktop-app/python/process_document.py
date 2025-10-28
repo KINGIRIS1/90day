@@ -103,19 +103,22 @@ def extract_document_title_from_text(text: str) -> str:
     
     # Common title patterns (case insensitive, flexible with OCR errors)
     # IMPORTANT: Order matters! More specific patterns should come first
-    # [EÊÉÈẾỀỂỄỆ] covers all E variants (E, Ê with 5 tones: acute, grave, hook, tilde, dot)
+    # Vietnamese vowel variations (all tones):
+    # E: [EÊÉÈẾỀỂỄỆ] - E, Ê + 5 tones
+    # O: [OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ] - O, Ô, Ơ + all tones
+    # U: [UƯÚÙỦŨỤỨỪỬỮỰ] - U, Ư + all tones
     title_patterns = [
         # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
-        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OỘ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OỚ]I\s+[ĐD][AÁẤ]T)?)',
+        r'(Đ[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]I\s+[ĐD][AÁẤ]T)?)',
         
         # HỢP ĐỒNG ỦY QUYỀN (check BEFORE HDCQ - more specific)
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
+        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
         
         # HỢP ĐỒNG CHUYỂN NHƯỢNG (check AFTER HDUQ)
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯỨ][OỢỠ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
+        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯÚÙỦŨỤỨỪỬỮỰ][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
         
         # GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT
-        r'(GI[AÁẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EÊÉÈẾỀỂỄỆ]N\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',
+        r'(GI[AÁẤ]Y\s+CH[UƯÚÙỦŨỤỨỪỬỮỰ]NG\s+NH[AẬ]N\s+QUY[EÊÉÈẾỀỂỄỆ]N\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',
         
         # GIẤY ỦY QUYỀN
         r'(GI[AÁẤ]Y\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
@@ -124,7 +127,7 @@ def extract_document_title_from_text(text: str) -> str:
         r'(QUY[EÊÉÈẾỀỂỄỆ]T\s+[ĐD][IỊ]NH(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
         
         # ĐƠN XIN
-        r'(Đ[OƠ]N\s+XIN(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
+        r'(Đ[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]N\s+XIN(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
         
         # BIÊN BẢN
         r'(BI[EÊÉÈẾỀỂỄỆ]N\s+B[AẢ]N(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',

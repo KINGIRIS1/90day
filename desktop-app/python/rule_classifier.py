@@ -1563,6 +1563,40 @@ def normalize_text(text: str) -> str:
     return text.strip()
 
 
+def clean_title_text(text: str) -> str:
+    """
+    Remove common government headers from document titles
+    to improve fuzzy matching accuracy
+    
+    Vietnamese admin docs often start with:
+    - CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+    - Độc lập - Tự do - Hạnh phúc
+    
+    Returns:
+        Cleaned title text without header
+    """
+    if not text:
+        return text
+    
+    # Common headers to remove (case insensitive)
+    headers_to_remove = [
+        r'CỘNG\s*HÒA\s*XÃ\s*HỘI\s*CHỦ\s*NGHĨA\s*VIỆT\s*NAM',
+        r'Cộng\s*hòa\s*xã\s*hội\s*chủ\s*nghĩa\s*Việt\s*Nam',
+        r'Đ[ôo]c\s*[lL]âp\s*[-–]\s*Tự\s*[dD]o\s*[-–]\s*H[aạ]nh\s*[pP]húc',
+        r'Độc\s*lập\s*[-–]\s*Tự\s*do\s*[-–]\s*Hạnh\s*phúc',
+        r'Mẫu\s*số\s*\w+',  # Remove form numbers like "Mẫu số O9/ĐK"
+    ]
+    
+    cleaned = text
+    for pattern in headers_to_remove:
+        cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+    
+    # Clean up extra whitespace
+    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    
+    return cleaned
+
+
 def calculate_uppercase_ratio(text: str) -> float:
     """
     Calculate ratio of uppercase letters in text

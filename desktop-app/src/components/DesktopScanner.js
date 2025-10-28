@@ -473,7 +473,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                 const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
                 const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
                 alert(`Đã xử lý gộp theo short_code và lưu tự động. Thành công: ${okCount}/${(merged || []).length}.`);
-              }} className="px-3 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700">📚 Gộp PDF</button>
+              }} className="px-4 py-2.5 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md font-medium">📚 Gộp PDF</button>
             </div>
           </div>
           <div className={`grid gap-3 ${gridColsClass}`}>

@@ -28,6 +28,13 @@ TITLE_TEMPLATES = {
         "GIẤY ỦY QUYỀN",
         "GIAY UY QUYEN"
     ],
+    "HDUQ": [
+        "HỢP ĐỒNG ỦY QUYỀN",
+        "HỢP ĐỒNG UỶ QUYỀN",
+        "HỢP ĐỎNG ỦY QUYỀN",
+        "HỢP ĐỎNG UỶ QUYỀN",
+        "HOP DONG UY QUYEN"
+    ],
     "DDKBD": [
         "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI TÀI SẢN GẮN LIỀN VỚI ĐẤT",
         "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG",

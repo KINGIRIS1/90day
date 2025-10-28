@@ -180,8 +180,20 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
                 "method": "ocr_failed"
             }
         
+        # Try to extract real title from full text using patterns
+        extracted_title = extract_document_title_from_text(extracted_text)
+        
+        # Priority:
+        # 1. If we found a title via patterns → use it
+        # 2. Otherwise use title_text from OCR
+        if extracted_title:
+            print(f"✅ Extracted title via pattern: {extracted_title[:80]}...", file=sys.stderr)
+            final_title = extracted_title
+        else:
+            final_title = title_text
+        
         # Classify using rules with title text priority
-        result = classifier.classify(extracted_text, title_text=title_text)
+        result = classifier.classify(extracted_text, title_text=final_title)
         
         # Determine if Cloud Boost is recommended
         confidence_threshold = 0.7

@@ -279,7 +279,7 @@ const RulesManager = () => {
       });
 
       if (result.success) {
-        showNotification(`Rule "${docType}" đã được tạo thành công!`, 'success');
+        showNotification(`Rule "${docType}" đã được tạo thành công! ✨ Có hiệu lực ngay lập tức!`, 'success');
         await loadRules();
         setShowAddNewModal(false);
         setSelectedRule(docType);

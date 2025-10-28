@@ -77,7 +77,7 @@ const RulesManager = () => {
       const result = await window.electronAPI.deleteRule(docType);
 
       if (result.success) {
-        showNotification(result.message, 'success');
+        showNotification(result.message + ' ✨ Các file scan mới sẽ dùng rule mặc định.', 'success');
         await loadRules();
         if (selectedRule === docType) {
           setSelectedRule(null);

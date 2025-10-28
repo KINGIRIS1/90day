@@ -1578,23 +1578,24 @@ def clean_title_text(text: str) -> str:
     if not text:
         return text
     
-    # Common headers to remove (case insensitive)
-    headers_to_remove = [
-        r'CỘNG\s*HÒA\s*XÃ\s*HỘI\s*CHỦ\s*NGHĨA\s*VIỆT\s*NAM',
-        r'Cộng\s*hòa\s*xã\s*hội\s*chủ\s*nghĩa\s*Việt\s*Nam',
-        r'Đ[ôo]c\s*[lL][âa]p\s*[-–]\s*Tự\s*[dD]o\s*[-–]\s*H[aạ]nh\s*[pP]húc',
-        r'Độc\s*lập\s*[-–]\s*Tự\s*do\s*[-–]\s*Hạnh\s*phúc',
-        r'Mẫu\s*số\s*[\w/]+',  # Remove form numbers like "Mẫu số O9/ĐK"
-        r'BÊN\s+[\w\s]+\(',  # Remove contract parties like "BÊN ỦY QUYỀN ("
-        r'\(sau\s+đây.*',  # Remove everything after "(sau đây..."
+    cleaned = text
+    
+    # Remove common Vietnamese government headers (very aggressive)
+    patterns = [
+        (r'CỘNG\s*HÒA.*?VIỆT\s*NAM', ''),
+        (r'[ĐD][ôo]c\s*[lL][âa]p.*?[Pp]húc', ''),
+        (r'Mẫu\s*số\s*[\w/]+', ''),
+        (r'BÊN\s+\w+\s+QUYỀN', ''),  # BÊN ỦY QUYỀN, BÊN CHUYỂN NHƯỢNG
+        (r'\(sau\s+đây.*', ''),  # Everything after "(sau đây..."
     ]
     
-    cleaned = text
-    for pattern in headers_to_remove:
-        cleaned = re.sub(pattern, '', cleaned, flags=re.IGNORECASE)
+    for pattern, replacement in patterns:
+        cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
     
-    # Clean up extra whitespace
-    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    # Clean up extra whitespace and punctuation
+    cleaned = re.sub(r'[-–—]\s*', ' ', cleaned)  # Remove dashes
+    cleaned = re.sub(r'\s+', ' ', cleaned)
+    cleaned = cleaned.strip()
     
     return cleaned
 

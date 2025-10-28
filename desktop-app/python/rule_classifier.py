@@ -781,40 +781,35 @@ DOCUMENT_RULES = {
     },
     "GTLQ": {
         "keywords": [
-            # Có dấu (GTLQ: Giấy tiếp nhận hồ sơ và hẹn trả kết quả)
+            # Có dấu (GTLQ: Giấy tiếp nhận hồ sơ và hẹn trả kết quả, bao gồm cả Biên nhận hồ sơ)
             "giấy tiếp nhận hồ sơ", "hẹn trả kết quả", "mã hồ sơ",
             "bộ phận tiếp nhận và trả kết quả", "trung tâm phục vụ hành chính công",
             "thành phần hồ sơ", "tiếp nhận hồ sơ",
             "giấy tiếp nhận hồ sơ và trả kết quả",
             "giấy tiếp nhận hồ sơ và hẹn trả kết quả",
+            # Từ BNHS (merged)
+            "biên nhận hồ sơ", "biên nhận", "đã nhận hồ sơ",
+            "phiếu biên nhận", "nhận hồ sơ từ",
             # Không dấu
             "giay tiep nhan ho so", "hen tra ket qua", "ma ho so",
             "bo phan tiep nhan va tra ket qua", "trung tam phuc vu hanh chinh cong",
             "thanh phan ho so", "tiep nhan ho so",
             "giay tiep nhan ho so va tra ket qua",
             "giay tiep nhan ho so va hen tra ket qua",
+            # Từ BNHS (merged)
+            "bien nhan ho so", "bien nhan", "da nhan ho so",
+            "phieu bien nhan", "nhan ho so tu",
             # Viết hoa
             "GIẤY TIẾP NHẬN HỒ SƠ", "HẸN TRẢ KẾT QUẢ",
             "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ", "TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG",
             "THÀNH PHẦN HỒ SƠ",
             "GIẤY TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ",
-            "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ"
-        ],
-        "weight": 1.2, "min_matches": 2
-    },
-    "BNHS": {
-        "keywords": [
-            # Có dấu
-            "biên nhận hồ sơ", "biên nhận", "đã nhận hồ sơ",
-            "phiếu biên nhận", "nhận hồ sơ từ",
-            # Không dấu
-            "bien nhan ho so", "bien nhan", "da nhan ho so",
-            "phieu bien nhan", "nhan ho so tu",
-            # Viết hoa
+            "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
+            # Từ BNHS (merged)
             "BIÊN NHẬN HỒ SƠ", "BIÊN NHẬN", "ĐÃ NHẬN HỒ SƠ",
             "PHIẾU BIÊN NHẬN", "NHẬN HỒ SƠ"
         ],
-        "weight": 1.0, "min_matches": 1
+        "weight": 1.2, "min_matches": 2
     },
     "GUQ": {
         "keywords": [

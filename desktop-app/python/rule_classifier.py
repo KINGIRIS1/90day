@@ -777,18 +777,24 @@ DOCUMENT_RULES = {
     },
     "GTLQ": {
         "keywords": [
-            # Có dấu (GTLQ: Giấy tiếp nhận hồ sơ và hẹn trả kết quả)
+            # Có dấu (GTLQ: Giấy tiếp nhận hồ sơ và hẹn trả kết quả, Biên nhận hồ sơ)
             "giấy tiếp nhận hồ sơ", "hẹn trả kết quả", "mã hồ sơ",
             "bộ phận tiếp nhận và trả kết quả", "trung tâm phục vụ hành chính công",
             "thành phần hồ sơ", "tiếp nhận hồ sơ",
+            "giấy tiếp nhận hồ sơ và trả kết quả",
+            "biên nhận hồ sơ", "biên nhận", "phiếu biên nhận",
             # Không dấu
             "giay tiep nhan ho so", "hen tra ket qua", "ma ho so",
             "bo phan tiep nhan va tra ket qua", "trung tam phuc vu hanh chinh cong",
             "thanh phan ho so", "tiep nhan ho so",
+            "giay tiep nhan ho so va tra ket qua",
+            "bien nhan ho so", "bien nhan", "phieu bien nhan",
             # Viết hoa
             "GIẤY TIẾP NHẬN HỒ SƠ", "HẸN TRẢ KẾT QUẢ",
             "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ", "TRUNG TÂM PHỤC VỤ HÀNH CHÍNH CÔNG",
-            "THÀNH PHẦN HỒ SƠ"
+            "THÀNH PHẦN HỒ SƠ",
+            "GIẤY TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ",
+            "BIÊN NHẬN HỒ SƠ", "BIÊN NHẬN", "PHIẾU BIÊN NHẬN"
         ],
         "weight": 1.2, "min_matches": 2
     },

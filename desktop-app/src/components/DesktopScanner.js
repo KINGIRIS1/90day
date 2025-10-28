@@ -462,7 +462,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
 
       {/* Results Grid */}
       {results.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-gray-900">Kết quả ({results.length})</h2>
             <div className="flex items-center gap-2">

@@ -1663,24 +1663,6 @@ def calculate_similarity(str1: str, str2: str) -> float:
     return case_aware_sim
 
 
-def find_best_template_match(title_text: str, templates: Dict[str, List[str]]) -> Tuple[str, float, dict]:
-    Calculate string similarity ratio using SequenceMatcher
-    
-    Args:
-        str1: First string (e.g., extracted title)
-        str2: Second string (e.g., template title)
-    
-    Returns:
-        float: Similarity ratio (0.0 to 1.0)
-    """
-    # Normalize both strings
-    s1 = normalize_text(str1)
-    s2 = normalize_text(str2)
-    
-    # Use SequenceMatcher for fuzzy matching
-    return SequenceMatcher(None, s1, s2).ratio()
-
-
 def find_best_template_match(title_text: str, templates: Dict[str, List[str]]) -> Tuple[str, float]:
     """
     Find best matching document type based on title templates

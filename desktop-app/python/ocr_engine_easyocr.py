@@ -78,8 +78,10 @@ class OCREngine:
             image = Image.open(image_path)
             width, height = image.size
             
-            # OPTIMIZATION 1: Crop to top 25% (where document title/type is)
-            crop_height = int(height * 0.25)
+            # OPTIMIZATION 1: Crop to top 35% (where document title/type is)
+            # Changed from 25% to 35% to capture full document titles
+            # Many Vietnamese admin docs have title at 12-15% from top
+            crop_height = int(height * 0.35)
             cropped_image = image.crop((0, 0, width, crop_height))
             
             # OPTIMIZATION 2: Resize if too large (max 1920px width)
@@ -99,7 +101,7 @@ class OCREngine:
             # paragraph=False: Faster, detect individual lines
             # width_ths=0.7: Group nearby text (reduce fragments)
             # decoder='greedy': Faster than beamsearch
-            print(f"🔍 Running EasyOCR on top 25% of image...", file=sys.stderr)
+            print(f"🔍 Running EasyOCR on top 35% of image...", file=sys.stderr)
             
             result = self._reader.readtext(
                 image_array,

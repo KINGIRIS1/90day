@@ -3,6 +3,9 @@ import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 
 const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePrefProp }) => {
+  // Tab state - Main navigation
+  const [activeTab, setActiveTab] = useState('files'); // 'files' or 'folders'
+  
   // Core selection and results
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [processing, setProcessing] = useState(false);

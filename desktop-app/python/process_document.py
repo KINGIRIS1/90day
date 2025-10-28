@@ -112,7 +112,8 @@ def extract_document_title_from_text(text: str) -> str:
         r'(Đ[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]I\s+[ĐD][AÁẤ]T)?)',
         
         # HỢP ĐỒNG ỦY QUYỀN (check BEFORE HDCQ - more specific)
-        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+[UỦ]\s*Y\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
+        # Flexible with: ỦY, UỶ (U+Ỷ), Ủ Y, U Y
+        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+(?:[UỦ][\sỶ]*Y|UY)\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
         
         # HỢP ĐỒNG CHUYỂN NHƯỢNG (check AFTER HDUQ)
         r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯÚÙỦŨỤỨỪỬỮỰ][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',

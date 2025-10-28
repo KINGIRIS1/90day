@@ -54,7 +54,7 @@ const RulesManager = () => {
       });
 
       if (result.success) {
-        showNotification(result.message, 'success');
+        showNotification(result.message + ' ✨ Thay đổi có hiệu lực ngay lập tức!', 'success');
         await loadRules();
         setEditingRule(null);
       } else {

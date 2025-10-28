@@ -441,7 +441,8 @@ ipcMain.handle('set-config', (event, key, value) => {
 });
 
 ipcMain.handle('get-backend-url', () => {
-  return store.get('backendUrl', '');
+  // Default to Railway backend if not configured
+  return store.get('backendUrl', 'https://sohoavpdkct.up.railway.app');
 });
 
 ipcMain.handle('set-backend-url', (event, url) => {

@@ -1,0 +1,117 @@
+{
+  "rule_validation": true,
+  "classifier_tests": [
+    {
+      "test_case": {
+        "title": "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
+        "expected_type": "GTLQ",
+        "description": "Perfect GTLQ title - should trigger fuzzy match with 75% threshold"
+      },
+      "result": {
+        "type": "GTLQ",
+        "doc_type": "Giấy tiếp nhận hồ sơ và hẹn trả kết quả",
+        "short_code": "GTLQ",
+        "confidence": 1.0,
+        "matched_keywords": [
+          "Title fuzzy match: 100% (Uppercase: 100%)"
+        ],
+        "title_boost": true,
+        "reasoning": "✅ HIGH CONFIDENCE title match (100% similarity, 100% uppercase) [TIER 1: FUZZY MATCH]",
+        "method": "fuzzy_title_match",
+        "accuracy_estimate": "95%+",
+        "recommend_cloud_boost": false
+      },
+      "is_correct": true
+    },
+    {
+      "test_case": {
+        "title": "GIAY TIEP NHAN HO SO VA HEN TRA KET QUA",
+        "expected_type": "GTLQ",
+        "description": "GTLQ without accents - should match with relaxed threshold"
+      },
+      "result": {
+        "type": "GTLQ",
+        "doc_type": "Giấy tiếp nhận hồ sơ và hẹn trả kết quả",
+        "short_code": "GTLQ",
+        "confidence": 1.0,
+        "matched_keywords": [
+          "Title fuzzy match: 100% (Uppercase: 100%)"
+        ],
+        "title_boost": true,
+        "reasoning": "✅ HIGH CONFIDENCE title match (100% similarity, 100% uppercase) [TIER 1: FUZZY MATCH]",
+        "method": "fuzzy_title_match",
+        "accuracy_estimate": "95%+",
+        "recommend_cloud_boost": false
+      },
+      "is_correct": true
+    },
+    {
+      "test_case": {
+        "title": "HỢP ĐỒNG ỦY QUYỀN",
+        "expected_type": "HDUQ",
+        "description": "HDUQ should be prioritized over HDCQ"
+      },
+      "result": {
+        "type": "HDUQ",
+        "doc_type": "Hợp đồng ủy quyền",
+        "short_code": "HDUQ",
+        "confidence": 1.0,
+        "matched_keywords": [
+          "Title fuzzy match: 100% (Uppercase: 100%)"
+        ],
+        "title_boost": true,
+        "reasoning": "✅ HIGH CONFIDENCE title match (100% similarity, 100% uppercase) [TIER 1: FUZZY MATCH]",
+        "method": "fuzzy_title_match",
+        "accuracy_estimate": "95%+",
+        "recommend_cloud_boost": false
+      },
+      "is_correct": true
+    },
+    {
+      "test_case": {
+        "title": "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT",
+        "expected_type": "HDCQ",
+        "description": "HDCQ full title"
+      },
+      "result": {
+        "type": "HDCQ",
+        "doc_type": "Hợp đồng chuyển nhượng, tặng cho quyền sử dụng đất",
+        "short_code": "HDCQ",
+        "confidence": 1.0,
+        "matched_keywords": [
+          "Title fuzzy match: 100% (Uppercase: 100%)"
+        ],
+        "title_boost": true,
+        "reasoning": "✅ HIGH CONFIDENCE title match (100% similarity, 100% uppercase) [TIER 1: FUZZY MATCH]",
+        "method": "fuzzy_title_match",
+        "accuracy_estimate": "95%+",
+        "recommend_cloud_boost": false
+      },
+      "is_correct": true
+    },
+    {
+      "test_case": {
+        "title": "HỢP ĐỎNG ỦY QUYỀN",
+        "expected_type": "HDUQ",
+        "description": "HDUQ with OCR typo - should still match with 75% threshold"
+      },
+      "result": {
+        "type": "HDUQ",
+        "doc_type": "Hợp đồng ủy quyền",
+        "short_code": "HDUQ",
+        "confidence": 1.0,
+        "matched_keywords": [
+          "Title fuzzy match: 100% (Uppercase: 100%)"
+        ],
+        "title_boost": true,
+        "reasoning": "✅ HIGH CONFIDENCE title match (100% similarity, 100% uppercase) [TIER 1: FUZZY MATCH]",
+        "method": "fuzzy_title_match",
+        "accuracy_estimate": "95%+",
+        "recommend_cloud_boost": false
+      },
+      "is_correct": true
+    }
+  ],
+  "easyocr_available": false,
+  "tesseract_test": null
+}

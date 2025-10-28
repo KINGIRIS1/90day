@@ -290,7 +290,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       // Check stop after processing
       if (stopRef.current) {
         console.log('❌ Scan stopped after processing at file', i);
-        break;
+        // Save remaining files for resume
+        setRemainingFiles(filesToProcess.slice(i + 1));
+        setIsPaused(true);
+        setProcessing(false);
+        return; // Exit early
       }
 
       const processedResult = applySequentialNaming(result, currentLastKnown);

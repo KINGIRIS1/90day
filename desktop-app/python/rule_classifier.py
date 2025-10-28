@@ -66,13 +66,18 @@ TITLE_TEMPLATES = {
         "GIẤY CHỨNG NHẬN BẢN CHÍNH",
         "GIAY CHUNG NHAN BAN CHINH"
     ],
-    # NEW: GTLQ = Giấy tiếp nhận hồ sơ và hẹn trả kết quả
+    # NEW: GTLQ = Giấy tiếp nhận hồ sơ và hẹn trả kết quả (bao gồm Biên nhận hồ sơ)
     "GTLQ": [
         "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
         "GIAY TIEP NHAN HO SO VA HEN TRA KET QUA",
         "GIẤY TIẾP NHẬN HỒ SƠ",
         "TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
-        "GIẤY TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ"
+        "GIẤY TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ",
+        # Biên nhận variants (merged from BNHS)
+        "BIÊN NHẬN HỒ SƠ",
+        "BIEN NHAN HO SO",
+        "PHIẾU BIÊN NHẬN",
+        "PHIEU BIEN NHAN"
     ],
 }
 

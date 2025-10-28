@@ -209,7 +209,9 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
             "method": "offline_ocr",
             "ocr_engine": engine_name,
             "original_text": extracted_text,
-            "title_text": title_text,
+            "title_text": final_title,  # Use final_title (pattern or OCR)
+            "title_text_ocr": title_text,  # Original from OCR
+            "title_extracted_via_pattern": bool(extracted_title),
             "avg_font_height": round(avg_height, 1),
             "doc_type": result['doc_type'],
             "confidence": result['confidence'],

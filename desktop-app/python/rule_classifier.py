@@ -1582,9 +1582,11 @@ def clean_title_text(text: str) -> str:
     headers_to_remove = [
         r'CỘNG\s*HÒA\s*XÃ\s*HỘI\s*CHỦ\s*NGHĨA\s*VIỆT\s*NAM',
         r'Cộng\s*hòa\s*xã\s*hội\s*chủ\s*nghĩa\s*Việt\s*Nam',
-        r'Đ[ôo]c\s*[lL]âp\s*[-–]\s*Tự\s*[dD]o\s*[-–]\s*H[aạ]nh\s*[pP]húc',
+        r'Đ[ôo]c\s*[lL][âa]p\s*[-–]\s*Tự\s*[dD]o\s*[-–]\s*H[aạ]nh\s*[pP]húc',
         r'Độc\s*lập\s*[-–]\s*Tự\s*do\s*[-–]\s*Hạnh\s*phúc',
-        r'Mẫu\s*số\s*\w+',  # Remove form numbers like "Mẫu số O9/ĐK"
+        r'Mẫu\s*số\s*[\w/]+',  # Remove form numbers like "Mẫu số O9/ĐK"
+        r'BÊN\s+[\w\s]+\(',  # Remove contract parties like "BÊN ỦY QUYỀN ("
+        r'\(sau\s+đây.*',  # Remove everything after "(sau đây..."
     ]
     
     cleaned = text

@@ -475,13 +475,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
             {childTabs.map((t) => (
               activeChild === t.path && (
                 <div key={t.path}>
-                  <div className={`grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5`}>
+                  <div className={`grid gap-3 ${gridColsClass}`}>
                     {(t.results || []).map((r, idx) => (
-                      <div key={idx} className="p-2 border rounded bg-white">
-                        <div className="mb-1">{r.previewUrl ? (<img src={r.previewUrl} alt={r.fileName} className="w-full h-32 object-contain border rounded bg-gray-50" />) : (<div className="w-full h-32 flex items-center justify-center border rounded text-[10px] text-gray-500 bg-gray-50">{r.isPdf ? 'PDF' : 'Không có preview'}</div>)}</div>
-                        <div className="text-[11px] font-medium truncate" title={r.fileName}>{r.fileName}</div>
-                        <div className="text-[10px] text-gray-600 mt-1">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
-                        <div className="mt-2 p-1 bg-gray-50 border rounded">
+                      <div key={idx} className="p-3 border rounded-lg bg-white">
+                        <div className="mb-2">
+                          {r.previewUrl ? (
+                            <img src={r.previewUrl} alt={r.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
+                          ) : (
+                            <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">{r.isPdf ? 'PDF (không có preview)' : 'Không có preview'}</div>
+                          )}
+                        </div>
+                        <div className="text-sm font-medium truncate" title={r.fileName}>{r.fileName}</div>
+                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                          {getMethodBadge(r.method)}
+                          <span className="ml-auto font-semibold">{(r.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-600">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
+                        <div className="mt-2 p-2 bg-gray-50 border rounded">
                           <InlineShortCodeEditor
                             value={r.short_code}
                             onChange={(newCode) => {
@@ -494,6 +504,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                             }}
                           />
                         </div>
+                        {r.previewUrl && (
+                          <button onClick={() => setSelectedPreview(r.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">Phóng to ảnh</button>
+                        )}
                       </div>
                     ))}
                   </div>

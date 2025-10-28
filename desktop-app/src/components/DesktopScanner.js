@@ -482,7 +482,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
             </button>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-            <div className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" style={{ width: `${(progress.current / progress.total) * 100}%` }}>
+            <div className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" style={{ width: `${(progress.current / selectedFiles.length) * 100}%` }}>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
             </div>
           </div>

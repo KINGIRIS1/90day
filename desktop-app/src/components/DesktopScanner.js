@@ -636,24 +636,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                   // Execute merge with selected options
                   const finalLines = [];
                   
-                  // Determine target folder
-                  let targetFolder = parentFolder;
-                  if (mergeOption === 'new') {
-                    const path = require('path');
-                    const newFolderName = path.basename(parentFolder) + mergeSuffix;
-                    targetFolder = path.join(path.dirname(parentFolder), newFolderName);
-                    
-                    // Create new folder
-                    try {
-                      const fs = require('fs');
-                      if (!fs.existsSync(targetFolder)) {
-                        fs.mkdirSync(targetFolder, { recursive: true });
-                      }
-                    } catch (err) {
-                      alert(`Lỗi tạo thư mục: ${err.message}`);
-                      return;
-                    }
-                  }
+                  // Pass merge options to backend
+                  const mergeOptions = {
+                    autoSave: true,
+                    mergeMode: mergeOption, // 'root' or 'new'
+                    mergeSuffix: mergeSuffix, // e.g., '_merged'
+                    parentFolder: parentFolder
+                  };
                   
                   // Merge each tab
                   for (const ct of childTabs) {
@@ -662,10 +651,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                       .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
                     if (payload.length === 0) continue;
                     
-                    const merged = await window.electronAPI.mergeByShortCode(payload, { 
-                      autoSave: true,
-                      targetFolder: targetFolder 
-                    });
+                    const merged = await window.electronAPI.mergeByShortCode(payload, mergeOptions);
                     
                     (merged || []).forEach(m => {
                       if (m && m.success && m.path) {

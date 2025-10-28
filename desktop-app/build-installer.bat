@@ -7,15 +7,42 @@ echo.
 echo [STEP 1/6] Checking prerequisites...
 echo.
 
-REM Check Node.js
-where node >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Node.js not found!
-    echo Please install Node.js from https://nodejs.org/
-    pause
-    exit /b 1
+REM Check Node.js - Try multiple methods
+set NODE_CMD=
+
+REM Method 1: Check if 'node' command works
+node --version >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set NODE_CMD=node
+    goto :node_found
 )
-node --version
+
+REM Method 2: Check common installation paths
+if exist "C:\Program Files\nodejs\node.exe" (
+    set NODE_CMD="C:\Program Files\nodejs\node.exe"
+    set PATH=%PATH%;C:\Program Files\nodejs
+    goto :node_found
+)
+
+if exist "C:\Program Files (x86)\nodejs\node.exe" (
+    set NODE_CMD="C:\Program Files (x86)\nodejs\node.exe"
+    set PATH=%PATH%;C:\Program Files (x86)\nodejs
+    goto :node_found
+)
+
+REM Not found
+echo [ERROR] Node.js not found!
+echo.
+echo Please install Node.js from https://nodejs.org/
+echo Make sure to check "Add to PATH" during installation
+echo.
+echo After installing, CLOSE this window and open a NEW Command Prompt
+echo.
+pause
+exit /b 1
+
+:node_found
+%NODE_CMD% --version
 echo [OK] Node.js found
 
 REM Check Yarn

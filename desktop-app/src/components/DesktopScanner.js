@@ -468,16 +468,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
               <div className="animate-spin text-2xl">⚙️</div>
-              <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>
+              <span className="text-gray-700 font-medium">
+                Đang xử lý... ({progress.current}/{selectedFiles.length})
+              </span>
             </div>
             <button 
               onClick={() => { 
                 stopRef.current = true; 
-                setTimeout(() => (stopRef.current = false), 100);
               }} 
-              className="px-4 py-2 text-sm rounded-xl bg-red-600 text-white hover:bg-red-700 transition-all shadow-sm hover:shadow-md font-medium"
+              className="px-4 py-2 text-sm rounded-xl bg-orange-600 text-white hover:bg-orange-700 transition-all shadow-sm hover:shadow-md font-medium"
             >
-              ⏹️ Dừng quét
+              ⏸️ Tạm dừng
             </button>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">

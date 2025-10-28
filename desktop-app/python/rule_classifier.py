@@ -1583,7 +1583,8 @@ def clean_title_text(text: str) -> str:
     # Remove common Vietnamese government headers (very aggressive)
     patterns = [
         (r'CỘNG\s*HÒA.*?VIỆT\s*NAM', ''),
-        (r'[ĐD][ôo]c\s*[lL][âa]p.*?[Pp]húc', ''),
+        (r'[ĐD][ôoố]c\s*[lL][âaậ]p.*?[Pp]húc', ''),  # Độc lập ... Hạnh phúc
+        (r'[ĐD][ôoố]c\s*[lL][âaậ]p\s+Tự\s+[dD]o\s+H[aạ]nh\s+[pP]húc', ''),  # Without dash
         (r'Mẫu\s*số\s*[\w/]+', ''),
         (r'BÊN\s+\w+\s+QUYỀN', ''),  # BÊN ỦY QUYỀN, BÊN CHUYỂN NHƯỢNG
         (r'\(sau\s+đây.*', ''),  # Everything after "(sau đây..."

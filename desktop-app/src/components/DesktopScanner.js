@@ -862,8 +862,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                     parentFolder: parentFolder
                   };
                   
+                  // Check if merging single tab or all tabs
+                  const tabsToMerge = activeChildForMerge ? [activeChildForMerge] : childTabs;
+                  
                   // Merge each tab
-                  for (const ct of childTabs) {
+                  for (const ct of tabsToMerge) {
                     const payload = (ct.results || [])
                       .filter(r => r.success && r.short_code)
                       .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
@@ -878,8 +881,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                     });
                   }
                   setChildMergeReport(finalLines);
+                  setActiveChildForMerge(null); // Reset
                 }}
-                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-sm font-medium"
               >
                 Bắt đầu gộp
               </button>

@@ -101,16 +101,33 @@ def extract_document_title_from_text(text: str) -> str:
     """
     import re
     
-    # Common title patterns (case insensitive, flexible with spaces/typos)
+    # Common title patterns (case insensitive, flexible with OCR errors)
+    # Using character classes that include common OCR substitutions
     title_patterns = [
-        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EẾ]N\s+[ĐD][OỘ]NG[^.]{0,100})',
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EỂ]N\s+NH[UƯ][OỢ]NG[^.]{0,100})',
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EỀ]N[^.]{0,100})',
-        r'(GI[AẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EỀ]N\s+S[UỬ]\s+D[UỤ]NG\s+[ĐD][AẤ]T[^.]{0,100})',
-        r'(GI[AẤ]Y\s+[UỦ]\s*Y\s+QUY[EỀ]N[^.]{0,80})',
-        r'(QUY[EẾ]T\s+[ĐD][IỊ]NH[^.]{0,80})',
+        # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
+        # Flexible with: BIÉN, BIẾN, BIEN, etc.
+        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÉẾ]N\s+[ĐD][OỘ]NG[^.]{0,100})',
+        
+        # HỢP ĐỒNG CHUYỂN NHƯỢNG
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÉẾ]N\s+NH[UƯỨ][OỢ]NG[^.]{0,100})',
+        
+        # HỢP ĐỒNG ỦY QUYỀN
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EÉẾ]N[^.]{0,100})',
+        
+        # GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT
+        r'(GI[AÁẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EÉẾ]N\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T[^.]{0,100})',
+        
+        # GIẤY ỦY QUYỀN
+        r'(GI[AÁẤ]Y\s+[UỦ]\s*Y\s+QUY[EÉẾ]N[^.]{0,80})',
+        
+        # QUYẾT ĐỊNH
+        r'(QUY[EÉẾ]T\s+[ĐD][IỊ]NH[^.]{0,80})',
+        
+        # ĐƠN XIN
         r'(Đ[OƠ]N\s+XIN[^.]{0,80})',
-        r'(BI[EÊ]N\s+B[AẢ]N[^.]{0,80})',
+        
+        # BIÊN BẢN
+        r'(BI[EÉẾ]N\s+B[AẢ]N[^.]{0,80})',
     ]
     
     for pattern in title_patterns:

@@ -439,9 +439,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
           <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
             <span>📂</span><span>Chọn thư mục</span>
           </button>
-          {selectedFiles.length > 0 && !processing && (
+          {selectedFiles.length > 0 && !processing && !isPaused && (
             <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto">
               <span>🚀</span><span>Bắt đầu quét</span>
+            </button>
+          )}
+          {isPaused && remainingFiles.length > 0 && (
+            <button onClick={() => handleProcessFiles(false, true)} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto animate-pulse">
+              <span>▶️</span><span>Tiếp tục quét ({remainingFiles.length} files còn lại)</span>
             </button>
           )}
         </div>

@@ -571,7 +571,81 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       {/* Child tabs for parent folder scan */}
       {parentFolder && childTabs.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
-          <div className="flex items-center gap-2 overflow-auto">
+          {/* Control buttons - MOVED TO TOP */}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-gray-900">Quét thư mục con</h2>
+            <div className="flex items-center gap-2">
+              {/* Density control */}
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-gray-600">Mật độ:</label>
+                <select value={density} onChange={(e) => setDensity(e.target.value)} className="text-xs border rounded-lg px-2 py-1">
+                  <option value="high">Cao (5)</option>
+                  <option value="medium">TB (4)</option>
+                  <option value="low">Thấp (3)</option>
+                </select>
+              </div>
+              
+              <label className="text-xs text-gray-600 inline-flex items-center gap-1">
+                <input type="checkbox" checked={childScanImagesOnly} onChange={(e) => setChildScanImagesOnly(e.target.checked)} />
+                Bỏ qua PDF
+              </label>
+              
+              {/* Resume button if paused */}
+              {isFolderPaused && remainingTabs.length > 0 && (
+                <button 
+                  onClick={() => scanAllChildFolders(true)}
+                  className="px-4 py-2.5 text-xs rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all shadow-sm hover:shadow-md font-medium animate-pulse"
+                >
+                  ▶️ Tiếp tục ({remainingTabs.length} thư mục)
+                </button>
+              )}
+              
+              {/* Stop/Scan All buttons */}
+              {!isFolderPaused && (
+                <>
+                  <button 
+                    onClick={() => { 
+                      stopRef.current = true;
+                    }} 
+                    className="px-4 py-2.5 text-xs rounded-xl bg-orange-600 text-white hover:bg-orange-700 transition-all shadow-sm hover:shadow-md font-medium"
+                  >
+                    ⏸️ Tạm dừng
+                  </button>
+                  <button 
+                    onClick={() => scanAllChildFolders(false)} 
+                    className="px-4 py-2.5 text-xs rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm hover:shadow-md font-medium"
+                  >
+                    Quét tất cả thư mục con
+                  </button>
+                </>
+              )}
+              
+              <button
+                onClick={() => setShowMergeModal(true)}
+                className="px-4 py-2.5 text-xs rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm hover:shadow-md font-medium"
+              >
+                📚 Gộp tất cả tab con
+              </button>
+            </div>
+          </div>
+          
+          {/* Paused indicator for folder scan */}
+          {isFolderPaused && remainingTabs.length > 0 && (
+            <div className="mb-3 p-3 bg-orange-50 rounded-xl border border-orange-200">
+              <div className="flex items-center space-x-3">
+                <span className="text-xl">⏸️</span>
+                <div>
+                  <div className="text-sm text-orange-900 font-medium">Đã tạm dừng quét thư mục</div>
+                  <div className="text-xs text-orange-700">
+                    Đã quét: {childTabs.filter(t => t.status === 'done').length} thư mục • Còn lại: {remainingTabs.length} thư mục
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Tabs */}
+          <div className="flex items-center gap-2 overflow-auto mb-3">
             {childTabs.map((t) => (
               <button 
                 key={t.path} 

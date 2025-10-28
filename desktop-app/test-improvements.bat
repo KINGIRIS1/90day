@@ -73,14 +73,14 @@ echo Found Python: %PYTHON_CMD%
 echo.
 
 REM Run test script
-echo 🚀 Starting test...
+echo Starting test...
 echo.
 
-%PYTHON_CMD% test-improvements.py "%~1"
+"%PYTHON_CMD%" test-improvements.py "%~1"
 
 echo.
 echo ================================================================================
-echo 📝 Test complete! Review results above.
+echo Test complete! Review results above.
 echo ================================================================================
 echo.
 pause

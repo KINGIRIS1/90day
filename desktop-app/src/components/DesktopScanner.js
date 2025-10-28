@@ -258,7 +258,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       }
 
       const processedResult = applySequentialNaming(result, currentLastKnown);
-      if (processedResult.success && processedResult.short_code !== 'UNKNOWN' && processedResult.confidence >= 0.3) {
+      // Update lastKnown if this is a valid, confident result (not sequential)
+      if (processedResult.success && 
+          processedResult.short_code !== 'UNKNOWN' && 
+          processedResult.confidence >= 0.5 &&
+          !processedResult.applied_sequential_logic) {
         currentLastKnown = {
           doc_type: processedResult.doc_type,
           short_code: processedResult.short_code,

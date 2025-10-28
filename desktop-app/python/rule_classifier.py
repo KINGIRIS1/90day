@@ -2003,7 +2003,7 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         
         for keyword in keywords:
             keyword_normalized = normalize_text(keyword)
-            specificity = calculate_keyword_specificity(keyword, DOCUMENT_RULES)
+            specificity = calculate_keyword_specificity(keyword, active_rules)
             
             if title_normalized and keyword_normalized in title_normalized:
                 matched.append(f"{keyword} [TITLE]")

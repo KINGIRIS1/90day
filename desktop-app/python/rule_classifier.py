@@ -2058,8 +2058,8 @@ class RuleClassifier:
         # Use instance rules instead of global DOCUMENT_RULES
         result = self._classify_by_rules(text, title_text=title_text, confidence_threshold=0.3)
         
-        # If Tier 0 low quality title or Tier 1 fuzzy match (already complete result), return as-is
-        if result.get('method') in ['low_quality_title_fallback', 'fuzzy_title_match']:
+        # If Tier 1 fuzzy match (already complete result), return as-is
+        if result.get('method') == 'fuzzy_title_match':
             return {
                 'doc_type': result.get('doc_type'),
                 'short_code': result.get('short_code'),
@@ -2068,8 +2068,7 @@ class RuleClassifier:
                 'title_boost': result.get('title_boost', False),
                 'method': result.get('method'),
                 'accuracy_estimate': result.get('accuracy_estimate', '88-91%'),
-                'recommend_cloud_boost': result.get('recommend_cloud_boost', False),
-                'use_previous_classification': result.get('use_previous_classification', False)
+                'recommend_cloud_boost': result.get('recommend_cloud_boost', False)
             }
         
         # For Tier 2/3 (keyword matching), build response

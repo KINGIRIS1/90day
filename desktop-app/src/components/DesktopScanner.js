@@ -40,6 +40,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   const [activeChild, setActiveChild] = useState(null);
   const [childScanImagesOnly, setChildScanImagesOnly] = useState(false);
   const stopRef = useRef(false);
+  const [isPaused, setIsPaused] = useState(false); // Track pause state
+  const [remainingFiles, setRemainingFiles] = useState([]); // Files left to process
 
   // Load config (guard electron)
   useEffect(() => { if (enginePrefProp) setEnginePref(enginePrefProp); }, [enginePrefProp]);

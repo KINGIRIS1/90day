@@ -116,7 +116,7 @@ class OCREngine:
             # Extract text from results
             full_text_parts = []
             
-            # Since we already cropped to top 35%, ALL text extracted IS title text
+            # Since we already cropped to top 40%, ALL text extracted IS title text
             for detection in result:
                 bbox, text, confidence = detection
                 full_text_parts.append(text)

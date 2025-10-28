@@ -1771,33 +1771,6 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     title_normalized = normalize_text(title_text) if title_text else ""
     
     # ==================================================================
-    # TIER 0: PRE-CHECK - Low Quality Title Detection
-    # ==================================================================
-    # Rule: If title has very few uppercase letters and low similarity,
-    # it's likely a bad OCR extraction. Recommend using previous classification.
-    # Vietnamese admin titles are ALWAYS uppercase (70%+)
-    if title_text:
-        title_uppercase_ratio = calculate_uppercase_ratio(title_text)
-        preliminary_match, preliminary_similarity = find_best_template_match(title_text, TITLE_TEMPLATES)
-        
-        # Check if title quality is poor (low uppercase + low match)
-        if title_uppercase_ratio < 0.4 and preliminary_similarity < 0.4:
-            # This is likely NOT a valid title extraction
-            return {
-                "type": "USE_PREVIOUS",
-                "doc_type": "Sử dụng phân loại trang trước",
-                "short_code": "USE_PREVIOUS",
-                "confidence": 0.0,
-                "matched_keywords": [],
-                "title_boost": False,
-                "reasoning": f"⚠️ LOW QUALITY title: Only {title_uppercase_ratio:.0%} uppercase, {preliminary_similarity:.0%} match. Vietnamese titles are always uppercase. Suggest using previous page's classification.",
-                "method": "low_quality_title_fallback",
-                "accuracy_estimate": "0%",
-                "recommend_cloud_boost": True,
-                "use_previous_classification": True  # Flag for frontend to use previous result
-            }
-    
-    # ==================================================================
     # TIER 1: FUZZY TITLE MATCHING (>= 80% similarity)
     # ==================================================================
     if title_text:

@@ -539,8 +539,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         </div>
       )}
 
-      {/* Paused State */}
-      {isPaused && remainingFiles.length > 0 && (
+      {/* Paused State - File Scan */}
+      {activeTab === 'files' && isPaused && remainingFiles.length > 0 && (
         <div className="bg-orange-50 rounded-xl shadow-sm p-4 border border-orange-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">

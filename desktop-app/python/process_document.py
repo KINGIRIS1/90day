@@ -92,6 +92,7 @@ def extract_document_title_from_text(text: str) -> str:
     - HỢP ĐỒNG CHUYỂN NHƯỢNG...
     - GIẤY CHỨNG NHẬN...
     - GIẤY ỦY QUYỀN...
+    - GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ
     
     Args:
         text: Full OCR text
@@ -108,6 +109,10 @@ def extract_document_title_from_text(text: str) -> str:
     # O: [OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ] - O, Ô, Ơ + all tones
     # U: [UƯÚÙỦŨỤỨỪỬỮỰ] - U, Ư + all tones
     title_patterns = [
+        # GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ (GTLQ)
+        # Chấp nhận lỗi OCR phổ biến: HỒ→HỎ, KẾT→KÉT, thiếu dấu
+        r'(GI[AÁẤ]Y\s+TI[EÊÉÈẾỀỂỄỆ]P\s+NH[ẬAĂÂÁÀÃẠÂẤĂẮ]N\s+H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ][\s]*S[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]|GI[AÁẤ]Y\s+TI[EÊÉÈẾỀỂỄỆ]P\s+NH[ẬAĂÂÁÀÃẠÂẤĂẮ]N\s+HỎ\s*SƠ)\s+V[ÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴ]\s+HẸN\s+TRẢ\s+K[ÊE]T\s+QUẢ',
+        
         # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
         r'(Đ[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]I\s+[ĐD][AÁẤ]T)?)',
         

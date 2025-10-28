@@ -238,6 +238,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     setComparisons([]);
     setProgress({ current: 0, total: filesToProcess.length });
     setLastKnownType(null);
+    stopRef.current = false; // Reset stop flag
 
     const enginePref = await window.electronAPI.getConfig('enginePreference');
 

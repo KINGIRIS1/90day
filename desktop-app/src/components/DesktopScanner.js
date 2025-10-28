@@ -458,23 +458,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
               <button onClick={() => { stopRef.current = true; setTimeout(() => (stopRef.current = false), 0); }} className="px-3 py-2 text-xs rounded-md bg-red-600 text-white hover:bg-red-700">Dừng quét</button>
               <button onClick={async () => { stopRef.current = false; for (const tab of childTabs) { if (stopRef.current) break; if (tab.status !== 'done') await scanChildFolder(tab.path); } }} className="px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Quét tất cả thư mục con</button>
               <button
-                onClick={async () => {
-                  // Merge per tab (subfolder) separately so outputs stay in each subfolder
-                  const finalLines = [];
-                  for (const ct of childTabs) {
-                    const payload = (ct.results || [])
-                      .filter(r => r.success && r.short_code)
-                      .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
-                    if (payload.length === 0) continue;
-                    const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
-                    (merged || []).forEach(m => {
-                      if (m && m.success && m.path) {
-                        finalLines.push(`✓ [${ct.name}] ${m.short_code}: ${m.path}`);
-                      }
-                    });
-                  }
-                  setChildMergeReport(finalLines);
-                }}
+                onClick={() => setShowMergeModal(true)}
                 className="px-3 py-2 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
               >
                 📚 Gộp tất cả tab con

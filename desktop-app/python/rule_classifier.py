@@ -1810,6 +1810,51 @@ def calculate_keyword_specificity(keyword: str, all_rules: Dict) -> float:
         return 0.3
 
 
+def get_active_rules() -> Dict:
+    """
+    Get active rules with user overrides applied
+    
+    Priority:
+    1. User overrides from rules_overrides.json
+    2. Default DOCUMENT_RULES
+    
+    Returns:
+        Dict: Merged rules
+    """
+    try:
+        from pathlib import Path
+        import json
+        
+        # Get user data path
+        USER_DATA_PATH = os.environ.get('USER_DATA_PATH', str(Path.home() / '.90daychonhanh'))
+        RULES_OVERRIDE_FILE = Path(USER_DATA_PATH) / 'rules_overrides.json'
+        
+        # Start with default rules
+        merged_rules = dict(DOCUMENT_RULES)
+        
+        # Apply overrides if file exists
+        if RULES_OVERRIDE_FILE.exists():
+            try:
+                with open(RULES_OVERRIDE_FILE, 'r', encoding='utf-8') as f:
+                    overrides = json.load(f)
+                
+                # Merge overrides into default rules
+                for doc_type, rule_data in overrides.items():
+                    if doc_type in merged_rules:
+                        # Update existing rule (merge keywords, update weight/min_matches)
+                        merged_rules[doc_type].update(rule_data)
+                    else:
+                        # Add new rule
+                        merged_rules[doc_type] = rule_data
+            except Exception as e:
+                print(f"⚠️ Error loading rules overrides: {e}", file=sys.stderr)
+        
+        return merged_rules
+    except Exception as e:
+        print(f"⚠️ Error in get_active_rules: {e}, falling back to defaults", file=sys.stderr)
+        return DOCUMENT_RULES
+
+
 def check_required_keywords_in_title(doc_type: str, title_text: str, config: Dict) -> bool:
     """
     Check if document type's required keywords appear in title

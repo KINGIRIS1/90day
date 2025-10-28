@@ -341,18 +341,34 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     const preferCloud = enginePref === 'cloud';
     
     for (let i = 0; i < files.length; i++) {
-      if (stopRef.current) break;
+      if (stopRef.current) {
+        console.log('❌ Folder scan stopped at file', i, 'in', childPath);
+        break;
+      }
       const f = files[i];
       
       // Use engine preference (same as file scan)
       let r;
       if (preferCloud) {
         r = await processCloudBoost(f);
+        
+        // Check stop after async
+        if (stopRef.current) {
+          console.log('❌ Folder scan stopped after cloud at file', i);
+          break;
+        }
+        
         if (!r.success && autoFallbackEnabled) {
           r = await processOffline(f);
         }
       } else {
         r = await processOffline(f);
+      }
+      
+      // Check stop after processing
+      if (stopRef.current) {
+        console.log('❌ Folder scan stopped after processing at file', i);
+        break;
       }
       
       let previewUrl = null;

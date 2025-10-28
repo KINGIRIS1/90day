@@ -71,7 +71,8 @@ TITLE_TEMPLATES = {
         "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
         "GIAY TIEP NHAN HO SO VA HEN TRA KET QUA",
         "GIẤY TIẾP NHẬN HỒ SƠ",
-        "TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ"
+        "TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ",
+        "GIẤY TIẾP NHẬN HỒ SƠ VÀ TRẢ KẾT QUẢ"
     ],
 }
 

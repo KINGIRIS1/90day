@@ -378,7 +378,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   return (
     <div className="space-y-4">
       {/* File Selection */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Chọn tài liệu</h2>
         <div className="flex flex-wrap gap-2">
           <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">

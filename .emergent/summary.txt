@@ -1,56 +1,75 @@
 <analysis>
-The AI engineer's work spanned enhancing Vietnamese OCR document classification, integrating a Railway backend, and fixing numerous classification inaccuracies stemming from OCR typos and inconsistent title detection. Initial efforts focused on refining regex patterns, adjusting image crop areas for title extraction, and implementing rules to discard low-quality titles. A major recent task involved successfully improving the classification of Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) by lowering the fuzzy matching threshold to 75% and adding specific, flexible regex patterns to  and . Subsequently, the engineer shifted to addressing build and environment issues reported by the user, specifically  errors related to Python execution paths during local development and with the packaged Electron app. The current focus is on building and delivering a new App-only Windows installer to resolve these Python path issues and incorporate the latest classification logic, while also troubleshooting local development environment setup problems reported by the user.
+The AI engineer's work primarily focused on enhancing the Vietnamese OCR document classification application. Initially, the engineer improved Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) classification by adjusting fuzzy matching and adding regex patterns. Following this, significant effort was dedicated to troubleshooting environment and build issues reported by the user, specifically  errors for Python execution during local development and with packaged Electron apps.
+
+A major phase involved applying Cloud logic (derived from GPT-4 Vision's approach) to the offline OCR system. This included implementing smart crop logic, optimizing EasyOCR for speed (increasing timeout, resizing images), adding more detailed regex patterns, and refining confidence scoring. The engineer then addressed numerous UI/UX requests: streamlining the interface, adding scanning animations, implementing a customizable PDF merge modal for single files and subfolders, and fixing responsive display issues for folder scan tabs.
+
+Persistent issues with local Python/Node.js environment setup ( not found,  errors due to wrong directory, PowerShell execution policy) during testing and building the installer consumed considerable interaction. The engineer also fixed stop/resume functionality for both file and folder scanning, re-designed UI elements for a professional look, and consolidated the application into two distinct File Scan and Folder Scan tabs. Most recently, a discrepancy in short codes for Giấy tiếp nhận hồ sơ và hẹn trả kết quả (BN in cloud, GTLQ offline) was identified and fixed, with plans to sync Biên nhận hồ sơ short code between cloud and offline rules. The process involved continuous iteration, detailed debugging, and adapting to user feedback on functionality and environmental challenges.
 </analysis>
 
 <product_requirements>
-The application is a desktop document scanner for Vietnamese land-related images, designed for OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users need default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is required. Key requirements include easy installation (all-in-one installer), improving  accuracy, resolving port conflicts, and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. Accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền) is critical, especially with OCR typos, addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. Robust handling of sequential documents with absent or low-quality titles is also required.
+The application is a desktop document scanner for Vietnamese land-related images, performing OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users require default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is essential. Key requirements include an easy-to-use all-in-one installer, improved accuracy of , resolution of port conflicts, and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. Accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền) is critical, especially with OCR typos, which is addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. Robust handling of sequential documents, even with absent or low-quality titles, is also required. Recent work focused on improving Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) classification, optimizing offline OCR logic to mimic cloud accuracy, enhancing UI/UX, and streamlining the build process.
 </product_requirements>
 
 <key_technical_concepts>
-- **Electron**: Desktop application framework.
-- **React**: Frontend UI development.
-- **Python**: Backend for OCR and rule classification.
-- **Tesseract, VietOCR, EasyOCR**: OCR engines.
-- **NSIS**: Windows installer creation.
-- **Fuzzy Matching**: Levenshtein distance for text similarity.
-- **Regex**: Pattern matching for text extraction.
+
+-   **Electron**: Desktop application framework, main.js, public/electron.js.
+-   **React**: Frontend UI development (DesktopScanner.js).
+-   **Python**: Backend for OCR and rule classification (process_document.py, rule_classifier.py).
+-   **Tesseract, VietOCR, EasyOCR**: OCR engines.
+-   **NSIS**: Windows installer creation.
+-   **Fuzzy Matching**: Levenshtein distance for text similarity.
+-   **Regex**: Pattern matching for text extraction.
+-   **GPT-4 Vision**: Cloud OCR (Cloud Boost) for high-accuracy recognition.
+
 </key_technical_concepts>
 
 <code_architecture>
 
-- : Main Electron process. Updated for dynamic backend URL management and defaulted to Railway URL.
-- : Packaged version of . Mirrored updates for backend URL configuration.
-- : Orchestrates local OCR and document processing.
-    - **Changes**: Fixed Unicode garbling. Introduced  with flexible regex for Vietnamese diacritics and character sequences. Expanded regex for E, O, U variations. Reordered  over  patterns. Added  specific patterns for robust detection.
-- : EasyOCR implementation.
-    - **Changes**: Increased  for title detection from 25% to 35%, then to 40%.
-- : Core classification logic.
-    - **Changes**: Resolved . Reverted Low Quality Title Detection Rule. Added  templates. Introduced . Set  if uppercase ratio is below 70%. **Most recent changes:** Lowered fuzzy matching confidence threshold from 80% to 75% for Tier-1 matches. Added specific rules, required keywords, and title templates for  (Giấy tiếp nhận hồ sơ và hẹn trả kết quả) to  and .
-- : Frontend scanning component.
-    - **Changes**: Logic for Low Quality Title Detection Rule () was added and then removed.
-- : Documentation file.
-    - **Changes**: Updated to reflect the new 75% fuzzy matching rule.
+
+-   ****: Handles API endpoints, Cloud Boost (GPT-4 Vision) integration.
+    -   **Changes**: Updated short code for Giấy tiếp nhận hồ sơ và hẹn trả kết quả from BN to GTLQ.
+-   ****: Main Electron process, handles IPC.
+    -   **Changes**: OCR processing timeout increased from 30s to 60s. Updated  IPC handler to process merge options (mode, suffix, parent folder) for PDF merging, delegating file system operations from frontend.
+-   ****: Packaged version of .
+    -   **Changes**: Mirrored updates from  for OCR timeout and  handler.
+-   ****: Orchestrates local OCR and document processing.
+    -   **Changes**: Fixed Unicode garbling. Flexible regex for Vietnamese diacritics. Reordered  over  patterns. Added  specific patterns.
+-   ****: EasyOCR implementation.
+    -   **Changes**: Implemented Smart Crop logic:  set dynamically (50% for single-page portrait, 65% for 2-page spread) based on image aspect ratio.
+-   ****: Core classification logic.
+    -   **Changes**: Lowered fuzzy matching confidence threshold from 80% to 75% for Tier-1 matches. Added specific rules, keywords, and title templates for . Preparing to add Biên nhận hồ sơ (BNHS) definition.
+-   ****: Frontend scanning component.
+    -   **Changes**: UI/UX improvements (reduced padding, removed Cloud/Offline buttons, added animations/loading indicators, redesigned with rounded corners). Folder scan display enhancements (zoom, method badges, confidence scores, density dropdown, fixed-width tab names). Naming logic modified for UNKNOWN/no-title files. Customizable PDF merge modal. Full pause/resume functionality for file and folder scanning. Refactored UI into File Scan and Folder Scan tabs. Removed Node.js / imports.
+-   ****: Project dependencies and build scripts.
+    -   **Changes**: Updated version to .
+-   **New Files Created**: , , , , , , , , , , , , , , .
 </code_architecture>
 
 <pending_tasks>
-- Implement the full logic for the all-in-one installer using .
-- Fine-tune remaining document types in .
-- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
-- Migrate or pin React/Webpack versions.
-- Test the backend with 5-10 real images to validate Hybrid OCR.
-- Update icon for macOS (.icns).
-- Implement license/activation key feature.
-- Implement Parallel Local Processing for batch scanning.
+-   Implement the full logic for the all-in-one installer using .
+-   Fine-tune remaining document types in .
+-   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+-   Migrate or pin React/Webpack versions.
+-   Test the backend with 5-10 real images to validate Hybrid OCR.
+-   Update icon for macOS (.icns).
+-   Implement license/activation key feature.
+-   Implement Parallel Local Processing for batch scanning.
+-   Add Biên nhận hồ sơ (BNHS) to offline  for sync with cloud.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer successfully implemented an improvement for classifying Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ), lowering the fuzzy matching confidence threshold to 75% in  and adding specific, flexible regex patterns for GTLQ in both  and  to handle common OCR typos. This was verified with synthetic tests. The engineer then summarized this feature addition and asked about frontend testing.
+Immediately prior to this summary request, the AI engineer was addressing multiple user requests to enhance the application's UI, naming conventions, and core functionalities. The user specifically asked to:
+1.  Adjust child folder tab names to be fixed width.
+2.  Redesign the UI with rounded corners for an office style.
+3.  Fix the naming rule for files without detected titles (currently UNKNOWN) to use the short code of the previously titled file.
+4.  Ensure the stop scan button for both file and folder scanning functioned correctly.
+5.  Implement a merge button for individual child tabs, similar to the merge all folders functionality.
+6.  Investigate and fix a logo not displaying in the app.
+7.  Check and remove/change a BN (Biên Nhận) short code definition in the rules.
 
-However, the user reported an error Lỗi and uploaded an image of a  error, indicating issues with running the Electron app (and later, local dev). The AI engineer diagnosed this as Python executable path issues within the Electron build environment (old builds bundle Python, new code expects system Python) and also in the local development setup (Yarn's  failing to find ). The user opted for a new App-only Windows installer build. The AI engineer has been in a dialogue with the user to confirm build specifications (Windows 10/11 64-bit, App-only, Tesseract, Installer .exe, version 1.1.0, Google Drive sharing) and is currently in the process of building this installer while simultaneously troubleshooting the user's local development environment issues related to  and  during yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. commands.
+The engineer implemented fixed-width tabs and a rounded-corner UI redesign across . The stop/resume logic for both file and folder scanning was refined with robust  checks after  calls in  and . The individual merge button for child tabs was updated to trigger the existing merge modal, allowing destination and suffix customization. The logo display issue was investigated, concluding the build configuration was correct, and no code changes were made. A BN short code in  was found (for Giấy tiếp nhận hồ sơ và hẹn trả kết quả) and changed to GTLQ. The offline  was confirmed to already have  and no . The current task is to add Biên nhận hồ sơ (BNHS) to the offline rules to maintain synchronization with the cloud backend, as it was missing.
 </current_work>
 
 <optional_next_step>
-The next step is to assist the user in resolving the  error in their local development environment by providing  (running commands in separate CMD terminals) or  (PowerShell syntax).
+Add the Biên nhận hồ sơ (BNHS) definition to .
 </optional_next_step>

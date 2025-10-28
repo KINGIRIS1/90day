@@ -458,38 +458,59 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
 
   return (
     <div className="space-y-4">
-      {/* File Selection */}
-      <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
-        <h2 className="text-base font-semibold text-gray-900 mb-3">Chọn tài liệu</h2>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
-            <span>📁</span><span>Chọn file</span>
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab('files')}
+            className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
+              activeTab === 'files'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            📄 Quét File
           </button>
-          <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
-            <span>📂</span><span>Chọn thư mục</span>
+          <button
+            onClick={() => setActiveTab('folders')}
+            className={`flex-1 px-6 py-4 text-sm font-semibold transition-all ${
+              activeTab === 'folders'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            📂 Quét Thư Mục
           </button>
-          {selectedFiles.length > 0 && !processing && !isPaused && (
-            <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto">
-              <span>🚀</span><span>Bắt đầu quét</span>
-            </button>
-          )}
-          {isPaused && remainingFiles.length > 0 && (
-            <button onClick={() => handleProcessFiles(false, true)} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto animate-pulse">
-              <span>▶️</span><span>Tiếp tục quét ({remainingFiles.length} files còn lại)</span>
-            </button>
-          )}
         </div>
-        {selectedFiles.length > 0 && (
-          <div className="mt-2"><span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"><span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file</span></div>
-        )}
-        {parentFolder && parentSummary && (
-          <div className="mt-2 text-xs text-gray-700">
-            Thư mục: <span className="font-medium">{parentFolder}</span> •
-            <span className="ml-2">{parentSummary.subfolderCount} thư mục con</span> •
-            <span className="ml-2">{parentSummary.rootFileCount} file ở cấp gốc</span>
-          </div>
-        )}
       </div>
+
+      {/* FILE SCAN TAB */}
+      {activeTab === 'files' && (
+        <>
+          {/* File Selection */}
+          <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+            <h2 className="text-base font-semibold text-gray-900 mb-3">Quét File</h2>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
+                <span>📁</span><span>Chọn file</span>
+              </button>
+              {selectedFiles.length > 0 && !processing && !isPaused && (
+                <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto">
+                  <span>🚀</span><span>Bắt đầu quét</span>
+                </button>
+              )}
+              {isPaused && remainingFiles.length > 0 && (
+                <button onClick={() => handleProcessFiles(false, true)} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto animate-pulse">
+                  <span>▶️</span><span>Tiếp tục quét ({remainingFiles.length} files còn lại)</span>
+                </button>
+              )}
+            </div>
+            {selectedFiles.length > 0 && (
+              <div className="mt-2"><span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"><span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file</span></div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Processing Progress with Animation */}
       {processing && (

@@ -407,6 +407,29 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done' } : t));
   };
 
+  // Scan all child folders with pause support
+  const scanAllChildFolders = async (isResume = false) => {
+    stopRef.current = false;
+    setIsFolderPaused(false);
+    
+    let tabsToScan = isResume ? remainingTabs : childTabs.filter(t => t.status !== 'done');
+    
+    for (const tab of tabsToScan) {
+      if (stopRef.current) {
+        console.log('❌ Folder scan stopped');
+        const remainingIndex = tabsToScan.indexOf(tab);
+        setRemainingTabs(tabsToScan.slice(remainingIndex));
+        setIsFolderPaused(true);
+        return;
+      }
+      await scanChildFolder(tab.path);
+    }
+    
+    // All done
+    setRemainingTabs([]);
+    setIsFolderPaused(false);
+  };
+
   const getConfidenceColor = (confidence) => {
     if (confidence >= 0.8) return 'bg-green-500';
     if (confidence >= 0.6) return 'bg-yellow-500';

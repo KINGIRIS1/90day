@@ -245,6 +245,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     let currentLastKnown = null;
 
     for (let i = 0; i < filesToProcess.length; i++) {
+      // Check if user clicked stop
+      if (stopRef.current) {
+        console.log('Scan stopped by user');
+        break;
+      }
+      
       const file = filesToProcess[i];
       setProgress({ current: i + 1, total: filesToProcess.length });
 

@@ -728,22 +728,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                   </div>
                   <div className="mt-3 flex items-center gap-2">
                     {t.status !== 'done' && (
-                      <button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="px-3 py-2 text-xs rounded-md bg-indigo-600 text-white hover:bg-indigo-700">Quét thư mục này</button>
+                      <button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="px-3 py-2 text-xs rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-sm font-medium">Quét thư mục này</button>
                     )}
                     {(t.results && t.results.length > 0) && (
                       <button
-                        onClick={async () => {
-                          const payload = (t.results || [])
-                            .filter(r => r.success && r.short_code)
-                            .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
-                          if (payload.length === 0) { alert('Không có trang hợp lệ để gộp.'); return; }
-                          const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
-                          const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
-                          alert(`Đã gộp PDF theo short_code cho thư mục "${t.name}". Thành công: ${okCount}/${(merged || []).length}.`);
+                        onClick={() => {
+                          // Save current tab info for modal
+                          setActiveChildForMerge(t);
+                          setShowMergeModal(true);
                         }}
-                        className="px-3 py-2 text-xs rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
+                        className="px-3 py-2 text-xs rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm font-medium"
                       >
-                        📚 Gộp PDF theo short_code (tab này)
+                        📚 Gộp thư mục này
                       </button>
                     )}
                   </div>

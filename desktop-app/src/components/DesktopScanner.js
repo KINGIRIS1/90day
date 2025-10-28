@@ -455,8 +455,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-2 overflow-auto">
             {childTabs.map((t) => (
-              <button key={t.path} onClick={() => setActiveChild(t.path)} className={`px-3 py-2 text-xs rounded-md border ${activeChild === t.path ? 'bg-gray-100 border-gray-400' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'}`}>
-                {t.name} ({t.count})<span className="ml-2">{t.status !== 'done' ? '…' : '✓'}</span>
+              <button key={t.path} onClick={() => setActiveChild(t.path)} className={`px-3 py-2 text-xs rounded-md border flex items-center gap-2 ${activeChild === t.path ? 'bg-gray-100 border-gray-400' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'}`}>
+                <span>{t.name} ({t.count})</span>
+                {t.status === 'scanning' ? (
+                  <span className="animate-spin">⚙️</span>
+                ) : t.status === 'done' ? (
+                  <span className="text-green-600">✓</span>
+                ) : (
+                  <span className="text-gray-400">○</span>
+                )}
               </button>
             ))}
             <div className="ml-auto flex items-center gap-2">

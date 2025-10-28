@@ -379,11 +379,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         )}
       </div>
 
-      {/* Processing Progress */}
+      {/* Processing Progress with Animation */}
       {processing && (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-center space-x-3 mb-4"><div>⚙️</div><span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span></div>
-          <div className="w-full bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${(progress.current / progress.total) * 100}%` }} /></div>
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="animate-spin text-2xl">⚙️</div>
+            <span className="text-gray-700 font-medium">Đang xử lý... ({progress.current}/{progress.total})</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" style={{ width: `${(progress.current / progress.total) * 100}%` }}>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+            </div>
+          </div>
         </div>
       )}
 

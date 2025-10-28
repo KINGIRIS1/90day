@@ -315,10 +315,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     const files = fileList;
     const childResults = [];
     stopRef.current = false;
+    
+    // Get engine preference from config (respect user settings)
+    const enginePref = await window.electronAPI.getConfig('enginePreference');
+    const preferCloud = enginePref === 'cloud';
+    
     for (let i = 0; i < files.length; i++) {
       if (stopRef.current) break;
       const f = files[i];
-      const r = await processOffline(f);
+      
+      // Use engine preference (same as file scan)
+      let r;
+      if (preferCloud) {
+        r = await processCloudBoost(f);
+        if (!r.success && autoFallbackEnabled) {
+          r = await processOffline(f);
+        }
+      } else {
+        r = await processOffline(f);
+      }
+      
       let previewUrl = null;
       try {
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name)) previewUrl = await window.electronAPI.readImageDataUrl(f.path);

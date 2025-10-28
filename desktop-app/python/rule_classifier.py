@@ -1817,6 +1817,19 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     title_normalized = normalize_text(title_text) if title_text else ""
     
     # ==================================================================
+    # PRE-CHECK: Vietnamese admin titles MUST be uppercase (70%+)
+    # ==================================================================
+    # If title has low uppercase ratio, it's likely NOT a real title but
+    # a mention in body text (e.g., "Giấy chứng nhận..." in contract body)
+    # → Ignore this title and use ONLY body text for classification
+    if title_text:
+        title_uppercase_ratio = calculate_uppercase_ratio(title_text)
+        if title_uppercase_ratio < 0.7:
+            print(f"⚠️ Title has low uppercase ({title_uppercase_ratio:.0%}), likely not a real title. Using body text only.", file=sys.stderr)
+            title_text = None  # Ignore this title
+            title_normalized = ""
+    
+    # ==================================================================
     # TIER 1: FUZZY TITLE MATCHING (>= 80% similarity)
     # ==================================================================
     if title_text:
@@ -1841,14 +1854,8 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         is_uppercase_title = title_uppercase_ratio >= 0.7
         
-        # CRITICAL RULE: Vietnamese admin titles MUST be uppercase (70%+)
-        # If similarity is high BUT uppercase is low → This is NOT a real title!
-        # It's likely a mention in body text (e.g., "Giấy chứng nhận..." trong hợp đồng)
-        if best_similarity >= 0.8 and title_uppercase_ratio < 0.7:
-            # High similarity but low uppercase → Skip fuzzy match, use keywords instead
-            print(f"⚠️ Skipping fuzzy match: High similarity ({best_similarity:.0%}) but low uppercase ({title_uppercase_ratio:.0%})", file=sys.stderr)
-            # Fall through to keyword matching
-        elif best_similarity >= 0.8 and is_uppercase_title:
+        # Only accept fuzzy match if uppercase >= 70%
+        if best_similarity >= 0.8 and is_uppercase_title:
             # HIGH CONFIDENCE - Direct match based on title
             doc_name = classify_document_name_from_code(best_template_match)
             

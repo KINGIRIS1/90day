@@ -153,6 +153,56 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      ✅ CẬP NHẬT GTLQ KEYWORDS + FIX RULES RELOAD
+      
+      🎯 THAY ĐỔI CHÍNH:
+      1. Bổ sung keywords cho GTLQ:
+         - Thêm "Giấy tiếp nhận hồ sơ và trả kết quả" (variant name)
+         - Thêm các biến thể có dấu/không dấu/viết hoa
+         - Giữ BNHS (Biên nhận hồ sơ) riêng biệt (theo cloud backend)
+      
+      2. Fix Rules Reload Mechanism:
+         - Thêm function get_active_rules() → merge DEFAULT_RULES + rules_overrides.json
+         - Sửa classify_by_rules() → dùng active_rules thay vì hardcoded DOCUMENT_RULES
+         - ✨ KẾT QUẢ: User thay đổi rules trong UI → có hiệu lực NGAY LẬP TỨC (không cần restart app)
+      
+      3. UI Improvements:
+         - Thêm info banner trong RulesManager: "Thay đổi có hiệu lực ngay lập tức!"
+         - Cập nhật success notifications với emoji ✨
+         - Thông báo rõ ràng khi lưu/xóa/tạo rule
+      
+      📦 FILES MODIFIED:
+      1. /app/desktop-app/python/rule_classifier.py
+         - Thêm imports: os, json, Path
+         - Thêm function get_active_rules(): load & merge rules from overrides file
+         - Sửa classify_by_rules(): active_rules = get_active_rules()
+         - Cập nhật GTLQ keywords: thêm "giấy tiếp nhận hồ sơ và trả kết quả"
+         - Cập nhật TITLE_TEMPLATES: thêm GTLQ variants
+      
+      2. /app/desktop-app/src/components/RulesManager.js
+         - Thêm info banner về rules reload
+         - Cập nhật success notifications
+      
+      3. /app/desktop-app/UPDATE_GTLQ_AND_RELOAD.md
+         - Tài liệu chi tiết về changes
+         - Giải thích GTLQ vs BNHS
+         - Hướng dẫn test
+      
+      🧪 TESTING:
+      - ✅ Created test-rules-reload.py
+      - ✅ Keywords đã được thêm vào GTLQ
+      - ✅ Rules reload mechanism hoạt động (get_active_rules() returns merged rules)
+      - ⏳ Chờ test với ảnh thật để verify classification accuracy
+      
+      📌 CẦN XÁC NHẬN TỪ USER:
+      - Có cần merge BNHS vào GTLQ không? (hiện tại giữ riêng theo cloud backend)
+      
+      📌 LƯU Ý:
+      - Không đổi .env hay URL; không hardcode backend URL.
+      - Rules reload hoạt động: mỗi lần scan → load fresh rules (defaults + overrides)
+  
+  - agent: "main"
+    message: |
       ✅ CẬP NHẬT PHÂN LOẠI: Giảm ngưỡng fuzzy 80% → 75% + Thêm quy tắc GTLQ
       
       🎯 THAY ĐỔI CHÍNH:

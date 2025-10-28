@@ -492,6 +492,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
             {childTabs.map((t) => (
               activeChild === t.path && (
                 <div key={t.path}>
+                  {/* Loading indicator for scanning tab */}
+                  {t.status === 'scanning' && (
+                    <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="animate-spin text-xl">⚙️</div>
+                        <span className="text-sm text-blue-900 font-medium">
+                          Đang quét thư mục "{t.name}"... ({(t.results || []).length}/{t.count})
+                        </span>
+                      </div>
+                      <div className="w-full bg-blue-200 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" 
+                          style={{ width: `${((t.results || []).length / t.count) * 100}%` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className={`grid gap-3 ${gridColsClass}`}>
                     {(t.results || []).map((r, idx) => (
                       <div key={idx} className="p-3 border rounded-lg bg-white">

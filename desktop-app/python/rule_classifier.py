@@ -1901,6 +1901,9 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     text_normalized = normalize_text(text)
     title_normalized = normalize_text(title_text) if title_text else ""
     
+    # Load active rules (with user overrides applied)
+    active_rules = get_active_rules()
+    
     # ==================================================================
     # PRE-CHECK: Vietnamese admin titles MUST be uppercase (70%+)
     # ==================================================================
@@ -1985,7 +1988,7 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     title_boost_applied = {}
     fuzzy_score_boost = {}
     
-    for doc_type, rules in DOCUMENT_RULES.items():
+    for doc_type, rules in active_rules.items():
         # Check required keywords in title
         if not check_required_keywords_in_title(doc_type, title_text, DOCUMENT_TYPE_CONFIG):
             continue

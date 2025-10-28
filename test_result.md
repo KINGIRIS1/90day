@@ -153,6 +153,38 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      ✅ XÓA BNHS & GỘP VÀO GTLQ
+      
+      🎯 THỰC HIỆN THEO YÊU CẦU USER:
+      - User xác nhận: "BNHS không có trong danh mục loại hồ sơ. Xóa luôn ạ"
+      - ✅ Đã xóa BNHS hoàn toàn khỏi hệ thống
+      - ✅ Gộp tất cả keywords & title templates của BNHS vào GTLQ
+      
+      📦 THAY ĐỔI:
+      1. Xóa BNHS:
+         - Xóa BNHS từ DOCUMENT_RULES trong rule_classifier.py
+         - Xóa "Biên nhận hồ sơ": "BNHS" từ backend/server.py
+         - Tổng rules: 99 → 98 (giảm 1)
+      
+      2. Gộp vào GTLQ:
+         - GTLQ keywords: 25 → 40 (tăng 15 từ BNHS)
+         - Thêm title templates: "BIÊN NHẬN HỒ SƠ", "PHIẾU BIÊN NHẬN"
+         - GTLQ bao gồm: "Giấy tiếp nhận" + "Biên nhận hồ sơ"
+      
+      📂 FILES MODIFIED:
+      - /app/desktop-app/python/rule_classifier.py (xóa BNHS, gộp vào GTLQ)
+      - /app/backend/server.py (xóa BNHS mapping)
+      - /app/desktop-app/DELETE_BNHS_MERGE_GTLQ.md (tài liệu)
+      
+      🧪 TESTING:
+      - ✅ Total rules: 98 (BNHS không còn tồn tại)
+      - ✅ GTLQ keywords: 40
+      - ✅ "GIẤY TIẾP NHẬN HỒ SƠ" → GTLQ (100%)
+      - ✅ "BIÊN NHẬN HỒ SƠ" → GTLQ (100%)
+      - ✅ "PHIẾU BIÊN NHẬN" → GTLQ (100%)
+  
+  - agent: "main"
+    message: |
       ✅ CẬP NHẬT GTLQ KEYWORDS + FIX RULES RELOAD
       
       🎯 THAY ĐỔI CHÍNH:

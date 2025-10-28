@@ -381,14 +381,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       <div className="bg-white rounded-lg shadow-sm p-4">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Chọn tài liệu</h2>
         <div className="flex flex-wrap gap-2">
-          <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm">
+          <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
             <span>📁</span><span>Chọn file</span>
           </button>
-          <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm">
+          <button onClick={handleSelectFolder} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
             <span>📂</span><span>Chọn thư mục</span>
           </button>
           {selectedFiles.length > 0 && !processing && (
-            <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm ml-auto">
+            <button onClick={() => handleProcessFiles()} className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md text-sm font-medium ml-auto">
               <span>🚀</span><span>Bắt đầu quét</span>
             </button>
           )}

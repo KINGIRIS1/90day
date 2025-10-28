@@ -6,6 +6,7 @@ COMPLETE Rule-based classifier for Vietnamese land documents with Smart Scoring
 - Tier 3: Title similarity < 50% → Pure keyword matching
 """
 import re
+import sys
 from typing import Dict, Tuple, List
 from difflib import SequenceMatcher
 

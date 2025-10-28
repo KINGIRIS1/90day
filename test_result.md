@@ -145,6 +145,7 @@ test_plan:
     - "Bổ sung nhận dạng GTLQ (Giấy tiếp nhận hồ sơ và hẹn trả kết quả)"
     - "Test Python OCR engine standalone với 2 ảnh mẫu người dùng gửi (EasyOCR)"
     - "Kiểm tra ưu tiên HDUQ > HDCQ trong fuzzy title"
+    - "Xác nhận build mới dùng Python hệ thống, không còn gọi resources/python/python3 (fix ENOENT)"
   stuck_tasks: []
   test_all: false
   test_priority: "desktop_app_first"

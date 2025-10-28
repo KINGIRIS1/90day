@@ -1819,11 +1819,21 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     # ==================================================================
     # PRE-CHECK: Vietnamese admin titles MUST be uppercase (70%+)
     # ==================================================================
-    # If title has low uppercase ratio, it's likely NOT a real title but
-    # a mention in body text (e.g., "Giấy chứng nhận..." in contract body)
-    # → Ignore this title and use ONLY body text for classification
+    # Clean title first to remove government headers, then check uppercase
+    # This prevents headers like "Đôc lâp - Tự do" from affecting ratio
     if title_text:
-        title_uppercase_ratio = calculate_uppercase_ratio(title_text)
+        cleaned_title = clean_title_text(title_text)
+        
+        # Calculate uppercase on CLEANED title (without headers)
+        if cleaned_title:
+            title_uppercase_ratio = calculate_uppercase_ratio(cleaned_title)
+        else:
+            # If cleaning removed everything, check original
+            title_uppercase_ratio = calculate_uppercase_ratio(title_text)
+        
+        # If title has low uppercase ratio, it's likely NOT a real title but
+        # a mention in body text (e.g., "Giấy chứng nhận..." in contract body)
+        # → Ignore this title and use ONLY body text for classification
         if title_uppercase_ratio < 0.7:
             print(f"⚠️ Title has low uppercase ({title_uppercase_ratio:.0%}), likely not a real title. Using body text only.", file=sys.stderr)
             title_text = None  # Ignore this title

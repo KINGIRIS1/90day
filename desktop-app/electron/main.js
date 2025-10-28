@@ -59,25 +59,28 @@ function createWindow() {
   });
 }
 
-// Helper function to get Python path
+// Helper function to get Python path (with fallback detection)
 function getPythonPath() {
+  const { spawnSync } = require('child_process');
+  const candidates = process.platform === 'win32' ? ['py', 'python'] : ['python3', 'python'];
+  for (const cmd of candidates) {
+    try {
+      const r = spawnSync(cmd, ['--version'], { stdio: 'ignore' });
+      if (r && r.status === 0) return cmd;
+    } catch (e) {
+      // ignore and try next
+    }
+  }
+  // final fallback
+  return candidates[0];
+}
+
+// Helper function to get Python script path
+function getPythonScriptPath(scriptName) {
   if (isDev) {
-    // Development mode - use python command directly
-    if (process.platform === 'win32') {
-      return 'python'; // Windows - direct python command
-    } else {
-      return 'python3'; // Linux/Mac
-    }
+    return path.join(__dirname, '../python', scriptName);
   } else {
-    // Production mode - use system Python
-    if (process.platform === 'win32') {
-      // Windows: use python command (compatible with all setups)
-      return 'python';
-    } else if (process.platform === 'darwin') {
-      return 'python3'; // macOS
-    } else {
-      return 'python3'; // Linux
-    }
+    return path.join(process.resourcesPath, 'python', scriptName);
   }
 }
 

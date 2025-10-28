@@ -248,7 +248,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     for (let i = 0; i < filesToProcess.length; i++) {
       // Check if user clicked stop
       if (stopRef.current) {
-        console.log('Scan stopped by user');
+        console.log('❌ Scan stopped by user at file', i);
         break;
       }
       
@@ -259,12 +259,25 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
       const preferCloud = enginePref === 'cloud';
       if (preferCloud) {
         result = await processCloudBoost(file);
+        
+        // Check stop after async operation
+        if (stopRef.current) {
+          console.log('❌ Scan stopped after cloud boost at file', i);
+          break;
+        }
+        
         if (!result.success && autoFallbackEnabled && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
           const userConfirmed = window.confirm(`Cloud lỗi: ${result.error || result.errorType}. Chuyển sang Offline (Tesseract) cho "${file.name}"?`);
           if (userConfirmed) result = await processOffline(file);
         }
       } else {
         result = await processOffline(file);
+      }
+      
+      // Check stop after processing
+      if (stopRef.current) {
+        console.log('❌ Scan stopped after processing at file', i);
+        break;
       }
 
       const processedResult = applySequentialNaming(result, currentLastKnown);

@@ -83,6 +83,47 @@ except ImportError as e:
     sys.exit(1)
 
 
+def extract_document_title_from_text(text: str) -> str:
+    """
+    Extract document title from OCR text using common patterns
+    
+    Vietnamese admin documents have titles like:
+    - ĐƠN ĐĂNG KÝ BIẾN ĐỘNG...
+    - HỢP ĐỒNG CHUYỂN NHƯỢNG...
+    - GIẤY CHỨNG NHẬN...
+    - GIẤY ỦY QUYỀN...
+    
+    Args:
+        text: Full OCR text
+        
+    Returns:
+        Extracted title or empty string if not found
+    """
+    import re
+    
+    # Common title patterns (case insensitive)
+    title_patterns = [
+        r'(ĐƠN\s+ĐĂNG\s+KÝ\s+BIẾN\s+ĐỘNG[^.]*)',
+        r'(HỢP\s+ĐỒNG\s+CHUYỂN\s+NHƯỢNG[^.]*)',
+        r'(HỢP\s+ĐỒNG\s+ỦY\s+QUYỀN[^.]*)',
+        r'(GIẤY\s+CHỨNG\s+NHẬN\s+QUYỀN\s+SỬ\s+DỤNG\s+ĐẤT[^.]*)',
+        r'(GIẤY\s+ỦY\s+QUYỀN[^.]*)',
+        r'(QUYẾT\s+ĐỊNH[^.]*)',
+        r'(ĐƠN\s+XIN[^.]*)',
+        r'(BIÊN\s+BẢN[^.]*)',
+    ]
+    
+    for pattern in title_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            title = match.group(1).strip()
+            # Limit length to avoid capturing too much
+            if len(title) < 200:
+                return title
+    
+    return ""
+
+
 def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict:
     """
     Process a document using OCR + Rules with font height detection

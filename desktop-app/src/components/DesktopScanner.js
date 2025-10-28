@@ -496,7 +496,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                   <option value="low">Thấp (3 cột)</option>
                 </select>
               </div>
-              <button onClick={() => { stopRef.current = true; setTimeout(() => (stopRef.current = false), 0); }} className="px-3 py-2 text-xs rounded-md bg-red-600 text-white hover:bg-red-700">Dừng quét</button>
+              <button 
+                onClick={() => { 
+                  stopRef.current = true; 
+                  setTimeout(() => (stopRef.current = false), 100);
+                }} 
+                className="px-3 py-2 text-xs rounded-md bg-red-600 text-white hover:bg-red-700"
+              >
+                ⏹️ Dừng quét
+              </button>
               <button onClick={async () => { stopRef.current = false; for (const tab of childTabs) { if (stopRef.current) break; if (tab.status !== 'done') await scanChildFolder(tab.path); } }} className="px-3 py-2 text-xs rounded-md bg-blue-600 text-white hover:bg-blue-700">Quét tất cả thư mục con</button>
               <button
                 onClick={() => setShowMergeModal(true)}

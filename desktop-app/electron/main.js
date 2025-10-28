@@ -457,7 +457,8 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
   
   return new Promise(async (resolve) => {
     try {
-      const backendUrl = store.get('backendUrl', '');
+      // Get backend URL with default to Railway
+      const backendUrl = store.get('backendUrl', 'https://sohoavpdkct.up.railway.app');
       
       if (!backendUrl) {
         resolve({

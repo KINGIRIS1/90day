@@ -33,6 +33,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeOption, setMergeOption] = useState('root'); // 'root' or 'new'
   const [mergeSuffix, setMergeSuffix] = useState('_merged');
+  const [activeChildForMerge, setActiveChildForMerge] = useState(null);
 
   const [parentFolder, setParentFolder] = useState(null);
   const [parentSummary, setParentSummary] = useState(null); // { subfolderCount, rootFileCount }

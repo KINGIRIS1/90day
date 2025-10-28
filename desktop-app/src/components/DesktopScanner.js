@@ -217,7 +217,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   };
 
   // Progressive file processing (vừa quét vừa hiện)
-  const handleProcessFiles = async (useCloudBoost = false) => {
+  const handleProcessFiles = async (useCloudBoost = false, isResume = false) => {
     let filesToProcess = selectedFiles;
     if (!filesToProcess || filesToProcess.length === 0) {
       if (!window.electronAPI) return;
@@ -236,15 +236,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     }
 
     setProcessing(true);
-    setResults([]);
-    setComparisons([]);
-    setProgress({ current: 0, total: filesToProcess.length });
-    setLastKnownType(null);
+    setIsPaused(false); // Reset pause state
+    
+    // If resuming, use remaining files, otherwise start fresh
+    if (!isResume) {
+      setResults([]);
+      setComparisons([]);
+      setProgress({ current: 0, total: filesToProcess.length });
+      setLastKnownType(null);
+      setRemainingFiles(filesToProcess);
+    } else {
+      // Resume: use remaining files
+      filesToProcess = remainingFiles;
+      setProgress({ current: results.length, total: results.length + filesToProcess.length });
+    }
+    
     stopRef.current = false; // Reset stop flag
 
     const enginePref = await window.electronAPI.getConfig('enginePreference');
 
-    const newResults = [];
+    const newResults = isResume ? [...results] : []; // Keep existing results if resuming
     let currentLastKnown = null;
 
     for (let i = 0; i < filesToProcess.length; i++) {

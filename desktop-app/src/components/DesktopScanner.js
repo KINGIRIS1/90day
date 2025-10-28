@@ -499,7 +499,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
 
       {/* Child tabs for parent folder scan */}
       {parentFolder && childTabs.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
           <div className="flex items-center gap-2 overflow-auto">
             {childTabs.map((t) => (
               <button 

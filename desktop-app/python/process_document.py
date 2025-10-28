@@ -180,14 +180,21 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
                 "method": "ocr_failed"
             }
         
+        # Debug: Print full extracted text to see what EasyOCR captured
+        print(f"📝 Full text (first 500 chars): {extracted_text[:500]}", file=sys.stderr)
+        
         # Try to extract real title from full text using patterns
         extracted_title = extract_document_title_from_text(extracted_text)
+        
+        if extracted_title:
+            print(f"✅ Extracted title via pattern: {extracted_title[:80]}...", file=sys.stderr)
+        else:
+            print(f"⚠️ No title pattern found in full text", file=sys.stderr)
         
         # Priority:
         # 1. If we found a title via patterns → use it
         # 2. Otherwise use title_text from OCR
         if extracted_title:
-            print(f"✅ Extracted title via pattern: {extracted_title[:80]}...", file=sys.stderr)
             final_title = extracted_title
         else:
             final_title = title_text

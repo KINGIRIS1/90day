@@ -1,46 +1,50 @@
 <analysis>
-The previous AI engineer's work involved a multi-faceted iterative process, focusing initially on building and debugging an all-in-one Electron installer. Key challenges included resolving NSIS icon errors, ensuring correct file copying within the installer, and fixing  privilege issues on Windows by disabling code signing. A significant portion of the work revolved around robustly configuring the Python environment for the packaged Electron app, addressing  missing dependency errors and hardcoded Python paths in  and . Concurrently, the engineer handled a port conflict request by updating build scripts and Electron configuration. The most recent efforts culminated in successfully installing and verifying VietOCR, a Vietnamese OCR engine, into the designated Python 3.12 environment, setting the stage for its integration into the application's OCR pipeline.
+The AI engineer's work primarily focused on enhancing the desktop application's OCR capabilities and improving document classification accuracy. Initially, efforts were directed at robustly integrating VietOCR, including debugging Python environment conflicts and installing dependencies. Following user feedback on VietOCR's installation challenges, EasyOCR was introduced, optimized for speed (from 39s to 7.69s by aggressive cropping and parameter tuning), and integrated alongside Tesseract. A significant portion of the work involved extensive debugging of Python-Electron communication, resolving  errors, JSON parsing failures due to VietOCR's console output, and persistent Unicode encoding issues for Vietnamese text. Concurrently, the document classification logic in  underwent a major overhaul, evolving from simple weighted keyword matching to a sophisticated Hybrid Fuzzy + Keyword Matching approach with Case-Aware Scoring to better adhere to Vietnamese administrative document structures. The final issue encountered is a  in .
 </analysis>
 
 <product_requirements>
-The application is a desktop document scanner for Vietnamese land-related images, designed for high-volume use. It aims to OCR and rename documents using short codes, supporting single and batch scanning, history, and PDF export. Key features implemented or requested include:
-- Default Offline OCR (Tesseract only) and Optional Cloud Boost (GPT-4 Vision).
-- Rules Manager for UI-driven classification rule management (add, edit, delete, import/export, reset, auto-generate keyword variants).
+The application is a high-volume desktop document scanner for Vietnamese land-related images, designed for OCR and renaming documents using short codes. It supports single/batch scanning, history, and PDF export. Key requirements include:
+- Default Offline OCR (Tesseract), with an optional Cloud Boost (GPT-4 Vision).
+- A Rules Manager for UI-driven classification rule management, including auto-generating keyword variants.
 - Persistent Scan Tab State.
-- **Easy Installation**: Simplified all-in-one installer bundling Python and Tesseract.
+- **Easy Installation**: An all-in-one installer bundling Python and Tesseract.
 - Improve existing  accuracy and add  to .
-- **Port Conflict Resolution**: Change the development server port from 3000 (used by another app) to 3001.
-- **Enhanced OCR**: Explore and integrate VietOCR for improved Vietnamese language OCR accuracy.
+- **Port Conflict Resolution**: Change the development server port from 3000 to 3001.
+- **Enhanced OCR**: Integrate and allow user selection between multiple OCR engines (Tesseract, VietOCR, EasyOCR) for improved Vietnamese language OCR accuracy and speed.
+- **Accurate Document Classification**: Improve the  to correctly identify document types (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền), especially when OCR introduces typos, by implementing fuzzy matching, case-aware scoring, and structured keyword prioritization based on administrative document rules.
 </product_requirements>
 
 <key_technical_concepts>
 - **Electron**: Desktop application framework.
 - **React**: Frontend UI development.
-- **Python**: Backend for OCR, rule classification.
+- **Python**: Backend for OCR and rule classification.
 - **Tesseract**: Primary offline OCR engine.
-- **NSIS (Nullsoft Scriptable Install System)**: Windows installer creation.
-- ****: Packaging and building Electron apps.
-- **/**: Electron inter-process communication.
-- ****: Python wrapper for Tesseract.
 - **VietOCR**: Transformer-based Vietnamese OCR library.
-- **PyTorch**: Deep learning framework, dependency for VietOCR.
+- **EasyOCR**: Python library for multi-language OCR.
+- **NSIS**: Windows installer creation.
+- ****: Packaging Electron apps.
+- **/**: Electron inter-process communication.
 </key_technical_concepts>
 
 <code_architecture>
 
-- : Updated for  configuration to skip code signing () and for development server port change ().
-- : Modified to include  for React development server.
-- : Created with  for higher precedence in React Scripts.
-- : Electron's main process. Modified to load React app on . Extensively updated to use robust Python path resolution (, , ) instead of hardcoded  paths, affecting , , and  handlers. Also, normalized backend URL for API calls.
-- : Copy of  used for packaging. Received identical updates to  for port, Python path resolution, and URL normalization.
-- : NSIS script for all-in-one installer. Modified to comment out icon loading () and fix file copying from  (using  instead of  for folders). Also updated Python package installation command () for better targeting.
-- : Build script for the all-in-one installer. Enhanced with better error checking for Electron app packaging.
-- : (NEW) Script to build the Electron app (yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.) separately for debugging.
-- : (NEW) Script to start the Electron development environment with the explicitly set port (3001).
-- : Orchestrates local OCR. Currently set to use Tesseract. Future updates will integrate VietOCR.
-- : (EXISTING) Contains the VietOCR engine implementation, ready for integration.
-- Numerous new Markdown and batch files were created for documentation, guides, and troubleshooting related to the installer, build process, and specific errors encountered (e.g., , , ).
+- : Updated build scripts for  (no code signing) and React dev server port ().
+-  & : Configured .
+- : Main Electron process. Modified to load React app on . Python path resolution was made robust (using  instead of hardcoded  or ). IPC handler  modified to pass OCR engine type. Character encoding for child process output set to UTF-8.
+- : Packaged version of . Received identical updates.
+- : NSIS script for installer. Modified for icon loading, file copying, and Python package installation.
+- : Orchestrates local OCR. Modified to dynamically load and use Tesseract, VietOCR, or EasyOCR based on user preference, with fallback logic. Handles JSON output with  for correct Unicode transmission.
+- : Contains VietOCR implementation. Modified to suppress initial Model weight exists output to stderr to prevent JSON parsing errors.
+- : Created/modified to encapsulate EasyOCR logic. Includes optimizations like cropping the image to the top 25%, resizing, and specific EasyOCR parameters to improve speed. Also, fixes  extraction to ensure it captures the top region of the image.
+- : The core classification logic. Has undergone significant changes:
+    - Initially, simple keyword matching with weights and title boosts.
+    - Updated to Required Keywords + Smart Scoring (Hybrid 1+3) to specify mandatory title keywords and assign specificity scores to keywords.
+    - Further updated to a Hybrid Fuzzy + Keyword Matching approach. This includes Tier 1 (fuzzy matching > 80% similarity), Tier 2 (fuzzy matching 50-80% + keyword confirmation), and Fallback (pure keyword matching). Uses Levenshtein distance for similarity.
+    - Incorporated Case-Aware Scoring to leverage uppercase patterns common in Vietnamese administrative titles for higher confidence.
+- : Frontend component. Modified to include a UI toggle for selecting the preferred OCR engine (Tesseract, VietOCR, EasyOCR) and display the selected engine in App Information.
+- : Updated to include , , ,  as dependencies.
+- , : Documentation for setting up VietOCR and EasyOCR.
+- , , , , : Various scripts for testing and debugging OCR and classification logic.
 </code_architecture>
 
 <pending_tasks>
@@ -51,13 +55,22 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
 - Test the backend with 5-10 real images to validate the integrated Hybrid OCR (specifically with the Tesseract-only change and Rules Manager).
 - Update icon for macOS (.icns).
 - Implement license/activation key feature.
-- Integrate VietOCR into  and potentially add a UI toggle.
+- Debug and fix  in .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was focused on enabling VietOCR as an alternative or supplementary OCR engine. The  script was confirmed to exist, and after several debugging steps related to Python versions (VietOCR being incompatible with Python 3.13, but available for Python 3.12), VietOCR was successfully installed into the user's Python 3.12 environment. A direct test using  resulted in successful model download and text extraction, confirming VietOCR's operational status. The application had previously been thoroughly debugged for various build and runtime issues, including: fixing  for correct file bundling, resolving  privilege errors by disabling code signing, addressing Python path resolution ( error) in the packaged Electron app by eliminating all hardcoded paths in  and , and correcting a double slash in the backend API URL. The Electron app is now working correctly with Tesseract OCR, and the VietOCR engine is installed and validated on the user's machine, ready for integration.
+Immediately before this summary, the AI engineer was engaged in refining the document classification logic () based on user feedback. The user reported that an image expected to be classified as Hợp đồng chuyển nhượng (HDCQ) was incorrectly identified as Căn cước công dân (CCCD), and Giấy ủy quyền (GUQ) was also incorrectly identified as HDCQ.
+
+This led to several iterations:
+1.  **Debugging Unicode Issues**: It was discovered that OCR output for Vietnamese characters was garbled due to incorrect encoding in Python's JSON output (). This was fixed by setting  in  in , ensuring proper Unicode transmission to Electron.
+2.  **Addressing OCR Typos**: The OCR engine (EasyOCR) introduced typos (e.g., HỢP ĐỎNG instead of HỢP ĐỒNG). This required adding typo variants to HDCQ keywords in  to correctly match.
+3.  **Enhancing Classification Logic**: The  was significantly updated:
+    *   **Hybrid Fuzzy + Keyword Matching**: A multi-tiered approach was implemented where titles are first compared using fuzzy matching (Levenshtein similarity). If similarity is high (>=80%), it's an instant match. If medium (50-80%), it requires keyword confirmation. Otherwise, it falls back to pure keyword matching.
+    *   **Case-Aware Scoring**: New logic was introduced to prioritize uppercase text for title matching, aligning with Vietnamese administrative document conventions, where titles are typically capitalized. This involved modifying  and the scoring mechanism.
+The immediate problem is a  at line 1747 in , which arose after the last set of modifications for Case-Aware Scoring.
 </current_work>
 
 <optional_next_step>
-Integrate VietOCR into  by modifying it to use .
+Fix the  in .
 </optional_next_step>
+

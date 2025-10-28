@@ -12,7 +12,7 @@ def test_llm_health():
     
     try:
         response = requests.get(
-            "https://vietdoc-scanner.preview.emergentagent.com/api/llm/health", 
+            "https://docsort-pro.preview.emergentagent.com/api/llm/health", 
             timeout=30
         )
         
@@ -62,7 +62,7 @@ def test_endpoints_exist():
         try:
             # Use HEAD request to check if endpoint exists without processing
             response = requests.head(
-                f"https://vietdoc-scanner.preview.emergentagent.com/api/{endpoint}",
+                f"https://docsort-pro.preview.emergentagent.com/api/{endpoint}",
                 timeout=10
             )
             

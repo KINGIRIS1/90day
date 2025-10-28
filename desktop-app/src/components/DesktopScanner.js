@@ -554,7 +554,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
                 <div key={t.path}>
                   {/* Loading indicator for scanning tab */}
                   {t.status === 'scanning' && (
-                    <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="mb-3 p-3 bg-blue-50 rounded-xl border border-blue-200">
                       <div className="flex items-center space-x-3 mb-2">
                         <div className="animate-spin text-xl">⚙️</div>
                         <span className="text-sm text-blue-900 font-medium">

@@ -1815,16 +1815,29 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     # TIER 1: FUZZY TITLE MATCHING (>= 80% similarity)
     # ==================================================================
     if title_text:
-        best_template_match, best_similarity = find_best_template_match(title_text, TITLE_TEMPLATES)
+        # Clean title by removing common government headers
+        cleaned_title = clean_title_text(title_text)
+        
+        # Try matching with both original and cleaned title (use best result)
+        best_template_match1, best_similarity1 = find_best_template_match(title_text, TITLE_TEMPLATES)
+        best_template_match2, best_similarity2 = find_best_template_match(cleaned_title, TITLE_TEMPLATES)
+        
+        # Use whichever gives better similarity
+        if best_similarity2 > best_similarity1:
+            best_template_match = best_template_match2
+            best_similarity = best_similarity2
+            title_used = cleaned_title
+        else:
+            best_template_match = best_template_match1
+            best_similarity = best_similarity1
+            title_used = title_text
         
         # Check if title is in UPPERCASE (Vietnamese admin document standard)
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         is_uppercase_title = title_uppercase_ratio >= 0.7
         
-        # Adjust threshold based on case:
-        # - UPPERCASE titles (70%+ uppercase): Use 80% threshold (strict)
-        # - Mixed/lowercase: Use 85% threshold (more strict to avoid false positives)
-        similarity_threshold = 0.8 if is_uppercase_title else 0.85
+        # Strict threshold: 80% for all uppercase titles
+        similarity_threshold = 0.8
         
         if best_similarity >= similarity_threshold:
             # HIGH CONFIDENCE - Direct match based on title

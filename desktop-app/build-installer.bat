@@ -102,7 +102,7 @@ echo [STEP 2/6] Installing Node.js dependencies...
 echo ================================================================================
 echo.
 
-call yarn install
+call %YARN_CMD% install
 if %ERRORLEVEL% NEQ 0 (
     echo [ERROR] Failed to install Node.js dependencies
     pause

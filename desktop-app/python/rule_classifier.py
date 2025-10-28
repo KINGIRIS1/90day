@@ -1864,8 +1864,11 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         is_uppercase_title = title_uppercase_ratio >= 0.7
         
-        # Only accept fuzzy match if uppercase >= 70%
-        if best_similarity >= 0.8 and is_uppercase_title:
+        # RELAXED threshold: 75% instead of 80% to handle more OCR errors
+        # With EasyOCR, even with typos like "ĐỎNG", "UỶ", we get 70-80% similarity
+        similarity_threshold = 0.75
+        
+        if best_similarity >= similarity_threshold and is_uppercase_title:
             # HIGH CONFIDENCE - Direct match based on title
             doc_name = classify_document_name_from_code(best_template_match)
             

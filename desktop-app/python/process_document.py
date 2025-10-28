@@ -107,28 +107,29 @@ def extract_document_title_from_text(text: str) -> str:
         # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
         # Flexible with: BIÉN, BIẾN, BIEN, etc.
         # Stop before lowercase or certain chars
-        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÉẾ]N\s+[ĐD][OỘ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EỀ]N\s+V[OỚ]I\s+[ĐD][AÁẤ]T)?)',
+        r'(Đ[OƠ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÉẾỂ]N\s+[ĐD][OỘ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÉẾỂ]N\s+V[OỚ]I\s+[ĐD][AÁẤ]T)?)',
         
         # HỢP ĐỒNG CHUYỂN NHƯỢNG
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÉẾ]N\s+NH[UƯỨ][OỢ]NG(?:\s+QUY[EÉẾ]N)?(?:\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
+        # Fix: CHUYỂN needs Ể, NHƯỢNG needs Ư and Ợ
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+CHUY[EÉẾỂ]N\s+NH[UƯỨ][OỢỠ]NG(?:\s+QUY[EÉẾỂ]N)?(?:\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
         
         # HỢP ĐỒNG ỦY QUYỀN
-        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EÉẾ]N)',
+        r'(H[OỢ]P\s+[ĐD][OỒ]NG\s+[UỦ]\s*Y\s+QUY[EÉẾỂ]N)',
         
         # GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT
-        r'(GI[AÁẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EÉẾ]N\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',
+        r'(GI[AÁẤ]Y\s+CH[UỨ]NG\s+NH[AẬ]N\s+QUY[EÉẾỂ]N\s+S[UỬỨ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',
         
         # GIẤY ỦY QUYỀN
-        r'(GI[AÁẤ]Y\s+[UỦ]\s*Y\s+QUY[EÉẾ]N)',
+        r'(GI[AÁẤ]Y\s+[UỦ]\s*Y\s+QUY[EÉẾỂ]N)',
         
         # QUYẾT ĐỊNH
-        r'(QUY[EÉẾ]T\s+[ĐD][IỊ]NH(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
+        r'(QUY[EÉẾỂ]T\s+[ĐD][IỊ]NH(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
         
         # ĐƠN XIN
         r'(Đ[OƠ]N\s+XIN(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
         
         # BIÊN BẢN
-        r'(BI[EÉẾ]N\s+B[AẢ]N(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
+        r'(BI[EÉẾỂ]N\s+B[AẢ]N(?:\s+[A-ZÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴĐÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸ]{1,30})?)',
     ]
     
     for pattern in title_patterns:

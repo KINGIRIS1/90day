@@ -18,10 +18,11 @@ except ImportError as e:
 
 class OCREngine:
     """
-    EasyOCR Engine - Optimized for Vietnamese documents
+    EasyOCR Engine - Optimized for Vietnamese documents (Cloud Logic Applied)
     - 90-92% accuracy for Vietnamese text
+    - Smart Crop: 50% single page, 65% for 2-page spread (like Cloud backend)
     - Optimized for speed (crop + resize + parameters)
-    - Focus on title area (top 40% - ensures capture of document titles at 15-20%)
+    - Focus on title area dynamically based on aspect ratio
     """
     
     _instance = None

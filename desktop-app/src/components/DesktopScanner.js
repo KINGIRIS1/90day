@@ -185,23 +185,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   };
 
   const applySequentialNaming = (result, lastType) => {
-    // Priority 1: Check if classifier explicitly recommends using previous classification
-    // This happens when title has low uppercase ratio (<40%) and poor match (<40%)
-    if (result.success && result.use_previous_classification && lastType) {
-      return {
-        ...result,
-        doc_type: lastType.doc_type,
-        short_code: lastType.short_code,
-        confidence: lastType.confidence * 0.95, // Higher confidence than fallback (95% vs 90%)
-        original_confidence: result.confidence,
-        original_short_code: result.short_code,
-        applied_sequential_logic: true,
-        low_quality_title_detected: true,
-        note: `Tiêu đề chất lượng thấp → Sử dụng phân loại trang trước (${lastType.short_code})`
-      };
-    }
-    
-    // Priority 2: Fallback for unknown/low confidence results (original logic)
     if (result.success && (result.short_code === 'UNKNOWN' || result.confidence < 0.3) && lastType) {
       return {
         ...result,

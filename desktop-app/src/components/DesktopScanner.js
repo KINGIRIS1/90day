@@ -564,6 +564,125 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
           </div>
         </div>
       )}
+
+      {/* Merge Modal */}
+      {showMergeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📚 Gộp tất cả thư mục con</h3>
+            
+            <div className="space-y-4">
+              {/* Option 1: Gộp vào thư mục gốc */}
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="mergeOption"
+                  value="root"
+                  checked={mergeOption === 'root'}
+                  onChange={(e) => setMergeOption(e.target.value)}
+                  className="mt-1"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Gộp vào thư mục gốc</div>
+                  <div className="text-sm text-gray-600">PDF sẽ được lưu trực tiếp vào thư mục gốc</div>
+                </div>
+              </label>
+
+              {/* Option 2: Tạo thư mục mới */}
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="mergeOption"
+                  value="new"
+                  checked={mergeOption === 'new'}
+                  onChange={(e) => setMergeOption(e.target.value)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Tạo thư mục mới</div>
+                  <div className="text-sm text-gray-600 mb-2">Tên thư mục = Thư mục gốc + ký tự tùy chọn</div>
+                  {mergeOption === 'new' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-700">Ký tự thêm vào:</span>
+                      <input
+                        type="text"
+                        value={mergeSuffix}
+                        onChange={(e) => setMergeSuffix(e.target.value)}
+                        placeholder="_merged"
+                        className="flex-1 px-2 py-1 text-sm border rounded"
+                      />
+                    </div>
+                  )}
+                  {mergeOption === 'new' && parentFolder && (
+                    <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                      Ví dụ: <span className="font-mono">{parentFolder.split(/[\\\/]/).pop()}{mergeSuffix}</span>
+                    </div>
+                  )}
+                </div>
+              </label>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={() => setShowMergeModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={async () => {
+                  setShowMergeModal(false);
+                  // Execute merge with selected options
+                  const finalLines = [];
+                  
+                  // Determine target folder
+                  let targetFolder = parentFolder;
+                  if (mergeOption === 'new') {
+                    const path = require('path');
+                    const newFolderName = path.basename(parentFolder) + mergeSuffix;
+                    targetFolder = path.join(path.dirname(parentFolder), newFolderName);
+                    
+                    // Create new folder
+                    try {
+                      const fs = require('fs');
+                      if (!fs.existsSync(targetFolder)) {
+                        fs.mkdirSync(targetFolder, { recursive: true });
+                      }
+                    } catch (err) {
+                      alert(`Lỗi tạo thư mục: ${err.message}`);
+                      return;
+                    }
+                  }
+                  
+                  // Merge each tab
+                  for (const ct of childTabs) {
+                    const payload = (ct.results || [])
+                      .filter(r => r.success && r.short_code)
+                      .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+                    if (payload.length === 0) continue;
+                    
+                    const merged = await window.electronAPI.mergeByShortCode(payload, { 
+                      autoSave: true,
+                      targetFolder: targetFolder 
+                    });
+                    
+                    (merged || []).forEach(m => {
+                      if (m && m.success && m.path) {
+                        finalLines.push(`✓ [${ct.name}] ${m.short_code}: ${m.path}`);
+                      }
+                    });
+                  }
+                  setChildMergeReport(finalLines);
+                }}
+                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              >
+                Bắt đầu gộp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

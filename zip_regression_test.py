@@ -15,7 +15,7 @@ from PIL import Image
 
 class ZipFolderScanTester:
     def __init__(self):
-        self.base_url = "https://docsort-pro.preview.emergentagent.com/api"
+        self.base_url = "https://vietdocscanner.preview.emergentagent.com/api"
         self.auth_headers = {}
         
     def authenticate(self):
@@ -189,7 +189,7 @@ class ZipFolderScanTester:
                 print(f"   Testing ZIP download for folder '{folder_name}': {zip_url}")
                 
                 # Construct full URL
-                full_url = f"https://docsort-pro.preview.emergentagent.com{zip_url}"
+                full_url = f"https://vietdocscanner.preview.emergentagent.com{zip_url}"
                 
                 try:
                     response = requests.get(full_url, headers=self.auth_headers)

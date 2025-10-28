@@ -7,7 +7,7 @@ import requests
 import json
 
 def test_auth():
-    base_url = "https://docsort-pro.preview.emergentagent.com/api"
+    base_url = "https://vietdocscanner.preview.emergentagent.com/api"
     
     print("🔍 Testing setup-admin endpoint")
     

@@ -1,76 +1,74 @@
 <analysis>
-The AI engineer's work primarily focused on enhancing the desktop application's OCR capabilities and improving document classification accuracy. Initially, efforts were directed at robustly integrating VietOCR, including debugging Python environment conflicts and installing dependencies. Following user feedback on VietOCR's installation challenges, EasyOCR was introduced, optimized for speed (from 39s to 7.69s by aggressive cropping and parameter tuning), and integrated alongside Tesseract. A significant portion of the work involved extensive debugging of Python-Electron communication, resolving  errors, JSON parsing failures due to VietOCR's console output, and persistent Unicode encoding issues for Vietnamese text. Concurrently, the document classification logic in  underwent a major overhaul, evolving from simple weighted keyword matching to a sophisticated Hybrid Fuzzy + Keyword Matching approach with Case-Aware Scoring to better adhere to Vietnamese administrative document structures. The final issue encountered is a  in .
+The AI engineer's work primarily focused on enhancing the desktop application's Vietnamese OCR and document classification capabilities. Key efforts included resolving a  in  and subsequently addressing various classification inaccuracies. A significant iteration involved implementing and then removing a Low Quality Title Detection Rule based on user feedback. The engineer then facilitated the integration of a Railway backend URL into the Electron app. Following this, extensive debugging of the classification engine ( and ) was performed, fixing issues where EasyOCR's output, including typos and reading order, led to incorrect title extraction and document classification. This involved refining regex patterns to be highly flexible with Vietnamese diacritics and character sequences, increasing image crop area for title detection, and strengthening logic to reject non-title text. The immediate next step involves improving the existing fuzzy matching approach to reduce reliance on strict regex patterns.
 </analysis>
 
 <product_requirements>
-The application is a high-volume desktop document scanner for Vietnamese land-related images, designed for OCR and renaming documents using short codes. It supports single/batch scanning, history, and PDF export. Key requirements include:
-- Default Offline OCR (Tesseract), with an optional Cloud Boost (GPT-4 Vision).
-- A Rules Manager for UI-driven classification rule management, including auto-generating keyword variants.
-- Persistent Scan Tab State.
-- **Easy Installation**: An all-in-one installer bundling Python and Tesseract.
-- Improve existing  accuracy and add  to .
-- **Port Conflict Resolution**: Change the development server port from 3000 to 3001.
-- **Enhanced OCR**: Integrate and allow user selection between multiple OCR engines (Tesseract, VietOCR, EasyOCR) for improved Vietnamese language OCR accuracy and speed.
-- **Accurate Document Classification**: Improve the  to correctly identify document types (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền), especially when OCR introduces typos, by implementing fuzzy matching, case-aware scoring, and structured keyword prioritization based on administrative document rules.
+The application is a high-volume desktop document scanner for Vietnamese land-related images, designed for OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users require default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is needed. Core requirements included easy installation (all-in-one installer), improving  accuracy, port conflict resolution (dev server 3000 to 3001), and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. A critical need is accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền), especially with OCR typos, addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. The application also needs robust handling of sequential documents where titles might be absent or of low quality.
 </product_requirements>
 
 <key_technical_concepts>
 - **Electron**: Desktop application framework.
 - **React**: Frontend UI development.
 - **Python**: Backend for OCR and rule classification.
-- **Tesseract**: Primary offline OCR engine.
-- **VietOCR**: Transformer-based Vietnamese OCR library.
-- **EasyOCR**: Python library for multi-language OCR.
+- **Tesseract, VietOCR, EasyOCR**: OCR engines.
 - **NSIS**: Windows installer creation.
-- ****: Packaging Electron apps.
 - **/**: Electron inter-process communication.
+- **Fuzzy Matching**: Levenshtein distance for text similarity.
+- **Regex**: Pattern matching for text extraction.
 </key_technical_concepts>
 
 <code_architecture>
 
-- : Updated build scripts for  (no code signing) and React dev server port ().
--  & : Configured .
-- : Main Electron process. Modified to load React app on . Python path resolution was made robust (using  instead of hardcoded  or ). IPC handler  modified to pass OCR engine type. Character encoding for child process output set to UTF-8.
-- : Packaged version of . Received identical updates.
-- : NSIS script for installer. Modified for icon loading, file copying, and Python package installation.
-- : Orchestrates local OCR. Modified to dynamically load and use Tesseract, VietOCR, or EasyOCR based on user preference, with fallback logic. Handles JSON output with  for correct Unicode transmission.
-- : Contains VietOCR implementation. Modified to suppress initial Model weight exists output to stderr to prevent JSON parsing errors.
-- : Created/modified to encapsulate EasyOCR logic. Includes optimizations like cropping the image to the top 25%, resizing, and specific EasyOCR parameters to improve speed. Also, fixes  extraction to ensure it captures the top region of the image.
-- : The core classification logic. Has undergone significant changes:
-    - Initially, simple keyword matching with weights and title boosts.
-    - Updated to Required Keywords + Smart Scoring (Hybrid 1+3) to specify mandatory title keywords and assign specificity scores to keywords.
-    - Further updated to a Hybrid Fuzzy + Keyword Matching approach. This includes Tier 1 (fuzzy matching > 80% similarity), Tier 2 (fuzzy matching 50-80% + keyword confirmation), and Fallback (pure keyword matching). Uses Levenshtein distance for similarity.
-    - Incorporated Case-Aware Scoring to leverage uppercase patterns common in Vietnamese administrative titles for higher confidence.
-- : Frontend component. Modified to include a UI toggle for selecting the preferred OCR engine (Tesseract, VietOCR, EasyOCR) and display the selected engine in App Information.
-- : Updated to include , , ,  as dependencies.
-- , : Documentation for setting up VietOCR and EasyOCR.
-- , , , , : Various scripts for testing and debugging OCR and classification logic.
+- : The main Electron process script.
+    - **Changes:** Updated to use  and  to manage the backend URL dynamically. It was updated to default to the Railway URL  for the Cloud Boost feature.
+- : The packaged version of .
+    - **Changes:** Received identical updates to handle the backend URL configuration.
+- : Orchestrates local OCR and document processing.
+    - **Changes:**
+        - Fixed Unicode garbling by setting  and ensuring  uses  encoding on Windows.
+        - Introduced  function to robustly find document titles using flexible regex patterns, prioritizing central titles over page headers, and accounting for various OCR typos and Vietnamese diacritics. This function is used to populate .
+        - Expanded regex patterns for Vietnamese characters (E, O, U variations) and character sequences (e.g., ) within  to handle OCR inaccuracies more effectively.
+        - Reordered title patterns to prioritize  over  to resolve classification conflicts.
+- : Contains EasyOCR implementation.
+    - **Changes:** Increased  for title detection from 25% to 35%, and then to 40% to capture titles that might be lower on the page, like ĐƠN ĐĂNG KÝ BIẾN ĐỘNG.
+- : The core classification logic.
+    - **Changes:**
+        - Resolved .
+        - Implemented and then reverted a Low Quality Title Detection Rule ( short code), which aimed to use sequential naming for low uppercase/low confidence titles.
+        - Added templates for  (Hợp đồng ủy quyền).
+        - Introduced  to remove common administrative headers before classification.
+        - Modified  to set  if its uppercase ratio is below 70%, effectively ignoring non-uppercase titles for fuzzy matching. This prevents incorrect classifications like Giấy chứng nhận quyền sử dụng đất being mistaken for a true title on a continuation page.
+        - Added  for potential debug warnings.
+- : Frontend component handling document scanning.
+    - **Changes:** Logic for handling the Low Quality Title Detection Rule ( flag) was added to  and then removed, reverting to the original sequential naming logic.
+- : New documentation file detailing how to set up the backend on Railway and configure the desktop app.
+- , , , , , , , : New documentation files explaining various fixes, rules, and comparisons.
 </code_architecture>
 
 <pending_tasks>
-- Implement the full logic for the all-in-one installer using  to bundle Python and Tesseract into the application's executable (NSIS build is pending successful packaging of Electron app).
+- Implement the full logic for the all-in-one installer using .
 - Fine-tune remaining document types in .
-- Monitor OpenAI quota/plan or balance for Emergent LLM Key (if Cloud Boost is used).
-- Migrate or pin React/Webpack versions to address peer dependency warnings.
-- Test the backend with 5-10 real images to validate the integrated Hybrid OCR (specifically with the Tesseract-only change and Rules Manager).
+- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+- Migrate or pin React/Webpack versions.
+- Test the backend with 5-10 real images to validate Hybrid OCR.
 - Update icon for macOS (.icns).
 - Implement license/activation key feature.
-- Debug and fix  in .
+- Implement Parallel Local Processing for batch scanning.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was engaged in refining the document classification logic () based on user feedback. The user reported that an image expected to be classified as Hợp đồng chuyển nhượng (HDCQ) was incorrectly identified as Căn cước công dân (CCCD), and Giấy ủy quyền (GUQ) was also incorrectly identified as HDCQ.
+Immediately prior to this summary, the AI engineer was addressing a user-reported issue where HỢP ĐỒNG ỦY QUYỀN was incorrectly classified as HDCQ. This led to a detailed debugging process focusing on the  for title pattern extraction. The root causes identified were:
+1.  Missing Vietnamese character variations (e.g.,  for ,  for ) in the regex character classes within .
+2.  Complex character sequences like UỶ (composed of U and a separate diacritic Ỷ) were not correctly matched by simpler patterns.
 
-This led to several iterations:
-1.  **Debugging Unicode Issues**: It was discovered that OCR output for Vietnamese characters was garbled due to incorrect encoding in Python's JSON output (). This was fixed by setting  in  in , ensuring proper Unicode transmission to Electron.
-2.  **Addressing OCR Typos**: The OCR engine (EasyOCR) introduced typos (e.g., HỢP ĐỎNG instead of HỢP ĐỒNG). This required adding typo variants to HDCQ keywords in  to correctly match.
-3.  **Enhancing Classification Logic**: The  was significantly updated:
-    *   **Hybrid Fuzzy + Keyword Matching**: A multi-tiered approach was implemented where titles are first compared using fuzzy matching (Levenshtein similarity). If similarity is high (>=80%), it's an instant match. If medium (50-80%), it requires keyword confirmation. Otherwise, it falls back to pure keyword matching.
-    *   **Case-Aware Scoring**: New logic was introduced to prioritize uppercase text for title matching, aligning with Vietnamese administrative document conventions, where titles are typically capitalized. This involved modifying  and the scoring mechanism.
-The immediate problem is a  at line 1747 in , which arose after the last set of modifications for Case-Aware Scoring.
+The AI engineer implemented the following fixes in :
+-   Expanded regex character classes for  to include all their Vietnamese diacritical variants (, ).
+-   Refined the pattern for ỦY to  to handle various forms including , , , .
+-   Ensured the order of  prioritizes more specific document types like  over potentially broader ones like  to prevent early, incorrect matches.
+
+After these fixes, all specific test cases for HỢP ĐỒNG ỦY QUYỀN and its variations passed successfully. The current problem-solving trajectory, prompted by the user's frustration with constant pattern fixes for OCR typos, has shifted towards leveraging and improving the existing fuzzy matching capabilities in . The AI engineer has identified the relevant section in  to potentially adjust the fuzzy matching threshold, with the goal of making the classification system more resilient to OCR inaccuracies without requiring continuous regex updates.
 </current_work>
 
 <optional_next_step>
-Fix the  in .
+Reduce the fuzzy matching confidence threshold in  from 80% to 75% to improve flexibility with OCR typos.
 </optional_next_step>
-

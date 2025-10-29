@@ -189,6 +189,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
+  // DEPRECATED: Cloud Boost (Backend GPT-4 Vision)
+  // This function is kept for potential future use but not currently used
+  // Current architecture: All engines (including cloud BYOK) go through processOffline()
   const processCloudBoost = async (file) => {
     if (!backendUrl) {
       return { success: false, error: 'Chưa cấu hình Backend URL.', method: 'cloud_boost_failed', errorType: 'CONFIG' };

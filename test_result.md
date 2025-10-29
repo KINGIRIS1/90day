@@ -165,6 +165,62 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      ✅ BYOK (BRING YOUR OWN KEY) - CLOUD OCR INTEGRATION
+      
+      🎯 TÍNH NĂNG MỚI:
+      - User có thể thêm API key riêng cho Google Cloud Vision và Azure Computer Vision
+      - Tận dụng free tier của từng provider (Google: 1K/tháng, Azure: 5K/tháng)
+      - Quản lý chi phí tự do, không phụ thuộc backend
+      - Accuracy cao hơn offline OCR (90-96% vs 85-92%)
+      
+      📦 THAY ĐỔI:
+      1. Electron IPC Handlers (main.js):
+         - save-api-key: Lưu API key (encrypted via electron-store)
+         - get-api-key: Lấy API key
+         - delete-api-key: Xóa API key
+         - test-api-key: Test tính hợp lệ của API key (Google/Azure)
+      
+      2. Frontend UI (CloudSettings.js):
+         - Chọn OCR engine: Offline Tesseract, Offline EasyOCR, Google Cloud Vision, Azure Vision
+         - Input API key + endpoint (Azure)
+         - Test API key button với validation
+         - Hướng dẫn chi tiết cách lấy API key từ Google/Azure
+         - Delete key functionality
+      
+      3. App Routing (App.js):
+         - Thêm tab mới "☁️ Cloud OCR" vào navigation
+         - CloudSettings component được render khi tab active
+      
+      📂 FILES CREATED/MODIFIED:
+      - ✅ /app/desktop-app/src/components/CloudSettings.js (component mới)
+      - ✅ /app/desktop-app/electron/main.js (thêm IPC handlers)
+      - ✅ /app/desktop-app/electron/preload.js (expose API mới)
+      - ✅ /app/desktop-app/public/electron.js (sync with main.js)
+      - ✅ /app/desktop-app/public/preload.js (sync with preload.js)
+      - ✅ /app/desktop-app/src/App.js (routing cho Cloud OCR tab)
+      - ✅ /app/desktop-app/BYOK_FEATURE_GUIDE.md (tài liệu hướng dẫn)
+      
+      🧪 CHỨC NĂNG:
+      - ✅ API key storage với encryption (electron-store)
+      - ✅ Test API key cho Google Cloud Vision
+      - ✅ Test API key cho Azure Computer Vision
+      - ✅ UI guides cho việc lấy API keys
+      - ✅ Delete API key functionality
+      - ⏳ Integration với Python OCR engines (pending)
+      
+      📌 NEXT STEPS:
+      1. Cập nhật Python OCR engines để sử dụng stored API keys
+      2. Test end-to-end flow với real API keys
+      3. Add usage tracking/cost estimation
+      
+      📌 LƯU Ý:
+      - API keys được lưu trữ an toàn trên máy user (encrypted)
+      - Không gửi keys lên server
+      - User cần tự tạo account Google/Azure để lấy keys
+      - Free tiers: Google (1K/month), Azure (5K/month)
+  
+  - agent: "main"
+    message: |
       ✅ XÓA BNHS & GỘP VÀO GTLQ
       
       🎯 THỰC HIỆN THEO YÊU CẦU USER:

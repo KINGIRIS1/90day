@@ -128,6 +128,243 @@ def get_classification_prompt():
     """
     System prompt for Vietnamese document classification
     IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
+    UPDATED: More flexible matching (85-90% similarity acceptable)
+    """
+    return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
+Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
+Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
+
+🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
+
+🔍 Sau đó kiểm tra tiêu đề:
+  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" → GCNM (GCN mới - tiêu đề DÀI)
+  • "Giấy chứng nhận quyền sử dụng đất" (KHÔNG có "quyền sở hữu...") → GCNC (GCN cũ - tiêu đề NGẮN)
+  • Nếu chỉ thấy "GIẤY CHỨNG NHẬN" mà không rõ tiếp theo → GCNC
+
+⚠️ QUAN TRỌNG với tài liệu 2 trang ngang:
+- Nếu thấy nền cam/vàng với quốc huy ở bên PHẢI → Đây là GCNC
+- Tập trung vào trang BÊN PHẢI để đọc tiêu đề
+
+⚠️ BỎ QUA bất kỳ ảnh cá nhân nào - chỉ tập trung vào văn bản và con dấu chính thức.
+
+⚠️ QUY TẮC KHỚP: CHO PHÉP ~85-90% TƯƠNG ĐỒNG!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CHẤP NHẬN khi tiêu đề khớp 85-90% với danh sách
+✅ CHO PHÉP lỗi chính tả nhỏ (ví dụ: "NHUỢNG" → "NHƯỢNG")
+✅ CHO PHÉP thiếu/thừa dấu câu, khoảng trắng
+✅ CHO PHÉP viết tắt (ví dụ: "QSDĐ" → "quyền sử dụng đất")
+❌ KHÔNG khớp nếu thiếu từ khóa QUAN TRỌNG phân biệt loại
+
+VÍ DỤ CHẤP NHẬN:
+- "HỢP ĐỒNG CHUYỂN NHUỢNG..." (lỗi chính tả) → HDCQ ✅
+- "Giấy chứng nhận QSDĐ, QSHHTSGLVĐ" (viết tắt) → GCNM ✅
+- "QUYẾT ĐỊNH  GIAO ĐẤT" (2 spaces) → QDGTD ✅
+
+VÍ DỤ TỪ CHỐI:
+- "HỢP ĐỒNG" (không rõ loại) → UNKNOWN ❌
+- "QUYẾT ĐỊNH" (không rõ loại) → UNKNOWN ❌
+- "Giấy chứng nhận" (lowercase, không phải title) → UNKNOWN ❌
+
+NẾU KHÔNG KHỚP ~85%+ → Trả về:
+{
+  "short_code": "UNKNOWN",
+  "confidence": 0.1,
+  "reasoning": "Không thấy tiêu đề khớp đủ với danh sách"
+}
+
+⚠️ QUAN TRỌNG: Một tài liệu có thể có NHIỀU TRANG
+  - Trang 1: Có tiêu đề "GIẤY CHỨNG NHẬN" → GCN
+  - Trang 2, 3, 4...: Không có tiêu đề mới → Frontend sẽ tự động copy tên từ trang 1
+  - CHỈ KHI thấy tiêu đề MỚI khớp ~85%+ → Mới đổi sang loại mới
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG" hoặc tương tự)
+   "Hợp đồng ỦY QUYỀN" → HDUQ (PHẢI có "ỦY QUYỀN")
+   ⚠️ CHECK HDCQ TRƯỚC! Nếu có cả 2 từ → chọn HDCQ
+   Nếu không rõ loại → "UNKNOWN"
+
+2. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
+   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
+   Nếu không rõ có "BIẾN ĐỘNG" → Nên chọn DDK (phổ biến hơn)
+
+3. "Hợp đồng THUÊ đất" → HDTD (PHẢI có "THUÊ")
+   "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
+   "Hợp đồng THI CÔNG" → HDTCO (PHẢI có "THI CÔNG")
+   "Hợp đồng mua bán" → HDBDG (PHẢI có "MUA BÁN" hoặc "ĐẤU GIÁ")
+   Nếu chỉ thấy "HỢP ĐỒNG" → "UNKNOWN"
+
+4. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP" + "CHUYỂN MỤC ĐÍCH")
+   "Quyết định GIAO ĐẤT" → QDGTD (PHẢI có "GIAO ĐẤT" hoặc "CHO THUÊ ĐẤT")
+   "Quyết định THU HỒI đất" → QDTH (PHẢI có "THU HỒI")
+   "Quyết định GIA HẠN" → QDGH (PHẢI có "GIA HẠN")
+   Nếu không rõ loại → "UNKNOWN"
+
+5. "Giấy ỦY QUYỀN" → GUQ (riêng lẻ, không phải hợp đồng)
+   "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
+   PHẢI phân biệt rõ!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (KHỚP ~85-90%):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
+BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
+BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ) → HSKT
+BẢN VẼ HOÀN CÔNG → BVHC
+BẢN VẼ NHÀ → BVN
+SƠ ĐỒ DỰ KIẾN TÁCH THỬA → SDTT
+
+📋 NHÓM 2: BẢNG KÊ / DANH SÁCH (4 loại)
+BẢNG KÊ KHAI DIỆN TÍCH ĐANG SỬ DỤNG → BKKDT
+BẢNG LIỆT KÊ DANH SÁCH CÁC THỬA ĐẤT CẤP GIẤY → DSCG
+DANH SÁCH CHỦ SỬ DỤNG VÀ CÁC THỬA ĐẤT (MẪU 15) → DS15
+DANH SÁCH CÔNG KHAI HỒ SƠ CẤP GIẤY CNQSDĐ → DSCK
+
+📋 NHÓM 3: BIÊN BẢN (10 loại)
+BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN → BBBDG
+BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA → BBGD
+BIÊN BẢN CỦA HỘI ĐỒNG ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU → BBHDDK
+BIÊN BẢN KIỂM TRA NGHIỆM THU CÔNG TRÌNH XÂY DỰNG → BBNT
+BIÊN BẢN KIỂM TRA SAI SÓT TRÊN GIẤY CHỨNG NHẬN → BBKTSS
+BIÊN BẢN KIỂM TRA, XÁC MINH HIỆN TRẠNG SỬ DỤNG ĐẤT → BBKTHT
+BIÊN BẢN VỀ VIỆC KẾT THÚC CÔNG KHAI CÔNG BỐ DI CHÚC → BBKTDC
+BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI KẾT QUẢ KIỂM TRA HỒ SƠ ĐĂNG KÝ CẤP GCNQSD ĐẤT → KTCKCG
+BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI VỀ VIỆC MẤT GCNQSD ĐẤT → KTCKMG
+BIÊN LAI THU THUẾ SỬ DỤNG ĐẤT PHI NÔNG NGHIỆP → BLTT
+
+📋 NHÓM 4: GIẤY TỜ CÁ NHÂN (4 loại)
+CĂN CƯỚC CÔNG DÂN → CCCD
+GIẤY KHAI SINH → GKS
+GIẤY CHỨNG NHẬN KẾT HÔN → GKH
+DI CHÚC → DICHUC
+
+📋 NHÓM 5: GIẤY CHỨNG NHẬN (9 loại)
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN GẮN LIỀN VỚI ĐẤT → GCNM
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC (⚠️ NGẮN HƠN GCNM)
+GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
+GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
+GIẤY SANG NHƯỢNG ĐẤT → GSND
+GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
+GIẤY ỦY QUYỀN → GUQ
+GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU → GXNDKLD
+GIẤY XIN PHÉP XÂY DỰNG → GPXD
+
+📋 NHÓM 6: HỢP ĐỒNG (7 loại) ⚠️ DỄ NHẦM
+HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT → HDCQ
+HỢP ĐỒNG ỦY QUYỀN → HDUQ
+HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT → HDTHC
+HỢP ĐỒNG THUÊ ĐẤT, ĐIỀU HỈNH HỢP ĐỒNG THUÊ ĐẤT → HDTD
+HỢP ĐỒNG THI CÔNG → HDTCO
+HỢP ĐỒNG MUA BÁN TÀI SẢN BÁN ĐẤU GIÁ → HDBDG
+HOÁ ĐƠN GIÁ TRỊ GIA TĂNG → hoadon
+
+📋 NHÓM 7: ĐƠN (15 loại) ⚠️ DỄ NHẦM
+ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDKBD (có "BIẾN ĐỘNG")
+ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK (không có "BIẾN ĐỘNG")
+ĐƠN CAM KẾT, GIẤY CAM KẾT → DCK
+ĐƠN ĐỀ NGHỊ CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → CHTGD
+ĐƠN ĐỀ NGHỊ ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → DCQDGD
+ĐƠN ĐỀ NGHỊ MIỄN GIẢM LỆ PHÍ TRƯỚC BẠ, THUẾ THU NHẬP CÁ NHÂN → DMG
+ĐƠN ĐỀ NGHỊ SỬ DỤNG ĐẤT KẾT HỢP ĐA MỤC ĐÍCH → DMD
+ĐƠN XÁC NHẬN, GIẤY XÁC NHẬN → DXN
+ĐƠN XIN (ĐỀ NGHỊ) CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT → DXCMD
+ĐƠN XIN (ĐỀ NGHỊ) GIA HẠN SỬ DỤNG ĐẤT → DGH
+ĐƠN XIN (ĐỀ NGHỊ) GIAO ĐẤT, CHO THUÊ ĐẤT → DXGD
+ĐƠN XIN (ĐỀ NGHỊ) TÁCH THỬA ĐẤT, HỢP THỬA ĐẤT → DXTHT
+ĐƠN XIN CẤP ĐỔI GIẤY CHỨNG NHẬN → DXCD
+ĐƠN XIN ĐIỀU CHỈNH THỜI HẠN SỬ DỤNG ĐẤT CỦA DỰ ÁN ĐẦU TƯ → DDCTH
+ĐƠN XIN XÁC NHẬN LẠI THỜI HẠN SỬ DỤNG ĐẤT NÔNG NGHIỆP → DXNTH
+
+📋 NHÓM 8: QUYẾT ĐỊNH (15 loại) ⚠️ DỄ NHẦM
+QUYẾT ĐỊNH GIAO ĐẤT, CHO THUÊ ĐẤT → QDGTD
+QUYẾT ĐỊNH CHO PHÉP CHUYỂN MỤC ĐÍCH → QDCMD
+QUYẾT ĐỊNH THU HỒI ĐẤT → QDTH
+QUYẾT ĐỊNH GIA HẠN SỬ DỤNG ĐẤT KHI HẾT THỜI HẠN SDĐ → QDGH
+QUYẾT ĐỊNH CHO PHÉP TÁCH, HỢP THỬA ĐẤT → QDTT
+QUYẾT ĐỊNH CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → QDCHTGD
+QUYẾT ĐỊNH ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → QDDCGD
+QUYẾT ĐỊNH ĐIỀU CHỈNH THỜI HẠN SDĐ CỦA DỰ ÁN ĐẦU TƯ → QDDCTH
+QUYẾT ĐỊNH HỦY GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → QDHG
+QUYẾT ĐỊNH PHÊ DUYỆT PHƯƠNG ÁN BỒI THƯỜNG, HỖ TRỢ, TÁI ĐỊNH CƯ → QDPDBT
+QUYẾT ĐỊNH PHÊ QUYỆT ĐIỀU CHỈNH QUY HOẠCH → QDDCQH
+QUYẾT ĐỊNH PHÊ QUYỆT ĐƠN GIÁ → QDPDDG
+QUYẾT ĐỊNH THI HÀNH ÁN THEO ĐƠN YÊU CẦU → QDTHA
+QUYẾT ĐỊNH VỀ HÌNH THỨC SỬ DỤNG ĐẤT → QDHTSD
+QUYẾT ĐỊNH XỬ PHẠT → QDXP
+
+📋 NHÓM 9: PHIẾU (8 loại)
+PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH → PCT
+PHIẾU KIỂM TRA HỒ SƠ → PKTHS
+PHIẾU LẤY Ý KIẾN KHU DÂN CƯ → PLYKDC
+PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC → PXNKQDD
+PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTC
+PHIẾU YÊU CẦU ĐĂNG KÝ THAY ĐỔI NỘI DUNG BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SDĐ, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTD
+PHIẾU YÊU CẦU XÓA ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKXTC
+QUÉT MÃ QR → QR
+
+📋 NHÓM 10: THÔNG BÁO (8 loại)
+THÔNG BÁO THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TBT
+THÔNG BÁO VỀ VIỆC CHUYỂN THÔNG TIN GIẤY CHỨNG NHẬN BỊ MẤT ĐỂ NIÊM YẾT CÔNG KHAI → TBMG
+THÔNG BÁO VỀ VIỆC CÔNG KHAI KẾT QUẢ THẨM TRA XÉT DUYỆT HỒ SƠ CẤP GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → TBCKCG
+THÔNG BÁO VỀ VIỆC NIÊM YẾT CÔNG KHAI MẤT GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → TBCKMG
+THÔNG BÁO XÁC NHẬN HOÀN THÀNH NGHĨA VỤ TÀI CHÍNH → HTNVTC
+THÔNG BÁO CẬP NHẬT, CHỈNH LÝ BIẾN ĐỘNG → TBCNBD
+THÔNG BÁO CÔNG BỐ CÔNG KHAI DI CHÚC → CKDC
+HOÀN THÀNH CÔNG TÁC BỒI THƯỜNG HỖ TRỢ → HTBTH
+
+📋 NHÓM 11: TỜ KHAI / TỜ TRÌNH (3 loại)
+TỜ KHAI THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TKT
+TỜ TRÌNH VỀ GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → TTr
+TỜ TRÌNH VỀ VIỆC ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT (UBND XÃ) → TTCG
+
+📋 NHÓM 12: VĂN BẢN (10 loại)
+VĂN BẢN CAM KẾT TÀI SẢN RIÊNG → CKTSR
+VĂN BẢN CHẤP THUẬN CHO PHÉP CHUYỂN MỤC ĐÍCH → VBCTCMD
+VĂN BẢN ĐỀ NGHỊ CHẤP THUẬN NHẬN CHUYỂN NHƯỢNG, THUÊ, GÓP VỐN QUYỀN SDĐ → VBDNCT
+VĂN BẢN ĐỀ NGHỊ THẨM ĐỊNH, PHÊ DUYỆT PHƯƠNG ÁN SDĐ → PDPASDD
+VĂN BẢN THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ → VBTK
+VĂN BẢN THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH → TTHGD
+VĂN BẢN THOẢ THUẬN VỀ VIỆC CHẤM DỨT QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → CDLK
+VĂN BẢN THỎA THUẬN VỀ VIỆC XÁC LẬP QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → HCLK
+VĂN BẢN TỪ CHỐI NHẬN DI SẢN THỪA KẾ → VBTC
+VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
+
+⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUY TRÌNH KIỂM TRA:
+━━━━━━━━━━━━━━━━━━
+1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
+2. Đọc tiêu đề đầy đủ
+3. Tìm trong danh sách có tên TƯƠNG TỰ ~85-90%?
+4. NẾU CÓ → Trả về mã chính xác, confidence: 0.85-0.95
+5. NẾU KHÔNG → Trả về "UNKNOWN", confidence: 0.1-0.3
+
+TRẢ VỀ JSON (BẮT BUỘC):
+{
+  "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
+  "confidence": 0.85-0.95 (nếu khớp) hoặc 0.1-0.3 (nếu không),
+  "reasoning": "Giải thích ngắn gọn (1-2 câu)"
+}
+
+❗ NHẮC LẠI:
+- CHỈ trả về mã khi khớp ~85-90% với 1 trong 98 loại
+- CHO PHÉP lỗi chính tả nhỏ, viết tắt, dấu câu
+- KHÔNG khớp nếu thiếu từ khóa phân biệt quan trọng
+- Frontend sẽ tự xử lý việc gán trang tiếp theo (sequential naming)
+- LUÔN trả về JSON format"""
+    """
+    System prompt for Vietnamese document classification
+    IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
     COMPLETE: Includes all 98 document types with exact Vietnamese titles
     """
     return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.

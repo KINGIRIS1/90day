@@ -2014,6 +2014,34 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
     active_rules = get_active_rules()
     
     # ==================================================================
+    # TIER 0: EXACT TITLE MATCHING (100% confidence)
+    # ==================================================================
+    if title_text:
+        # Normalize and clean title for exact matching
+        cleaned_title = clean_title_text(title_text)
+        title_upper = cleaned_title.upper().strip()
+        
+        # Check exact match in EXACT_TITLE_MAPPING
+        if title_upper in EXACT_TITLE_MAPPING:
+            matched_code = EXACT_TITLE_MAPPING[title_upper]
+            doc_name = classify_document_name_from_code(matched_code)
+            
+            print(f"🎯 TIER 0: EXACT title match '{title_upper[:60]}...' → {matched_code}", file=sys.stderr)
+            
+            return {
+                "type": matched_code,
+                "doc_type": doc_name,
+                "short_code": matched_code,
+                "confidence": 1.0,  # 100% confidence
+                "matched_keywords": [f"Exact title match: {title_upper[:50]}..."],
+                "title_boost": True,
+                "reasoning": f"Exact title match (100%)",
+                "method": "exact_title_match",
+                "accuracy_estimate": "100%",
+                "recommend_cloud_boost": False
+            }
+    
+    # ==================================================================
     # PRE-CHECK: Vietnamese admin titles MUST be uppercase (70%+)
     # ==================================================================
     # Clean title first to remove government headers, then check uppercase

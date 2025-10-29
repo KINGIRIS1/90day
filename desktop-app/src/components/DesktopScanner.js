@@ -308,10 +308,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
       const processedResult = applySequentialNaming(result, currentLastKnown);
       // Update lastKnown if this is a valid, confident result (not sequential)
-      // Raised threshold to 0.6 to only track reliable classifications
+      // Raised threshold to 0.8 to only track reliable classifications
       if (processedResult.success && 
           processedResult.short_code !== 'UNKNOWN' && 
-          processedResult.confidence >= 0.6 &&
+          processedResult.confidence >= 0.8 &&
           !processedResult.applied_sequential_logic) {
         currentLastKnown = {
           doc_type: processedResult.doc_type,

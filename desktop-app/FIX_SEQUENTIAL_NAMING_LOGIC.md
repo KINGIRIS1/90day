@@ -1,18 +1,45 @@
-# FIX: Sequential Naming Logic - Refined Approach
+# FIX: Sequential Naming Logic + Pattern Order - Complete Fix
 
 **Ngày**: 2025-01-XX  
-**Vấn đề**: Documents với title rõ ràng bị misclassified bởi sequential naming logic
+**Vấn đề**: 
+1. Documents với title rõ ràng bị misclassified bởi sequential naming logic
+2. Pattern matching order sai → "HỢP ĐỒNG CHUYỂN NHƯỢNG" bị nhận nhầm thành "HỢP ĐỒNG ỦY QUYỀN"
 
 ---
 
 ## 🐛 Vấn đề gốc
 
-### Triệu chứng:
-- Google Cloud Vision extract chính xác: "ĐƠN XIN CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT"
-- Nhưng bị rename thành: "ĐKBĐ" (document type trước đó)
-- Xảy ra khi: confidence < 80% HOẶC uppercase ratio < 50%
+### Issue 1: Sequential Naming Over-Applied
+(Đã fix trong phần trước - xem details trong file)
 
-### Nguyên nhân:
+### Issue 2: Pattern Matching Order SAI
+
+**Triệu chứng**:
+```
+Input: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+Google Cloud Vision: ✅ Extract chính xác
+Pattern extraction: ❌ "Hợp đồng ủy..." (HDUQ thay vì HDCQ)
+Result: ❌ Uppercase ratio 11% < 30% → Title rejected → Classify sai thành DKTC
+```
+
+**Nguyên nhân**:
+```python
+# TRƯỚC (SAI):
+title_patterns = [
+    # ...
+    r'(HỢP ĐỒNG ỦY QUYỀN)',  # Pattern này được check TRƯỚC
+    r'(HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT)',  # Pattern này sau
+]
+
+# VẤN ĐỀ:
+# Text: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+# → Pattern HDUQ match với "HỢP ĐỒNG ... QUYỀN" (regex quá flexible)
+# → Return "Hợp đồng ủy..." thay vì "HỢP ĐỒNG CHUYỂN NHƯỢNG..."
+```
+
+---
+
+## ✅ Giải pháp Complete
 
 1. **Uppercase Ratio Check quá strict** (rule_classifier.py):
    ```python

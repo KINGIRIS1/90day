@@ -133,7 +133,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
     Returns classification result with confidence
     """
     try:
-        # Handle Gemini Flash (AI classification)
+        # Handle Gemini Flash (AI classification) - SMART HYBRID APPROACH
         if ocr_engine_type == 'gemini-flash':
             if not cloud_api_key:
                 return {
@@ -142,22 +142,108 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     "method": "config_error"
                 }
             
-            print("🤖 Using Gemini Flash 2.0 AI", file=sys.stderr)
+            print("🤖 Using Gemini Flash AI with SMART HYBRID approach", file=sys.stderr)
             
-            # Import and run Gemini Flash classification
+            # Import classification function
             from ocr_engine_gemini_flash import classify_document_gemini_flash
-            result = classify_document_gemini_flash(file_path, cloud_api_key)
+            from rule_classifier import classify_document_name_from_code
+            import time
             
-            if result.get("short_code") == "ERROR":
+            # Helper function to check if type is ambiguous
+            def is_ambiguous_type(short_code):
+                """Types that often need full context for accurate classification"""
+                ambiguous_types = [
+                    'UNKNOWN',      # Uncertain classification
+                    'HDCQ', 'HDUQ', # Contract confusion (chuyển nhượng vs ủy quyền)
+                    'HDTHC', 'HDTD', 'HDTCO', 'HDBDG',  # Other contracts
+                    'DDKBD', 'DDK', # Application confusion (có/không biến động)
+                    'GUQ',          # vs HDUQ
+                    'QDGTD', 'QDCMD', 'QDTH', 'QDGH',  # Decision types
+                ]
+                return short_code in ambiguous_types
+            
+            # STEP 1: Try with 35% crop (fast & cheap)
+            print("📸 STEP 1: Quick scan with 35% crop (title area)...", file=sys.stderr)
+            start_time = time.time()
+            
+            result_crop = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=0.35)
+            
+            crop_time = time.time() - start_time
+            print(f"⏱️ Crop result: {result_crop.get('short_code')} (confidence: {result_crop.get('confidence'):.2f}, time: {crop_time:.1f}s)", file=sys.stderr)
+            
+            # Check for errors
+            if result_crop.get("short_code") == "ERROR":
                 return {
                     "success": False,
-                    "error": result.get("reasoning", "Gemini Flash error"),
+                    "error": result_crop.get("reasoning", "Gemini Flash error"),
                     "method": "gemini_flash_failed"
                 }
             
-            # Map Gemini result to rule_classifier format
-            from rule_classifier import classify_document_name_from_code
+            # STEP 2: Decide if we need full image retry
+            short_code_crop = result_crop.get("short_code", "UNKNOWN")
+            confidence_crop = result_crop.get("confidence", 0.0)
             
+            # Confidence threshold for retry (default 0.8)
+            CONFIDENCE_THRESHOLD = 0.8
+            
+            need_full_retry = (
+                confidence_crop < CONFIDENCE_THRESHOLD or 
+                is_ambiguous_type(short_code_crop)
+            )
+            
+            if need_full_retry:
+                print(f"⚠️ STEP 2: Low confidence ({confidence_crop:.2f}) or ambiguous type ({short_code_crop})", file=sys.stderr)
+                print("🔄 Retrying with FULL IMAGE (100%) for better accuracy...", file=sys.stderr)
+                
+                start_time = time.time()
+                result_full = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
+                full_time = time.time() - start_time
+                
+                print(f"⏱️ Full result: {result_full.get('short_code')} (confidence: {result_full.get('confidence'):.2f}, time: {full_time:.1f}s)", file=sys.stderr)
+                
+                # Check for errors
+                if result_full.get("short_code") == "ERROR":
+                    print("⚠️ Full image retry failed, using crop result", file=sys.stderr)
+                    result = result_crop
+                    method_used = "gemini_crop_only"
+                else:
+                    # Compare results and use the better one
+                    confidence_full = result_full.get("confidence", 0.0)
+                    
+                    if confidence_full > confidence_crop:
+                        print(f"✅ Full image better: {result_full.get('short_code')} ({confidence_full:.2f} > {confidence_crop:.2f})", file=sys.stderr)
+                        result = result_full
+                        method_used = "gemini_hybrid_full"
+                    else:
+                        print(f"✅ Crop was sufficient: {short_code_crop} ({confidence_crop:.2f} >= {confidence_full:.2f})", file=sys.stderr)
+                        result = result_crop
+                        method_used = "gemini_hybrid_crop"
+                
+                # Add statistics
+                result['hybrid_stats'] = {
+                    'crop_result': short_code_crop,
+                    'crop_confidence': confidence_crop,
+                    'full_result': result_full.get('short_code', 'N/A') if result_full.get("short_code") != "ERROR" else "ERROR",
+                    'full_confidence': result_full.get('confidence', 0.0) if result_full.get("short_code") != "ERROR" else 0.0,
+                    'crop_time': f"{crop_time:.1f}s",
+                    'full_time': f"{full_time:.1f}s" if result_full.get("short_code") != "ERROR" else "N/A",
+                    'total_time': f"{crop_time + full_time:.1f}s" if result_full.get("short_code") != "ERROR" else f"{crop_time:.1f}s",
+                    'used_full': result_full.get("short_code") != "ERROR"
+                }
+            else:
+                print(f"✅ High confidence ({confidence_crop:.2f}), using crop result only", file=sys.stderr)
+                result = result_crop
+                method_used = "gemini_crop_only"
+                
+                # Add statistics
+                result['hybrid_stats'] = {
+                    'crop_result': short_code_crop,
+                    'crop_confidence': confidence_crop,
+                    'crop_time': f"{crop_time:.1f}s",
+                    'used_full': False
+                }
+            
+            # Map Gemini result to rule_classifier format
             short_code = result.get("short_code", "UNKNOWN")
             doc_name = classify_document_name_from_code(short_code)
             
@@ -171,10 +257,11 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 "title_boost_applied": True if short_code != "UNKNOWN" else False,
                 "title_extracted_via_pattern": True if short_code != "UNKNOWN" else False,
                 "reasoning": result.get("reasoning", ""),
-                "method": "gemini_flash_ai",
+                "method": method_used,
                 "accuracy_estimate": f"{int(result.get('confidence', 0.5) * 100)}%",
                 "recommend_cloud_boost": False,
-                "avg_font_height": 0
+                "avg_font_height": 0,
+                "hybrid_stats": result.get('hybrid_stats', {})
             }
         
         # Handle Cloud OCR engines

@@ -1,48 +1,42 @@
 <analysis>
-The AI engineer's work primarily focused on enhancing the Vietnamese OCR document classification application. Initially, the engineer improved Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) classification by adjusting fuzzy matching and adding regex patterns. Following this, significant effort was dedicated to troubleshooting environment and build issues reported by the user, specifically  errors for Python execution during local development and with packaged Electron apps.
+The AI engineer's work spanned a wide range of enhancements and fixes for the Vietnamese OCR document classification application. Initially, the focus was on refining existing classification logic for Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ), followed by extensive environment troubleshooting. A significant portion involved adapting Cloud logic for offline OCR, improving accuracy with smart cropping, and optimizing EasyOCR. Concurrently, numerous UI/UX improvements were implemented, including scanning animations, a flexible PDF merge modal, and responsive design fixes.
 
-A major phase involved applying Cloud logic (derived from GPT-4 Vision's approach) to the offline OCR system. This included implementing smart crop logic, optimizing EasyOCR for speed (increasing timeout, resizing images), adding more detailed regex patterns, and refining confidence scoring. The engineer then addressed numerous UI/UX requests: streamlining the interface, adding scanning animations, implementing a customizable PDF merge modal for single files and subfolders, and fixing responsive display issues for folder scan tabs.
-
-Persistent issues with local Python/Node.js environment setup ( not found,  errors due to wrong directory, PowerShell execution policy) during testing and building the installer consumed considerable interaction. The engineer also fixed stop/resume functionality for both file and folder scanning, re-designed UI elements for a professional look, and consolidated the application into two distinct File Scan and Folder Scan tabs. Most recently, a discrepancy in short codes for Giấy tiếp nhận hồ sơ và hẹn trả kết quả (BN in cloud, GTLQ offline) was identified and fixed, with plans to sync Biên nhận hồ sơ short code between cloud and offline rules. The process involved continuous iteration, detailed debugging, and adapting to user feedback on functionality and environmental challenges.
+Recent efforts focused on crucial rule management, such shifting Biên nhận hồ sơ (BNHS) into GTLQ, implementing dynamic rules reloading without app restart, and robust sequential naming for UNKNOWN files in both file and folder scans. The engineer also addressed user inquiries regarding cloud backend operations, cost analysis of various OCR services, and initiated the development of a Bring Your Own Key (BYOK) feature to allow users to integrate their own Cloud OCR API keys. Throughout, there was a strong emphasis on detailed user guidance for installation and packaging, reflecting an iterative and user-centric development approach.
 </analysis>
 
 <product_requirements>
-The application is a desktop document scanner for Vietnamese land-related images, performing OCR and renaming using short codes. It supports single/batch scanning, history, and PDF export. Users require default Offline OCR (Tesseract) with an optional Cloud Boost (GPT-4 Vision). A Rules Manager for UI-driven classification and auto-generating keyword variants is essential. Key requirements include an easy-to-use all-in-one installer, improved accuracy of , resolution of port conflicts, and enhanced OCR with user selection among Tesseract, VietOCR, and EasyOCR. Accurate document classification (e.g., Hợp đồng chuyển nhượng vs. Căn cước công dân or Giấy ủy quyền) is critical, especially with OCR typos, which is addressed by fuzzy matching, case-aware scoring, and structured keyword prioritization. Robust handling of sequential documents, even with absent or low-quality titles, is also required. Recent work focused on improving Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ) classification, optimizing offline OCR logic to mimic cloud accuracy, enhancing UI/UX, and streamlining the build process.
+The application is a desktop OCR scanner for Vietnamese land-related documents, designed to classify and rename images using short codes. It features single/batch scanning, history, and PDF export. Key requirements include accurate document classification (e.g., distinguishing Hợp đồng chuyển nhượng from Căn cước công dân even with OCR errors), supported by fuzzy matching, case-aware scoring, and structured keyword prioritization. The application must handle sequential documents, assigning previous titles to low-confidence or untitled scans. Users require an easy-to-use installer, enhanced OCR options (Tesseract, VietOCR, EasyOCR, and optional Cloud Boost via GPT-4 Vision), and a Rules Manager for UI-driven classification and auto-generating keyword variants. Recent work focused on refining GTLQ classification, making offline OCR accuracy comparable to cloud, improving UI/UX (fixed-width tabs, rounded corners, stop/resume functions, individual merge button, logo fix), and streamlining the installer build process and user guides. Future needs include BYOK for Cloud OCR and detailed cost analysis.
 </product_requirements>
 
 <key_technical_concepts>
-
--   **Electron**: Desktop application framework, main.js, public/electron.js.
--   **React**: Frontend UI development (DesktopScanner.js).
--   **Python**: Backend for OCR and rule classification (process_document.py, rule_classifier.py).
--   **Tesseract, VietOCR, EasyOCR**: OCR engines.
--   **NSIS**: Windows installer creation.
--   **Fuzzy Matching**: Levenshtein distance for text similarity.
--   **Regex**: Pattern matching for text extraction.
+-   **Electron**: Framework for desktop applications, managing main process and IPC.
+-   **React**: Frontend library for building the user interface.
+-   **Python**: Backend for local OCR processing and rule-based classification.
+-   **Tesseract, VietOCR, EasyOCR**: OCR engines for text recognition.
 -   **GPT-4 Vision**: Cloud OCR (Cloud Boost) for high-accuracy recognition.
-
+-   **Fuzzy Matching & Regex**: Techniques for robust document classification.
+-   **NSIS**: Tool for creating Windows installers.
+-   **electron-store**: Library for persistent, secure storage of user settings (like API keys).
 </key_technical_concepts>
 
 <code_architecture>
 
-
--   ****: Handles API endpoints, Cloud Boost (GPT-4 Vision) integration.
-    -   **Changes**: Updated short code for Giấy tiếp nhận hồ sơ và hẹn trả kết quả from BN to GTLQ.
--   ****: Main Electron process, handles IPC.
-    -   **Changes**: OCR processing timeout increased from 30s to 60s. Updated  IPC handler to process merge options (mode, suffix, parent folder) for PDF merging, delegating file system operations from frontend.
+-   ****: Main backend for API, Cloud Boost, and MongoDB.
+    -   **Changes**: Removed BNHS short code and its definition.
+-   ****: Electron's main process, handles IPC communications and file system operations.
+    -   **Changes**: Merged PDF logic in  was fixed to correctly handle root and new merge modes as per user's specific folder requirements. Also implements  for saving/retrieving API keys.
 -   ****: Packaged version of .
-    -   **Changes**: Mirrored updates from  for OCR timeout and  handler.
--   ****: Orchestrates local OCR and document processing.
-    -   **Changes**: Fixed Unicode garbling. Flexible regex for Vietnamese diacritics. Reordered  over  patterns. Added  specific patterns.
--   ****: EasyOCR implementation.
-    -   **Changes**: Implemented Smart Crop logic:  set dynamically (50% for single-page portrait, 65% for 2-page spread) based on image aspect ratio.
--   ****: Core classification logic.
-    -   **Changes**: Lowered fuzzy matching confidence threshold from 80% to 75% for Tier-1 matches. Added specific rules, keywords, and title templates for . Preparing to add Biên nhận hồ sơ (BNHS) definition.
--   ****: Frontend scanning component.
-    -   **Changes**: UI/UX improvements (reduced padding, removed Cloud/Offline buttons, added animations/loading indicators, redesigned with rounded corners). Folder scan display enhancements (zoom, method badges, confidence scores, density dropdown, fixed-width tab names). Naming logic modified for UNKNOWN/no-title files. Customizable PDF merge modal. Full pause/resume functionality for file and folder scanning. Refactored UI into File Scan and Folder Scan tabs. Removed Node.js / imports.
+    -   **Changes**: Mirrored PDF merge logic fixes from .
+-   ****: Core logic for document classification.
+    -   **Changes**: Incorporated Biên nhận hồ sơ keywords and title templates into  (Giấy tiếp nhận hồ sơ và hẹn trả kết quả) and removed the separate  entry. Modified to support dynamic loading of rules via  and  for immediate effect of UI changes. Adjusted  for better GTLQ detection.
+-   ****: Frontend component for scanning, displaying results, and handling UI interactions.
+    -   **Changes**: Refined  logic for UNKNOWN files in both File and Folder scans. The conditions for sequential naming were tightened () and the logic for updating  was made stricter ().
+-   ****: UI component for managing classification rules.
+    -   **Changes**: Added UI notifications to inform users that rule changes take effect immediately without needing to restart the application.
+-   ** (NEW)**: A new React component created to handle settings for various Cloud OCR providers, allowing users to input their own API keys.
 -   ****: Project dependencies and build scripts.
-    -   **Changes**: Updated version to .
--   **New Files Created**: , , , , , , , , , , , , , , .
+    -   **Changes**:  (version ) is implicitly acknowledged for BYOK feature.
+
 </code_architecture>
 
 <pending_tasks>
@@ -54,22 +48,16 @@ The application is a desktop document scanner for Vietnamese land-related images
 -   Update icon for macOS (.icns).
 -   Implement license/activation key feature.
 -   Implement Parallel Local Processing for batch scanning.
--   Add Biên nhận hồ sơ (BNHS) to offline  for sync with cloud.
+-   Finalize BYOK feature integration in  and backend-side API key usage.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary request, the AI engineer was addressing multiple user requests to enhance the application's UI, naming conventions, and core functionalities. The user specifically asked to:
-1.  Adjust child folder tab names to be fixed width.
-2.  Redesign the UI with rounded corners for an office style.
-3.  Fix the naming rule for files without detected titles (currently UNKNOWN) to use the short code of the previously titled file.
-4.  Ensure the stop scan button for both file and folder scanning functioned correctly.
-5.  Implement a merge button for individual child tabs, similar to the merge all folders functionality.
-6.  Investigate and fix a logo not displaying in the app.
-7.  Check and remove/change a BN (Biên Nhận) short code definition in the rules.
+Immediately before this summary request, the AI engineer was implementing the Bring Your Own Key (BYOK) feature for Cloud OCR providers. This initiative allows users to utilize their own API keys for services like Google Cloud Vision and Azure Vision, enabling them to benefit from individual free tiers and manage their own costs.
 
-The engineer implemented fixed-width tabs and a rounded-corner UI redesign across . The stop/resume logic for both file and folder scanning was refined with robust  checks after  calls in  and . The individual merge button for child tabs was updated to trigger the existing merge modal, allowing destination and suffix customization. The logo display issue was investigated, concluding the build configuration was correct, and no code changes were made. A BN short code in  was found (for Giấy tiếp nhận hồ sơ và hẹn trả kết quả) and changed to GTLQ. The offline  was confirmed to already have  and no . The current task is to add Biên nhận hồ sơ (BNHS) to the offline rules to maintain synchronization with the cloud backend, as it was missing.
+The engineer identified  as the mechanism for securely storing these API keys. A new frontend component, , has been created. This component is designed to provide the UI for selecting an OCR engine (Offline, Google, Azure, OpenAI), inputting the respective API key, and offering guidance on how to obtain these keys from the cloud providers. It also includes functionality to test the API key validity and save/delete them. The current step involves integrating this  component into the application's overall structure, likely by adding a new route in  or embedding it within the existing  component, to make it accessible to the user.
 </current_work>
 
 <optional_next_step>
-Add the Biên nhận hồ sơ (BNHS) definition to .
+The next step is to integrate the new  component into the application, likely within  or by adding a new route in .
+Direct quote: Em thấy đã có Settings tab rồi. Giờ em cần thêm CloudSettings vào Settings.js hoặc tạo tab riêng. Để em check Settings.js hiện tại.
 </optional_next_step>

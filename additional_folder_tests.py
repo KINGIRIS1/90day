@@ -13,7 +13,7 @@ from io import BytesIO
 from PIL import Image
 
 class AdditionalFolderTests:
-    def __init__(self, base_url="https://landoc-scanner.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://viet-ocr-scan.preview.emergentagent.com/api"):
         self.base_url = base_url
         
     def create_test_image(self, width=100, height=100, color=(255, 255, 255)):

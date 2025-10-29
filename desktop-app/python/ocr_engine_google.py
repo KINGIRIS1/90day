@@ -103,8 +103,9 @@ def ocr_google_cloud_vision(image_path, api_key, crop_top_percent=0.35):
         
         return None, 0, "No text detected in image"
         
-    except ImportError:
-        return None, 0, "Missing 'requests' library. Install: pip install requests"
+    except ImportError as e:
+        missing_lib = str(e).split("'")[1] if "'" in str(e) else "unknown"
+        return None, 0, f"Missing library: {missing_lib}. Install: pip install {missing_lib}"
     except FileNotFoundError:
         return None, 0, f"Image file not found: {image_path}"
     except Exception as e:

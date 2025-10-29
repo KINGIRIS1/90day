@@ -419,25 +419,22 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         // Determine target directory based on mergeMode
         let targetDir;
         
-        if (options.mergeMode === 'new' && options.parentFolder) {
-          // Create new folder: parentFolder + suffix
-          const parentDir = path.dirname(options.parentFolder);
-          const baseName = path.basename(options.parentFolder);
-          const newFolderName = baseName + (options.mergeSuffix || '_merged');
-          targetDir = path.join(parentDir, newFolderName);
+        // IMPORTANT: Always use the child folder (where images are located)
+        const childFolder = path.dirname(filePaths[0]); // Folder chứa file ảnh gốc
+        
+        if (options.mergeMode === 'new') {
+          // Create new folder INSIDE child folder
+          const childBaseName = path.basename(childFolder);
+          const newFolderName = childBaseName + (options.mergeSuffix || '_merged');
+          targetDir = path.join(childFolder, newFolderName);
           
           // Create folder if doesn't exist
           if (!fs.existsSync(targetDir)) {
             fs.mkdirSync(targetDir, { recursive: true });
           }
         } else {
-          // Default: Save to folder of first file (original behavior)
-          // Or if mergeMode === 'root', save to parentFolder
-          if (options.mergeMode === 'root' && options.parentFolder) {
-            targetDir = options.parentFolder;
-          } else {
-            targetDir = path.dirname(filePaths[0]);
-          }
+          // Default or 'root' mode: Save directly to child folder (where images are)
+          targetDir = childFolder;
         }
         
         outputPath = path.join(targetDir, `${shortCode}.pdf`);

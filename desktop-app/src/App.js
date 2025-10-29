@@ -77,7 +77,6 @@ function App() {
   const [activeTab, setActiveTab] = useState('scanner');
   const [folders, setFolders] = useState([]); // multi-folder tabs
   const [isElectron, setIsElectron] = useState(false);
-  const [enginePref, setEnginePref] = useState('offline'); // 'offline' | 'cloud'
   const [visitedTabs, setVisitedTabs] = useState(new Set(['scanner'])); // Track visited tabs to optimize rendering
 
   // Track visited tabs when switching
@@ -94,14 +93,6 @@ function App() {
       return;
     }
     setIsElectron(window.electronAPI?.isElectron || false);
-  }, []);
-  useEffect(() => {
-    const loadPref = async () => {
-      if (!window.electronAPI) return;
-      const ep = await window.electronAPI.getConfig('enginePreference');
-      setEnginePref(ep || 'offline');
-    };
-    loadPref();
   }, []);
 
   // Listen for navigate-to-cloud event from Settings

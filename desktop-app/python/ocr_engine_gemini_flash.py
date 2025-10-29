@@ -128,6 +128,7 @@ def get_classification_prompt():
     """
     System prompt for Vietnamese document classification
     IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
+    COMPLETE: Includes all 98 document types with exact Vietnamese titles
     """
     return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
 Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
@@ -173,57 +174,161 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
-   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
-   Nếu không rõ có "BIẾN ĐỘNG" không → "UNKNOWN"
-
-2. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
-   "Hợp đồng THUÊ" → HDTD (PHẢI có "THUÊ")
-   "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
+1. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
    "Hợp đồng ỦY QUYỀN" → HDUQ (PHẢI có "ỦY QUYỀN")
-   Nếu không rõ loại nào → "UNKNOWN"
+   ⚠️ CHECK HDCQ TRƯỚC! Nếu có cả 2 từ → chọn HDCQ
+   Nếu không rõ loại → "UNKNOWN"
 
-3. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP")
-   Nếu không thấy "CHO PHÉP" rõ ràng → "UNKNOWN"
+2. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
+   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
+   Nếu không rõ có "BIẾN ĐỘNG" → "UNKNOWN"
 
-4. "Hợp đồng chuyển nhượng, tặng cho" → HDCQ (có "chuyển nhượng")
-   "Hợp đồng ủy quyền" → HDUQ (hoàn toàn khác!)
-   ⚠️ PHẢI phân biệt rõ giữa HDCQ và HDUQ
+3. "Hợp đồng THUÊ đất" → HDTD (PHẢI có "THUÊ")
+   "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
+   "Hợp đồng THI CÔNG" → HDTCO (PHẢI có "THI CÔNG")
+   "Hợp đồng mua bán" → HDBDG (PHẢI có "MUA BÁN")
+   Nếu không rõ loại → "UNKNOWN"
 
-VÍ DỤ:
-- Thấy "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu..." (khớp 100%) → GCNM ✅
-- Thấy "Giấy chứng nhận quyền sử dụng đất" (khớp 100%, không có "sở hữu") → GCNC ✅
-- Thấy "Bản mô tả ranh giới" (khớp 100%) → BMT ✅
-- Thấy "Hợp đồng" nhưng không rõ loại → UNKNOWN ❌
-- Chỉ thấy nội dung, không có tiêu đề → UNKNOWN ❌
+4. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP")
+   "Quyết định GIAO ĐẤT" → QDGTD (PHẢI có "GIAO ĐẤT")
+   "Quyết định THU HỒI đất" → QDTH (PHẢI có "THU HỒI")
+   "Quyết định GIA HẠN" → QDGH (PHẢI có "GIA HẠN")
+   Nếu không rõ loại → "UNKNOWN"
 
-DANH SÁCH ĐẦY ĐỦ - CHỈ CHỌN KHI KHỚP CHÍNH XÁC:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. "Giấy ỦY QUYỀN" → GUQ (riêng lẻ, không phải hợp đồng)
+   "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
+   PHẢI phân biệt rõ!
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (CHỈ CHỌN KHI KHỚP CHÍNH XÁC):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
 BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
 BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ) → HSKT
 BẢN VẼ HOÀN CÔNG → BVHC
 BẢN VẼ NHÀ → BVN
+SƠ ĐỒ DỰ KIẾN TÁCH THỬA → SDTT
+
+📋 NHÓM 2: BẢNG KÊ / DANH SÁCH (4 loại)
 BẢNG KÊ KHAI DIỆN TÍCH ĐANG SỬ DỤNG → BKKDT
+BẢNG LIỆT KÊ DANH SÁCH CÁC THỬA ĐẤT CẤP GIẤY → DSCG
+DANH SÁCH CHỦ SỬ DỤNG VÀ CÁC THỬA ĐẤT (MẪU 15) → DS15
+DANH SÁCH CÔNG KHAI HỒ SƠ CẤP GIẤY CNQSDĐ → DSCK
+
+📋 NHÓM 3: BIÊN BẢN (10 loại)
+BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN → BBBDG
+BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA → BBGD
+BIÊN BẢN CỦA HỘI ĐỒNG ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU → BBHDDK
+BIÊN BẢN KIỂM TRA NGHIỆM THU CÔNG TRÌNH XÂY DỰNG → BBNT
+BIÊN BẢN KIỂM TRA SAI SÓT TRÊN GIẤY CHỨNG NHẬN → BBKTSS
+BIÊN BẢN KIỂM TRA, XÁC MINH HIỆN TRẠNG SỬ DỤNG ĐẤT → BBKTHT
+BIÊN BẢN VỀ VIỆC KẾT THÚC CÔNG KHAI CÔNG BỐ DI CHÚC → BBKTDC
+BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI KẾT QUẢ KIỂM TRA HỒ SƠ ĐĂNG KÝ CẤP GCNQSD ĐẤT → KTCKCG
+BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI VỀ VIỆC MẤT GCNQSD ĐẤT → KTCKMG
+BIÊN LAI THU THUẾ SỬ DỤNG ĐẤT PHI NÔNG NGHIỆP → BLTT
+
+📋 NHÓM 4: GIẤY TỜ CÁ NHÂN (4 loại)
+CĂN CƯỚC CÔNG DÂN → CCCD
+GIẤY KHAI SINH → GKS
+GIẤY CHỨNG NHẬN KẾT HÔN → GKH
+DI CHÚC → DICHUC
+
+📋 NHÓM 5: GIẤY CHỨNG NHẬN (9 loại)
 GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN GẮN LIỀN VỚI ĐẤT → GCNM
-GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC (⚠️ NGẮN HƠN GCNM)
+GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
+GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
+GIẤY SANG NHƯỢNG ĐẤT → GSND
+GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
+GIẤY ỦY QUYỀN → GUQ
+GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU → GXNDKLD
+GIẤY XIN PHÉP XÂY DỰNG → GPXD
+
+📋 NHÓM 6: HỢP ĐỒNG (7 loại) ⚠️ DỄ NHẦM
 HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT → HDCQ
 HỢP ĐỒNG ỦY QUYỀN → HDUQ
 HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT → HDTHC
 HỢP ĐỒNG THUÊ ĐẤT, ĐIỀU HỈNH HỢP ĐỒNG THUÊ ĐẤT → HDTD
-ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDKBD
-ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK
-PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT → DKTC
+HỢP ĐỒNG THI CÔNG → HDTCO
+HỢP ĐỒNG MUA BÁN TÀI SẢN BÁN ĐẤU GIÁ → HDBDG
+HOÁ ĐƠN GIÁ TRỊ GIA TĂNG → hoadon
+
+📋 NHÓM 7: ĐƠN (15 loại) ⚠️ DỄ NHẦM
+ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDKBD (có "BIẾN ĐỘNG")
+ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK (không có "BIẾN ĐỘNG")
+ĐƠN CAM KẾT, GIẤY CAM KẾT → DCK
+ĐƠN ĐỀ NGHỊ CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → CHTGD
+ĐƠN ĐỀ NGHỊ ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → DCQDGD
+ĐƠN ĐỀ NGHỊ MIỄN GIẢM LỆ PHÍ TRƯỚC BẠ, THUẾ THU NHẬP CÁ NHÂN → DMG
+ĐƠN ĐỀ NGHỊ SỬ DỤNG ĐẤT KẾT HỢP ĐA MỤC ĐÍCH → DMD
+ĐƠN XÁC NHẬN, GIẤY XÁC NHẬN → DXN
+ĐƠN XIN (ĐỀ NGHỊ) CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT → DXCMD
+ĐƠN XIN (ĐỀ NGHỊ) GIA HẠN SỬ DỤNG ĐẤT → DGH
+ĐƠN XIN (ĐỀ NGHỊ) GIAO ĐẤT, CHO THUÊ ĐẤT → DXGD
+ĐƠN XIN (ĐỀ NGHỊ) TÁCH THỬA ĐẤT, HỢP THỬA ĐẤT → DXTHT
+ĐƠN XIN CẤP ĐỔI GIẤY CHỨNG NHẬN → DXCD
+ĐƠN XIN ĐIỀU CHỈNH THỜI HẠN SỬ DỤNG ĐẤT CỦA DỰ ÁN ĐẦU TƯ → DDCTH
+ĐƠN XIN XÁC NHẬN LẠI THỜI HẠN SỬ DỤNG ĐẤT NÔNG NGHIỆP → DXNTH
+
+📋 NHÓM 8: QUYẾT ĐỊNH (15 loại) ⚠️ DỄ NHẦM
 QUYẾT ĐỊNH GIAO ĐẤT, CHO THUÊ ĐẤT → QDGTD
 QUYẾT ĐỊNH CHO PHÉP CHUYỂN MỤC ĐÍCH → QDCMD
 QUYẾT ĐỊNH THU HỒI ĐẤT → QDTH
-CĂN CƯỚC CÔNG DÂN → CCCD
-DI CHÚC → DICHUC
-GIẤY KHAI SINH → GKS
-GIẤY CHỨNG NHẬN KẾT HÔN → GKH
-(... và 84 loại khác - xem đầy đủ trong hệ thống)
+QUYẾT ĐỊNH GIA HẠN SỬ DỤNG ĐẤT KHI HẾT THỜI HẠN SDĐ → QDGH
+QUYẾT ĐỊNH CHO PHÉP TÁCH, HỢP THỬA ĐẤT → QDTT
+QUYẾT ĐỊNH CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → QDCHTGD
+QUYẾT ĐỊNH ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → QDDCGD
+QUYẾT ĐỊNH ĐIỀU CHỈNH THỜI HẠN SDĐ CỦA DỰ ÁN ĐẦU TƯ → QDDCTH
+QUYẾT ĐỊNH HỦY GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → QDHG
+QUYẾT ĐỊNH PHÊ DUYỆT PHƯƠNG ÁN BỒI THƯỜNG, HỖ TRỢ, TÁI ĐỊNH CƯ → QDPDBT
+QUYẾT ĐỊNH PHÊ QUYỆT ĐIỀU CHỈNH QUY HOẠCH → QDDCQH
+QUYẾT ĐỊNH PHÊ QUYỆT ĐƠN GIÁ → QDPDDG
+QUYẾT ĐỊNH THI HÀNH ÁN THEO ĐƠN YÊU CẦU → QDTHA
+QUYẾT ĐỊNH VỀ HÌNH THỨC SỬ DỤNG ĐẤT → QDHTSD
+QUYẾT ĐỊNH XỬ PHẠT → QDXP
 
-⚠️ Nếu tiêu đề KHÔNG KHỚP CHÍNH XÁC với danh sách → Trả về UNKNOWN
+📋 NHÓM 9: PHIẾU (8 loại)
+PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH → PCT
+PHIẾU KIỂM TRA HỒ SƠ → PKTHS
+PHIẾU LẤY Ý KIẾN KHU DÂN CƯ → PLYKDC
+PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC → PXNKQDD
+PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTC
+PHIẾU YÊU CẦU ĐĂNG KÝ THAY ĐỔI NỘI DUNG BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SDĐ, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTD
+PHIẾU YÊU CẦU XÓA ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKXTC
+QUÉT MÃ QR → QR
+
+📋 NHÓM 10: THÔNG BÁO (8 loại)
+THÔNG BÁO THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TBT
+THÔNG BÁO VỀ VIỆC CHUYỂN THÔNG TIN GIẤY CHỨNG NHẬN BỊ MẤT ĐỂ NIÊM YẾT CÔNG KHAI → TBMG
+THÔNG BÁO VỀ VIỆC CÔNG KHAI KẾT QUẢ THẨM TRA XÉT DUYỆT HỒ SƠ CẤP GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → TBCKCG
+THÔNG BÁO VỀ VIỆC NIÊM YẾT CÔNG KHAI MẤT GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → TBCKMG
+THÔNG BÁO XÁC NHẬN HOÀN THÀNH NGHĨA VỤ TÀI CHÍNH → HTNVTC
+THÔNG BÁO CẬP NHẬT, CHỈNH LÝ BIẾN ĐỘNG → TBCNBD
+THÔNG BÁO CÔNG BỐ CÔNG KHAI DI CHÚC → CKDC
+HOÀN THÀNH CÔNG TÁC BỒI THƯỜNG HỖ TRỢ → HTBTH
+
+📋 NHÓM 11: TỜ KHAI / TỜ TRÌNH (3 loại)
+TỜ KHAI THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TKT
+TỜ TRÌNH VỀ GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → TTr
+TỜ TRÌNH VỀ VIỆC ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT (UBND XÃ) → TTCG
+
+📋 NHÓM 12: VĂN BẢN (8 loại)
+VĂN BẢN CAM KẾT TÀI SẢN RIÊNG → CKTSR
+VĂN BẢN CHẤP THUẬN CHO PHÉP CHUYỂN MỤC ĐÍCH → VBCTCMD
+VĂN BẢN ĐỀ NGHỊ CHẤP THUẬN NHẬN CHUYỂN NHƯỢNG, THUÊ, GÓP VỐN QUYỀN SDĐ → VBDNCT
+VĂN BẢN ĐỀ NGHỊ THẨM ĐỊNH, PHÊ DUYỆT PHƯƠNG ÁN SDĐ → PDPASDD
+VĂN BẢN THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ → VBTK
+VĂN BẢN THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH → TTHGD
+VĂN BẢN THOẢ THUẬN VỀ VIỆC CHẤM DỨT QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → CDLK
+VĂN BẢN THỎA THUẬN VỀ VIỆC XÁC LẬP QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → HCLK
+VĂN BẢN TỪ CHỐI NHẬN DI SẢN THỪA KẾ → VBTC
+VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
+
+⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 QUY TRÌNH KIỂM TRA:
 ━━━━━━━━━━━━━━━━━━
@@ -241,7 +346,7 @@ TRẢ VỀ JSON (BẮT BUỘC):
 }
 
 ❗ NHẮC LẠI:
-- CHỈ trả về mã khi khớp TOÀN BỘ tiêu đề
+- CHỈ trả về mã khi khớp TOÀN BỘ tiêu đề với 1 trong 98 loại
 - KHÔNG khớp 1 nửa, vài chữ, hoặc gần giống
 - Hệ thống sẽ tự xử lý việc gán trang tiếp theo
 - LUÔN trả về JSON format"""

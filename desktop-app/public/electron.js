@@ -80,7 +80,26 @@ function getPythonScriptPath(scriptName) {
   if (isDev) {
     return path.join(__dirname, '../python', scriptName);
   } else {
-    return path.join(process.resourcesPath, 'python', scriptName);
+    // In production, Python files should be in resources/python (extraResources)
+    // Try multiple paths as fallback
+    const paths = [
+      path.join(process.resourcesPath, 'python', scriptName),
+      path.join(process.resourcesPath, '..', 'python', scriptName),
+      path.join(path.dirname(process.execPath), 'resources', 'python', scriptName),
+      path.join(path.dirname(process.execPath), 'python', scriptName)
+    ];
+    
+    const fs = require('fs');
+    for (const p of paths) {
+      if (fs.existsSync(p)) {
+        console.log(`Found Python script at: ${p}`);
+        return p;
+      }
+    }
+    
+    // Fallback to first path if none found
+    console.warn(`Python script not found, using default path: ${paths[0]}`);
+    return paths[0];
   }
 }
 
@@ -254,9 +273,37 @@ ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
 
 
 ipcMain.handle('process-document-offline', async (event, filePath) => {
-  return new Promise((resolve, reject) => {
-    // Get OCR engine preference from store (default: tesseract)
-    const ocrEngineType = store.get('ocrEngineType', 'tesseract');
+  return new Promise(async (resolve, reject) => {
+    // Get OCR engine preference from store
+    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure'
+    const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
+    
+    // Get cloud API keys if using cloud engines
+    let cloudApiKey = null;
+    let cloudEndpoint = null;
+    
+    if (ocrEngineType === 'google') {
+      cloudApiKey = store.get('cloudOCR.google.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({
+          success: false,
+          error: 'Google Cloud Vision API key not configured. Please add it in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    } else if (ocrEngineType === 'azure') {
+      cloudApiKey = store.get('cloudOCR.azure.apiKey', '');
+      cloudEndpoint = store.get('cloudOCR.azureEndpoint.apiKey', '');
+      if (!cloudApiKey || !cloudEndpoint) {
+        resolve({
+          success: false,
+          error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    }
     
     // Auto-detect Python command based on platform
     let pythonPath;
@@ -276,8 +323,17 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       ? path.join(__dirname, '../python/process_document.py')
       : getPythonScriptPath('process_document.py');
 
-    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
-    const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType], {
+    // Build command args
+    const args = [scriptPath, filePath, ocrEngineType];
+    if (cloudApiKey) {
+      args.push(cloudApiKey);
+      if (cloudEndpoint) {
+        args.push(cloudEndpoint);
+      }
+    }
+
+    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType} ${cloudApiKey ? '[API_KEY]' : ''} ${cloudEndpoint || ''}`);
+    const childProcess = spawn(pythonPath, args, {
       encoding: 'utf8',
       env: {
         ...process.env,

@@ -1925,10 +1925,11 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
             # If cleaning removed everything, check original
             title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         
-        # Cloud OCR (Google/Azure) is more accurate → Use relaxed threshold
-        # Offline OCR (Tesseract/EasyOCR) has more errors → Use strict threshold
+        # STRICT MODE: Vietnamese admin titles MUST be uppercase (70%+)
+        # Apply same threshold for both Cloud and Offline OCR
+        # Rationale: Cloud OCR (Google/Azure) is highly accurate, no need for relaxed threshold
         is_cloud_ocr = ocr_engine in ['google', 'azure']
-        uppercase_threshold = 0.3 if is_cloud_ocr else 0.7  # Relaxed 0.5 → 0.3 for Cloud OCR
+        uppercase_threshold = 0.7  # STRICT: 70% for ALL engines (Cloud + Offline)
         
         # If title has low uppercase ratio, it's likely NOT a real title but
         # a mention in body text (e.g., "Giấy chứng nhận..." in contract body)

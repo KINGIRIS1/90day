@@ -33,8 +33,18 @@ function CloudSettings() {
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Map UI values to backend values
+      const engineMapping = {
+        'offline-tesseract': 'tesseract',
+        'offline-easyocr': 'easyocr',
+        'google': 'google',
+        'azure': 'azure'
+      };
+      
+      const backendEngine = engineMapping[ocrEngine] || 'tesseract';
+      
       // Save OCR engine preference
-      await window.electronAPI.setConfig('ocrEngine', ocrEngine);
+      await window.electronAPI.setConfig('ocrEngine', backendEngine);
 
       // Save API keys if provided
       if (ocrEngine === 'google' && googleKey.trim()) {

@@ -1,63 +1,66 @@
 <analysis>
-The AI engineer's work spanned a wide range of enhancements and fixes for the Vietnamese OCR document classification application. Initially, the focus was on refining existing classification logic for Giấy tiếp nhận hồ sơ và hẹn trả kết quả (GTLQ), followed by extensive environment troubleshooting. A significant portion involved adapting Cloud logic for offline OCR, improving accuracy with smart cropping, and optimizing EasyOCR. Concurrently, numerous UI/UX improvements were implemented, including scanning animations, a flexible PDF merge modal, and responsive design fixes.
-
-Recent efforts focused on crucial rule management, such shifting Biên nhận hồ sơ (BNHS) into GTLQ, implementing dynamic rules reloading without app restart, and robust sequential naming for UNKNOWN files in both file and folder scans. The engineer also addressed user inquiries regarding cloud backend operations, cost analysis of various OCR services, and initiated the development of a Bring Your Own Key (BYOK) feature to allow users to integrate their own Cloud OCR API keys. Throughout, there was a strong emphasis on detailed user guidance for installation and packaging, reflecting an iterative and user-centric development approach.
+The AI engineer's work has spanned several critical areas to enhance the desktop OCR application. Initially, efforts focused on refining the Bring Your Own Key (BYOK) feature for Cloud OCR providers, addressing issues like Python script execution in production and unifying OCR engine selection. A significant portion involved debugging and improving the document classification and sequential naming logic, particularly for Cloud OCR results that were incorrectly categorized due to strict uppercase checks or over-applied sequential naming. Solutions included adjusting uppercase thresholds, refining sequential naming conditions, and fixing pattern matching order. Subsequently, the engineer implemented an image cropping feature for cloud OCR to optimize cost and speed, and introduced a stricter 70% uppercase rule for all titles. The most recent, ongoing task is the integration of Gemini Flash as a new, cost-effective AI classification option, which has involved extensive code modifications across Python OCR engines, Electron's main process, and the React frontend, along with debugging persistent 404 Model Not Found errors. The latest step involved successfully listing available Gemini models and identifying  as the correct one to use.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land-related documents, designed to classify and rename images using short codes. It features single/batch scanning, history, and PDF export. Key requirements include accurate document classification (e.g., distinguishing Hợp đồng chuyển nhượng from Căn cước công dân even with OCR errors), supported by fuzzy matching, case-aware scoring, and structured keyword prioritization. The application must handle sequential documents, assigning previous titles to low-confidence or untitled scans. Users require an easy-to-use installer, enhanced OCR options (Tesseract, VietOCR, EasyOCR, and optional Cloud Boost via GPT-4 Vision), and a Rules Manager for UI-driven classification and auto-generating keyword variants. Recent work focused on refining GTLQ classification, making offline OCR accuracy comparable to cloud, improving UI/UX (fixed-width tabs, rounded corners, stop/resume functions, individual merge button, logo fix), and streamlining the installer build process and user guides. Future needs include BYOK for Cloud OCR and detailed cost analysis.
+The application is a desktop OCR scanner for Vietnamese land-related documents, designed to accurately classify and rename them using short codes. Key functionalities include single/batch scanning, history, PDF export, fuzzy matching, case-aware scoring, and prioritized keyword-based classification. Sequential documents need automatic title assignment for low-confidence or untitled scans. The application provides various OCR options: Tesseract, VietOCR, EasyOCR, and a Bring Your Own Key (BYOK) feature for Google Cloud Vision and Azure Computer Vision, now expanding to Gemini Flash. It also features a Rules Manager for UI-driven classification and keyword variant auto-generation. Recent improvements include GTLQ classification, offline OCR accuracy, and UI/UX enhancements. The current focus is on refining classification logic (uppercase checks, sequential naming, exact matching) and integrating Gemini Flash to offer a cost-effective AI-powered classification.
 </product_requirements>
 
 <key_technical_concepts>
--   **Electron**: Framework for desktop applications, managing main process and IPC.
--   **React**: Frontend library for building the user interface.
--   **Python**: Backend for local OCR processing and rule-based classification.
--   **Tesseract, VietOCR, EasyOCR**: OCR engines for text recognition.
--   **GPT-4 Vision**: Cloud OCR (Cloud Boost) for high-accuracy recognition.
--   **Fuzzy Matching & Regex**: Techniques for robust document classification.
--   **NSIS**: Tool for creating Windows installers.
--   **electron-store**: Library for persistent, secure storage of user settings (like API keys).
+- **Electron**: Desktop application framework (IPC, ).
+- **React**: Frontend UI development.
+- **Python**: Backend for OCR, rule-based classification, and AI integration.
+- **Tesseract, VietOCR, EasyOCR**: Offline OCR engines.
+- **Google Cloud Vision, Azure Computer Vision, Gemini Flash**: BYOK cloud OCR/AI.
+- **Pillow**: Python library for image processing (cropping).
+- **requests**: Python library for making HTTP requests (for Gemini API).
+- **Fuzzy Matching & Regex**: Document classification and title extraction.
+- **Lazy Importing**: Optimizing Python OCR engine loading.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Main backend for API, Cloud Boost, and MongoDB.
-    -   **Changes**: Removed BNHS short code and its definition.
--   ****: Electron's main process, handles IPC communications and file system operations.
-    -   **Changes**: Merged PDF logic in  was fixed to correctly handle root and new merge modes as per user's specific folder requirements. Also implements  for saving/retrieving API keys.
--   ****: Packaged version of .
-    -   **Changes**: Mirrored PDF merge logic fixes from .
--   ****: Core logic for document classification.
-    -   **Changes**: Incorporated Biên nhận hồ sơ keywords and title templates into  (Giấy tiếp nhận hồ sơ và hẹn trả kết quả) and removed the separate  entry. Modified to support dynamic loading of rules via  and  for immediate effect of UI changes. Adjusted  for better GTLQ detection.
--   ****: Frontend component for scanning, displaying results, and handling UI interactions.
-    -   **Changes**: Refined  logic for UNKNOWN files in both File and Folder scans. The conditions for sequential naming were tightened () and the logic for updating  was made stricter ().
--   ****: UI component for managing classification rules.
-    -   **Changes**: Added UI notifications to inform users that rule changes take effect immediately without needing to restart the application.
--   ** (NEW)**: A new React component created to handle settings for various Cloud OCR providers, allowing users to input their own API keys.
--   ****: Project dependencies and build scripts.
-    -   **Changes**:  (version ) is implicitly acknowledged for BYOK feature.
 
+-   ****: Electron's main process.
+    -   **Changes**: Added/updated IPC handlers (, , , ) to support Google, Azure, and now Gemini API keys. Fixed Python script path handling for production and passing API keys to .
+-   ****: Packaged .
+    -   **Changes**: Synchronized with changes from  to ensure production builds reflect latest logic.
+-   ****: Google Cloud Vision OCR engine.
+    -   **Changes**: Modified to crop input images to the top 35% before sending to the API, optimizing cost and speed.
+-   ****: Azure Computer Vision OCR engine.
+    -   **Changes**: Modified to crop input images to the top 35% before sending to the API, optimizing cost and speed.
+-   ** (NEW)**: Python module for Gemini Flash AI OCR.
+    -   **Summary**: Created to integrate Gemini Flash. Includes image cropping, direct REST API calls using the  library, and handles API errors. Initial model name  was updated to  after debugging.
+-   ****: Handles document processing and OCR engine selection.
+    -   **Changes**: Refactored for lazy loading OCR engines. Updated  to accept and use cloud API keys. Added support for . Improved logging to show full text length and uppercase ratio. Corrected pattern matching order for HỢP ĐỒNG CHUYỂN NHƯỢNG vs HỢP ĐỒNG ỦY QUYỀN.
+-   ****: Core logic for document classification.
+    -   **Changes**: Modified  to enforce a strict 70% uppercase ratio for *all* OCR engine types (Cloud and Offline) for title acceptance. Introduced  for a new Tier 0 exact title matching.
+-   ****: Frontend component for scanning.
+    -   **Changes**: Unified OCR engine selection. Refined  logic to be more robust: applies for  or when  is  (i.e., no title or rejected title).  is updated only if classification confidence is .
+-   ****: UI component for cloud OCR settings.
+    -   **Changes**: Added Gemini Flash as an OCR option in the UI, including its specific API key input section and testing functionality. Updated mappings for OCR engine names and / functions.
+-   ****: Python dependencies.
+    -   **Changes**: Added  and confirmed  is present.
+-   **New Documentation Files**: , , , ,  were created to document the changes and provide user instructions.
+-   **New Test Scripts**: , ,  were created for debugging and verification.
 </code_architecture>
 
 <pending_tasks>
--   Implement the full logic for the all-in-one installer using .
--   Fine-tune remaining document types in .
--   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
--   Migrate or pin React/Webpack versions.
--   Test the backend with 5-10 real images to validate Hybrid OCR.
--   Update icon for macOS (.icns).
--   Implement license/activation key feature.
--   Implement Parallel Local Processing for batch scanning.
--   Finalize BYOK feature integration in  and backend-side API key usage.
+- Implement the full logic for the all-in-one installer using .
+- Fine-tune remaining document types in .
+- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+- Migrate or pin React/Webpack versions.
+- Test the backend with 5-10 real images to validate Hybrid OCR.
+- Update icon for macOS (.icns).
+- Implement license/activation key feature.
+- Implement Parallel Local Processing for batch scanning.
+- Complete the Gemini Flash integration by updating the model name in the code and verifying its functionality.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was implementing the Bring Your Own Key (BYOK) feature for Cloud OCR providers. This initiative allows users to utilize their own API keys for services like Google Cloud Vision and Azure Vision, enabling them to benefit from individual free tiers and manage their own costs.
-
-The engineer identified  as the mechanism for securely storing these API keys. A new frontend component, , has been created. This component is designed to provide the UI for selecting an OCR engine (Offline, Google, Azure, OpenAI), inputting the respective API key, and offering guidance on how to obtain these keys from the cloud providers. It also includes functionality to test the API key validity and save/delete them. The current step involves integrating this  component into the application's overall structure, likely by adding a new route in  or embedding it within the existing  component, to make it accessible to the user.
+Immediately prior to this summary, the AI engineer was deep in the integration of Gemini Flash as a new cloud OCR/AI option. After implementing the necessary Python (, ) and Electron/React UI (, ) changes, the system encountered persistent  Model Not Found errors when attempting to use the Gemini API. This indicated an incorrect model name or API version. The engineer created a diagnostic script () to query the Gemini API for available models. The output of this script (Chat Message 331) identified  as a stable and suitable model for use, and  as recommended. The last action was acknowledging this discovery, choosing  as the target model.
 </current_work>
 
 <optional_next_step>
-The next step is to integrate the new  component into the application, likely within  or by adding a new route in .
-Direct quote: Em thấy đã có Settings tab rồi. Giờ em cần thêm CloudSettings vào Settings.js hoặc tạo tab riêng. Để em check Settings.js hiện tại.
+Update , , and  to use the  model.
 </optional_next_step>

@@ -410,7 +410,56 @@ agent_communication:
   
   - agent: "main"
     message: |
-      ✅ FIX: SEQUENTIAL NAMING LOGIC + PATTERN ORDER - COMPLETE FIX
+      ✅ FIX v2: SEQUENTIAL NAMING SIMPLIFIED - Body Text Override Issue
+      
+      🐛 NEW ISSUE DISCOVERED:
+      - File: Page 2 của "HỢP ĐỒNG CHUYỂN NHƯỢNG" (20240504-01700007.jpg)
+      - No title extracted ❌
+      - Body text: "Các bên giao kết... đăng ký biện pháp bảo đảm..."
+      - Body classification: DKTC (confidence 70%) ❌
+      - OLD logic: Không apply sequential (confidence ≥ 50%) → Giữ DKTC → SAI!
+      - EXPECTED: Apply sequential → HDCQ ✅
+      
+      🔍 ROOT CAUSE:
+      - OLD logic Case 3: "No title + confidence ≥ 0.5 → Keep body classification"
+      - VẤN ĐỀ: Page 2/3 của HỢP ĐỒNG chứa keywords của doc type khác
+      - → Body text classification KHÔNG đáng tin cậy cho continuation pages
+      
+      🎯 FIX v2 - SIMPLIFIED LOGIC (2 cases only):
+      
+      ```javascript
+      Case 1: short_code === 'UNKNOWN' → Apply sequential
+      Case 2: !title_extracted_via_pattern → Apply sequential (DÙ confidence cao)
+      Case 3: title_extracted_via_pattern → KHÔNG apply (Document mới)
+      ```
+      
+      **KEY INSIGHT**:
+      - ❌ SAI: "No title + confidence ≥ 50% → Keep body classification"
+      - ✅ ĐÚNG: "No title → ALWAYS sequential (ignore body classification)"
+      - **Lý do**: Page continuation không bao giờ có title → Luôn thuộc document trước
+      
+      📦 FILES MODIFIED:
+      1. /app/desktop-app/src/components/DesktopScanner.js (line 207-262)
+         - Removed Case 3 (confidence threshold logic)
+         - Simplified to 2 cases: UNKNOWN hoặc No title → Sequential
+      
+      2. /app/desktop-app/FIX_SEQUENTIAL_NAMING_LOGIC.md
+         - Updated with simplified logic + real user case
+      
+      🧪 VERIFICATION - Real User Case:
+      ```
+      File 1: "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ ✅
+      File 2: "Các bên giao kết... đăng ký..."
+         - No title ❌
+         - Body → DKTC (70%) ❌
+         - OLD: Keep DKTC → SAI
+         - NEW: Sequential → HDCQ ✅
+      ```
+      
+      ⏳ NEXT STEPS:
+      - User test lại với batch scan 2 files (20240504-01700003.jpg + 20240504-01700007.jpg)
+      - Kỳ vọng: Cả 2 files đều classify thành HDCQ
+      - Console log: "🔄 Sequential: No title extracted... → Override to HDCQ"
       
       🐛 VẤN ĐỀ ĐƯỢC FIX:
       1. Documents với title rõ ràng bị misclassified bởi sequential naming

@@ -275,7 +275,7 @@ ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
 ipcMain.handle('process-document-offline', async (event, filePath) => {
   return new Promise(async (resolve, reject) => {
     // Get OCR engine preference from store
-    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure'
+    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure', 'gemini-flash'
     const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
     
     // Get cloud API keys if using cloud engines
@@ -299,6 +299,17 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         resolve({
           success: false,
           error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    } else if (ocrEngineType === 'gemini-flash') {
+      // Gemini Flash uses same Google API key
+      cloudApiKey = store.get('cloudOCR.gemini.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({
+          success: false,
+          error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.',
           method: 'config_error'
         });
         return;
@@ -1110,8 +1121,40 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
         };
       }
       
+    } else if (provider === 'gemini') {
+      // Test Gemini Flash API
+      const axios = require('axios');
+      
+      // Test with Gemini Flash using generateContent API
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      
+      const response = await axios.post(testUrl, {
+        contents: [{
+          parts: [{
+            text: 'Hello, this is a test.'
+          }]
+        }]
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+      
+      if (response.status === 200 && response.data && response.data.candidates) {
+        return { 
+          success: true, 
+          message: '✅ Gemini Flash API key hợp lệ!\n\n✨ Sẵn sàng sử dụng AI Classification với chi phí thấp nhất ($0.16/1K images).\n\n🎯 Free tier: 45,000 requests/tháng' 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'API key có vẻ không hợp lệ hoặc chưa enable Generative Language API' 
+        };
+      }
+      
     } else {
-      return { success: false, error: 'Unsupported provider' };
+      return { success: false, error: `Unsupported provider: ${provider}. Supported: google, azure, gemini` };
     }
     
   } catch (error) {

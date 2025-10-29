@@ -236,6 +236,32 @@ function CloudSettings() {
               </div>
             </div>
           </label>
+
+          {/* Gemini Flash - AI Classification */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-purple-50 transition border-purple-200">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="gemini-flash"
+              checked={ocrEngine === 'gemini-flash'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium flex items-center gap-2">
+                <span>🤖 Gemini Flash 2.0 (AI Classification)</span>
+                <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded">RẺ NHẤT</span>
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                • <strong>AI reasoning - Hiểu context</strong><br />
+                • Accuracy: 93-97% (AI classification trực tiếp)<br />
+                • Tốc độ: Rất nhanh (1-2s)<br />
+                • <strong>Chi phí: $0.16/1,000 pages (Rẻ hơn 3.6x Google Vision)</strong><br />
+                • Free tier: Có (monthly limits)<br />
+                • ⚠️ Cần Google API key (BYOK)
+              </div>
+            </div>
+          </label>
         </div>
       </div>
 

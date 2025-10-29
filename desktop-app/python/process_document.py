@@ -210,9 +210,23 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 else:
                     # Compare results and use the better one
                     confidence_full = result_full.get("confidence", 0.0)
+                    short_code_full = result_full.get("short_code", "UNKNOWN")
                     
-                    if confidence_full > confidence_crop:
-                        print(f"✅ Full image better: {result_full.get('short_code')} ({confidence_full:.2f} > {confidence_crop:.2f})", file=sys.stderr)
+                    # Priority logic:
+                    # 1. If crop is UNKNOWN but full found something → Use full
+                    # 2. If both found something → Use higher confidence
+                    # 3. If full is UNKNOWN → Use crop
+                    
+                    if short_code_crop == "UNKNOWN" and short_code_full != "UNKNOWN":
+                        print(f"✅ Full image found type: {short_code_full} (crop was UNKNOWN)", file=sys.stderr)
+                        result = result_full
+                        method_used = "gemini_hybrid_full"
+                    elif short_code_full == "UNKNOWN" and short_code_crop != "UNKNOWN":
+                        print(f"✅ Crop result kept: {short_code_crop} (full was UNKNOWN)", file=sys.stderr)
+                        result = result_crop
+                        method_used = "gemini_hybrid_crop"
+                    elif confidence_full > confidence_crop:
+                        print(f"✅ Full image better: {short_code_full} ({confidence_full:.2f} > {confidence_crop:.2f})", file=sys.stderr)
                         result = result_full
                         method_used = "gemini_hybrid_full"
                     else:

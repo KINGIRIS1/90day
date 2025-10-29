@@ -268,7 +268,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       
       // Case 3: Title được sử dụng bởi classifier → Document MỚI → KHÔNG apply sequential
       if (result.title_boost_applied) {
-        console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
+        console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${formatConfidence(result.confidence)}%)`);
       }
     }
     

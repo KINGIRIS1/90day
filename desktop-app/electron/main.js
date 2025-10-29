@@ -1144,7 +1144,7 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
       if (response.status === 200 && response.data && response.data.candidates) {
         return { 
           success: true, 
-          message: '✅ Gemini Flash API key hợp lệ!\n\n✨ Sẵn sàng sử dụng AI Classification với chi phí thấp nhất ($0.16/1K images).\n\n🎯 Free tier: 45,000 requests/tháng' 
+          message: '✅ Gemini Flash API key hợp lệ!\n\n✨ Sẵn sàng sử dụng AI Classification với model mới nhất (gemini-2.5-flash).\n\n💰 Chi phí thấp, tốc độ nhanh.\n🎯 Free tier có sẵn - kiểm tra quota tại Google Cloud Console' 
         };
       } else {
         return { 

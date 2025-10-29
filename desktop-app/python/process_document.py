@@ -186,11 +186,18 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             
             # Confidence threshold for retry (default 0.8)
             CONFIDENCE_THRESHOLD = 0.8
+            # High confidence threshold (skip retry even for ambiguous)
+            HIGH_CONFIDENCE_THRESHOLD = 0.9
             
-            need_full_retry = (
-                confidence_crop < CONFIDENCE_THRESHOLD or 
-                is_ambiguous_type(short_code_crop)
-            )
+            # Don't retry if confidence is very high (≥0.9), even for ambiguous types
+            if confidence_crop >= HIGH_CONFIDENCE_THRESHOLD:
+                print(f"✅ Very high confidence ({confidence_crop:.2f}), skipping full retry", file=sys.stderr)
+                need_full_retry = False
+            else:
+                need_full_retry = (
+                    confidence_crop < CONFIDENCE_THRESHOLD or 
+                    is_ambiguous_type(short_code_crop)
+                )
             
             if need_full_retry:
                 print(f"⚠️ STEP 2: Low confidence ({confidence_crop:.2f}) or ambiguous type ({short_code_crop})", file=sys.stderr)

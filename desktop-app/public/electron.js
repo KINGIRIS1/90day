@@ -19,13 +19,9 @@ function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
-    icon: path.join(__dirname, isDev ? '../assets/icon.png' : '../assets/icon.png')
+    icon: path.join(__dirname, '../assets/icon.png')
   });
-  
-  const splashPath = isDev 
-    ? `file://${path.join(__dirname, 'splash.html')}`
-    : `file://${path.join(__dirname, '../build/splash.html')}`;
-  splash.loadURL(splashPath);
+  splash.loadURL(`file://${path.join(__dirname, '../public/splash.html')}`);
 
   // Main window
   mainWindow = new BrowserWindow({
@@ -38,7 +34,7 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, isDev ? '../assets/icon.png' : '../assets/icon.png')
+    icon: path.join(__dirname, '../assets/icon.png')
   });
 
   // Load React app
@@ -84,17 +80,6 @@ function getPythonScriptPath(scriptName) {
   if (isDev) {
     return path.join(__dirname, '../python', scriptName);
   } else {
-    return path.join(process.resourcesPath, 'python', scriptName);
-  }
-}
-
-// Helper function to get Python script path
-function getPythonScriptPath(scriptName) {
-  if (isDev) {
-    // Development mode - scripts in ../python/
-    return path.join(__dirname, '../python', scriptName);
-  } else {
-    // Production mode - scripts in resources/python/
     return path.join(process.resourcesPath, 'python', scriptName);
   }
 }
@@ -288,7 +273,7 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     }
     
     const scriptPath = isDev
-      ? getPythonScriptPath('process_document.py')
+      ? path.join(__dirname, '../python/process_document.py')
       : getPythonScriptPath('process_document.py');
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
@@ -351,11 +336,11 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       }
     });
 
-    // Add timeout (60 seconds for OCR processing - increased for EasyOCR)
+    // Add timeout (30 seconds for OCR processing)
     setTimeout(() => {
       childProcess.kill();
-      reject(new Error('OCR processing timeout (60s)'));
-    }, 60000);
+      reject(new Error('OCR processing timeout (30s)'));
+    }, 30000);
   });
 });
 
@@ -595,7 +580,7 @@ ipcMain.handle('read-image-data-url', async (event, filePath) => {
 ipcMain.handle('get-rules', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'get']);
@@ -637,7 +622,7 @@ ipcMain.handle('get-rules', async () => {
 ipcMain.handle('save-rule', async (event, docType, ruleData) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     const ruleJson = JSON.stringify(ruleData);
     
     return new Promise((resolve, reject) => {
@@ -680,7 +665,7 @@ ipcMain.handle('save-rule', async (event, docType, ruleData) => {
 ipcMain.handle('delete-rule', async (event, docType) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'delete', docType]);
@@ -722,7 +707,7 @@ ipcMain.handle('delete-rule', async (event, docType) => {
 ipcMain.handle('reset-rules', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'reset']);
@@ -775,7 +760,7 @@ ipcMain.handle('export-rules', async () => {
     
     const exportPath = result.filePath;
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'export', exportPath]);
@@ -828,7 +813,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
     
     const importPath = result.filePaths[0];
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     const mergeFlag = mergeBool ? 'true' : 'false';
     
     return new Promise((resolve, reject) => {
@@ -871,7 +856,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
 ipcMain.handle('open-rules-folder', async () => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('rules_manager.py');
+    const scriptPath = path.join(__dirname, '../python/rules_manager.py');
     
     return new Promise((resolve, reject) => {
       const childProcess = spawn(pythonPath, [scriptPath, 'folder']);
@@ -921,7 +906,7 @@ ipcMain.handle('open-rules-folder', async () => {
 ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos = true) => {
   try {
     const pythonPath = getPythonPath();
-    const scriptPath = getPythonScriptPath('keyword_variants.py');
+    const scriptPath = path.join(__dirname, '../python/keyword_variants.py');
     const typosFlag = includeTypos ? 'true' : 'false';
     
     return new Promise((resolve, reject) => {
@@ -957,6 +942,144 @@ ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos 
     });
   } catch (error) {
     return { success: false, error: error.message };
+  }
+});
+
+
+// ===== Cloud OCR API Key Management =====
+
+// Save API key (encrypted via electron-store)
+ipcMain.handle('save-api-key', async (event, { provider, apiKey }) => {
+  try {
+    store.set(`cloudOCR.${provider}.apiKey`, apiKey);
+    return { success: true, message: `API key for ${provider} saved successfully` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Get API key
+ipcMain.handle('get-api-key', async (event, provider) => {
+  try {
+    const apiKey = store.get(`cloudOCR.${provider}.apiKey`, '');
+    return apiKey;
+  } catch (error) {
+    console.error('Error getting API key:', error);
+    return '';
+  }
+});
+
+// Delete API key
+ipcMain.handle('delete-api-key', async (event, provider) => {
+  try {
+    store.delete(`cloudOCR.${provider}.apiKey`);
+    if (provider === 'azure') {
+      store.delete(`cloudOCR.azureEndpoint.apiKey`);
+    }
+    return { success: true, message: `API key for ${provider} deleted` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Test API key validity
+ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => {
+  try {
+    if (provider === 'google') {
+      // Test Google Cloud Vision API
+      const axios = require('axios');
+      
+      // Create a simple test request (using TEXT_DETECTION on a dummy image)
+      const testUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+      
+      const response = await axios.post(testUrl, {
+        requests: [{
+          image: {
+            content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' // 1x1 transparent PNG
+          },
+          features: [{
+            type: 'TEXT_DETECTION',
+            maxResults: 1
+          }]
+        }]
+      }, {
+        timeout: 10000
+      });
+      
+      if (response.status === 200) {
+        return { 
+          success: true, 
+          message: '✅ Google Cloud Vision API key hợp lệ!\n\n✨ Sẵn sàng sử dụng Cloud OCR với độ chính xác cao.' 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'API key có vẻ không hợp lệ hoặc chưa enable Cloud Vision API' 
+        };
+      }
+      
+    } else if (provider === 'azure') {
+      // Test Azure Computer Vision API
+      const axios = require('axios');
+      
+      if (!endpoint) {
+        return { success: false, error: 'Azure endpoint URL is required' };
+      }
+      
+      // Normalize endpoint (remove trailing slash)
+      const normalizedEndpoint = endpoint.replace(/\/$/, '');
+      
+      // Test with Read API (OCR)
+      const testUrl = `${normalizedEndpoint}/vision/v3.2/read/analyze`;
+      
+      const response = await axios.post(testUrl, {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Atomist_quote_from_Democritus.png/338px-Atomist_quote_from_Democritus.png'
+      }, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+      
+      if (response.status === 202) {
+        return { 
+          success: true, 
+          message: '✅ Azure Computer Vision API key hợp lệ!\n\n✨ Sẵn sàng sử dụng Cloud OCR với độ chính xác cao.' 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'API key hoặc endpoint không hợp lệ' 
+        };
+      }
+      
+    } else {
+      return { success: false, error: 'Unsupported provider' };
+    }
+    
+  } catch (error) {
+    console.error('Test API key error:', error);
+    
+    let errorMessage = error.message;
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 401 || status === 403) {
+        errorMessage = 'API key không hợp lệ hoặc không có quyền truy cập';
+      } else if (status === 429) {
+        errorMessage = 'Đã vượt quá giới hạn request. Vui lòng thử lại sau.';
+      } else if (status === 400) {
+        errorMessage = 'Có lỗi trong cấu hình API key hoặc endpoint';
+      }
+    } else if (error.code === 'ENOTFOUND' || error.code === 'ETIMEDOUT') {
+      errorMessage = 'Không thể kết nối đến Cloud API. Kiểm tra internet hoặc endpoint URL.';
+    }
+    
+    return { 
+      success: false, 
+      error: errorMessage 
+    };
   }
 });
 

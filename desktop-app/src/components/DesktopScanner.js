@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 
-const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePrefProp }) => {
+const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   // Tab state - Main navigation
   const [activeTab, setActiveTab] = useState('files'); // 'files' or 'folders'
   
@@ -21,7 +21,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   const [selectedPreview, setSelectedPreview] = useState(null);
   const [lastKnownType, setLastKnownType] = useState(null);
   const [autoFallbackEnabled, setAutoFallbackEnabled] = useState(false);
-  const [enginePref, setEnginePref] = useState(enginePrefProp || 'offline');
+  const [currentOcrEngine, setCurrentOcrEngine] = useState('tesseract'); // Current OCR engine from config
 
   // Grid density: low=3, medium=4, high=5
   const [density, setDensity] = useState('high');

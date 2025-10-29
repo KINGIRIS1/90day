@@ -179,28 +179,71 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             ocr_confidence = confidence
             
         else:
-            # Offline OCR engines
+            # Offline OCR engines - Lazy load on demand
+            global tesseract_engine, vietocr_engine, easyocr_engine
+            
             # Select OCR engine based on preference
-            if ocr_engine_type == 'vietocr' and vietocr_engine is not None:
-                ocr_engine = vietocr_engine
-                engine_name = "VietOCR"
-                print("🔍 Using VietOCR engine", file=sys.stderr)
-            elif ocr_engine_type == 'easyocr' and easyocr_engine is not None:
-                ocr_engine = easyocr_engine
-                engine_name = "EasyOCR"
-                print("🔍 Using EasyOCR engine", file=sys.stderr)
+            if ocr_engine_type == 'vietocr':
+                # Lazy load VietOCR
+                if vietocr_engine is None:
+                    try:
+                        from ocr_engine_vietocr import OCREngine as VietOCREngine
+                        vietocr_engine = VietOCREngine()
+                        print("✅ VietOCR engine loaded", file=sys.stderr)
+                    except Exception as e:
+                        print(f"⚠️ VietOCR load failed: {e}, falling back to Tesseract", file=sys.stderr)
+                
+                if vietocr_engine is not None:
+                    ocr_engine = vietocr_engine
+                    engine_name = "VietOCR"
+                    print("🔍 Using VietOCR engine", file=sys.stderr)
+                else:
+                    # Fallback to Tesseract
+                    if tesseract_engine is None:
+                        from ocr_engine_tesseract import OCREngine as TesseractEngine
+                        tesseract_engine = TesseractEngine()
+                    ocr_engine = tesseract_engine
+                    engine_name = "Tesseract"
+                    
+            elif ocr_engine_type == 'easyocr':
+                # Lazy load EasyOCR
+                if easyocr_engine is None:
+                    try:
+                        from ocr_engine_easyocr import OCREngine as EasyOCREngine
+                        easyocr_engine = EasyOCREngine()
+                        print("✅ EasyOCR engine loaded", file=sys.stderr)
+                    except Exception as e:
+                        print(f"⚠️ EasyOCR load failed: {e}, falling back to Tesseract", file=sys.stderr)
+                
+                if easyocr_engine is not None:
+                    ocr_engine = easyocr_engine
+                    engine_name = "EasyOCR"
+                    print("🔍 Using EasyOCR engine", file=sys.stderr)
+                else:
+                    # Fallback to Tesseract
+                    if tesseract_engine is None:
+                        from ocr_engine_tesseract import OCREngine as TesseractEngine
+                        tesseract_engine = TesseractEngine()
+                    ocr_engine = tesseract_engine
+                    engine_name = "Tesseract"
+                    
             else:
-                # Default to Tesseract or fallback
+                # Default to Tesseract
+                if tesseract_engine is None:
+                    try:
+                        from ocr_engine_tesseract import OCREngine as TesseractEngine
+                        tesseract_engine = TesseractEngine()
+                        print("✅ Tesseract engine loaded", file=sys.stderr)
+                    except Exception as e:
+                        return {
+                            "success": False,
+                            "error": f"Tesseract not available: {e}",
+                            "method": "engine_load_failed"
+                        }
+                
                 ocr_engine = tesseract_engine
                 engine_name = "Tesseract"
-                
-                # Show fallback message if non-Tesseract was requested
-                if ocr_engine_type == 'vietocr' and vietocr_engine is None:
-                    print("⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
-                elif ocr_engine_type == 'easyocr' and easyocr_engine is None:
-                    print("⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
-                else:
-                    print("🔍 Using Tesseract engine", file=sys.stderr)
+                print("🔍 Using Tesseract engine", file=sys.stderr)
             
             # Extract text using selected OCR engine (returns dict with full_text, title_text, avg_height)
             ocr_result = ocr_engine.extract_text(file_path)

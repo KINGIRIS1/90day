@@ -343,13 +343,15 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({
-            "error": "Usage: python process_document.py <file_path> [ocr_engine_type]",
+            "error": "Usage: python process_document.py <file_path> [ocr_engine_type] [cloud_api_key] [cloud_endpoint]",
             "success": False
         }, ensure_ascii=True))
         sys.exit(1)
     
     file_path = sys.argv[1]
     ocr_engine_type = sys.argv[2] if len(sys.argv) > 2 else 'tesseract'
+    cloud_api_key = sys.argv[3] if len(sys.argv) > 3 else None
+    cloud_endpoint = sys.argv[4] if len(sys.argv) > 4 else None
     
     if not file_path or not os.path.exists(file_path):
         error_msg = json.dumps({
@@ -361,7 +363,7 @@ def main():
         sys.stdout.flush()
         sys.exit(1)
     
-    result = process_document(file_path, ocr_engine_type)
+    result = process_document(file_path, ocr_engine_type, cloud_api_key, cloud_endpoint)
     
     # Output JSON with ASCII encoding (Unicode will be escaped like \uXXXX)
     # This ensures safe transmission through process pipes

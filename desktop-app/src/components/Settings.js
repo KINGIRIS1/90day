@@ -160,15 +160,20 @@ const Settings = () => {
       const url = await window.electronAPI.getBackendUrl();
       setBackendUrl(url || '');
       
-      // Load OCR engine type
-      const engineType = await window.electronAPI.getConfig('ocrEngineType');
-      if (engineType === 'vietocr') {
-        setOcrEngine('VietOCR (Transformer)');
-      } else if (engineType === 'easyocr') {
-        setOcrEngine('EasyOCR');
-      } else {
-        setOcrEngine('Tesseract OCR');
-      }
+      // Load OCR engine from new unified config
+      const engineType = await window.electronAPI.getConfig('ocrEngine') || 
+                         await window.electronAPI.getConfig('ocrEngineType') || 
+                         'tesseract';
+      
+      const engineMap = {
+        'tesseract': 'Tesseract OCR',
+        'easyocr': 'EasyOCR',
+        'vietocr': 'VietOCR (Transformer)',
+        'google': 'Google Cloud Vision',
+        'azure': 'Azure Computer Vision'
+      };
+      
+      setOcrEngine(engineMap[engineType] || 'Tesseract OCR');
     } catch (error) {
       console.error('Error loading settings:', error);
     }

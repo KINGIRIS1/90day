@@ -196,17 +196,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
   };
 
   const applySequentialNaming = (result, lastType) => {
-    // Apply sequential naming if:
-    // 1. Current result is UNKNOWN (no classification)
-    // 2. Low confidence (< 0.7) - might be a page without clear title
-    // 3. No title detected (indicated by missing or very short title_text)
-    // This mimics Cloud behavior: if page has no title, use previous short_code
+    // Apply sequential naming ONLY if:
+    // 1. Current result is UNKNOWN (confirmed no classification)
+    // 2. Very low confidence (< 0.3) - definitely unreliable
+    // This should be conservative - only apply when truly needed
     if (result.success && lastType) {
       const shouldUseSequential = 
         result.short_code === 'UNKNOWN' || 
-        result.confidence < 0.7 ||  // Increased from 0.5 to 0.7 to catch more cases
-        !result.title_text ||  // No title at all
-        (result.title_text && result.title_text.trim().length < 10); // Very short/no title
+        (result.confidence < 0.3 && result.short_code !== 'UNKNOWN'); // Only very low confidence
       
       if (shouldUseSequential) {
         return {
@@ -217,7 +214,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
           original_confidence: result.confidence,
           original_short_code: result.short_code,
           applied_sequential_logic: true,
-          note: `📄 Trang tiếp theo của ${lastType.short_code} (${result.short_code === 'UNKNOWN' ? 'không nhận dạng được' : 'confidence thấp'})`
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (${result.short_code === 'UNKNOWN' ? 'không nhận dạng được' : 'confidence cực thấp'})`
         };
       }
     }

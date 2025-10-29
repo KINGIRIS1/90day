@@ -127,71 +127,124 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.35):
 def get_classification_prompt():
     """
     System prompt for Vietnamese document classification
+    IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
     """
-    return """Bạn là chuyên gia phân loại tài liệu đất đai Việt Nam.
+    return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
+Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
+Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
 
-🎯 NHIỆM VỤ:
-Phân tích ảnh tài liệu và trả về JSON với:
+🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
+
+🔍 Sau đó kiểm tra tiêu đề:
+  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" → GCNM (GCN mới - tiêu đề DÀI)
+  • "Giấy chứng nhận quyền sử dụng đất" (KHÔNG có "quyền sở hữu...") → GCNC (GCN cũ - tiêu đề NGẮN)
+  • Nếu chỉ thấy "GIẤY CHỨNG NHẬN" mà không rõ tiếp theo → GCNC
+
+⚠️ QUAN TRỌNG với tài liệu 2 trang ngang:
+- Nếu thấy nền cam/vàng với quốc huy ở bên PHẢI → Đây là GCNC
+- Tập trung vào trang BÊN PHẢI để đọc tiêu đề
+
+⚠️ BỎ QUA bất kỳ ảnh cá nhân nào - chỉ tập trung vào văn bản và con dấu chính thức.
+
+⚠️ QUY TẮC NGHIÊM NGẶT: CHỈ CHẤP NHẬN KHI KHỚP 100% CHÍNH XÁC!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ KHÔNG được đoán hoặc chọn "gần giống"
+❌ KHÔNG được bỏ qua từ khóa phân biệt
+❌ KHÔNG được nhận diện nếu chỉ khớp 1 nửa hoặc vài chữ
+✅ CHỈ chọn khi khớp CHÍNH XÁC, TOÀN BỘ tiêu đề
+
+NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 {
-  "short_code": "CODE",
-  "confidence": 0.95,
-  "reasoning": "Giải thích ngắn gọn"
+  "short_code": "UNKNOWN",
+  "confidence": 0.1,
+  "reasoning": "Không thấy tiêu đề khớp chính xác với danh sách"
 }
 
-📋 DANH SÁCH 98 LOẠI TÀI LIỆU:
-BMT, HSKT, BVHC, BVN, BKKDT, DSCG, BBBDG, BBGD, BBHDDK, BBNT, BBKTSS, 
-BBKTHT, BBKTDC, KTCKCG, KTCKMG, BLTT, CCCD, DS15, DSCK, DICHUC, DCK, 
-DDKBD, DDK, CHTGD, DCQDGD, DMG, DMD, DXN, DXCMD, DGH, DXGD, DXTHT, 
-DXCD, DDCTH, DXNTH, GKH, GCNM, GCNC, GXNNVTC, GKS, GNT, GSND, GTLQ, 
-GUQ, GXNDKLD, GPXD, hoadon, HTBTH, HDCQ, HDBDG, HDTHC, HDTCO, HDTD, 
-HDUQ, PCT, PKTHS, PLYKDC, PXNKQDD, DKTC, DKTD, DKXTC, QR, QDCMD, QDTT, 
-QDCHTGD, QDDCGD, QDDCTH, QDGH, QDGTD, QDHG, QDPDBT, QDDCQH, QDPDDG, 
-QDTHA, QDTH, QDHTSD, QDXP, SDTT, TBCNBD, CKDC, TBT, TBMG, TBCKCG, 
-TBCKMG, HTNVTC, TKT, TTr, TTCG, CKTSR, VBCTCMD, VBDNCT, PDPASDD, VBTK, 
-TTHGD, CDLK, HCLK, VBTC, PCTSVC
+⚠️ QUAN TRỌNG: Một tài liệu có thể có NHIỀU TRANG
+  - Trang 1: Có tiêu đề "GIẤY CHỨNG NHẬN" → GCN
+  - Trang 2, 3, 4...: Không có tiêu đề mới → Hệ thống sẽ tự động gán là GCN
+  - CHỈ KHI thấy tiêu đề MỚI khớp 100% → Mới đổi sang loại mới
 
-🔍 QUY TẮC PHÂN TÍCH:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. **NHẬN DIỆN QUỐC HUY** (ưu tiên cao):
-   - Quốc huy Việt Nam (ngôi sao vàng, búa liềm) → Tài liệu chính thức
-   - Màu vàng/cam background → Thường là GCNC
+CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. **ĐỌC TIÊU ĐỀ** (chính xác):
-   - "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ
-   - "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN..." → GCNM (DÀI)
-   - "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT" (KHÔNG có "quyền sở hữu") → GCNC (NGẮN)
-   - "PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM..." → DKTC
-   - "QUYẾT ĐỊNH GIAO ĐẤT..." → QDGTD
-   - "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG..." → DDKBD (PHẢI có "BIẾN ĐỘNG")
-   - "ĐƠN ĐĂNG KÝ ĐẤT ĐAI..." (KHÔNG có "BIẾN ĐỘNG") → DDK
+1. "Đơn đăng ký BIẾN ĐỘNG đất đai" → DDKBD (PHẢI có "BIẾN ĐỘNG")
+   "Đơn đăng ký đất đai" → DDK (KHÔNG có "BIẾN ĐỘNG")
+   Nếu không rõ có "BIẾN ĐỘNG" không → "UNKNOWN"
 
-3. **LAYOUT & CONTEXT**:
-   - 2 trang ngang (landscape) + màu cam → GCNC
-   - Có chữ ký, con dấu → Hợp đồng (HDCQ, HDUQ, HDTD...)
-   - Có header "UBND" + "QUYẾT ĐỊNH" → QD* types
+2. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
+   "Hợp đồng THUÊ" → HDTD (PHẢI có "THUÊ")
+   "Hợp đồng THẾ CHẤP" → HDTHC (PHẢI có "THẾ CHẤP")
+   "Hợp đồng ỦY QUYỀN" → HDUQ (PHẢI có "ỦY QUYỀN")
+   Nếu không rõ loại nào → "UNKNOWN"
 
-4. **CÁC CẶP DỄ NHẦM**:
-   - GCNM vs GCNC: Check "quyền sở hữu tài sản" (có = GCNM, không = GCNC)
-   - DDKBD vs DDK: Check "biến động" (có = DDKBD, không = DDK)
-   - HDCQ vs HDTD vs HDTHC: Check "chuyển nhượng" / "thuê" / "thế chấp"
+3. "Quyết định CHO PHÉP chuyển mục đích" → QDCMD (PHẢI có "CHO PHÉP")
+   Nếu không thấy "CHO PHÉP" rõ ràng → "UNKNOWN"
 
-5. **NẾU KHÔNG RÕ RÀNG**:
-   - confidence < 0.5
-   - short_code: "UNKNOWN"
-   - reasoning: Giải thích tại sao không chắc chắn
+4. "Hợp đồng chuyển nhượng, tặng cho" → HDCQ (có "chuyển nhượng")
+   "Hợp đồng ủy quyền" → HDUQ (hoàn toàn khác!)
+   ⚠️ PHẢI phân biệt rõ giữa HDCQ và HDUQ
 
-⚠️ QUAN TRỌNG:
-- LUÔN trả về JSON format chính xác
-- confidence: 0.0 - 1.0
-- reasoning: Tiếng Việt, ngắn gọn (1-2 câu)
-- Nếu không thấy title rõ ràng: "UNKNOWN"
+VÍ DỤ:
+- Thấy "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu..." (khớp 100%) → GCNM ✅
+- Thấy "Giấy chứng nhận quyền sử dụng đất" (khớp 100%, không có "sở hữu") → GCNC ✅
+- Thấy "Bản mô tả ranh giới" (khớp 100%) → BMT ✅
+- Thấy "Hợp đồng" nhưng không rõ loại → UNKNOWN ❌
+- Chỉ thấy nội dung, không có tiêu đề → UNKNOWN ❌
 
-VÍ DỤ RESPONSE:
+DANH SÁCH ĐẦY ĐỦ - CHỈ CHỌN KHI KHỚP CHÍNH XÁC:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
+BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ) → HSKT
+BẢN VẼ HOÀN CÔNG → BVHC
+BẢN VẼ NHÀ → BVN
+BẢNG KÊ KHAI DIỆN TÍCH ĐANG SỬ DỤNG → BKKDT
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN GẮN LIỀN VỚI ĐẤT → GCNM
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC
+HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT → HDCQ
+HỢP ĐỒNG ỦY QUYỀN → HDUQ
+HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT → HDTHC
+HỢP ĐỒNG THUÊ ĐẤT, ĐIỀU HỈNH HỢP ĐỒNG THUÊ ĐẤT → HDTD
+ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDKBD
+ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK
+PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT → DKTC
+QUYẾT ĐỊNH GIAO ĐẤT, CHO THUÊ ĐẤT → QDGTD
+QUYẾT ĐỊNH CHO PHÉP CHUYỂN MỤC ĐÍCH → QDCMD
+QUYẾT ĐỊNH THU HỒI ĐẤT → QDTH
+CĂN CƯỚC CÔNG DÂN → CCCD
+DI CHÚC → DICHUC
+GIẤY KHAI SINH → GKS
+GIẤY CHỨNG NHẬN KẾT HÔN → GKH
+(... và 84 loại khác - xem đầy đủ trong hệ thống)
+
+⚠️ Nếu tiêu đề KHÔNG KHỚP CHÍNH XÁC với danh sách → Trả về UNKNOWN
+
+QUY TRÌNH KIỂM TRA:
+━━━━━━━━━━━━━━━━━━
+1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
+2. Đọc tiêu đề đầy đủ
+3. Tìm trong danh sách có tên CHÍNH XÁC 100%?
+4. NẾU CÓ → Trả về mã chính xác, confidence: 0.9
+5. NẾU KHÔNG → Trả về "UNKNOWN", confidence: 0.1
+
+TRẢ VỀ JSON (BẮT BUỘC):
 {
-  "short_code": "HDCQ",
-  "confidence": 0.92,
-  "reasoning": "Có quốc huy VN + tiêu đề 'HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT' rõ ràng"
-}"""
+  "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
+  "confidence": 0.9 hoặc 0.1,
+  "reasoning": "Giải thích ngắn gọn (1-2 câu)"
+}
+
+❗ NHẮC LẠI:
+- CHỈ trả về mã khi khớp TOÀN BỘ tiêu đề
+- KHÔNG khớp 1 nửa, vài chữ, hoặc gần giống
+- Hệ thống sẽ tự xử lý việc gán trang tiếp theo
+- LUÔN trả về JSON format"""
 
 
 def parse_gemini_response(response_text):

@@ -134,8 +134,11 @@ Expected Output:
 
 ### Tương thích:
 - ✅ Hoạt động cho cả **Cloud Boost** và **Offline OCR**
-- ✅ Hoạt động cho cả **File Scan** và **Folder Scan**
+- ✅ Hoạt động cho cả **File Scan** và **Folder Scan** (ĐÃ FIX)
 - ✅ Tương thích với **Stop/Resume** functionality
+
+### 📝 Update Log:
+**2025-01-28:** Fixed Folder Scan - Đã áp dụng sequential naming cho cả Folder Scan. Giờ cả File Scan và Folder Scan đều kế thừa short code từ file trước khi gặp UNKNOWN.
 
 ---
 

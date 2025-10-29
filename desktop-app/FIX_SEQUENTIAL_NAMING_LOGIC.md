@@ -129,13 +129,13 @@ uppercase_threshold = 0.3 if is_cloud_ocr else 0.7  # Relaxed 0.5 → 0.3 for Cl
 
 ---
 
-### Fix 2: Refined Sequential Naming Logic
+### Fix 2: Refined Sequential Naming Logic (Simplified)
 
 **File**: `/app/desktop-app/src/components/DesktopScanner.js` (dòng 207-262)
 
-```javascript
-// SAU: Logic rõ ràng hơn với 4 cases
+**LOGIC ĐƠN GIẢN HÓA** (2 cases):
 
+```javascript
 const applySequentialNaming = (result, lastType) => {
   if (result.success && lastType) {
     // Case 1: UNKNOWN → ALWAYS apply sequential
@@ -143,35 +143,48 @@ const applySequentialNaming = (result, lastType) => {
       return { ...result, /* apply sequential */ };
     }
     
-    // Case 2: Không có title VÀ confidence < 0.5 → Apply sequential
-    if (!result.title_extracted_via_pattern && result.confidence < 0.5) {
+    // Case 2: Không có title extracted → ALWAYS apply sequential
+    // Lý do: Page 2/3/4 không có title, body text không đáng tin cậy
+    if (!result.title_extracted_via_pattern) {
       return { ...result, /* apply sequential */ };
     }
     
-    // Case 3: Không có title NHƯNG confidence >= 0.5 → KHÔNG apply
-    // → Body text classification đủ tin cậy
-    
-    // Case 4: Có title extracted → KHÔNG apply (dù confidence thấp)
-    // → Document mới với title riêng
+    // Case 3: Có title extracted → Document MỚI → NO sequential
   }
   
-  return result; // Default: Keep original classification
+  return result; // Default: Keep original
 };
 ```
 
-**Logic table**:
+**Logic table (Simplified)**:
 
-| Condition | title_extracted | confidence | Action | Lý do |
-|-----------|----------------|------------|--------|-------|
-| Case 1 | - | - | Apply sequential | UNKNOWN → chắc chắn là trang tiếp theo |
-| Case 2 | ❌ false | < 0.5 | Apply sequential | Không có title + không tin cậy |
-| Case 3 | ❌ false | ≥ 0.5 | Keep original | Body text classification đủ tin cậy |
-| Case 4 | ✅ true | any | Keep original | Có title → document mới |
+| Condition | title_extracted | Action | Lý do |
+|-----------|----------------|--------|-------|
+| Case 1 | - | Apply sequential | UNKNOWN → trang tiếp theo |
+| Case 2 | ❌ false | Apply sequential | Không có title → page 2/3/4 |
+| Case 3 | ✅ true | Keep original | Có title → document mới |
+
+**CRITICAL INSIGHT**:
+- ❌ **SAI** (old): "No title + confidence ≥ 0.5 → Keep classification"
+- ✅ **ĐÚNG** (new): "No title → ALWAYS sequential (dù confidence cao)"
+- **Vì sao?**: Page 2/3 của "HỢP ĐỒNG" có thể chứa keywords của doc type khác
+  - Ví dụ: "đăng ký", "biện pháp bảo đảm" → Match DKTC
+  - → Body text classification KHÔNG đáng tin cậy cho continuation pages
+
+**Real Example từ User**:
+```
+Page 1: "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ ✅
+Page 2: "Các bên giao kết... đăng ký biện pháp..." 
+   - No title extracted ❌
+   - Body text match DKTC (confidence 70%) ❌
+   - OLD logic: Keep DKTC → SAI ❌
+   - NEW logic: Apply sequential → HDCQ ✅
+```
 
 **Kết quả**:
-- ✅ Documents với title rõ ràng KHÔNG bị sequential naming
-- ✅ Chỉ apply cho truly unknown hoặc continuation pages
-- ✅ Console logs rõ ràng cho debug
+- ✅ Page 2/3/4 không có title → Luôn được assign vào document type của page 1
+- ✅ Chỉ documents với title rõ ràng mới được classify riêng
+- ✅ Body text classification không override sequential naming
 
 ---
 

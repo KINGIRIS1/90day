@@ -619,15 +619,26 @@ def parse_gemini_response(response_text):
             
             # Validate required fields
             if 'short_code' in result and 'confidence' in result:
-                short_code = result.get('short_code', 'UNKNOWN').strip()
+                short_code = str(result.get('short_code', 'UNKNOWN')).strip()
                 
-                # Sanitize short_code - remove invalid characters
-                # Valid format: All uppercase letters, no special chars except underscore
-                short_code = re.sub(r'[^A-Z_]', '', short_code.upper())
-                
-                # Check if valid code (not empty, not N/A)
-                if not short_code or short_code == 'N' or short_code == 'NA':
+                # Handle common invalid responses
+                invalid_codes = ['N/A', 'NA', 'N', 'NONE', 'NULL', 'UNDEFINED', '']
+                if short_code.upper() in invalid_codes:
+                    print(f"⚠️ Invalid short_code from Gemini: '{short_code}', using UNKNOWN", file=sys.stderr)
                     short_code = 'UNKNOWN'
+                else:
+                    # Sanitize short_code - remove invalid characters
+                    # Valid format: All uppercase letters, no special chars except underscore
+                    original_code = short_code
+                    short_code = re.sub(r'[^A-Z0-9_]', '', short_code.upper())
+                    
+                    if short_code != original_code:
+                        print(f"⚠️ Sanitized short_code: '{original_code}' → '{short_code}'", file=sys.stderr)
+                    
+                    # Check if valid code (not empty after sanitization)
+                    if not short_code or len(short_code) < 2:
+                        print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
+                        short_code = 'UNKNOWN'
                 
                 return {
                     "short_code": short_code,

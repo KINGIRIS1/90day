@@ -63,9 +63,9 @@ def test_gemini_api_key(api_key):
                         print()
                         print("✅ API key đã được verify thành công")
                         print("✅ Gemini API đã được enable")
-                        print("✅ Model: gemini-2.0-flash")
-                        print("✅ Cost: $0.16/1,000 images")
-                        print("✅ Free tier: 45,000 requests/tháng")
+                        print("✅ Model: gemini-2.5-flash")
+                        print("✅ Cost: ~$0.15/1,000 images (ước tính)")
+                        print("✅ Free tier: Khả dụng (kiểm tra quota tại console.cloud.google.com)")
                         return True
             
             print("❌ Response không hợp lệ")

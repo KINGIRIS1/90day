@@ -88,10 +88,18 @@ function CloudSettings() {
   const handleTestKey = async (provider) => {
     setTestingKey(provider);
     try {
-      const key = provider === 'google' ? googleKey : azureKey;
-      const endpoint = provider === 'azure' ? azureEndpoint : null;
+      let key, endpoint;
       
-      if (!key.trim()) {
+      if (provider === 'google') {
+        key = googleKey;
+      } else if (provider === 'gemini') {
+        key = geminiKey;
+      } else if (provider === 'azure') {
+        key = azureKey;
+        endpoint = azureEndpoint;
+      }
+      
+      if (!key || !key.trim()) {
         alert('⚠️ Vui lòng nhập API key trước khi test!');
         return;
       }

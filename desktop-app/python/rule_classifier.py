@@ -2189,5 +2189,6 @@ class RuleClassifier:
     def __init__(self):
         pass
 
-    def classify(self, text: str, title_text: str = None) -> Dict:
-        return classify_by_rules(text, title_text)
+    def classify(self, text: str, title_text: str = None, ocr_engine: str = 'tesseract') -> Dict:
+        return classify_by_rules(text, title_text, ocr_engine=ocr_engine)
+

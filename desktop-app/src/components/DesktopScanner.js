@@ -180,6 +180,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   const processOffline = async (file) => {
     try {
+      // This calls Python with current ocrEngine config (tesseract/easyocr/vietocr/google/azure)
+      // Main.js will load API keys if engine is 'google' or 'azure'
       const result = await window.electronAPI.processDocumentOffline(file.path);
       return result;
     } catch (error) {

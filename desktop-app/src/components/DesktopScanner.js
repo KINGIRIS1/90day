@@ -814,7 +814,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                         <div className="text-sm font-medium truncate" title={r.fileName}>{r.fileName}</div>
                         <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
                           {getMethodBadge(r.method)}
-                          <span className="ml-auto font-semibold">{(r.confidence * 100).toFixed(0)}%</span>
+                          <span className="ml-auto font-semibold">{formatConfidence(r.confidence)}%</span>
                         </div>
                         <div className="mt-2 text-xs text-gray-600">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
                         <div className="mt-2 p-2 bg-gray-50 border rounded">

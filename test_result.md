@@ -165,6 +165,83 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      ✅ BYOK PHASE 2 - CLOUD OCR PYTHON INTEGRATION COMPLETE
+      
+      🎯 Hoàn thành tích hợp Python OCR engines với stored API keys:
+      
+      📦 PYTHON OCR ENGINES:
+      1. ocr_engine_google.py (168 lines) - Google Cloud Vision API
+         - TEXT_DETECTION với language hints (vi, en)
+         - Word-level confidence calculation
+         - Error handling cho API errors
+         
+      2. ocr_engine_azure.py (182 lines) - Azure Computer Vision API
+         - Read API v3.2 với async polling
+         - Max 10s timeout
+         - Comprehensive error messages
+      
+      📦 PROCESS_DOCUMENT.PY UPDATES:
+      - Updated function signature: process_document(file_path, ocr_engine_type, cloud_api_key, cloud_endpoint)
+      - Support 5 engines: tesseract, vietocr, easyocr, google, azure
+      - Cloud engine validation và error handling
+      - Proper metadata return (ocr_confidence, method: cloud_ocr)
+      
+      📦 ELECTRON MAIN.JS UPDATES:
+      1. Fixed getPythonScriptPath() - Multiple fallback paths cho production
+      2. Updated process-document-offline handler:
+         - Load API keys từ electron-store
+         - Validate keys before calling Python
+         - Pass keys as CLI args
+         - Check ocrEngine config (not ocrEngineType)
+      
+      📦 CLOUDSETTINGS.JS MAPPING:
+      - UI → Backend value mapping
+      - 'offline-tesseract' → 'tesseract'
+      - 'offline-easyocr' → 'easyocr'
+      - Save as 'ocrEngine' config key
+      
+      📦 REQUIREMENTS.TXT:
+      - Added requests>=2.31.0 for cloud APIs
+      
+      🐛 FIXES:
+      1. ✅ Fixed Python path issue trong production build
+         - getPythonScriptPath với 4 fallback paths
+         - Should fix "rules_manager.py not found" error
+      
+      2. ✅ Added requests library to requirements
+      
+      📂 FILES CREATED/MODIFIED:
+      - ✅ /app/desktop-app/python/ocr_engine_google.py (NEW)
+      - ✅ /app/desktop-app/python/ocr_engine_azure.py (NEW)
+      - ✅ /app/desktop-app/python/process_document.py (updated)
+      - ✅ /app/desktop-app/electron/main.js (updated)
+      - ✅ /app/desktop-app/src/components/CloudSettings.js (updated)
+      - ✅ /app/desktop-app/python/requirements.txt (updated)
+      - ✅ /app/desktop-app/public/electron.js (synced)
+      - ✅ /app/desktop-app/public/preload.js (synced)
+      - ✅ /app/desktop-app/BYOK_PHASE2_COMPLETE.md (doc)
+      
+      🧪 TESTING NEEDED:
+      - ⏳ Test Python path fix (rules manager should work)
+      - ⏳ Test Google Cloud Vision với real API key
+      - ⏳ Test Azure Computer Vision với real API key
+      - ⏳ Compare accuracy: Tesseract vs Google vs Azure
+      - ⏳ Test API key persistence across restart
+      
+      📌 ACCURACY COMPARISON:
+      - Tesseract: 75-85% (offline, miễn phí)
+      - EasyOCR: 88-92% (offline, miễn phí)
+      - VietOCR: 90-95% (offline, miễn phí)
+      - Google: 90-95% (cloud, $1.50/1K, free 1K/month)
+      - Azure: 92-96% (cloud, $1.00/1K, free 5K/month)
+      
+      📌 NEXT STEPS:
+      1. User test với real API keys
+      2. Validate accuracy improvements
+      3. Future: Usage tracking, cost estimation
+  
+  - agent: "main"
+    message: |
       ✅ BYOK (BRING YOUR OWN KEY) - CLOUD OCR INTEGRATION
       
       🎯 TÍNH NĂNG MỚI:

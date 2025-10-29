@@ -11,23 +11,37 @@ import base64
 import json
 from pathlib import Path
 
-def ocr_google_cloud_vision(image_path, api_key):
+def ocr_google_cloud_vision(image_path, api_key, crop_top_percent=0.35):
     """
     Perform OCR using Google Cloud Vision API with API key authentication
     
     Args:
         image_path: Path to image file
         api_key: Google Cloud Vision API key
+        crop_top_percent: Percentage of top image to process (default 0.35 = 35%)
         
     Returns:
         tuple: (extracted_text, confidence_score)
     """
     try:
         import requests
+        from PIL import Image
+        import io
         
-        # Read and encode image
-        with open(image_path, 'rb') as f:
-            image_content = f.read()
+        # Read and crop image to top portion (where title/header usually is)
+        with Image.open(image_path) as img:
+            width, height = img.size
+            
+            # Crop to top N% (default 35%)
+            crop_height = int(height * crop_top_percent)
+            cropped_img = img.crop((0, 0, width, crop_height))
+            
+            # Convert to bytes
+            img_byte_arr = io.BytesIO()
+            cropped_img.save(img_byte_arr, format=img.format or 'PNG')
+            image_content = img_byte_arr.getvalue()
+            
+            print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
         
         encoded_image = base64.b64encode(image_content).decode('utf-8')
         

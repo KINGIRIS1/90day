@@ -33,31 +33,14 @@ os.environ['FLAGS_use_mkldnn'] = '0'
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))
 
-try:
-    # Always import Tesseract (required)
-    from ocr_engine_tesseract import OCREngine as TesseractEngine
-    from rule_classifier import RuleClassifier
-    
-    # Initialize Tesseract engine
-    tesseract_engine = TesseractEngine()
-    
-    # Try to import and initialize VietOCR (optional)
-    vietocr_engine = None
-    VietOCREngine = None
-    
-    try:
-        from ocr_engine_vietocr import OCREngine as VietOCREngine
-        vietocr_engine = VietOCREngine()
-        print("✅ VietOCR engine loaded", file=sys.stderr)
-    except ImportError as viet_import_error:
-        print(f"⚠️ VietOCR not installed: {viet_import_error}", file=sys.stderr)
-    except Exception as viet_error:
-        print(f"⚠️ VietOCR initialization failed: {viet_error}", file=sys.stderr)
-    
-    # Try to import and initialize EasyOCR (optional)
-    easyocr_engine = None
-    EasyOCREngine = None
-    
+# Import rule classifier (always needed)
+from rule_classifier import RuleClassifier
+
+# Lazy import OCR engines only when needed
+# This allows Google/Azure to work even if Tesseract dependencies are missing
+tesseract_engine = None
+vietocr_engine = None
+easyocr_engine = None
     try:
         from ocr_engine_easyocr import OCREngine as EasyOCREngine
         easyocr_engine = EasyOCREngine()

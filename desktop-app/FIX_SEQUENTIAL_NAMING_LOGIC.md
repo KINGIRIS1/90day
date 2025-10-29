@@ -230,21 +230,27 @@ SAU:
 - ✅ Không apply sequential naming
 ```
 
-### Scenario 2: Document Sequence (Page 1, 2, 3)
+### Scenario 2: Document Sequence (Page 1, 2, 3) - CRITICAL
 ```
 Doc 1: "GIẤY CHỨNG NHẬN..." → GCNQSDD (confidence 88%)
+- ✅ title_extracted = true
 - ✅ Update currentLastKnown (88% ≥ 70%)
 
-Doc 2: [Page 2 - no title] → confidence 45%
-- ✅ Apply sequential (no title + confidence < 50%) → GCNQSDD
+Doc 2: [Page 2 - no title, body text matches DKTC keywords]
+- ❌ title_extracted = false
+- Body classification: DKTC (confidence 70%)
+- OLD: ❌ Keep DKTC (confidence ≥ 50%)
+- NEW: ✅ Apply sequential → GCNQSDD
 
-Doc 3: [Page 3 - no title] → confidence 40%
+Doc 3: [Page 3 - no title]
+- ❌ title_extracted = false
 - ✅ Apply sequential → GCNQSDD
 ```
 
-### Scenario 3: Mixed Documents (ĐKBĐ → ĐƠN XIN)
+### Scenario 3: Mixed Documents (ĐKBĐ → ĐƠN XIN) - CRITICAL
 ```
 Doc 1: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG" → ĐKBĐ (confidence 92%)
+- ✅ title_extracted = true
 - ✅ Update currentLastKnown
 
 Doc 2: "ĐƠN XIN CHUYỂN MỤC ĐÍCH..." → ĐƠN XIN (confidence 75%)
@@ -252,8 +258,28 @@ Doc 2: "ĐƠN XIN CHUYỂN MỤC ĐÍCH..." → ĐƠN XIN (confidence 75%)
 - ✅ Keep classification: ĐƠN XIN
 - ✅ Update currentLastKnown (75% ≥ 70%)
 
-Doc 3: [Page 2 của ĐƠN XIN - no title] → confidence 42%
-- ✅ Apply sequential → ĐƠN XIN (từ currentLastKnown)
+Doc 3: [Page 2 của ĐƠN XIN - no title, body matches GCNQSDD keywords]
+- ❌ title_extracted = false
+- Body classification: GCNQSDD (confidence 65%)
+- OLD: ❌ Keep GCNQSDD (confidence ≥ 50%)
+- NEW: ✅ Apply sequential → ĐƠN XIN
+```
+
+### Scenario 4: Real User Case (HỢP ĐỒNG CHUYỂN NHƯỢNG)
+```
+File 1: 20240504-01700003.jpg
+- Text: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+- Pattern match: ✅ HDCQ (100% uppercase)
+- Result: HDCQ (confidence 90%)
+- ✅ Update currentLastKnown
+
+File 2: 20240504-01700007.jpg
+- Text: "Các bên giao kết... đăng ký biện pháp bảo đảm..."
+- Pattern match: ❌ No title found
+- Body classification: DKTC (confidence 70%)
+- title_extracted: false
+- OLD: ❌ Keep DKTC → SAI!
+- NEW: ✅ Apply sequential → HDCQ → ĐÚNG!
 ```
 
 ---

@@ -1962,17 +1962,16 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         is_uppercase_title = title_uppercase_ratio >= 0.7
         
-        # RELAXED threshold: 75% instead of 80% to handle more OCR errors
-        # With EasyOCR, even with typos like "ĐỎNG", "UỶ", we get 70-80% similarity
-        similarity_threshold = 0.75
-        
-        if best_similarity >= similarity_threshold and is_uppercase_title:
+        # INSTANT HIGH CONFIDENCE: Title similarity >= 80%
+        if best_similarity >= 0.80 and is_uppercase_title:
             # HIGH CONFIDENCE - Direct match based on title
             doc_name = classify_document_name_from_code(best_template_match)
             
             # Boost confidence for UPPERCASE titles (more reliable)
             confidence = best_similarity
             confidence = min(confidence * 1.05, 1.0)  # 5% boost for uppercase
+            
+            print(f"✅ TIER 1 MATCH: Title '{title_text[:50]}...' matches {best_template_match} ({best_similarity:.1%} similarity)", file=sys.stderr)
             
             return {
                 "type": best_template_match,
@@ -1981,15 +1980,22 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
                 "confidence": confidence,
                 "matched_keywords": [f"Title fuzzy match: {best_similarity:.0%} (Uppercase: {title_uppercase_ratio:.0%})"],
                 "title_boost": True,
-                "reasoning": f"✅ HIGH CONFIDENCE title match ({best_similarity:.0%} similarity, {title_uppercase_ratio:.0%} uppercase) [TIER 1: FUZZY MATCH]",
+                "reasoning": f"High title similarity: {best_similarity:.1%} (Instant match)",
                 "method": "fuzzy_title_match",
                 "accuracy_estimate": "95%+",
                 "recommend_cloud_boost": False  # Very confident, no need for cloud boost
             }
         
-        elif best_similarity >= 0.5:
-            # MEDIUM CONFIDENCE - Verify with keywords
+        elif best_similarity >= 0.70 and is_uppercase_title:
+            # MEDIUM CONFIDENCE (70-80%) - Verify with keywords
+            print(f"⚠️ TIER 2: Title similarity {best_similarity:.1%}, verifying with keywords...", file=sys.stderr)
             # Continue to Tier 2...
+            pass
+        
+        else:
+            # LOW SIMILARITY (< 70%) - Don't trust title, use body keywords only
+            print(f"⚠️ Title similarity too low ({best_similarity:.1%}), using body text only", file=sys.stderr)
+            # Continue to Tier 3...
             pass
     
     # ==================================================================

@@ -360,10 +360,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const childResults = [];
     stopRef.current = false;
     
-    // Get engine preference from config (respect user settings)
-    const enginePref = await window.electronAPI.getConfig('enginePreference');
-    const preferCloud = enginePref === 'cloud';
-    
     // Track last known type for sequential naming (same as file scan)
     let currentLastKnown = null;
     
@@ -374,22 +370,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
       const f = files[i];
       
-      // Use engine preference (same as file scan)
-      let r;
-      if (preferCloud) {
-        r = await processCloudBoost(f);
-        
-        // Check stop after async
-        if (stopRef.current) {
-          console.log('❌ Folder scan stopped after cloud at file', i);
-          break;
-        }
-        
-        if (!r.success && autoFallbackEnabled) {
-          r = await processOffline(f);
-        }
-      } else {
-        r = await processOffline(f);
+      // Process with current ocrEngine (tesseract/easyocr/vietocr/google/azure)
+      // Main.js will handle API keys automatically for cloud engines
+      let r = await processOffline(f);
+      
+      // Check stop after async operation
+      if (stopRef.current) {
+        console.log('❌ Folder scan stopped after processing at file', i);
+        break;
       }
       
       // Check stop after processing

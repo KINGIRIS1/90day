@@ -50,18 +50,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [remainingFiles, setRemainingFiles] = useState([]); // Files left to process
 
   // Load config (guard electron)
-  useEffect(() => { if (enginePrefProp) setEnginePref(enginePrefProp); }, [enginePrefProp]);
-
   useEffect(() => {
     const loadConfig = async () => {
       const api = window.electronAPI;
       if (!api) return;
+      
+      // Load backend URL and auto-fallback
       const url = await api.getBackendUrl();
       setBackendUrl(url || '');
       const enabled = await api.getConfig('autoFallbackEnabled');
       setAutoFallbackEnabled(!!enabled);
-      const ep = await api.getConfig('enginePreference');
-      setEnginePref(ep || 'offline');
+      
+      // Load current OCR engine from unified config
+      const engine = await api.getConfig('ocrEngine') || 'tesseract';
+      setCurrentOcrEngine(engine);
+      
+      console.log('🔍 Current OCR Engine:', engine);
     };
     try { loadConfig(); } catch {}
   }, []);

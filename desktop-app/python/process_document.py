@@ -126,13 +126,57 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
     
     Args:
         file_path: Path to the image file
-        ocr_engine_type: 'tesseract', 'vietocr', 'easyocr', 'google', or 'azure'
-        cloud_api_key: API key for cloud OCR (Google/Azure)
-        cloud_endpoint: Endpoint URL for Azure (optional for Google)
+        ocr_engine_type: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure', or 'gemini-flash'
+        cloud_api_key: API key for cloud OCR/AI (Google/Azure/Gemini)
+        cloud_endpoint: Endpoint URL for Azure (optional for Google/Gemini)
     
     Returns classification result with confidence
     """
     try:
+        # Handle Gemini Flash (AI classification)
+        if ocr_engine_type == 'gemini-flash':
+            if not cloud_api_key:
+                return {
+                    "success": False,
+                    "error": "Google API key is required for Gemini Flash",
+                    "method": "config_error"
+                }
+            
+            print("🤖 Using Gemini Flash 2.0 AI", file=sys.stderr)
+            
+            # Import and run Gemini Flash classification
+            from ocr_engine_gemini_flash import classify_document_gemini_flash
+            result = classify_document_gemini_flash(file_path, cloud_api_key)
+            
+            if result.get("short_code") == "ERROR":
+                return {
+                    "success": False,
+                    "error": result.get("reasoning", "Gemini Flash error"),
+                    "method": "gemini_flash_failed"
+                }
+            
+            # Map Gemini result to rule_classifier format
+            from rule_classifier import classify_document_name_from_code
+            
+            short_code = result.get("short_code", "UNKNOWN")
+            doc_name = classify_document_name_from_code(short_code)
+            
+            return {
+                "success": True,
+                "type": short_code,
+                "doc_type": doc_name,
+                "short_code": short_code,
+                "confidence": result.get("confidence", 0.5),
+                "matched_keywords": [result.get("reasoning", "AI classification")],
+                "title_boost_applied": True if short_code != "UNKNOWN" else False,
+                "title_extracted_via_pattern": True if short_code != "UNKNOWN" else False,
+                "reasoning": result.get("reasoning", ""),
+                "method": "gemini_flash_ai",
+                "accuracy_estimate": f"{int(result.get('confidence', 0.5) * 100)}%",
+                "recommend_cloud_boost": False,
+                "avg_font_height": 0
+            }
+        
         # Handle Cloud OCR engines
         if ocr_engine_type == 'google':
             if not cloud_api_key:

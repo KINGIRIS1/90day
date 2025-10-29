@@ -41,6 +41,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openRulesFolder: () => ipcRenderer.invoke('open-rules-folder'),
   generateKeywordVariants: (keyword, includeTypos) => ipcRenderer.invoke('generate-keyword-variants', keyword, includeTypos),
   
+  // Cloud OCR API Key Management
+  saveApiKey: (data) => ipcRenderer.invoke('save-api-key', data),
+  getApiKey: (provider) => ipcRenderer.invoke('get-api-key', provider),
+  deleteApiKey: (provider) => ipcRenderer.invoke('delete-api-key', provider),
+  testApiKey: (data) => ipcRenderer.invoke('test-api-key', data),
+  
   // Platform info
   platform: process.platform,
   isElectron: true

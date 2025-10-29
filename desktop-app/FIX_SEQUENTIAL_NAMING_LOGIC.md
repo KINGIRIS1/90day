@@ -109,23 +109,55 @@ cd /app/desktop-app && python test_title_pattern.py
 
 ---
 
-### Fix 1: Giảm Uppercase Threshold cho Cloud OCR
+### Fix 1: Uppercase Threshold - STRICT MODE (70% for ALL)
 
 **File**: `/app/desktop-app/python/rule_classifier.py` (dòng 1931)
 
 ```python
-# SAU:
-uppercase_threshold = 0.3 if is_cloud_ocr else 0.7  # Relaxed 0.5 → 0.3 for Cloud OCR
+# AFTER: STRICT MODE
+uppercase_threshold = 0.7  # 70% for ALL engines (Cloud + Offline)
 
 # GIẢI THÍCH:
-# - Cloud OCR (Google/Azure) rất chính xác, có thể extract titles với mixed case
-# - Ví dụ: "Đơn xin chuyển..." có ~30-40% uppercase → Vẫn là title hợp lệ
-# - Offline OCR vẫn giữ 70% vì ít chính xác hơn
+# - Vietnamese admin document titles MUST be uppercase (70%+)
+# - Examples: "HỢP ĐỒNG CHUYỂN NHƯỢNG...", "GIẤY CHỨNG NHẬN..."
+# - Cloud OCR (Google/Azure) is highly accurate → No need for relaxed threshold
+# - Prevents false positives (body text with lowercase letters)
 ```
 
+**Evolution of thresholds**:
+```python
+# Version 1 (OLD): Differentiated thresholds
+Cloud OCR: 0.5 (50%)    → Too relaxed
+Offline OCR: 0.7 (70%)  → Correct
+
+# Version 2 (PREVIOUS): More relaxed Cloud
+Cloud OCR: 0.3 (30%)    → Way too relaxed!
+Offline OCR: 0.7 (70%)  → Correct
+
+# Version 3 (CURRENT): STRICT MODE ✅
+Cloud OCR: 0.7 (70%)    → STRICT: Title MUST be uppercase
+Offline OCR: 0.7 (70%)  → STRICT: Same standard
+```
+
+**Rationale**:
+1. **Vietnamese administrative documents**: Titles are ALWAYS uppercase
+   - ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT" (100%)
+   - ✅ "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT" (100%)
+   - ✅ "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG" (100%)
+   - ❌ "Hợp đồng chuyển nhượng..." (mixed case → body text)
+
+2. **Cloud OCR accuracy**: Google/Azure extract uppercase correctly
+   - No need for relaxed threshold
+   - 70% is appropriate for high-quality OCR
+
+3. **Prevent false positives**: Body text with document mentions
+   - ❌ "Các bên giao kết hợp đồng..." (lowercase)
+   - ❌ "Theo giấy chứng nhận số..." (lowercase)
+
 **Kết quả**: 
-- ✅ Cloud OCR titles với 30-50% uppercase được chấp nhận
-- ✅ Logging rõ ràng hơn: `"Title has low uppercase (35% < 30%)"`
+- ✅ Only TRUE uppercase titles accepted
+- ✅ Body text mentions rejected
+- ✅ Same strict standard for all OCR engines
 
 ---
 

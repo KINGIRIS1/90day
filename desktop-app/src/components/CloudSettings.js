@@ -56,7 +56,8 @@ function CloudSettings() {
         'offline-easyocr': 'easyocr',
         'offline-vietocr': 'vietocr',
         'google': 'google',
-        'azure': 'azure'
+        'azure': 'azure',
+        'gemini-flash': 'gemini-flash'
       };
       
       const backendEngine = engineMapping[ocrEngine] || 'tesseract';
@@ -67,6 +68,9 @@ function CloudSettings() {
       // Save API keys if provided
       if (ocrEngine === 'google' && googleKey.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'google', apiKey: googleKey.trim() });
+      }
+      if (ocrEngine === 'gemini-flash' && geminiKey.trim()) {
+        await window.electronAPI.saveApiKey({ provider: 'gemini', apiKey: geminiKey.trim() });
       }
       if (ocrEngine === 'azure' && azureKey.trim() && azureEndpoint.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'azure', apiKey: azureKey.trim() });

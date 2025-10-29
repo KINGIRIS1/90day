@@ -204,6 +204,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
+  // Helper function to safely format confidence percentage
+  const formatConfidence = (confidence) => {
+    if (confidence === null || confidence === undefined || isNaN(confidence)) {
+      return '0';
+    }
+    const conf = parseFloat(confidence);
+    if (isNaN(conf) || conf < 0 || conf > 1) {
+      return '0';
+    }
+    return (conf * 100).toFixed(0);
+  };
+
   const applySequentialNaming = (result, lastType) => {
     // REFINED LOGIC v2:
     // Apply sequential naming khi:

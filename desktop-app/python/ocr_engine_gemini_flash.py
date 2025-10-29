@@ -25,7 +25,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.35):
         dict: Classification result with short_code, confidence, reasoning
     """
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+        import requests
         
         # Read and crop image to top portion (where title/header usually is)
         with Image.open(image_path) as img:
@@ -45,40 +45,78 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.35):
         # Encode to base64
         encoded_image = base64.b64encode(image_content).decode('utf-8')
         
-        # Create Gemini Flash chat instance
-        chat = LlmChat(
-            api_key=api_key,
-            session_id="gemini-flash-doc-classify",
-            system_message=get_classification_prompt()
-        ).with_model("gemini", "gemini-2.0-flash")
+        # Use direct REST API instead of emergentintegrations
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
         
-        # Create message with image
-        image_attachment = ImageContent(image_base64=encoded_image)
+        # Create request payload
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": get_classification_prompt()},
+                    {
+                        "inline_data": {
+                            "mime_type": "image/png",
+                            "data": encoded_image
+                        }
+                    }
+                ]
+            }]
+        }
         
-        user_message = UserMessage(
-            text="Classify this Vietnamese land document. Return JSON with: short_code, confidence (0-1), reasoning",
-            file_contents=[image_attachment]
+        print(f"📡 Sending request to Gemini Flash...", file=sys.stderr)
+        
+        # Send request
+        response = requests.post(
+            url,
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            timeout=30
         )
         
-        # Run async classification
-        result = asyncio.run(chat.send_message(user_message))
+        print(f"📊 Response status: {response.status_code}", file=sys.stderr)
         
-        print(f"🤖 Gemini Flash response: {result[:200]}...", file=sys.stderr)
+        if response.status_code != 200:
+            error_msg = f"API error {response.status_code}: {response.text[:200]}"
+            print(f"❌ {error_msg}", file=sys.stderr)
+            return {
+                "short_code": "ERROR",
+                "confidence": 0,
+                "reasoning": error_msg
+            }
         
-        # Parse result
-        classification = parse_gemini_response(result)
+        result_data = response.json()
         
-        return classification
+        # Extract text from response
+        if 'candidates' in result_data and len(result_data['candidates']) > 0:
+            candidate = result_data['candidates'][0]
+            if 'content' in candidate and 'parts' in candidate['content']:
+                parts = candidate['content']['parts']
+                if len(parts) > 0 and 'text' in parts[0]:
+                    result_text = parts[0]['text']
+                    print(f"🤖 Gemini response: {result_text[:200]}...", file=sys.stderr)
+                    
+                    # Parse result
+                    classification = parse_gemini_response(result_text)
+                    return classification
+        
+        # No valid response
+        return {
+            "short_code": "UNKNOWN",
+            "confidence": 0.3,
+            "reasoning": "Could not parse Gemini response"
+        }
         
     except ImportError as e:
-        missing_lib = str(e).split("'")[1] if "'" in str(e) else "emergentintegrations"
+        missing_lib = str(e).split("'")[1] if "'" in str(e) else "unknown"
         return {
             "short_code": "ERROR",
             "confidence": 0,
-            "reasoning": f"Missing library: {missing_lib}. Run: pip install emergentintegrations --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/"
+            "reasoning": f"Missing library: {missing_lib}. Install: pip install {missing_lib}"
         }
     except Exception as e:
         print(f"❌ Gemini Flash error: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         return {
             "short_code": "ERROR",
             "confidence": 0,

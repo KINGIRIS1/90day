@@ -296,6 +296,15 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
         # Pass engine type to classifier for smart title validation
         result = classifier.classify(extracted_text, title_text=final_title, ocr_engine=ocr_engine_type)
         
+        # Handle case where classification completely fails (no doc_type found)
+        if not result or 'doc_type' not in result:
+            result = {
+                'doc_type': 'Không xác định',
+                'short_code': 'UNKNOWN',
+                'confidence': 0.0,
+                'reasoning': 'Không thể nhận diện loại tài liệu'
+            }
+        
         # Determine if Cloud Boost is recommended (only for offline engines)
         confidence_threshold = 0.7
         is_cloud = ocr_engine_type in ['google', 'azure']

@@ -1125,8 +1125,8 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
       // Test Gemini Flash API
       const axios = require('axios');
       
-      // Test with Gemini Flash using generateContent API
-      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      // Test with Gemini Flash using generateContent API (v1beta)
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
       
       const response = await axios.post(testUrl, {
         contents: [{

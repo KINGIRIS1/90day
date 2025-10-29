@@ -410,7 +410,88 @@ agent_communication:
   
   - agent: "main"
     message: |
-      ✅ STRICT MODE: Uppercase Threshold 70% for ALL OCR Engines
+      🐛 CRITICAL BUG FIX: Sequential Naming with title_boost_applied
+      
+      📋 USER REPORT (Real Case):
+      - File: 20240504-01700004.jpg
+      - Text: "Giấy chứng nhận quyền sử dụng đất..." (5% uppercase)
+      - Pattern matched ✅ → title_extracted_via_pattern = true
+      - Uppercase check ❌ → 5% < 70% → Title REJECTED
+      - Result: Classified as KHÁC với tài liệu trước (HDCQ) → SAI!
+      - Expected: Sequential naming → HDCQ
+      
+      🐛 ROOT CAUSE:
+      - OLD logic checked: `!title_extracted_via_pattern`
+      - Problem: title_extracted_via_pattern = true (pattern matched)
+      - NHƯNG title bị REJECT bởi uppercase check
+      - → Sequential không apply → Body classification used → SAI!
+      
+      ✅ FIX v3: Check `title_boost_applied` instead
+      
+      ```javascript
+      // OLD (SAI):
+      if (!result.title_extracted_via_pattern) {
+        applySequential();  // Only if NO pattern match
+      }
+      
+      // NEW (ĐÚNG):
+      if (!result.title_boost_applied) {
+        applySequential();  // If title NOT USED by classifier
+      }
+      ```
+      
+      **KEY INSIGHT**:
+      - `title_extracted_via_pattern`: Pattern có match không? (TRƯỚC uppercase check)
+      - `title_boost_applied`: Classifier có DÙNG title không? (SAU uppercase check)
+      
+      **Logic Flow**:
+      ```
+      1. Pattern matched → title_extracted_via_pattern = true
+      2. Uppercase check: 5% < 70% → REJECT
+      3. Classifier không dùng title → title_boost_applied = false
+      4. Sequential logic check: !title_boost_applied → Apply sequential ✅
+      ```
+      
+      📊 LOGIC TABLE:
+      | title_extracted | uppercase | title_boost | Action |
+      |----------------|-----------|-------------|---------|
+      | ❌ false | N/A | ❌ false | Sequential |
+      | ✅ true | < 70% | ❌ false | Sequential ← FIX |
+      | ✅ true | ≥ 70% | ❌ false | Sequential |
+      | ✅ true | ≥ 70% | ✅ true | New doc |
+      
+      📦 FILES MODIFIED:
+      1. /app/desktop-app/src/components/DesktopScanner.js (line 207-262)
+         - Changed check from title_extracted_via_pattern
+         - To: title_boost_applied
+         - Added detailed reason logging
+      
+      2. /app/desktop-app/FIX_SEQUENTIAL_NAMING_LOGIC.md
+         - Updated Fix 2 section with bug details
+         - Added logic table with all cases
+         - Real example with step-by-step flow
+      
+      🧪 VERIFICATION - Real User Case:
+      ```
+      File: 20240504-01700004.jpg
+      Pattern: "Giấy chứng nhận..." ✅
+      Uppercase: 5% < 70% ❌
+      title_boost_applied: false ❌
+      
+      OLD: title_extracted = true → No sequential → Body classification
+      NEW: title_boost = false → Sequential → HDCQ ✅
+      ```
+      
+      Console log kỳ vọng:
+      ```
+      🔄 Sequential: title rejected by classifier (uppercase < 70%)
+         (confidence 75%, classified as GCNQSDD) → Override to HDCQ
+      ```
+      
+      ⏳ NEXT STEPS:
+      - User test lại với batch: 20240504-01700003.jpg + 004.jpg
+      - File 004 phải được classify thành HDCQ (sequential từ 003)
+      - Monitor console logs
       
       📋 USER REQUEST:
       - "Hình như vẫn chưa ép quy tắc tiêu đề phải viết hoa"

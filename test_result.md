@@ -410,7 +410,71 @@ agent_communication:
   
   - agent: "main"
     message: |
-      ✅ FEATURE: CLOUD OCR CROP OPTIMIZATION - Top 35% Processing
+      ✅ STRICT MODE: Uppercase Threshold 70% for ALL OCR Engines
+      
+      📋 USER REQUEST:
+      - "Hình như vẫn chưa ép quy tắc tiêu đề phải viết hoa"
+      - Option 1: Set 70% uppercase threshold cho CẢ Cloud và Offline OCR
+      
+      🎯 CHANGES:
+      - OLD: Cloud OCR = 30%, Offline = 70% (too relaxed for Cloud)
+      - NEW: Cloud OCR = 70%, Offline = 70% (STRICT MODE)
+      
+      📊 RATIONALE:
+      1. Vietnamese admin titles MUST be uppercase (70%+)
+         - ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG..." (100% uppercase)
+         - ✅ "GIẤY CHỨNG NHẬN..." (100% uppercase)
+         - ❌ "Hợp đồng chuyển nhượng..." (mixed case → body text)
+      
+      2. Cloud OCR (Google/Azure) is highly accurate
+         - No need for relaxed threshold (30% was too lax)
+         - 70% is appropriate for high-quality OCR
+      
+      3. Prevent false positives
+         - Body text: "Các bên giao kết hợp đồng..." (8% uppercase) → Rejected ✅
+         - Only TRUE uppercase titles accepted
+      
+      🔧 IMPLEMENTATION:
+      ```python
+      # rule_classifier.py line 1931
+      # OLD:
+      uppercase_threshold = 0.3 if is_cloud_ocr else 0.7
+      
+      # NEW (STRICT MODE):
+      uppercase_threshold = 0.7  # 70% for ALL engines
+      ```
+      
+      📁 FILES MODIFIED:
+      1. /app/desktop-app/python/rule_classifier.py (line 1928-1940)
+         - Removed differentiated thresholds
+         - Set 70% for ALL OCR engines
+         - Updated comments: "STRICT MODE"
+      
+      2. /app/desktop-app/FIX_SEQUENTIAL_NAMING_LOGIC.md
+         - Updated Fix 1 section
+         - Added threshold evolution history
+         - Updated test scenarios
+      
+      🧪 TEST CASES:
+      1. "HỢP ĐỒNG CHUYỂN NHƯỢNG..." (100% uppercase)
+         → ✅ Accepted, classified as HDCQ
+      
+      2. "Hợp đồng chuyển nhượng..." (15% uppercase)
+         → ❌ Rejected (< 70%), fallback to body text
+         → ⚠️ Log: "Title has low uppercase (15% < 70%)"
+      
+      3. "Các bên giao kết hợp đồng..." (8% uppercase)
+         → ❌ Correctly rejected as body text
+      
+      📊 IMPACT:
+      - Higher precision: Only TRUE titles accepted
+      - Fewer false positives: Body text mentions rejected
+      - Consistent standard: Same 70% for all engines
+      
+      ⏳ NEXT STEPS:
+      - User test với real documents
+      - Verify strict mode rejects mixed-case "titles"
+      - Monitor logs: Should see more "low uppercase" rejections
       
       🎯 USER REQUEST:
       - Chỉ đọc 35% phía trên của tài liệu (title/header)

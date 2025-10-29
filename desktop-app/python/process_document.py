@@ -41,29 +41,6 @@ from rule_classifier import RuleClassifier
 tesseract_engine = None
 vietocr_engine = None
 easyocr_engine = None
-    try:
-        from ocr_engine_easyocr import OCREngine as EasyOCREngine
-        easyocr_engine = EasyOCREngine()
-        print("✅ EasyOCR engine loaded", file=sys.stderr)
-    except ImportError as easy_import_error:
-        print(f"⚠️ EasyOCR not installed: {easy_import_error}", file=sys.stderr)
-    except Exception as easy_error:
-        print(f"⚠️ EasyOCR initialization failed: {easy_error}", file=sys.stderr)
-    
-    # Summary of loaded engines
-    engines_loaded = ["Tesseract"]
-    if vietocr_engine:
-        engines_loaded.append("VietOCR")
-    if easyocr_engine:
-        engines_loaded.append("EasyOCR")
-    print(f"✅ OCR Engines loaded: {', '.join(engines_loaded)}", file=sys.stderr)
-    
-except ImportError as e:
-    print(json.dumps({
-        "error": f"Missing Tesseract OCR dependencies: {str(e)}",
-        "success": False
-    }, ensure_ascii=True), file=sys.stderr)
-    sys.exit(1)
 
 
 def extract_document_title_from_text(text: str) -> str:

@@ -275,7 +275,7 @@ ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
 ipcMain.handle('process-document-offline', async (event, filePath) => {
   return new Promise(async (resolve, reject) => {
     // Get OCR engine preference from store
-    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure'
+    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure', 'gemini-flash'
     const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
     
     // Get cloud API keys if using cloud engines
@@ -299,6 +299,17 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         resolve({
           success: false,
           error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    } else if (ocrEngineType === 'gemini-flash') {
+      // Gemini Flash uses same Google API key
+      cloudApiKey = store.get('cloudOCR.gemini.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({
+          success: false,
+          error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.',
           method: 'config_error'
         });
         return;

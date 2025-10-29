@@ -403,11 +403,11 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       }
     });
 
-    // Add timeout (30 seconds for OCR processing)
+    // Add timeout (60 seconds for OCR processing - increased for full image Gemini retries)
     setTimeout(() => {
       childProcess.kill();
-      reject(new Error('OCR processing timeout (30s)'));
-    }, 30000);
+      reject(new Error('OCR processing timeout (60s)'));
+    }, 60000);
   });
 });
 

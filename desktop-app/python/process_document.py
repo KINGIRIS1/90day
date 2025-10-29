@@ -154,54 +154,111 @@ def extract_document_title_from_text(text: str) -> str:
     return ""
 
 
-def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict:
+def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_api_key: str = None, cloud_endpoint: str = None) -> dict:
     """
     Process a document using OCR + Rules with font height detection
     
     Args:
         file_path: Path to the image file
-        ocr_engine_type: 'tesseract' or 'vietocr' (default: 'tesseract')
+        ocr_engine_type: 'tesseract', 'vietocr', 'easyocr', 'google', or 'azure'
+        cloud_api_key: API key for cloud OCR (Google/Azure)
+        cloud_endpoint: Endpoint URL for Azure (optional for Google)
     
     Returns classification result with confidence
     """
     try:
-        # Select OCR engine based on preference
-        if ocr_engine_type == 'vietocr' and vietocr_engine is not None:
-            ocr_engine = vietocr_engine
-            engine_name = "VietOCR"
-            print("🔍 Using VietOCR engine", file=sys.stderr)
-        elif ocr_engine_type == 'easyocr' and easyocr_engine is not None:
-            ocr_engine = easyocr_engine
-            engine_name = "EasyOCR"
-            print("🔍 Using EasyOCR engine", file=sys.stderr)
-        else:
-            # Default to Tesseract or fallback
-            ocr_engine = tesseract_engine
-            engine_name = "Tesseract"
+        # Handle Cloud OCR engines
+        if ocr_engine_type == 'google':
+            if not cloud_api_key:
+                return {
+                    "success": False,
+                    "error": "Google Cloud Vision API key is required",
+                    "method": "config_error"
+                }
             
-            # Show fallback message if non-Tesseract was requested
-            if ocr_engine_type == 'vietocr' and vietocr_engine is None:
-                print("⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
-            elif ocr_engine_type == 'easyocr' and easyocr_engine is None:
-                print("⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+            print("☁️ Using Google Cloud Vision", file=sys.stderr)
+            
+            # Import and run Google OCR
+            from ocr_engine_google import ocr_google_cloud_vision
+            text, confidence, error = ocr_google_cloud_vision(file_path, cloud_api_key)
+            
+            if error:
+                return {
+                    "success": False,
+                    "error": error,
+                    "method": "cloud_ocr_failed"
+                }
+            
+            engine_name = "Google Cloud Vision"
+            extracted_text = text
+            ocr_confidence = confidence
+            
+        elif ocr_engine_type == 'azure':
+            if not cloud_api_key or not cloud_endpoint:
+                return {
+                    "success": False,
+                    "error": "Azure Computer Vision API key and endpoint are required",
+                    "method": "config_error"
+                }
+            
+            print("☁️ Using Azure Computer Vision", file=sys.stderr)
+            
+            # Import and run Azure OCR
+            from ocr_engine_azure import ocr_azure_computer_vision
+            text, confidence, error = ocr_azure_computer_vision(file_path, cloud_api_key, cloud_endpoint)
+            
+            if error:
+                return {
+                    "success": False,
+                    "error": error,
+                    "method": "cloud_ocr_failed"
+                }
+            
+            engine_name = "Azure Computer Vision"
+            extracted_text = text
+            ocr_confidence = confidence
+            
+        else:
+            # Offline OCR engines
+            # Select OCR engine based on preference
+            if ocr_engine_type == 'vietocr' and vietocr_engine is not None:
+                ocr_engine = vietocr_engine
+                engine_name = "VietOCR"
+                print("🔍 Using VietOCR engine", file=sys.stderr)
+            elif ocr_engine_type == 'easyocr' and easyocr_engine is not None:
+                ocr_engine = easyocr_engine
+                engine_name = "EasyOCR"
+                print("🔍 Using EasyOCR engine", file=sys.stderr)
             else:
-                print("🔍 Using Tesseract engine", file=sys.stderr)
+                # Default to Tesseract or fallback
+                ocr_engine = tesseract_engine
+                engine_name = "Tesseract"
+                
+                # Show fallback message if non-Tesseract was requested
+                if ocr_engine_type == 'vietocr' and vietocr_engine is None:
+                    print("⚠️ VietOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+                elif ocr_engine_type == 'easyocr' and easyocr_engine is None:
+                    print("⚠️ EasyOCR requested but not available, falling back to Tesseract", file=sys.stderr)
+                else:
+                    print("🔍 Using Tesseract engine", file=sys.stderr)
+            
+            # Extract text using selected OCR engine (returns dict with full_text, title_text, avg_height)
+            ocr_result = ocr_engine.extract_text(file_path)
+            
+            # Handle both old format (string) and new format (dict) for backward compatibility
+            if isinstance(ocr_result, dict):
+                extracted_text = ocr_result.get('full_text', '')
+                title_text = ocr_result.get('title_text', '')
+                avg_height = ocr_result.get('avg_height', 0)
+            else:
+                # Old format: just a string
+                extracted_text = ocr_result
+                title_text = extracted_text
+                avg_height = 0
+            
+            ocr_confidence = None  # Not available for offline engines
         
         classifier = RuleClassifier()
-        
-        # Extract text using selected OCR engine (returns dict with full_text, title_text, avg_height)
-        ocr_result = ocr_engine.extract_text(file_path)
-        
-        # Handle both old format (string) and new format (dict) for backward compatibility
-        if isinstance(ocr_result, dict):
-            extracted_text = ocr_result.get('full_text', '')
-            title_text = ocr_result.get('title_text', '')
-            avg_height = ocr_result.get('avg_height', 0)
-        else:
-            # Old format: just a string
-            extracted_text = ocr_result
-            title_text = extracted_text
-            avg_height = 0
         
         if not extracted_text or extracted_text.strip() == "":
             return {
@@ -210,7 +267,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
                 "method": "ocr_failed"
             }
         
-        # Debug: Print full extracted text to see what EasyOCR captured
+        # Debug: Print full extracted text to see what OCR captured
         print(f"📝 Full text (first 500 chars): {extracted_text[:500]}", file=sys.stderr)
         
         # Try to extract real title from full text using patterns
@@ -223,43 +280,59 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract') -> dict
         
         # Priority:
         # 1. If we found a title via patterns → use it
-        # 2. Otherwise use title_text from OCR
+        # 2. Otherwise use title_text from OCR (or full text for cloud)
         if extracted_title:
             final_title = extracted_title
+        elif ocr_engine_type in ['google', 'azure']:
+            # For cloud OCR, use extracted text (no separate title_text)
+            final_title = extracted_text
         else:
             final_title = title_text
         
         # Classify using rules with title text priority
         result = classifier.classify(extracted_text, title_text=final_title)
         
-        # Determine if Cloud Boost is recommended
+        # Determine if Cloud Boost is recommended (only for offline engines)
         confidence_threshold = 0.7
-        recommend_cloud_boost = result['confidence'] < confidence_threshold
+        is_cloud = ocr_engine_type in ['google', 'azure']
+        recommend_cloud_boost = not is_cloud and result['confidence'] < confidence_threshold
         
         # Add title boost indicator
         title_boost_info = ""
         if result.get('title_boost', False):
             title_boost_info = " [TITLE DETECTED ✓]"
         
-        return {
+        response = {
             "success": True,
-            "method": "offline_ocr",
+            "method": "cloud_ocr" if is_cloud else "offline_ocr",
             "ocr_engine": engine_name,
             "original_text": extracted_text,
             "title_text": final_title,  # Use final_title (pattern or OCR)
-            "title_text_ocr": title_text,  # Original from OCR
             "title_extracted_via_pattern": bool(extracted_title),
-            "avg_font_height": round(avg_height, 1),
             "doc_type": result['doc_type'],
             "confidence": result['confidence'],
             "short_code": result['short_code'],
             "reasoning": result.get('reasoning', '') + title_boost_info,
             "recommend_cloud_boost": recommend_cloud_boost,
-            "accuracy_estimate": "88-91%" if result.get('title_boost') else "85-88%",
             "title_boost_applied": result.get('title_boost', False)
         }
         
+        # Add cloud-specific fields
+        if is_cloud:
+            response["ocr_confidence"] = float(ocr_confidence) if ocr_confidence else 0.9
+            response["accuracy_estimate"] = "90-96%"
+        else:
+            # Offline engines
+            response["title_text_ocr"] = title_text if 'title_text' in locals() else final_title
+            response["avg_font_height"] = round(avg_height, 1) if 'avg_height' in locals() else 0
+            response["accuracy_estimate"] = "88-91%" if result.get('title_boost') else "85-88%"
+        
+        return response
+        
     except Exception as e:
+        import traceback
+        error_detail = traceback.format_exc()
+        print(f"❌ Error: {error_detail}", file=sys.stderr)
         return {
             "success": False,
             "error": str(e),

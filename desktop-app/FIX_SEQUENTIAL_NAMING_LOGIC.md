@@ -161,61 +161,72 @@ Offline OCR: 0.7 (70%)  → STRICT: Same standard
 
 ---
 
-### Fix 2: Refined Sequential Naming Logic (Simplified)
+### Fix 2: Refined Sequential Naming Logic (Using title_boost_applied)
 
 **File**: `/app/desktop-app/src/components/DesktopScanner.js` (dòng 207-262)
 
-**LOGIC ĐƠN GIẢN HÓA** (2 cases):
+**CRITICAL BUG FIX**: Check `title_boost_applied` thay vì `title_extracted_via_pattern`
 
+**VẤN ĐỀ CŨ**:
 ```javascript
-const applySequentialNaming = (result, lastType) => {
-  if (result.success && lastType) {
-    // Case 1: UNKNOWN → ALWAYS apply sequential
-    if (result.short_code === 'UNKNOWN') {
-      return { ...result, /* apply sequential */ };
-    }
-    
-    // Case 2: Không có title extracted → ALWAYS apply sequential
-    // Lý do: Page 2/3/4 không có title, body text không đáng tin cậy
-    if (!result.title_extracted_via_pattern) {
-      return { ...result, /* apply sequential */ };
-    }
-    
-    // Case 3: Có title extracted → Document MỚI → NO sequential
-  }
+// OLD (SAI):
+if (!result.title_extracted_via_pattern) {
+  return applySequential();
+}
+
+// Problem: title_extracted_via_pattern = true nếu pattern matched
+// NHƯNG title có thể bị REJECT bởi uppercase check (5% < 70%)
+// → Sequential không được apply → SAI!
+```
+
+**LOGIC MỚI (ĐÚNG)**:
+```javascript
+// NEW (CORRECT):
+if (!result.title_boost_applied) {
+  return applySequential();
+}
+
+// title_boost_applied = true CHỈ KHI:
+// 1. Pattern matched
+// 2. Uppercase check PASSED (≥ 70%)
+// 3. Classifier ACCEPTED và SỬ DỤNG title
+```
+
+**Logic table (Corrected)**:
+
+| Condition | title_extracted | uppercase | title_boost | Action | Lý do |
+|-----------|----------------|-----------|-------------|--------|-------|
+| Case 1 | - | - | - | Apply sequential | UNKNOWN |
+| Case 2a | ❌ false | N/A | ❌ false | Apply sequential | Không có title |
+| Case 2b | ✅ true | < 70% | ❌ false | Apply sequential | Title rejected (uppercase) |
+| Case 2c | ✅ true | ≥ 70% | ❌ false | Apply sequential | Title có nhưng low similarity |
+| Case 3 | ✅ true | ≥ 70% | ✅ true | Keep original | Title accepted → New doc |
+
+**Real Example - Bug Fixed**:
+```
+File: 20240504-01700004.jpg
+Text: "Giấy chứng nhận quyền sử dụng đất..."
+
+Step 1: Pattern matched ✅
+  → title_extracted_via_pattern = true
+
+Step 2: Uppercase check ❌
+  → 5% < 70% → Title REJECTED
+  → title_boost_applied = false
+
+Step 3: Sequential logic
+  OLD: Check title_extracted_via_pattern = true
+    → KHÔNG apply sequential
+    → Keep body classification → SAI! ❌
   
-  return result; // Default: Keep original
-};
-```
-
-**Logic table (Simplified)**:
-
-| Condition | title_extracted | Action | Lý do |
-|-----------|----------------|--------|-------|
-| Case 1 | - | Apply sequential | UNKNOWN → trang tiếp theo |
-| Case 2 | ❌ false | Apply sequential | Không có title → page 2/3/4 |
-| Case 3 | ✅ true | Keep original | Có title → document mới |
-
-**CRITICAL INSIGHT**:
-- ❌ **SAI** (old): "No title + confidence ≥ 0.5 → Keep classification"
-- ✅ **ĐÚNG** (new): "No title → ALWAYS sequential (dù confidence cao)"
-- **Vì sao?**: Page 2/3 của "HỢP ĐỒNG" có thể chứa keywords của doc type khác
-  - Ví dụ: "đăng ký", "biện pháp bảo đảm" → Match DKTC
-  - → Body text classification KHÔNG đáng tin cậy cho continuation pages
-
-**Real Example từ User**:
-```
-Page 1: "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ ✅
-Page 2: "Các bên giao kết... đăng ký biện pháp..." 
-   - No title extracted ❌
-   - Body text match DKTC (confidence 70%) ❌
-   - OLD logic: Keep DKTC → SAI ❌
-   - NEW logic: Apply sequential → HDCQ ✅
+  NEW: Check title_boost_applied = false
+    → Apply sequential
+    → Classify as HDCQ (from previous doc) → ĐÚNG! ✅
 ```
 
 **Kết quả**:
-- ✅ Page 2/3/4 không có title → Luôn được assign vào document type của page 1
-- ✅ Chỉ documents với title rõ ràng mới được classify riêng
+- ✅ Title pattern matched NHƯNG bị reject → Apply sequential
+- ✅ Chỉ title được ACCEPT mới coi là document mới
 - ✅ Body text classification không override sequential naming
 
 ---

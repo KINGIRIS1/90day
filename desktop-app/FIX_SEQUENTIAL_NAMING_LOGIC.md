@@ -244,22 +244,42 @@ if (processedResult.success &&
 
 ## 🧪 Testing Scenarios
 
-### Scenario 1: Cloud OCR với Title Chính Xác (Mixed Case)
+### Scenario 1: STRICT Uppercase Check - Cloud OCR
 ```
-Input: "Đơn xin chuyển mục đích sử dụng đất"
+Input Text: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
 OCR Engine: Google Cloud Vision
-Uppercase Ratio: 35%
+Uppercase Ratio: 100%
 
-TRƯỚC:
-- ❌ Title rejected (35% < 50%)
-- ❌ Classified bằng body text → confidence 65%
-- ❌ Sequential naming applied → Renamed thành ĐKBĐ
+✅ PASS:
+- Title accepted (100% ≥ 70%)
+- Classified với title → HDCQ (confidence 90%)
+- No sequential naming applied
+```
 
-SAU:
-- ✅ Title accepted (35% ≥ 30%)
-- ✅ Classified với title → confidence 85%
-- ✅ currentLastKnown updated
-- ✅ Không apply sequential naming
+### Scenario 2: Mixed Case Title REJECTED (STRICT MODE)
+```
+Input Text: "Hợp đồng chuyển nhượng quyền sử dụng đất"
+OCR Engine: Google Cloud Vision
+Uppercase Ratio: 15%
+
+❌ REJECTED:
+- Title rejected (15% < 70%)
+- Log: "⚠️ Title has low uppercase (15% < 70%), likely not a real title (Cloud OCR)"
+- Fallback: Use body text for classification
+- Result: Depends on body text keywords
+```
+
+### Scenario 3: Body Text Mention (Correctly Rejected)
+```
+Input Text: "Các bên giao kết đã ký hợp đồng chuyển nhượng..."
+OCR Engine: Google Cloud Vision
+Uppercase Ratio: 8%
+
+✅ CORRECTLY REJECTED:
+- This is body text, not a title
+- Uppercase ratio: 8% < 70%
+- Classification: Use ONLY body text (ignore this "title")
+- Result: Sequential naming if no valid title
 ```
 
 ### Scenario 2: Document Sequence (Page 1, 2, 3) - CRITICAL

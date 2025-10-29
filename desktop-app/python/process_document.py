@@ -76,12 +76,14 @@ def extract_document_title_from_text(text: str) -> str:
         # ĐƠN ĐĂNG KÝ BIẾN ĐỘNG
         r'(Đ[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]N\s+[ĐD][AĂ]NG\s+K[YÝ]\s+BI[EÊÉÈẾỀỂỄỆ]N\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+[ĐD][AÁẤ]T\s+[ĐD]AI)?(?:\s*,?\s*T[AÀ]I\s+S[AẢ]N)?(?:\s+G[AẮ]N\s+LI[EÊÉÈẾỀỂỄỆ]N\s+V[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]I\s+[ĐD][AÁẤ]T)?)',
         
-        # HỢP ĐỒNG ỦY QUYỀN (check BEFORE HDCQ - more specific)
+        # HỢP ĐỒNG CHUYỂN NHƯỢNG (check FIRST - more specific than HDUQ)
+        # CRITICAL: Must check BEFORE "HỢP ĐỒNG ỦY QUYỀN" to avoid false matches
+        # "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT" should match HDCQ, not HDUQ
+        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯÚÙỦŨỤỨỪỬỮỰ][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
+        
+        # HỢP ĐỒNG ỦY QUYỀN (check AFTER HDCQ)
         # Flexible with: ỦY (correct), UỶ (U+Ỷ OCR error), Ủ Y (with space), UY (no accents)
         r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+(?:[UỦ][\sỶ]*Y|U[ỶY])\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
-        
-        # HỢP ĐỒNG CHUYỂN NHƯỢNG (check AFTER HDUQ)
-        r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯÚÙỦŨỤỨỪỬỮỰ][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG(?:\s+QUY[EÊÉÈẾỀỂỄỆ]N)?(?:\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)?)',
         
         # GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT
         r'(GI[AÁẤ]Y\s+CH[UƯÚÙỦŨỤỨỪỬỮỰ]NG\s+NH[AẬ]N\s+QUY[EÊÉÈẾỀỂỄỆ]N\s+S[UƯÚÙỦŨỤỨỪỬỮỰ]\s+D[UỤ]NG\s+[ĐD][AÁẤ]T)',

@@ -207,15 +207,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const applySequentialNaming = (result, lastType) => {
     // Apply sequential naming CHỈ KHI thực sự là "trang tiếp theo":
     // 1. UNKNOWN (không nhận dạng được loại gì cả)
-    // 2. KHÔNG extract được title rõ ràng (title_extracted_via_pattern = false)
+    // 2. KHÔNG extract được title rõ ràng (title_extracted_via_pattern = false) VÀ confidence thấp (< 0.5)
     // 
     // KHÔNG apply nếu:
-    // - Có title rõ ràng được extract (dù confidence < 80%)
+    // - Có title rõ ràng được extract (title_extracted_via_pattern = true) VÀ confidence >= 0.5
     // - Đây có thể là document type mới, không phải trang tiếp theo
     
     if (result.success && lastType) {
-      // Case 1: UNKNOWN - chắc chắn không nhận dạng được
+      // Case 1: UNKNOWN - chắc chắn không nhận dạng được → ALWAYS apply sequential
       if (result.short_code === 'UNKNOWN') {
+        console.log(`🔄 Sequential: UNKNOWN → ${lastType.short_code}`);
         return {
           ...result,
           doc_type: lastType.doc_type,
@@ -228,9 +229,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
-      // Case 2: Không extract được title VÀ confidence thấp (< 0.6)
+      // Case 2: Không extract được title VÀ confidence thấp (< 0.5)
       // → Có thể là trang 2, 3, 4... không có tiêu đề rõ
-      if (!result.title_extracted_via_pattern && result.confidence < 0.6) {
+      if (!result.title_extracted_via_pattern && result.confidence < 0.5) {
+        console.log(`🔄 Sequential: No title + low confidence (${(result.confidence * 100).toFixed(0)}%) → ${lastType.short_code}`);
         return {
           ...result,
           doc_type: lastType.doc_type,
@@ -243,12 +245,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
-      // Case 3: Có title extracted NHƯNG confidence rất thấp (< 0.4)
-      // → Có thể OCR lỗi, nhưng cẩn thận - có thể là doc type mới!
-      if (result.title_extracted_via_pattern && result.confidence < 0.4) {
-        console.warn(`⚠️ Document có title extracted nhưng confidence cực thấp (${(result.confidence * 100).toFixed(0)}%). Cẩn thận có thể là doc type mới!`);
-        // Không apply sequential - để giữ classification gốc
-        // User có thể sửa thủ công nếu cần
+      // Case 3: Không extract được title NHƯNG confidence khá cao (0.5-0.7)
+      // → Có thể nhận dạng dựa vào body text, KHÔNG apply sequential
+      if (!result.title_extracted_via_pattern && result.confidence >= 0.5) {
+        console.log(`✅ No sequential: No title but confident classification (${(result.confidence * 100).toFixed(0)}%) → Keep ${result.short_code}`);
+      }
+      
+      // Case 4: Có title extracted → KHÔNG apply sequential (dù confidence thấp)
+      // → Đây là document mới với title riêng
+      if (result.title_extracted_via_pattern) {
+        console.log(`✅ No sequential: Title extracted → Keep ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
       }
     }
     

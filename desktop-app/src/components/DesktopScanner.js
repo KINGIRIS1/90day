@@ -253,7 +253,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           ? "title rejected by classifier (uppercase < 70% or low similarity)"
           : "no title extracted";
         
-        console.log(`🔄 Sequential: ${reason} (confidence ${(result.confidence * 100).toFixed(0)}%, classified as ${result.short_code}) → Override to ${lastType.short_code}`);
+        console.log(`🔄 Sequential: ${reason} (confidence ${formatConfidence(result.confidence)}%, classified as ${result.short_code}) → Override to ${lastType.short_code}`);
         return {
           ...result,
           doc_type: lastType.doc_type,

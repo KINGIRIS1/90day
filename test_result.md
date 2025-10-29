@@ -132,6 +132,18 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "Added new UI section for OCR engine selection. Users can choose between Tesseract (fast, 85-88%) and VietOCR (Vietnamese specialized, 90-95%). Preference saved via electron-store. Dynamic display of selected engine in App Info section."
+  
+  - task: "BYOK Cloud OCR Settings"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/desktop-app/src/components/CloudSettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Implemented BYOK (Bring Your Own Key) feature for Cloud OCR. Users can add their own API keys for Google Cloud Vision and Azure Computer Vision. Features: API key storage (encrypted), test functionality, usage guides. New tab '☁️ Cloud OCR' added to App.js routing."
 
 metadata:
   created_by: "main_agent"

@@ -264,8 +264,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     stopRef.current = false; // Reset stop flag
 
-    const enginePref = await window.electronAPI.getConfig('enginePreference');
-
     const newResults = isResume ? [...results] : []; // Keep existing results if resuming
     let currentLastKnown = null;
 
@@ -282,26 +280,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       const file = filesToProcess[i];
       setProgress({ current: i + 1, total: filesToProcess.length });
 
-      let result;
-      const preferCloud = enginePref === 'cloud';
-      if (preferCloud) {
-        result = await processCloudBoost(file);
-        
-        // Check stop after async operation
-        if (stopRef.current) {
-          console.log('❌ Scan stopped after cloud boost at file', i);
-          setRemainingFiles(filesToProcess.slice(i));
-          setIsPaused(true);
-          setProcessing(false);
-          return;
-        }
-        
-        if (!result.success && autoFallbackEnabled && ['TIMEOUT','UNAUTHORIZED','QUOTA','SERVER','NETWORK','CONFIG','OTHER'].includes(result.errorType || 'OTHER')) {
-          const userConfirmed = window.confirm(`Cloud lỗi: ${result.error || result.errorType}. Chuyển sang Offline (Tesseract) cho "${file.name}"?`);
-          if (userConfirmed) result = await processOffline(file);
-        }
-      } else {
-        result = await processOffline(file);
+      // Process with current ocrEngine (tesseract/easyocr/vietocr/google/azure)
+      // Main.js will handle API keys automatically for cloud engines
+      let result = await processOffline(file);
+      
+      // Check stop after async operation
+      if (stopRef.current) {
+        console.log('❌ Scan stopped after processing at file', i);
+        setRemainingFiles(filesToProcess.slice(i));
+        setIsPaused(true);
+        setProcessing(false);
+        return;
       }
       
       // Check stop after processing

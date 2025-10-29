@@ -22,6 +22,7 @@ function CloudSettings() {
       const uiEngineMapping = {
         'tesseract': 'offline-tesseract',
         'easyocr': 'offline-easyocr',
+        'vietocr': 'offline-vietocr',
         'google': 'google',
         'azure': 'azure'
       };

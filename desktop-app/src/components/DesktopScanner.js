@@ -205,15 +205,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   const applySequentialNaming = (result, lastType) => {
-    // REFINED LOGIC:
+    // REFINED LOGIC v2:
     // Apply sequential naming khi:
     // 1. UNKNOWN (chắc chắn không nhận dạng được)
-    // 2. KHÔNG có title extracted (title_extracted_via_pattern = false)
-    //    → Đây là trang 2/3/4 của document, KHÔNG phải document mới
+    // 2. Title KHÔNG được sử dụng bởi classifier (title_boost_applied = false)
+    //    → Nghĩa là: Hoặc không có title, HOẶC title bị reject (uppercase < 70%)
     // 
     // KHÔNG apply chỉ khi:
-    // - Có title extracted (title_extracted_via_pattern = true)
-    //   → Document mới với title riêng
+    // - Title được sử dụng bởi classifier (title_boost_applied = true)
+    //   → Document mới với title hợp lệ
     
     if (result.success && lastType) {
       // Case 1: UNKNOWN - chắc chắn không nhận dạng được → ALWAYS apply sequential
@@ -231,11 +231,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
-      // Case 2: KHÔNG có title extracted → Page tiếp theo → ALWAYS apply sequential
-      // Lý do: Trang 2/3/4 của HỢP ĐỒNG có thể chứa keywords của doc type khác
-      // → Body text classification không đáng tin cậy cho continuation pages
-      if (!result.title_extracted_via_pattern) {
-        console.log(`🔄 Sequential: No title extracted (confidence ${(result.confidence * 100).toFixed(0)}%, classified as ${result.short_code}) → Override to ${lastType.short_code}`);
+      // Case 2: Title KHÔNG được sử dụng bởi classifier → Apply sequential
+      // Điều này bao gồm:
+      // - Không có title pattern match
+      // - Title pattern matched NHƯNG bị reject (uppercase < 70%)
+      // - Title có nhưng similarity quá thấp
+      if (!result.title_boost_applied) {
+        const reason = result.title_extracted_via_pattern 
+          ? "title rejected by classifier (uppercase < 70% or low similarity)"
+          : "no title extracted";
+        
+        console.log(`🔄 Sequential: ${reason} (confidence ${(result.confidence * 100).toFixed(0)}%, classified as ${result.short_code}) → Override to ${lastType.short_code}`);
         return {
           ...result,
           doc_type: lastType.doc_type,
@@ -244,17 +250,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           original_confidence: result.confidence,
           original_short_code: result.short_code,
           applied_sequential_logic: true,
-          note: `📄 Trang tiếp theo của ${lastType.short_code} (page 2/3/4 không có tiêu đề)`
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (${reason})`
         };
       }
       
-      // Case 3: Có title extracted → Document MỚI → KHÔNG apply sequential
-      if (result.title_extracted_via_pattern) {
-        console.log(`✅ No sequential: Title extracted → New document ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
+      // Case 3: Title được sử dụng bởi classifier → Document MỚI → KHÔNG apply sequential
+      if (result.title_boost_applied) {
+        console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
       }
     }
     
-    // Default: Không apply sequential (no lastType hoặc has title)
+    // Default: Không apply sequential (no lastType hoặc has valid title)
     return result;
   };
 

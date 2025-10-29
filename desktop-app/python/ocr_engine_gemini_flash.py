@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Gemini Flash 2.0 - AI Document Classification Engine
-Using emergentintegrations library for multimodal AI
+Using direct REST API (no async, no emergentintegrations)
 """
 
 import sys
 import base64
-import asyncio
 from PIL import Image
 import io
 

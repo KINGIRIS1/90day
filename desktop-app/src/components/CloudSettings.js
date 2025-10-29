@@ -164,8 +164,29 @@ function CloudSettings() {
               <div className="text-sm text-gray-600 mt-1">
                 • Miễn phí, không cần internet<br />
                 • Accuracy: 88-92%<br />
-                • Tốc độ: Nhanh (có GPU)<br />
+                • Tốc độ: Trung bình (7-8s)<br />
                 • Không cần API key
+              </div>
+            </div>
+          </label>
+
+          {/* Offline VietOCR */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="offline-vietocr"
+              checked={ocrEngine === 'offline-vietocr'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium">⚡ VietOCR (Offline) ⭐ Best for Vietnamese</div>
+              <div className="text-sm text-gray-600 mt-1">
+                • Miễn phí, không cần internet<br />
+                • Accuracy: 90-95%<br />
+                • Tốc độ: Nhanh (1-2s)<br />
+                • Chuyên tiếng Việt, cần cài đặt riêng
               </div>
             </div>
           </label>

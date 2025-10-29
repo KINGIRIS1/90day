@@ -450,7 +450,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           short_code: processedResult.short_code,
           confidence: processedResult.confidence
         };
-        console.log(`📌 Updated lastKnown (folder): ${processedResult.short_code} (${(processedResult.confidence * 100).toFixed(0)}%)`);
+        console.log(`📌 Updated lastKnown (folder): ${processedResult.short_code} (${formatConfidence(processedResult.confidence)}%)`);
       }
       
       let previewUrl = null;

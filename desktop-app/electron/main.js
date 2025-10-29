@@ -80,7 +80,26 @@ function getPythonScriptPath(scriptName) {
   if (isDev) {
     return path.join(__dirname, '../python', scriptName);
   } else {
-    return path.join(process.resourcesPath, 'python', scriptName);
+    // In production, Python files should be in resources/python (extraResources)
+    // Try multiple paths as fallback
+    const paths = [
+      path.join(process.resourcesPath, 'python', scriptName),
+      path.join(process.resourcesPath, '..', 'python', scriptName),
+      path.join(path.dirname(process.execPath), 'resources', 'python', scriptName),
+      path.join(path.dirname(process.execPath), 'python', scriptName)
+    ];
+    
+    const fs = require('fs');
+    for (const p of paths) {
+      if (fs.existsSync(p)) {
+        console.log(`Found Python script at: ${p}`);
+        return p;
+      }
+    }
+    
+    // Fallback to first path if none found
+    console.warn(`Python script not found, using default path: ${paths[0]}`);
+    return paths[0];
   }
 }
 

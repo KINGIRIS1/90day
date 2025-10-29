@@ -1,9 +1,9 @@
 """
 COMPLETE Rule-based classifier for Vietnamese land documents with Smart Scoring
-- HYBRID APPROACH: Fuzzy title matching (75%+) → Keyword fallback
-- Tier 1: Title similarity >= 75% → High confidence
-- Tier 2: Title similarity >= 50% → Check keywords
-- Tier 3: Title similarity < 50% → Pure keyword matching
+- HYBRID APPROACH: Fuzzy title matching (80%+) → Keyword fallback
+- Tier 1: Title similarity >= 80% → High confidence (Instant match)
+- Tier 2: Title similarity 70-80% → Verify with keywords
+- Tier 3: Title similarity < 70% → Pure keyword matching
 """
 import re
 import sys

@@ -248,7 +248,6 @@ function App() {
         {visitedTabs.has('scanner') && (
           <div style={{ display: activeTab === 'scanner' ? 'block' : 'none' }}>
             <DesktopScanner
-              enginePref={enginePref}
               onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
             />
           </div>
@@ -260,7 +259,6 @@ function App() {
           return visitedTabs.has(tabKey) ? (
             <div key={f} style={{ display: activeTab === tabKey ? 'block' : 'none' }}>
               <DesktopScanner
-                enginePref={enginePref}
                 initialFolder={f}
                 onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
               />
@@ -285,13 +283,7 @@ function App() {
         {/* Settings tab - rendered after first visit, just hidden when not active */}
         {visitedTabs.has('settings') && (
           <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
-            <Settings
-              enginePref={enginePref}
-              onChangeEnginePref={async (val) => {
-                setEnginePref(val);
-                if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', val);
-              }}
-            />
+            <Settings />
           </div>
         )}
       </main>

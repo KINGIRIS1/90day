@@ -619,8 +619,18 @@ def parse_gemini_response(response_text):
             
             # Validate required fields
             if 'short_code' in result and 'confidence' in result:
+                short_code = result.get('short_code', 'UNKNOWN').strip()
+                
+                # Sanitize short_code - remove invalid characters
+                # Valid format: All uppercase letters, no special chars except underscore
+                short_code = re.sub(r'[^A-Z_]', '', short_code.upper())
+                
+                # Check if valid code (not empty, not N/A)
+                if not short_code or short_code == 'N' or short_code == 'NA':
+                    short_code = 'UNKNOWN'
+                
                 return {
-                    "short_code": result.get('short_code', 'UNKNOWN'),
+                    "short_code": short_code,
                     "confidence": float(result.get('confidence', 0)),
                     "reasoning": result.get('reasoning', 'AI classification'),
                     "method": "gemini_flash_ai"

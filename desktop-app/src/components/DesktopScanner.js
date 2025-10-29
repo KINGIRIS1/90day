@@ -371,6 +371,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
     const enginePref = await window.electronAPI.getConfig('enginePreference');
     const preferCloud = enginePref === 'cloud';
     
+    // Track last known type for sequential naming (same as file scan)
+    let currentLastKnown = null;
+    
     for (let i = 0; i < files.length; i++) {
       if (stopRef.current) {
         console.log('❌ Folder scan stopped at file', i, 'in', childPath);
@@ -402,11 +405,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, enginePref: enginePref
         break;
       }
       
+      // Apply sequential naming logic (same as file scan)
+      const processedResult = applySequentialNaming(r, currentLastKnown);
+      
+      // Update lastKnown if this is a valid, confident result (not sequential)
+      if (processedResult.success && 
+          processedResult.short_code !== 'UNKNOWN' && 
+          processedResult.confidence >= 0.5 &&
+          !processedResult.applied_sequential_logic) {
+        currentLastKnown = {
+          doc_type: processedResult.doc_type,
+          short_code: processedResult.short_code,
+          confidence: processedResult.confidence
+        };
+      }
+      
       let previewUrl = null;
       try {
         if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name)) previewUrl = await window.electronAPI.readImageDataUrl(f.path);
       } catch {}
-      childResults.push({ fileName: f.name, filePath: f.path, previewUrl, isPdf: /\.pdf$/i.test(f.name), ...r });
+      childResults.push({ fileName: f.name, filePath: f.path, previewUrl, isPdf: /\.pdf$/i.test(f.name), ...processedResult });
       setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
     }
 

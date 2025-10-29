@@ -1,0 +1,392 @@
+import React, { useState, useEffect } from 'react';
+
+function CloudSettings() {
+  const [ocrEngine, setOcrEngine] = useState('offline-tesseract');
+  const [googleKey, setGoogleKey] = useState('');
+  const [azureKey, setAzureKey] = useState('');
+  const [azureEndpoint, setAzureEndpoint] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [testingKey, setTestingKey] = useState(null);
+  const [showGoogleGuide, setShowGoogleGuide] = useState(false);
+  const [showAzureGuide, setShowAzureGuide] = useState(false);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const engine = await window.electronAPI.getConfig('ocrEngine') || 'offline-tesseract';
+      const google = await window.electronAPI.getApiKey('google') || '';
+      const azure = await window.electronAPI.getApiKey('azure') || '';
+      const azureEp = await window.electronAPI.getApiKey('azureEndpoint') || '';
+      
+      setOcrEngine(engine);
+      setGoogleKey(google);
+      setAzureKey(azure);
+      setAzureEndpoint(azureEp);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Save OCR engine preference
+      await window.electronAPI.setConfig('ocrEngine', ocrEngine);
+
+      // Save API keys if provided
+      if (ocrEngine === 'google' && googleKey.trim()) {
+        await window.electronAPI.saveApiKey({ provider: 'google', apiKey: googleKey.trim() });
+      }
+      if (ocrEngine === 'azure' && azureKey.trim() && azureEndpoint.trim()) {
+        await window.electronAPI.saveApiKey({ provider: 'azure', apiKey: azureKey.trim() });
+        await window.electronAPI.saveApiKey({ provider: 'azureEndpoint', apiKey: azureEndpoint.trim() });
+      }
+
+      alert('✅ Đã lưu cài đặt thành công!');
+    } catch (error) {
+      alert('❌ Lỗi khi lưu: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTestKey = async (provider) => {
+    setTestingKey(provider);
+    try {
+      const key = provider === 'google' ? googleKey : azureKey;
+      const endpoint = provider === 'azure' ? azureEndpoint : null;
+      
+      if (!key.trim()) {
+        alert('⚠️ Vui lòng nhập API key trước khi test!');
+        return;
+      }
+
+      const result = await window.electronAPI.testApiKey({ provider, apiKey: key, endpoint });
+      
+      if (result.success) {
+        alert(`✅ API key hợp lệ!\n\n${result.message || 'Test thành công'}`);
+      } else {
+        alert(`❌ API key không hợp lệ!\n\nLỗi: ${result.error}`);
+      }
+    } catch (error) {
+      alert('❌ Lỗi khi test API key: ' + error.message);
+    } finally {
+      setTestingKey(null);
+    }
+  };
+
+  const handleDeleteKey = async (provider) => {
+    if (!window.confirm(`Xóa API key cho ${provider === 'google' ? 'Google Cloud Vision' : 'Azure Vision'}?`)) {
+      return;
+    }
+
+    try {
+      await window.electronAPI.deleteApiKey(provider);
+      if (provider === 'google') {
+        setGoogleKey('');
+      } else {
+        setAzureKey('');
+        setAzureEndpoint('');
+      }
+      alert('✅ Đã xóa API key!');
+    } catch (error) {
+      alert('❌ Lỗi: ' + error.message);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-2">⚙️ Cài đặt Cloud OCR</h1>
+      <p className="text-gray-600 mb-6">Cấu hình OCR engine và API keys</p>
+
+      {/* OCR Engine Selection */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">📡 Chọn OCR Engine</h2>
+        
+        <div className="space-y-3">
+          {/* Offline Tesseract */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="offline-tesseract"
+              checked={ocrEngine === 'offline-tesseract'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium">⚡ Tesseract OCR (Offline)</div>
+              <div className="text-sm text-gray-600 mt-1">
+                • Miễn phí, không cần internet<br />
+                • Accuracy: 75-85%<br />
+                • Tốc độ: Trung bình<br />
+                • Không cần API key
+              </div>
+            </div>
+          </label>
+
+          {/* Offline EasyOCR */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="offline-easyocr"
+              checked={ocrEngine === 'offline-easyocr'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium">⚡ EasyOCR (Offline)</div>
+              <div className="text-sm text-gray-600 mt-1">
+                • Miễn phí, không cần internet<br />
+                • Accuracy: 88-92%<br />
+                • Tốc độ: Nhanh (có GPU)<br />
+                • Không cần API key
+              </div>
+            </div>
+          </label>
+
+          {/* Google Cloud Vision */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-blue-50 transition border-blue-200">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="google"
+              checked={ocrEngine === 'google'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium">☁️ Google Cloud Vision (Cloud)</div>
+              <div className="text-sm text-gray-600 mt-1">
+                • <strong>Accuracy cao nhất: 90-95%</strong><br />
+                • Tốc độ: Rất nhanh (1-2s)<br />
+                • Free tier: 1,000 requests/tháng<br />
+                • Sau đó: $1.50/1,000 requests<br />
+                • ⚠️ Cần API key riêng của bạn
+              </div>
+            </div>
+          </label>
+
+          {/* Azure Vision */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition border-green-200">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="azure"
+              checked={ocrEngine === 'azure'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium">☁️ Azure Computer Vision (Cloud)</div>
+              <div className="text-sm text-gray-600 mt-1">
+                • Accuracy: 92-96%<br />
+                • Tốc độ: Rất nhanh (1-2s)<br />
+                • Free tier: 5,000 requests/tháng<br />
+                • Sau đó: $1.00/1,000 requests<br />
+                • ⚠️ Cần API key + endpoint riêng của bạn
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      {/* Google Cloud Vision Setup */}
+      {ocrEngine === 'google' && (
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>🔑</span> Google Cloud Vision API Key
+          </h2>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">API Key:</label>
+            <input
+              type="password"
+              value={googleKey}
+              onChange={(e) => setGoogleKey(e.target.value)}
+              placeholder="AIzaSyD...your_google_api_key_here..."
+              className="w-full border rounded px-3 py-2 font-mono text-sm"
+            />
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => handleTestKey('google')}
+              disabled={testingKey === 'google'}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
+            >
+              {testingKey === 'google' ? '⏳ Đang test...' : '🧪 Test API Key'}
+            </button>
+            {googleKey && (
+              <button
+                onClick={() => handleDeleteKey('google')}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+              >
+                🗑️ Xóa Key
+              </button>
+            )}
+            <button
+              onClick={() => setShowGoogleGuide(!showGoogleGuide)}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition"
+            >
+              {showGoogleGuide ? '▲ Ẩn hướng dẫn' : '▼ Xem hướng dẫn'}
+            </button>
+          </div>
+
+          {showGoogleGuide && (
+            <div className="bg-white rounded p-4 text-sm">
+              <p className="font-medium mb-2">📖 Hướng dẫn lấy Google Cloud Vision API Key:</p>
+              <ol className="list-decimal ml-5 space-y-2">
+                <li>Truy cập <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google Cloud Console</a></li>
+                <li>Đăng nhập với Google account (hoặc tạo account mới)</li>
+                <li>Tạo project mới: Click "Select a project" → "New Project"</li>
+                <li>Enable Cloud Vision API:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Vào "APIs & Services" → "Library"</li>
+                    <li>Tìm "Cloud Vision API"</li>
+                    <li>Click "Enable"</li>
+                  </ul>
+                </li>
+                <li>Tạo API key:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Vào "APIs & Services" → "Credentials"</li>
+                    <li>Click "Create Credentials" → "API key"</li>
+                    <li>Copy API key</li>
+                  </ul>
+                </li>
+                <li>Paste API key vào ô trên</li>
+                <li>Click "Test API Key" để verify</li>
+              </ol>
+              <p className="mt-3 text-gray-600">
+                💡 <strong>Free tier:</strong> 1,000 requests/tháng miễn phí<br />
+                💰 <strong>Sau đó:</strong> $1.50 per 1,000 requests
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Azure Vision Setup */}
+      {ocrEngine === 'azure' && (
+        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>🔑</span> Azure Computer Vision API
+          </h2>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">API Key:</label>
+            <input
+              type="password"
+              value={azureKey}
+              onChange={(e) => setAzureKey(e.target.value)}
+              placeholder="your_azure_api_key_here..."
+              className="w-full border rounded px-3 py-2 font-mono text-sm"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Endpoint URL:</label>
+            <input
+              type="text"
+              value={azureEndpoint}
+              onChange={(e) => setAzureEndpoint(e.target.value)}
+              placeholder="https://your-resource-name.cognitiveservices.azure.com/"
+              className="w-full border rounded px-3 py-2 font-mono text-sm"
+            />
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => handleTestKey('azure')}
+              disabled={testingKey === 'azure'}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition"
+            >
+              {testingKey === 'azure' ? '⏳ Đang test...' : '🧪 Test API Key'}
+            </button>
+            {azureKey && (
+              <button
+                onClick={() => handleDeleteKey('azure')}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+              >
+                🗑️ Xóa Key
+              </button>
+            )}
+            <button
+              onClick={() => setShowAzureGuide(!showAzureGuide)}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition"
+            >
+              {showAzureGuide ? '▲ Ẩn hướng dẫn' : '▼ Xem hướng dẫn'}
+            </button>
+          </div>
+
+          {showAzureGuide && (
+            <div className="bg-white rounded p-4 text-sm">
+              <p className="font-medium mb-2">📖 Hướng dẫn lấy Azure Computer Vision API:</p>
+              <ol className="list-decimal ml-5 space-y-2">
+                <li>Truy cập <a href="https://portal.azure.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Azure Portal</a></li>
+                <li>Đăng nhập với Microsoft account (hoặc tạo account mới)</li>
+                <li>Tạo Computer Vision resource:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Click "Create a resource"</li>
+                    <li>Tìm "Computer Vision"</li>
+                    <li>Click "Create"</li>
+                    <li>Chọn subscription, resource group, region</li>
+                    <li>Chọn pricing tier: "Free F0" (5,000 calls/month)</li>
+                  </ul>
+                </li>
+                <li>Sau khi tạo xong, vào resource</li>
+                <li>Copy API Key và Endpoint:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Vào "Keys and Endpoint"</li>
+                    <li>Copy "KEY 1" hoặc "KEY 2"</li>
+                    <li>Copy "Endpoint"</li>
+                  </ul>
+                </li>
+                <li>Paste vào các ô trên</li>
+                <li>Click "Test API Key" để verify</li>
+              </ol>
+              <p className="mt-3 text-gray-600">
+                💡 <strong>Free tier:</strong> 5,000 requests/tháng miễn phí<br />
+                💰 <strong>Sau đó:</strong> $1.00 per 1,000 requests
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Save Button */}
+      <div className="flex gap-3">
+        <button
+          onClick={handleSave}
+          disabled={loading}
+          className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition font-medium"
+        >
+          {loading ? '⏳ Đang lưu...' : '💾 Lưu cài đặt'}
+        </button>
+        <button
+          onClick={() => window.history.back()}
+          className="px-8 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 transition font-medium"
+        >
+          ❌ Hủy
+        </button>
+      </div>
+
+      {/* Info Box */}
+      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p className="text-sm text-gray-700">
+          <strong>ℹ️ Lưu ý:</strong><br />
+          • API keys được lưu trữ an toàn (encrypted) trên máy của bạn<br />
+          • Mỗi user nên dùng API key riêng để tận dụng free tier<br />
+          • Offline OCR hoàn toàn miễn phí, không cần API key<br />
+          • Cloud OCR có accuracy cao hơn nhưng cần internet
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default CloudSettings;

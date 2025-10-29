@@ -297,6 +297,13 @@ function App() {
           </div>
         )}
 
+        {/* Cloud OCR Settings tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('cloud') && (
+          <div style={{ display: activeTab === 'cloud' ? 'block' : 'none' }}>
+            <CloudSettings />
+          </div>
+        )}
+
         {/* Settings tab - rendered after first visit, just hidden when not active */}
         {visitedTabs.has('settings') && (
           <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>

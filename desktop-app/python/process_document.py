@@ -106,6 +106,10 @@ def extract_document_title_from_text(text: str) -> str:
         match = re.search(pattern, text, re.IGNORECASE)
         if match:
             title = match.group(1).strip()
+            # Debug: Log matched pattern for troubleshooting
+            import sys
+            print(f"🎯 Pattern matched: {pattern[:50]}... → Extracted: '{title[:80]}'", file=sys.stderr)
+            
             # Clean up: remove trailing lowercase text or noise
             # Keep only the uppercase title part
             title = re.sub(r'\s+[a-zàáạảãâầấậẩẫăằắặẳẵđèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹ].*$', '', title)

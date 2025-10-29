@@ -437,6 +437,105 @@ function CloudSettings() {
         </div>
       )}
 
+      {/* Gemini Flash Setup */}
+      {ocrEngine === 'gemini-flash' && (
+        <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>🤖</span> Gemini Flash 2.0 API Key
+            <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded ml-2">RẺ NHẤT</span>
+          </h2>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Google API Key:</label>
+            <input
+              type="password"
+              value={geminiKey}
+              onChange={(e) => setGeminiKey(e.target.value)}
+              placeholder="AIzaSyD...your_google_api_key_here..."
+              className="w-full border rounded px-3 py-2 font-mono text-sm"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Dùng chung Google API key (cùng key với Google Cloud Vision)
+            </p>
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => handleTestKey('gemini')}
+              disabled={testingKey === 'gemini'}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition"
+            >
+              {testingKey === 'gemini' ? '⏳ Đang test...' : '🧪 Test API Key'}
+            </button>
+            {geminiKey && (
+              <button
+                onClick={() => handleDeleteKey('gemini')}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+              >
+                🗑️ Xóa Key
+              </button>
+            )}
+            <button
+              onClick={() => setShowGeminiGuide(!showGeminiGuide)}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition"
+            >
+              {showGeminiGuide ? '▲ Ẩn hướng dẫn' : '▼ Xem hướng dẫn'}
+            </button>
+          </div>
+
+          {showGeminiGuide && (
+            <div className="bg-white rounded p-4 text-sm">
+              <h3 className="font-semibold mb-2">📖 Hướng dẫn lấy Google API Key:</h3>
+              <ol className="list-decimal ml-5 space-y-2">
+                <li>Truy cập <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google Cloud Console</a></li>
+                <li>Tạo project mới (nếu chưa có):
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Click "Select a project" → "New Project"</li>
+                    <li>Tên: "Vietnamese-OCR-App"</li>
+                  </ul>
+                </li>
+                <li>Enable Gemini API:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Vào: APIs & Services → Library</li>
+                    <li>Search: "Generative Language API"</li>
+                    <li>Click "Enable"</li>
+                  </ul>
+                </li>
+                <li>Tạo API Key:
+                  <ul className="list-disc ml-5 mt-1">
+                    <li>Vào: APIs & Services → Credentials</li>
+                    <li>Click "Create Credentials" → "API Key"</li>
+                    <li>Copy key (dạng: AIzaSyABC...xyz123)</li>
+                  </ul>
+                </li>
+                <li>Paste vào ô trên</li>
+                <li>Click "Test API Key" để verify</li>
+              </ol>
+              <div className="mt-4 p-3 bg-purple-100 rounded">
+                <p className="font-semibold mb-2">💰 Chi phí Gemini Flash:</p>
+                <ul className="space-y-1">
+                  <li>✅ <strong>Free tier: 45,000 requests/tháng</strong></li>
+                  <li>💵 <strong>$0.16 per 1,000 images</strong> (rẻ nhất!)</li>
+                  <li>📊 60K hồ sơ × 50 trang = 3M pages → <strong>~$500</strong></li>
+                  <li>🎯 Rẻ hơn 3.6x so với Google Vision ($1,800)</li>
+                  <li>🎯 Rẻ hơn 90x so với GPT-4 Vision ($45,000)</li>
+                </ul>
+              </div>
+              <div className="mt-3 p-3 bg-blue-50 rounded">
+                <p className="font-semibold mb-2">🤖 Ưu điểm AI Classification:</p>
+                <ul className="space-y-1">
+                  <li>✅ Hiểu context (quốc huy, layout, màu sắc)</li>
+                  <li>✅ Không cần rules phức tạp</li>
+                  <li>✅ Accuracy: 93-97%</li>
+                  <li>✅ Direct classification từ image</li>
+                  <li>✅ Returns reasoning (giải thích tại sao)</li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Save Button */}
       <div className="flex gap-3">
         <button

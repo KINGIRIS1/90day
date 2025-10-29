@@ -104,6 +104,15 @@ function App() {
     loadPref();
   }, []);
 
+  // Listen for navigate-to-cloud event from Settings
+  useEffect(() => {
+    const handleNavigate = () => {
+      setActiveTab('cloud');
+    };
+    window.addEventListener('navigate-to-cloud', handleNavigate);
+    return () => window.removeEventListener('navigate-to-cloud', handleNavigate);
+  }, []);
+
 
   const basename = (p) => {
     if (!p) return '';

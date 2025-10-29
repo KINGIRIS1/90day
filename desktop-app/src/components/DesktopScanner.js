@@ -531,7 +531,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               )}
             </div>
             {selectedFiles.length > 0 && (
-              <div className="mt-2"><span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-2 py-1 text-xs text-gray-700"><span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file</span></div>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="inline-flex items-center bg-gray-100 border border-gray-200 rounded-full px-2 py-1 text-xs text-gray-700">
+                  <span className="mr-1">📦</span>Đã chọn {selectedFiles.length} file
+                </span>
+                <span className="inline-flex items-center border border-blue-200 rounded-full px-2 py-1 text-xs">
+                  {currentOcrEngine === 'google' && <span className="text-blue-700">☁️ Google Cloud Vision</span>}
+                  {currentOcrEngine === 'azure' && <span className="text-blue-700">☁️ Azure Computer Vision</span>}
+                  {currentOcrEngine === 'tesseract' && <span className="text-gray-700">⚡ Tesseract OCR</span>}
+                  {currentOcrEngine === 'easyocr' && <span className="text-gray-700">⚡ EasyOCR</span>}
+                  {currentOcrEngine === 'vietocr' && <span className="text-gray-700">⚡ VietOCR</span>}
+                </span>
+              </div>
             )}
           </div>
         </>

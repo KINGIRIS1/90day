@@ -410,72 +410,72 @@ agent_communication:
   
   - agent: "main"
     message: |
-      ✅ FIX: SEQUENTIAL NAMING LOGIC - REFINED APPROACH
+      ✅ FIX: SEQUENTIAL NAMING LOGIC + PATTERN ORDER - COMPLETE FIX
       
       🐛 VẤN ĐỀ ĐƯỢC FIX:
-      - Documents với title rõ ràng bị misclassified bởi sequential naming
-      - Ví dụ: "ĐƠN XIN CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT" → Bị rename thành "ĐKBĐ"
-      - Nguyên nhân: Uppercase ratio check quá strict + Sequential logic không rõ ràng
+      1. Documents với title rõ ràng bị misclassified bởi sequential naming
+      2. Pattern matching order SAI → "HỢP ĐỒNG CHUYỂN NHƯỢNG" bị nhận nhầm thành "HỢP ĐỒNG ỦY QUYỀN"
+      
+      📋 USER REPORT:
+      - File: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+      - Google Cloud Vision: ✅ Extract chính xác
+      - Pattern extraction: ❌ "Hợp đồng ủy..." (HDUQ)
+      - Result: ❌ Uppercase 11% < 30% → Rejected → Classify sai thành DKTC
       
       🎯 CÁC FIX CHÍNH:
+      
+      0. **CRITICAL FIX: Pattern Order Correction**:
+         - OLD: HDUQ pattern check TRƯỚC HDCQ → Match sai
+         - NEW: HDCQ pattern check TRƯỚC HDUQ → Match đúng
+         - Verification: ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ (100% uppercase)
       
       1. **Giảm Uppercase Threshold cho Cloud OCR**:
          - Cloud OCR: 0.5 → 0.3 (30%)
          - Offline OCR: Giữ nguyên 0.7 (70%)
-         - Lý do: Cloud OCR chính xác, accept mixed-case titles (e.g., "Đơn xin chuyển..." ~30-40% uppercase)
       
-      2. **Refined Sequential Naming Logic** (4 cases rõ ràng):
-         - Case 1: UNKNOWN → Always apply sequential
-         - Case 2: No title + confidence < 0.5 → Apply sequential
-         - Case 3: No title + confidence ≥ 0.5 → Keep original (body text reliable)
-         - Case 4: Has title extracted → Keep original (new document)
+      2. **Refined Sequential Naming Logic** (4 cases):
+         - Case 1: UNKNOWN → Always apply
+         - Case 2: No title + confidence < 0.5 → Apply
+         - Case 3: No title + confidence ≥ 0.5 → Keep original
+         - Case 4: Has title → Keep original
       
-      3. **Giảm Threshold cho currentLastKnown Update**:
-         - Threshold: 0.8 → 0.7
-         - Lý do: Confidence 70-79% vẫn là valid classifications
-         - Cải thiện document flow tracking
+      3. **Giảm Threshold currentLastKnown**: 0.8 → 0.7
       
-      4. **Enhanced Logging**:
-         - Console logs chi tiết cho mỗi decision
-         - "🔄 Sequential: UNKNOWN → ĐKBĐ"
-         - "✅ No sequential: Title extracted → Keep ĐƠN XIN (75%)"
-         - "📌 Updated lastKnown: GCNQSDD (88%)"
+      4. **Enhanced Logging**: Console logs chi tiết
       
       📦 FILES MODIFIED:
-      1. /app/desktop-app/python/rule_classifier.py (line 1931)
-         - uppercase_threshold = 0.3 for Cloud OCR
+      1. /app/desktop-app/python/process_document.py
+         - Line 71-91: Fixed pattern order (HDCQ before HDUQ)
+         - Line 105-117: Added debug logging for pattern matching
+      
+      2. /app/desktop-app/python/rule_classifier.py
+         - Line 1931: uppercase_threshold = 0.3 for Cloud OCR
          - Enhanced logging with threshold value
       
-      2. /app/desktop-app/src/components/DesktopScanner.js
-         - Line 207-262: Refined applySequentialNaming() với 4 cases
-         - Line 335-349: Threshold 0.7 for file scan + logging
-         - Line 426-440: Threshold 0.7 for folder scan + logging
+      3. /app/desktop-app/src/components/DesktopScanner.js
+         - Line 207-262: Refined applySequentialNaming() 4 cases
+         - Line 335-349, 426-440: Threshold 0.7 + logging
       
-      3. /app/desktop-app/FIX_SEQUENTIAL_NAMING_LOGIC.md (tài liệu chi tiết)
+      4. /app/desktop-app/test_title_pattern.py (test script)
+      5. /app/desktop-app/FIX_SEQUENTIAL_NAMING_LOGIC.md (docs)
       
-      🧪 TESTING SCENARIOS:
-      1. Cloud OCR với Mixed-Case Title:
-         - "Đơn xin chuyển..." (35% uppercase)
-         - ✅ Title accepted → Classified chính xác
-         - ✅ Không apply sequential naming
+      🧪 VERIFICATION:
+      ```bash
+      python test_title_pattern.py
       
-      2. Document Sequence (Page 1, 2, 3):
-         - Doc 1: "GIẤY CHỨNG NHẬN..." → GCNQSDD (88%)
-         - Doc 2: [No title] → Sequential → GCNQSDD
-         - Doc 3: [No title] → Sequential → GCNQSDD
+      Result:
+      ✅ Pattern HDCQ MATCHED
+         Extracted: 'HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT'
+         Uppercase ratio: 100.0%
+      ```
       
-      3. Mixed Documents:
-         - Doc 1: "ĐƠN ĐĂNG KÝ..." → ĐKBĐ (92%)
-         - Doc 2: "ĐƠN XIN CHUYỂN..." → ĐƠN XIN (75%)
-         - ✅ Không bị rename thành ĐKBĐ
-         - Doc 3: [Page 2 of ĐƠN XIN] → Sequential → ĐƠN XIN
-      
-      📊 IMPACT:
-      - ✅ Cloud OCR accuracy: 95%+ (accept 30%+ uppercase)
-      - ✅ Sequential naming precision: Chỉ cho truly unknown pages
-      - ✅ Better document flow tracking (threshold 70%)
+      📊 TESTING SCENARIOS:
+      1. ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG..." → HDCQ (not HDUQ)
+      2. ✅ Cloud OCR mixed-case titles (30-50% uppercase) accepted
+      3. ✅ Sequential naming chỉ cho truly unknown pages
+      4. ✅ Better document flow tracking (threshold 70%)
       
       ⏳ NEXT STEPS:
-      - Test với real Vietnamese documents (ĐKBĐ, ĐƠN XIN, GCNQSDD)
-      - Verify Cloud OCR titles với 30-50% uppercase được accept
-      - Monitor console logs during batch scanning
+      - User test với file: "20240504-01700003.jpg"
+      - Verify classification: Should be HDCQ, not DKTC
+      - Monitor console logs: Should see "HỢP ĐỒNG CHUYỂN NHƯỢNG..." extracted

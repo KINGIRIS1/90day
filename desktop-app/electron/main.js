@@ -945,3 +945,141 @@ ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos 
   }
 });
 
+
+// ===== Cloud OCR API Key Management =====
+
+// Save API key (encrypted via electron-store)
+ipcMain.handle('save-api-key', async (event, { provider, apiKey }) => {
+  try {
+    store.set(`cloudOCR.${provider}.apiKey`, apiKey);
+    return { success: true, message: `API key for ${provider} saved successfully` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Get API key
+ipcMain.handle('get-api-key', async (event, provider) => {
+  try {
+    const apiKey = store.get(`cloudOCR.${provider}.apiKey`, '');
+    return apiKey;
+  } catch (error) {
+    console.error('Error getting API key:', error);
+    return '';
+  }
+});
+
+// Delete API key
+ipcMain.handle('delete-api-key', async (event, provider) => {
+  try {
+    store.delete(`cloudOCR.${provider}.apiKey`);
+    if (provider === 'azure') {
+      store.delete(`cloudOCR.azureEndpoint.apiKey`);
+    }
+    return { success: true, message: `API key for ${provider} deleted` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Test API key validity
+ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => {
+  try {
+    if (provider === 'google') {
+      // Test Google Cloud Vision API
+      const axios = require('axios');
+      
+      // Create a simple test request (using TEXT_DETECTION on a dummy image)
+      const testUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+      
+      const response = await axios.post(testUrl, {
+        requests: [{
+          image: {
+            content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' // 1x1 transparent PNG
+          },
+          features: [{
+            type: 'TEXT_DETECTION',
+            maxResults: 1
+          }]
+        }]
+      }, {
+        timeout: 10000
+      });
+      
+      if (response.status === 200) {
+        return { 
+          success: true, 
+          message: '✅ Google Cloud Vision API key hợp lệ!\n\n✨ Sẵn sàng sử dụng Cloud OCR với độ chính xác cao.' 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'API key có vẻ không hợp lệ hoặc chưa enable Cloud Vision API' 
+        };
+      }
+      
+    } else if (provider === 'azure') {
+      // Test Azure Computer Vision API
+      const axios = require('axios');
+      
+      if (!endpoint) {
+        return { success: false, error: 'Azure endpoint URL is required' };
+      }
+      
+      // Normalize endpoint (remove trailing slash)
+      const normalizedEndpoint = endpoint.replace(/\/$/, '');
+      
+      // Test with Read API (OCR)
+      const testUrl = `${normalizedEndpoint}/vision/v3.2/read/analyze`;
+      
+      const response = await axios.post(testUrl, {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Atomist_quote_from_Democritus.png/338px-Atomist_quote_from_Democritus.png'
+      }, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+      
+      if (response.status === 202) {
+        return { 
+          success: true, 
+          message: '✅ Azure Computer Vision API key hợp lệ!\n\n✨ Sẵn sàng sử dụng Cloud OCR với độ chính xác cao.' 
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'API key hoặc endpoint không hợp lệ' 
+        };
+      }
+      
+    } else {
+      return { success: false, error: 'Unsupported provider' };
+    }
+    
+  } catch (error) {
+    console.error('Test API key error:', error);
+    
+    let errorMessage = error.message;
+    
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 401 || status === 403) {
+        errorMessage = 'API key không hợp lệ hoặc không có quyền truy cập';
+      } else if (status === 429) {
+        errorMessage = 'Đã vượt quá giới hạn request. Vui lòng thử lại sau.';
+      } else if (status === 400) {
+        errorMessage = 'Có lỗi trong cấu hình API key hoặc endpoint';
+      }
+    } else if (error.code === 'ENOTFOUND' || error.code === 'ETIMEDOUT') {
+      errorMessage = 'Không thể kết nối đến Cloud API. Kiểm tra internet hoặc endpoint URL.';
+    }
+    
+    return { 
+      success: false, 
+      error: errorMessage 
+    };
+  }
+});
+

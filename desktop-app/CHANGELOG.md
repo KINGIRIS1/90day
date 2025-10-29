@@ -1,3 +1,89 @@
+# 📝 Changelog - BYOK Cloud OCR Integration
+
+## Version 1.2.0 - 2025-01-XX
+
+### ✨ New Features - BYOK (Bring Your Own Key)
+
+#### Cloud OCR Settings
+- **Tab mới "☁️ Cloud OCR"** trong navigation
+  - UI thân thiện để quản lý Cloud OCR settings
+  - Chọn OCR engine: Offline Tesseract, Offline EasyOCR, Google Cloud Vision, Azure Computer Vision
+  - Input và test API keys cho Google/Azure
+  - Hướng dẫn chi tiết cách lấy API keys từ cloud providers
+
+- **API Key Management**
+  - Lưu trữ an toàn API keys (encrypted via electron-store)
+  - Test API key validity trước khi lưu
+  - Delete API keys khi không cần
+  - Support Google Cloud Vision và Azure Computer Vision
+
+- **Cost Optimization**
+  - Tận dụng free tier của từng provider:
+    - Google: 1,000 requests/tháng miễn phí
+    - Azure: 5,000 requests/tháng miễn phí
+  - User tự quản lý chi phí
+  - Không phụ thuộc backend server
+
+#### Backend (Electron)
+- **4 IPC handlers mới** trong main.js:
+  - `save-api-key`: Lưu API key với encryption
+  - `get-api-key`: Lấy stored API key
+  - `delete-api-key`: Xóa API key
+  - `test-api-key`: Validate API key với Google/Azure APIs
+
+- **Security**
+  - API keys được encrypt tự động bởi electron-store
+  - Không gửi keys lên server
+  - Keys chỉ dùng để gọi trực tiếp Cloud APIs
+
+#### Frontend
+- **CloudSettings.js** component mới (393 lines)
+  - Radio buttons cho OCR engine selection
+  - Password inputs cho API keys (masked)
+  - Test API key buttons với loading states
+  - Collapsible guides cho Google và Azure
+  - Error handling và user feedback
+
+- **App.js routing**
+  - Thêm tab "☁️ Cloud OCR" vào navigation
+  - Lazy rendering cho performance optimization
+
+#### Documentation
+- **BYOK_FEATURE_GUIDE.md** (comprehensive guide)
+  - Hướng dẫn lấy Google Cloud Vision API key
+  - Hướng dẫn lấy Azure Computer Vision API key
+  - So sánh OCR engines (accuracy, cost, speed)
+  - Troubleshooting guide
+  - Security best practices
+
+### 📊 Comparison Table
+
+| Engine | Accuracy | Tốc độ | Chi phí | Internet | Ghi chú |
+|--------|----------|--------|---------|----------|---------|
+| Tesseract | 75-85% | 0.5-1s | Miễn phí | Không | Đa ngôn ngữ |
+| EasyOCR | 88-92% | 7-8s | Miễn phí | Không | Tốt cho tiếng Việt |
+| VietOCR | 90-95% | 1-2s | Miễn phí | Không | Chuyên tiếng Việt |
+| **Google Cloud Vision** | 90-95% | 1-2s | $1.50/1K | Cần | **Free 1K/tháng** |
+| **Azure Vision** | 92-96% | 1-2s | $1.00/1K | Cần | **Free 5K/tháng** |
+
+### 🚧 Pending Work
+- [ ] Integrate API keys với Python OCR engines
+- [ ] Usage tracking và cost estimation
+- [ ] Batch processing với Cloud OCR
+- [ ] OpenAI GPT-4 Vision support
+
+### 📂 Files Created/Modified
+- ✅ `/desktop-app/src/components/CloudSettings.js` (NEW)
+- ✅ `/desktop-app/electron/main.js` (IPC handlers added)
+- ✅ `/desktop-app/electron/preload.js` (API exposed)
+- ✅ `/desktop-app/public/electron.js` (synced)
+- ✅ `/desktop-app/public/preload.js` (synced)
+- ✅ `/desktop-app/src/App.js` (routing updated)
+- ✅ `/desktop-app/BYOK_FEATURE_GUIDE.md` (NEW)
+- ✅ `/desktop-app/CHANGELOG.md` (updated)
+
+---
+
 # 📝 Changelog - Rules Manager Implementation
 
 ## Version 1.1.0 - 2025-01-15

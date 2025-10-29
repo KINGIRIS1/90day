@@ -419,14 +419,15 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         // Determine target directory based on mergeMode
         let targetDir;
         
-        // IMPORTANT: Always use the child folder (where images are located)
-        const childFolder = path.dirname(filePaths[0]); // Folder chứa file ảnh gốc
+        // Get the folder containing the first file
+        const childFolder = path.dirname(filePaths[0]);
         
         if (options.mergeMode === 'new') {
-          // Create new folder INSIDE child folder
+          // Create new folder at SAME LEVEL as child folder (sibling)
+          const parentOfChild = path.dirname(childFolder);
           const childBaseName = path.basename(childFolder);
           const newFolderName = childBaseName + (options.mergeSuffix || '_merged');
-          targetDir = path.join(childFolder, newFolderName);
+          targetDir = path.join(parentOfChild, newFolderName);
           
           // Create folder if doesn't exist
           if (!fs.existsSync(targetDir)) {
@@ -434,6 +435,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
           }
         } else {
           // Default or 'root' mode: Save directly to child folder (where images are)
+          // This is the behavior for File Scan
           targetDir = childFolder;
         }
         

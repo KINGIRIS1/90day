@@ -151,14 +151,15 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             
             # Helper function to check if type is ambiguous
             def is_ambiguous_type(short_code):
-                """Types that often need full context for accurate classification"""
+                """
+                ONLY truly confusing pairs that need full context
+                Reduced list to minimize unnecessary full retries
+                """
                 ambiguous_types = [
-                    'UNKNOWN',      # Uncertain classification
-                    'HDCQ', 'HDUQ', # Contract confusion (chuyển nhượng vs ủy quyền)
-                    'HDTHC', 'HDTD', 'HDTCO', 'HDBDG',  # Other contracts
-                    'DDKBD', 'DDK', # Application confusion (có/không biến động)
-                    'GUQ',          # vs HDUQ
-                    'QDGTD', 'QDCMD', 'QDTH', 'QDGH',  # Decision types
+                    'UNKNOWN',      # Always retry if uncertain
+                    # Only the most confusing pairs:
+                    'HDCQ', 'HDUQ', # Chuyển nhượng vs Ủy quyền (very similar)
+                    'DDKBD', 'DDK', # Có/không "biến động" (needs body text)
                 ]
                 return short_code in ambiguous_types
             

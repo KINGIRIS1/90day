@@ -1925,11 +1925,17 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
             # If cleaning removed everything, check original
             title_uppercase_ratio = calculate_uppercase_ratio(title_text)
         
+        # Cloud OCR (Google/Azure) is more accurate → Use relaxed threshold
+        # Offline OCR (Tesseract/EasyOCR) has more errors → Use strict threshold
+        is_cloud_ocr = ocr_engine in ['google', 'azure']
+        uppercase_threshold = 0.5 if is_cloud_ocr else 0.7
+        
         # If title has low uppercase ratio, it's likely NOT a real title but
         # a mention in body text (e.g., "Giấy chứng nhận..." in contract body)
         # → Ignore this title and use ONLY body text for classification
-        if title_uppercase_ratio < 0.7:
-            print(f"⚠️ Title has low uppercase ({title_uppercase_ratio:.0%}), likely not a real title. Using body text only.", file=sys.stderr)
+        if title_uppercase_ratio < uppercase_threshold:
+            engine_note = "(Cloud OCR)" if is_cloud_ocr else "(Offline OCR)"
+            print(f"⚠️ Title has low uppercase ({title_uppercase_ratio:.0%}), likely not a real title {engine_note}. Using body text only.", file=sys.stderr)
             title_text = None  # Ignore this title
             title_normalized = ""
     

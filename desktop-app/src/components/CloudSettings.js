@@ -119,21 +119,23 @@ function CloudSettings() {
   };
 
   const handleDeleteKey = async (provider) => {
-    if (!window.confirm(`Xóa API key cho ${provider === 'google' ? 'Google Cloud Vision' : 'Azure Vision'}?`)) {
-      return;
-    }
-
-    try {
-      await window.electronAPI.deleteApiKey(provider);
-      if (provider === 'google') {
-        setGoogleKey('');
-      } else {
-        setAzureKey('');
-        setAzureEndpoint('');
+    if (window.confirm(`⚠️ Xác nhận xóa ${provider.toUpperCase()} API key?`)) {
+      try {
+        await window.electronAPI.deleteApiKey(provider);
+        
+        if (provider === 'google') {
+          setGoogleKey('');
+        } else if (provider === 'gemini') {
+          setGeminiKey('');
+        } else if (provider === 'azure') {
+          setAzureKey('');
+          setAzureEndpoint('');
+        }
+        
+        alert('✅ Đã xóa API key!');
+      } catch (error) {
+        alert('❌ Lỗi khi xóa: ' + error.message);
       }
-      alert('✅ Đã xóa API key!');
-    } catch (error) {
-      alert('❌ Lỗi: ' + error.message);
     }
   };
 

@@ -17,7 +17,7 @@ def test_gemini_api_key(api_key):
     print()
     
     # Test endpoint - v1beta is standard
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
     # Simple test request
     payload = {

@@ -10,7 +10,7 @@ import os
 import json
 import time
 
-def ocr_azure_computer_vision(image_path, api_key, endpoint):
+def ocr_azure_computer_vision(image_path, api_key, endpoint, crop_top_percent=0.35):
     """
     Perform OCR using Azure Computer Vision API
     
@@ -18,19 +18,33 @@ def ocr_azure_computer_vision(image_path, api_key, endpoint):
         image_path: Path to image file
         api_key: Azure Computer Vision API key
         endpoint: Azure endpoint URL (e.g., https://xxx.cognitiveservices.azure.com/)
+        crop_top_percent: Percentage of top image to process (default 0.35 = 35%)
         
     Returns:
         tuple: (extracted_text, confidence_score, error)
     """
     try:
         import requests
+        from PIL import Image
+        import io
         
         # Normalize endpoint (remove trailing slash)
         endpoint = endpoint.rstrip('/')
         
-        # Read image
-        with open(image_path, 'rb') as f:
-            image_data = f.read()
+        # Read and crop image to top portion
+        with Image.open(image_path) as img:
+            width, height = img.size
+            
+            # Crop to top N% (default 35%)
+            crop_height = int(height * crop_top_percent)
+            cropped_img = img.crop((0, 0, width, crop_height))
+            
+            # Convert to bytes
+            img_byte_arr = io.BytesIO()
+            cropped_img.save(img_byte_arr, format=img.format or 'PNG')
+            image_data = img_byte_arr.getvalue()
+            
+            print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
         
         # Step 1: Submit read request
         read_url = f'{endpoint}/vision/v3.2/read/analyze'

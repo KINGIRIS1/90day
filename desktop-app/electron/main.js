@@ -273,9 +273,37 @@ ipcMain.handle('analyze-parent-folder', async (event, folderPath) => {
 
 
 ipcMain.handle('process-document-offline', async (event, filePath) => {
-  return new Promise((resolve, reject) => {
-    // Get OCR engine preference from store (default: tesseract)
-    const ocrEngineType = store.get('ocrEngineType', 'tesseract');
+  return new Promise(async (resolve, reject) => {
+    // Get OCR engine preference from store
+    // Can be: 'tesseract', 'vietocr', 'easyocr', 'google', 'azure'
+    const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
+    
+    // Get cloud API keys if using cloud engines
+    let cloudApiKey = null;
+    let cloudEndpoint = null;
+    
+    if (ocrEngineType === 'google') {
+      cloudApiKey = store.get('cloudOCR.google.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({
+          success: false,
+          error: 'Google Cloud Vision API key not configured. Please add it in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    } else if (ocrEngineType === 'azure') {
+      cloudApiKey = store.get('cloudOCR.azure.apiKey', '');
+      cloudEndpoint = store.get('cloudOCR.azureEndpoint.apiKey', '');
+      if (!cloudApiKey || !cloudEndpoint) {
+        resolve({
+          success: false,
+          error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.',
+          method: 'config_error'
+        });
+        return;
+      }
+    }
     
     // Auto-detect Python command based on platform
     let pythonPath;
@@ -295,8 +323,17 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       ? path.join(__dirname, '../python/process_document.py')
       : getPythonScriptPath('process_document.py');
 
-    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType}`);
-    const childProcess = spawn(pythonPath, [scriptPath, filePath, ocrEngineType], {
+    // Build command args
+    const args = [scriptPath, filePath, ocrEngineType];
+    if (cloudApiKey) {
+      args.push(cloudApiKey);
+      if (cloudEndpoint) {
+        args.push(cloudEndpoint);
+      }
+    }
+
+    console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType} ${cloudApiKey ? '[API_KEY]' : ''} ${cloudEndpoint || ''}`);
+    const childProcess = spawn(pythonPath, args, {
       encoding: 'utf8',
       env: {
         ...process.env,

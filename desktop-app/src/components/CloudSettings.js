@@ -16,12 +16,23 @@ function CloudSettings() {
 
   const loadSettings = async () => {
     try {
-      const engine = await window.electronAPI.getConfig('ocrEngine') || 'offline-tesseract';
+      const backendEngine = await window.electronAPI.getConfig('ocrEngine') || 'tesseract';
+      
+      // Map backend values to UI values
+      const uiEngineMapping = {
+        'tesseract': 'offline-tesseract',
+        'easyocr': 'offline-easyocr',
+        'google': 'google',
+        'azure': 'azure'
+      };
+      
+      const uiEngine = uiEngineMapping[backendEngine] || 'offline-tesseract';
+      
       const google = await window.electronAPI.getApiKey('google') || '';
       const azure = await window.electronAPI.getApiKey('azure') || '';
       const azureEp = await window.electronAPI.getApiKey('azureEndpoint') || '';
       
-      setOcrEngine(engine);
+      setOcrEngine(uiEngine);
       setGoogleKey(google);
       setAzureKey(azure);
       setAzureEndpoint(azureEp);

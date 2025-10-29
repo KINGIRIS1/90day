@@ -205,13 +205,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   const applySequentialNaming = (result, lastType) => {
-    // Apply sequential naming CHỈ KHI thực sự là "trang tiếp theo":
-    // 1. UNKNOWN (không nhận dạng được loại gì cả)
-    // 2. KHÔNG extract được title rõ ràng (title_extracted_via_pattern = false) VÀ confidence thấp (< 0.5)
+    // REFINED LOGIC:
+    // Apply sequential naming khi:
+    // 1. UNKNOWN (chắc chắn không nhận dạng được)
+    // 2. KHÔNG có title extracted (title_extracted_via_pattern = false)
+    //    → Đây là trang 2/3/4 của document, KHÔNG phải document mới
     // 
-    // KHÔNG apply nếu:
-    // - Có title rõ ràng được extract (title_extracted_via_pattern = true) VÀ confidence >= 0.5
-    // - Đây có thể là document type mới, không phải trang tiếp theo
+    // KHÔNG apply chỉ khi:
+    // - Có title extracted (title_extracted_via_pattern = true)
+    //   → Document mới với title riêng
     
     if (result.success && lastType) {
       // Case 1: UNKNOWN - chắc chắn không nhận dạng được → ALWAYS apply sequential
@@ -229,10 +231,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
-      // Case 2: Không extract được title VÀ confidence thấp (< 0.5)
-      // → Có thể là trang 2, 3, 4... không có tiêu đề rõ
-      if (!result.title_extracted_via_pattern && result.confidence < 0.5) {
-        console.log(`🔄 Sequential: No title + low confidence (${(result.confidence * 100).toFixed(0)}%) → ${lastType.short_code}`);
+      // Case 2: KHÔNG có title extracted → Page tiếp theo → ALWAYS apply sequential
+      // Lý do: Trang 2/3/4 của HỢP ĐỒNG có thể chứa keywords của doc type khác
+      // → Body text classification không đáng tin cậy cho continuation pages
+      if (!result.title_extracted_via_pattern) {
+        console.log(`🔄 Sequential: No title extracted (confidence ${(result.confidence * 100).toFixed(0)}%, classified as ${result.short_code}) → Override to ${lastType.short_code}`);
         return {
           ...result,
           doc_type: lastType.doc_type,
@@ -241,24 +244,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           original_confidence: result.confidence,
           original_short_code: result.short_code,
           applied_sequential_logic: true,
-          note: `📄 Trang tiếp theo của ${lastType.short_code} (không có tiêu đề rõ ràng)`
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (page 2/3/4 không có tiêu đề)`
         };
       }
       
-      // Case 3: Không extract được title NHƯNG confidence khá cao (0.5-0.7)
-      // → Có thể nhận dạng dựa vào body text, KHÔNG apply sequential
-      if (!result.title_extracted_via_pattern && result.confidence >= 0.5) {
-        console.log(`✅ No sequential: No title but confident classification (${(result.confidence * 100).toFixed(0)}%) → Keep ${result.short_code}`);
-      }
-      
-      // Case 4: Có title extracted → KHÔNG apply sequential (dù confidence thấp)
-      // → Đây là document mới với title riêng
+      // Case 3: Có title extracted → Document MỚI → KHÔNG apply sequential
       if (result.title_extracted_via_pattern) {
-        console.log(`✅ No sequential: Title extracted → Keep ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
+        console.log(`✅ No sequential: Title extracted → New document ${result.short_code} (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
       }
     }
     
-    // Default: Không apply sequential, giữ nguyên classification
+    // Default: Không apply sequential (no lastType hoặc has title)
     return result;
   };
 

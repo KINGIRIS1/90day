@@ -138,28 +138,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-            {/* Engine banner + toggle quick switch */}
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-gray-600">Engine:</div>
-              {enginePref === 'cloud' ? (
-                <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-700">☁️ Cloud</span>
-              ) : (
-                <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-700">🔵 Offline</span>
-              )}
-              <div className="text-xs text-gray-400">|</div>
-              <button
-                onClick={async ()=>{
-                  const next = enginePref === 'cloud' ? 'offline' : 'cloud';
-                  setEnginePref(next);
-                  if (window.electronAPI) await window.electronAPI.setConfig('enginePreference', next);
-                }}
-                className="text-xs px-2 py-1 rounded border hover:bg-gray-50"
-                title="Chuyển nhanh Engine (có thể chỉnh trong Cài đặt)"
-              >
-                Đổi sang {enginePref === 'cloud' ? 'Offline' : 'Cloud'}
-              </button>
-            </div>
-
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-3 py-2">

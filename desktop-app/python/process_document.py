@@ -293,7 +293,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             final_title = title_text
         
         # Classify using rules with title text priority
-        result = classifier.classify(extracted_text, title_text=final_title)
+        # Pass engine type to classifier for smart title validation
+        result = classifier.classify(extracted_text, title_text=final_title, ocr_engine=ocr_engine_type)
         
         # Determine if Cloud Boost is recommended (only for offline engines)
         confidence_threshold = 0.7

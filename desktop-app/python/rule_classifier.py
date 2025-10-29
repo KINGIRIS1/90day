@@ -1886,7 +1886,7 @@ def check_required_keywords_in_title(doc_type: str, title_text: str, config: Dic
     return False
 
 
-def classify_by_rules(text: str, title_text: str = None, confidence_threshold: float = 0.3) -> Dict:
+def classify_by_rules(text: str, title_text: str = None, confidence_threshold: float = 0.3, ocr_engine: str = 'tesseract') -> Dict:
     """
     HYBRID CLASSIFICATION: Fuzzy title matching + Keyword fallback
     
@@ -1898,6 +1898,8 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
         text: Full OCR text
         title_text: Text extracted from large fonts (titles/headers)
         confidence_threshold: Minimum confidence threshold
+        ocr_engine: OCR engine used ('tesseract', 'easyocr', 'vietocr', 'google', 'azure')
+
         
     Returns:
         Classification result with type, confidence, and method used

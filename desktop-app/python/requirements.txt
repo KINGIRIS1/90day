@@ -4,6 +4,9 @@
 pytesseract>=0.3.10
 Pillow>=10.0.0
 
+# HTTP requests for Cloud OCR
+requests>=2.31.0
+
 # VietOCR - Optional Vietnamese OCR Engine (Transformer-based)
 # Chỉ cài nếu cần độ chính xác cao hơn cho tiếng Việt (90-95%)
 # Uncomment dòng dưới để cài:
@@ -18,6 +21,12 @@ Pillow>=10.0.0
 # easyocr>=1.7.0
 # torch>=2.0.0
 # torchvision>=0.15.0
+
+# Cloud OCR - Google Cloud Vision & Azure Computer Vision
+# Requires API keys (BYOK - Bring Your Own Key)
+# Install: pip install requests (already included above)
+# Google: 1,000 free requests/month, $1.50/1K after
+# Azure: 5,000 free requests/month, $1.00/1K after
 
 # Lưu ý: Cần cài Tesseract binary riêng
 # Windows: https://github.com/UB-Mannheim/tesseract/wiki

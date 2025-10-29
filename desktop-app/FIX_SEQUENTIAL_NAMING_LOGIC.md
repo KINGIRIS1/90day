@@ -73,7 +73,41 @@ title_patterns = [
 
 ---
 
-## ✅ Giải pháp
+## ✅ Giải pháp Complete
+
+### Fix 0: Pattern Order Correction (CRITICAL FIX)
+
+**File**: `/app/desktop-app/python/process_document.py` (line 71-91)
+
+```python
+# SAU: HDCQ check TRƯỚC HDUQ
+title_patterns = [
+    # ...
+    
+    # HỢP ĐỒNG CHUYỂN NHƯỢNG (check FIRST - more specific)
+    r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+CHUY[EÊÉÈẾỀỂỄỆ]N\s+NH[UƯÚÙỦŨỤỨỪỬỮỰ][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG...)',
+    
+    # HỢP ĐỒNG ỦY QUYỀN (check AFTER HDCQ)
+    r'(H[OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]P\s+[ĐD][OÔƠÓÒỎÕỌỐỒỔỖỘỚỜỞỠỢ]NG\s+(?:[UỦ][\sỶ]*Y|U[ỶY])\s+QUY[EÊÉÈẾỀỂỄỆ]N)',
+]
+```
+
+**Verification**:
+```bash
+cd /app/desktop-app && python test_title_pattern.py
+
+# Result:
+✅ Pattern HDCQ MATCHED
+   Extracted: 'HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT'
+   Uppercase ratio: 100.0%
+```
+
+**Impact**: 
+- ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG..." correctly extracted as HDCQ
+- ✅ No longer misidentified as HDUQ
+- ✅ Uppercase ratio 100% → Accepted by classifier
+
+---
 
 ### Fix 1: Giảm Uppercase Threshold cho Cloud OCR
 

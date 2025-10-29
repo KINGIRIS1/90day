@@ -207,23 +207,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const applySequentialNaming = (result, lastType) => {
     // Apply sequential naming ONLY if:
     // 1. Current result is UNKNOWN (confirmed no classification)
-    // 2. Very low confidence (< 0.3) - definitely unreliable
-    // This should be conservative - only apply when truly needed
+    // 2. Low to medium confidence (< 0.8) - not confident enough
+    // User requirement: Need 70-80% confidence to trust classification
     if (result.success && lastType) {
       const shouldUseSequential = 
         result.short_code === 'UNKNOWN' || 
-        (result.confidence < 0.3 && result.short_code !== 'UNKNOWN'); // Only very low confidence
+        (result.confidence < 0.8 && result.short_code !== 'UNKNOWN'); // < 80% confidence
       
       if (shouldUseSequential) {
         return {
           ...result,
           doc_type: lastType.doc_type,
           short_code: lastType.short_code,
-          confidence: Math.max(0.65, lastType.confidence * 0.9), // Maintain reasonable confidence
+          confidence: Math.max(0.75, lastType.confidence * 0.95), // Higher base confidence for sequential
           original_confidence: result.confidence,
           original_short_code: result.short_code,
           applied_sequential_logic: true,
-          note: `📄 Trang tiếp theo của ${lastType.short_code} (${result.short_code === 'UNKNOWN' ? 'không nhận dạng được' : 'confidence cực thấp'})`
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (${result.short_code === 'UNKNOWN' ? 'không nhận dạng được' : `confidence thấp: ${(result.confidence * 100).toFixed(0)}%`})`
         };
       }
     }

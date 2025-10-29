@@ -233,15 +233,24 @@ const Settings = () => {
         <EnginePreferenceSetting />
       </div>
 
-      {/* OCR Engine Type Selection */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          🔍 Chọn OCR Engine (Offline)
+      {/* OCR Engine Selection - Redirect to Cloud OCR tab */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
+        <h2 className="text-lg font-semibold text-blue-900 mb-3">
+          🔍 Chọn OCR Engine
         </h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Chọn công cụ OCR để xử lý ảnh trong chế độ offline
+        <p className="text-sm text-blue-800 mb-4">
+          Để chọn OCR engine (Tesseract, EasyOCR, Google Cloud Vision, Azure Computer Vision), 
+          vui lòng vào tab <strong>"☁️ Cloud OCR"</strong>.
         </p>
-        <OCREngineTypeSetting />
+        <button
+          onClick={() => {
+            // Trigger tab change to 'cloud'
+            window.dispatchEvent(new CustomEvent('navigate-to-cloud'));
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+        >
+          ☁️ Đi tới Cloud OCR Settings
+        </button>
       </div>
 
       {/* Auto-fallback setting */}

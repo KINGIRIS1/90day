@@ -17,6 +17,7 @@
   "build": {
     "appId": "com.90daychonhanh.app",
     "productName": "90dayChonThanh",
+    "asar": false,
     "files": [
       "build/**/*",
       "public/electron.js",
@@ -24,10 +25,6 @@
       "python/**/*",
       "node_modules/**/*",
       "package.json"
-    ],
-    "asarUnpack": [
-      "python/**/*",
-      "node_modules/electron-store/**/*"
     ],
     "extraResources": [
       {

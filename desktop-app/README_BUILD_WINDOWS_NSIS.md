@@ -1,4 +1,7 @@
 Windows Build Guide (NSIS, system Python)
+App: 90dayChonThanh | Company: Nguyen Thin Trung | Version: 1.1.0 | Arch: x64
+
+
 
 Summary
 - Target: 90dayChonThanh v1.1.0 (x64)

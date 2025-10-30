@@ -158,21 +158,68 @@ Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tíc
 ✅ CHO PHÉP viết tắt (ví dụ: "QSDĐ" → "quyền sử dụng đất")
 ❌ KHÔNG khớp nếu thiếu từ khóa QUAN TRỌNG phân biệt loại
 
+⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TIÊU ĐỀ CHÍNH (Main Title):
+- Nằm Ở ĐẦU trang, TRÊN CÙNG
+- Cỡ chữ LỚN, IN HOA, căn giữa
+- VD: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI..."
+- → CHỈ TIÊU ĐỀ CHÍNH mới dùng để phân loại!
+
+❌ KHÔNG PHÂN LOẠI DỰA VÀO:
+- Section headers (III. THÔNG TIN VỀ...)
+- Mentions trong body text
+- Danh sách đính kèm
+- Ghi chú cuối trang
+
+VÍ DỤ DỄ NHẦM:
+
+❌ SAI: Trang có section "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG..."
+   → Đây CHỈ là section header, KHÔNG phải title
+   → Trả về: UNKNOWN (không có title chính rõ ràng)
+
+❌ SAI: Body text có mention "...hợp đồng chuyển nhượng..."
+   → Đây là mention, KHÔNG phải title
+   → CHỈ phân loại HDCQ nếu có TITLE "HỢP ĐỒNG CHUYỂN NHƯỢNG"
+
+✅ ĐÚNG: Tiêu đề ở đầu trang: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG..."
+   → Có title chính rõ ràng
+   → Phân loại: DDKBD
+
+🎯 TRANG TIẾP THEO (Continuation Pages):
+Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
+- Section headers: "II. THÔNG TIN...", "III. ĐĂNG KÝ..."
+- Body content: Danh sách, bảng biểu, nội dung chi tiết
+- → Trả về: UNKNOWN (Frontend sẽ tự động gán theo trang trước)
+
+🎯 NHẬN DIỆN TRANG GCN (Continuation):
+Trang 2+ của GCN thường có các section:
+- "Nội dung thay đổi và cơ sở pháp lý"
+- "Xác nhận của cơ quan có thẩm quyền"
+- "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
+- "II. NỘI DUNG THAY ĐỔI..."
+- "III. XÁC NHẬN..."
+→ Nếu thấy những section này NHƯNG KHÔNG có title chính
+→ Trả về: UNKNOWN (đây là trang continuation của GCN)
+
 VÍ DỤ CHẤP NHẬN:
-- "HỢP ĐỒNG CHUYỂN NHUỢNG..." (lỗi chính tả) → HDCQ ✅
-- "Giấy chứng nhận QSDĐ, QSHHTSGLVĐ" (viết tắt) → GCNM ✅
-- "QUYẾT ĐỊNH  GIAO ĐẤT" (2 spaces) → QDGTD ✅
+- Thấy "HỢP ĐỒNG CHUYỂN NHUỢNG..." (lỗi chính tả) → HDCQ ✅
+- Thấy "Giấy chứng nhận QSDĐ" (viết tắt) → GCNM ✅
+- Thấy "QUYET  DINH GIAO DAT" (no diacritics) → QDGTD ✅
 
 VÍ DỤ TỪ CHỐI:
+- Chỉ có section "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG" → UNKNOWN ❌
+- Body text mention "đăng ký biến động" → UNKNOWN ❌
+- Trang có "Nội dung thay đổi" nhưng không có title GCN → UNKNOWN ❌
 - "HỢP ĐỒNG" (không rõ loại) → UNKNOWN ❌
 - "QUYẾT ĐỊNH" (không rõ loại) → UNKNOWN ❌
-- "Giấy chứng nhận" (lowercase, không phải title) → UNKNOWN ❌
 
 NẾU KHÔNG KHỚP ~85%+ → Trả về:
 {
   "short_code": "UNKNOWN",
   "confidence": 0.1,
-  "reasoning": "Không thấy tiêu đề khớp đủ với danh sách"
+  "reasoning": "Không thấy tiêu đề chính khớp đủ với danh sách (chỉ thấy section header hoặc mention)"
 }
 
 ⚠️ QUAN TRỌNG: Một tài liệu có thể có NHIỀU TRANG

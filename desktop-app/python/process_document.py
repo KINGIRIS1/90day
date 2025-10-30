@@ -156,7 +156,9 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
             
             scan_time = time.time() - start_time
-            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)
+            page_number = result.get('page_number', None)
+            page_info = f", page: {page_number}" if page_number else ""
+            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}{page_info}, time: {scan_time:.1f}s)", file=sys.stderr)
             
             # Check for errors
             if result.get("short_code") == "ERROR":

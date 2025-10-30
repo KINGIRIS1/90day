@@ -58,6 +58,15 @@
     "linux": {
       "target": [
         "AppImage"
+,
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "include": "build/installer.nsh"
+    }
       ],
       "icon": "assets/icon.png",
       "category": "Utility"

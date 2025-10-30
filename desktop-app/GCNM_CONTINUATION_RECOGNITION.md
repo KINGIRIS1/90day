@@ -29,21 +29,43 @@ Updated the recognition logic for GCN (Giấy Chứng Nhận) continuation pages
 AI sẽ tự động nhận là `GCNM` khi thấy các section đặc trưng:
 
 1. **"NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"**
+   - PHẢI CÓ CẢ HAI: "Nội dung thay đổi" + "Cơ quan"
    - Confidence: 0.85
    
 2. **"THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"**
    - Confidence: 0.85
    
-3. **"II. NỘI DUNG THAY ĐỔI" hoặc "III. XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"**
+3. **"II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"**
+   - Section II về thay đổi
    - Confidence: 0.8
    
-4. **"XÁC NHẬN CƠ QUAN" + bảng thông tin thửa đất**
+4. **"III. XÁC NHẬN CỦA CƠ QUAN"**
+   - PHẢI có từ "CƠ QUAN", KHÔNG phải "ỦY BAN NHÂN DÂN"
    - Confidence: 0.8
+
+### ⚠️ CRITICAL: Phân biệt GCNM vs DDKBD
+
+**GCNM (Giấy chứng nhận):**
+- ✅ "III. XÁC NHẬN CỦA **CƠ QUAN**"
+- ✅ "XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+- Keyword: **"CƠ QUAN"** (agency/authority)
+- Thường là section III
+
+**DDKBD (Đơn đăng ký biến động) - KHÔNG PHẢI GCN:**
+- ❌ "II. XÁC NHẬN CỦA **ỦY BAN NHÂN DÂN CẤP XÃ**"
+- ❌ "XÁC NHẬN CỦA ỦY BAN NHÂN DÂN"
+- Keyword: **"ỦY BAN NHÂN DÂN"** (People's Committee)
+- Thường là section II
+- → Trả về: **UNKNOWN** (không phải GCNM!)
+
+**QUY TẮC:**
+- NẾU thấy "ỦY BAN NHÂN DÂN" → KHÔNG phải GCNM
+- CHỈ KHI thấy "CƠ QUAN" → Mới xét GCNM
 
 ### Additional indicators:
 - Bảng thông tin thửa đất (số hiệu, diện tích, vị trí...)
 - Section "Nội dung thay đổi", "Cơ sở pháp lý"
-- Section "Xác nhận của cơ quan"
+- Section "Xác nhận của **CƠ QUAN**" (không phải "Ủy ban nhân dân")
 - Format dạng phiếu chính thức với các ô điền thông tin đất đai
 
 ---

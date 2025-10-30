@@ -633,6 +633,8 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 - Nằm Ở ĐẦU trang, TRÊN CÙNG
 - Cỡ chữ LỚN, IN HOA, căn giữa
 - VD: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI..."
+- **NẰM ĐỘC LẬP:** Mỗi dòng CHỈ có text của title, KHÔNG có text khác
+- Có thể xuống dòng: "VĂN BẢN" (dòng 1) + "PHÂN CHIA..." (dòng 2)
 - → CHỈ TIÊU ĐỀ CHÍNH mới dùng để phân loại!
 
 ❌ KHÔNG PHÂN LOẠI DỰA VÀO:
@@ -640,6 +642,7 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 - Mentions trong body text
 - Danh sách đính kèm
 - Ghi chú cuối trang
+- **Text NẰM CHUNG với từ khác:** "theo Giấy chứng nhận...", "...theo văn bản..." (reference, không phải title)
 
 🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

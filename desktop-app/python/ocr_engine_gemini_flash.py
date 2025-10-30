@@ -30,7 +30,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.6):
         with Image.open(image_path) as img:
             width, height = img.size
             
-            # Crop to top N% (default 35%)
+            # Crop to top N% (default 60%)
             crop_height = int(height * crop_top_percent)
             cropped_img = img.crop((0, 0, width, crop_height))
             

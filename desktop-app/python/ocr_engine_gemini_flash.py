@@ -1158,7 +1158,6 @@ def parse_gemini_response(response_text):
                 "confidence": float(conf_match.group(1)) if conf_match else 0.7,
                 "reasoning": "Parsed from text response",
                 "title_position": "unknown",
-                "page_number": None,
                 "method": "gemini_flash_ai"
             }
         
@@ -1168,7 +1167,6 @@ def parse_gemini_response(response_text):
             "confidence": 0.3,
             "reasoning": "Could not parse AI response",
             "title_position": "unknown",
-            "page_number": None,
             "method": "gemini_flash_ai"
         }
         

@@ -179,22 +179,6 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 result["reasoning"] = f"Text pattern found at {title_position}, not a main title"
             
             method_used = "gemini_position_aware"
-                    'full_time': f"{full_time:.1f}s" if result_full.get("short_code") != "ERROR" else "N/A",
-                    'total_time': f"{crop_time + full_time:.1f}s" if result_full.get("short_code") != "ERROR" else f"{crop_time:.1f}s",
-                    'used_full': result_full.get("short_code") != "ERROR"
-                }
-            else:
-                print(f"✅ High confidence ({confidence_crop:.2f}), using crop result only", file=sys.stderr)
-                result = result_crop
-                method_used = "gemini_crop_only"
-                
-                # Add statistics
-                result['hybrid_stats'] = {
-                    'crop_result': short_code_crop,
-                    'crop_confidence': confidence_crop,
-                    'crop_time': f"{crop_time:.1f}s",
-                    'used_full': False
-                }
             
             # Map Gemini result to rule_classifier format
             short_code = result.get("short_code", "UNKNOWN")

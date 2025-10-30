@@ -862,24 +862,28 @@ VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
 
 QUY TRÌNH KIỂM TRA:
 ━━━━━━━━━━━━━━━━━━
-1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
-2. Đọc tiêu đề đầy đủ
-3. Tìm trong danh sách có tên CHÍNH XÁC 100%?
-4. NẾU CÓ → Trả về mã chính xác, confidence: 0.9
-5. NẾU KHÔNG → Trả về "UNKNOWN", confidence: 0.1
+1. Phân tích VỊ TRÍ của các text trong ảnh (TOP/MIDDLE/BOTTOM)
+2. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
+3. Đọc tiêu đề Ở TOP 30% (bỏ qua mentions ở MIDDLE/BOTTOM)
+4. Tìm trong danh sách có tên CHÍNH XÁC 100% với tiêu đề ở TOP?
+5. NẾU CÓ → Trả về mã chính xác, confidence: 0.9, title_position: "top"
+6. NẾU KHÔNG CÓ TIÊU ĐỀ Ở TOP → Kiểm tra GCNM continuation patterns
+7. NẾU VẪN KHÔNG → Trả về "UNKNOWN", confidence: 0.1
 
 TRẢ VỀ JSON (BẮT BUỘC):
 {
   "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
   "confidence": 0.9 hoặc 0.1,
-  "reasoning": "Giải thích ngắn gọn (1-2 câu)"
+  "title_position": "top" hoặc "middle" hoặc "bottom" hoặc "none",
+  "reasoning": "Giải thích ngắn gọn, bao gồm vị trí của tiêu đề"
 }
 
 ❗ NHẮC LẠI:
-- CHỈ trả về mã khi khớp TOÀN BỘ tiêu đề với 1 trong 98 loại
-- KHÔNG khớp 1 nửa, vài chữ, hoặc gần giống
-- Hệ thống sẽ tự xử lý việc gán trang tiếp theo
-- LUÔN trả về JSON format"""
+- CHỈ phân loại dựa vào tiêu đề Ở TOP 30% của trang
+- BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
+- NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
+- NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
+- LUÔN trả về JSON format với field title_position"""
 
 
 def parse_gemini_response(response_text):

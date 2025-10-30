@@ -970,6 +970,7 @@ def parse_gemini_response(response_text):
             "short_code": "UNKNOWN",
             "confidence": 0.2,
             "reasoning": f"Parse error: {str(e)}",
+            "title_position": "unknown",
             "method": "gemini_flash_ai"
         }
 

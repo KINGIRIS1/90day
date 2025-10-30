@@ -119,10 +119,19 @@ EXACT_TITLE_MAPPING = {
     "VĂN BẢN ĐỀ NGHỊ THẨM ĐỊNH, PHÊ DUYỆT PHƯƠNG ÁN SDĐ": "PDPASDD",
     "VĂN BẢN THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ": "VBTK",
     "VĂN BẢN THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH": "TTHGD",
+    "THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH": "TTHGD",
+    "VĂN BẢN THỎA THUẬN QUYỀN QSDĐ CỦA HỘ GIA ĐÌNH": "TTHGD",
+    "THỎA THUẬN QUYỀN QSDĐ HỘ GIA ĐÌNH": "TTHGD",
+    "THỎA THUẬN SỬ DỤNG ĐẤT HỘ GIA ĐÌNH": "TTHGD",
     "VĂN BẢN THOẢ THUẬN VỀ VIỆC CHẤM DỨT QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ": "CDLK",
     "VĂN BẢN THỎA THUẬN VỀ VIỆC XÁC LẬP QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ": "HCLK",
     "VĂN BẢN TỪ CHỐI NHẬN DI SẢN THỪA KẾ": "VBTC",
     "VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG": "PCTSVC",
+    "PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG": "PCTSVC",
+    "VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG": "PCTSVC",
+    "THỎA THUẬN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG": "PCTSVC",
+    "VĂN BẢN THỎA THUẬN PHÂN CHIA TÀI SẢN VỢ CHỒNG": "PCTSVC",
+    "PHÂN CHIA TÀI SẢN VỢ CHỒNG": "PCTSVC",
 }
 
 # Title templates for fuzzy matching (các mẫu title chuẩn)

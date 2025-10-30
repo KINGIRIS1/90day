@@ -81,6 +81,8 @@ EXACT_TITLE_MAPPING = {
     "HỢP ĐỒNG ỦY QUYỀN": "HDUQ",
     "PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH": "PCT",
     "PHIẾU KIỂM TRA HỒ SƠ": "PKTHS",
+    "PHIẾU TRÌNH KÝ HỒ SƠ CẤP GIẤY CHỨNG NHẬN": "PKTHS",
+    "PHIẾU TRÌNH KÝ HỒ SƠ": "PKTHS",
     "PHIẾU LẤY Ý KIẾN KHU DÂN CƯ": "PLYKDC",
     "PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC": "PXNKQDD",
     "PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT": "DKTC",

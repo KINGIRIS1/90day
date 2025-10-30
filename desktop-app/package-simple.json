@@ -1,0 +1,59 @@
+{
+  "name": "90daychonhanh-desktop",
+  "version": "1.1.0",
+  "description": "Desktop app for land document scanning",
+  "main": "public/electron.js",
+  "homepage": ".",
+  "scripts": {
+    "start": "set PORT=3001 && react-scripts start",
+    "build": "react-scripts build",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"set PORT=3001 && yarn start\" \"wait-on http://localhost:3001 && electron .\"",
+    "electron-pack": "yarn build && electron-builder --dir",
+    "electron-build": "yarn build && electron-builder"
+  },
+  "build": {
+    "appId": "com.90daychonhanh.app",
+    "productName": "90dayChonThanh",
+    "asar": false,
+    "files": [
+      "build/**/*",
+      "public/**/*",
+      "python/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    }
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "axios": "^1.12.2",
+    "date-fns": "^2.29.3",
+    "electron-store": "^8.1.0",
+    "form-data": "^4.0.4",
+    "lucide-react": "latest",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "tailwindcss": "^3.4.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "concurrently": "^8.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "postcss": "^8.4.21",
+    "react-scripts": "5.0.1",
+    "wait-on": "^7.2.0"
+  }
+}

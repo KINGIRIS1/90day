@@ -1214,6 +1214,7 @@ def parse_gemini_response(response_text):
             "confidence": 0.2,
             "reasoning": f"Parse error: {str(e)}",
             "title_position": "unknown",
+            "page_number": None,
             "method": "gemini_flash_ai"
         }
 

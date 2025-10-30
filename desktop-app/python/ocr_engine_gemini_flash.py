@@ -951,6 +951,7 @@ def parse_gemini_response(response_text):
                 "short_code": code_match.group(1),
                 "confidence": float(conf_match.group(1)) if conf_match else 0.7,
                 "reasoning": "Parsed from text response",
+                "title_position": "unknown",
                 "method": "gemini_flash_ai"
             }
         
@@ -959,6 +960,7 @@ def parse_gemini_response(response_text):
             "short_code": "UNKNOWN",
             "confidence": 0.3,
             "reasoning": "Could not parse AI response",
+            "title_position": "unknown",
             "method": "gemini_flash_ai"
         }
         

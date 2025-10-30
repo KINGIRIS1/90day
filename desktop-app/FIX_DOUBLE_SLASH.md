@@ -4,7 +4,7 @@
 
 Khi dùng Cloud Boost, gặp lỗi 404:
 ```
-URL: https://docusmart-vn.preview.emergentagent.com//api/scan-document-public
+URL: https://vietdoc-scanner-1.preview.emergentagent.com//api/scan-document-public
                                                   ^^
                                                   Double slash!
 ```
@@ -64,15 +64,15 @@ yarn electron-pack
 
 **✅ Đúng - Cả 2 cách đều OK:**
 ```
-https://docusmart-vn.preview.emergentagent.com
-https://docusmart-vn.preview.emergentagent.com/
+https://vietdoc-scanner-1.preview.emergentagent.com
+https://vietdoc-scanner-1.preview.emergentagent.com/
 ```
 
 Cả 2 đều hoạt động vì code đã normalize!
 
 **❌ Sai:**
 ```
-https://docusmart-vn.preview.emergentagent.com//
+https://vietdoc-scanner-1.preview.emergentagent.com//
 (double slash cuối - không nên, nhưng code cũng xử lý được)
 ```
 
@@ -107,7 +107,7 @@ Cloud Boost: Uploading D:\file.jpg to https://landocr-pro...
 
 URL phải là:
 ```
-https://docusmart-vn.preview.emergentagent.com/api/scan-document-public
+https://vietdoc-scanner-1.preview.emergentagent.com/api/scan-document-public
 ```
 
 **KHÔNG có double slash `//api`**
@@ -119,7 +119,7 @@ https://docusmart-vn.preview.emergentagent.com/api/scan-document-public
 Dùng curl hoặc Postman:
 
 ```bash
-curl -X POST https://docusmart-vn.preview.emergentagent.com/api/scan-document-public \
+curl -X POST https://vietdoc-scanner-1.preview.emergentagent.com/api/scan-document-public \
   -F "file=@test.jpg"
 ```
 

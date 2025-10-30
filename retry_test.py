@@ -8,7 +8,7 @@ import json
 from io import BytesIO
 
 def test_retry_scan():
-    base_url = "https://docusmart-vn.preview.emergentagent.com/api"
+    base_url = "https://vietdoc-scanner-1.preview.emergentagent.com/api"
     
     print("🔍 Testing Retry Scan Endpoint")
     print("=" * 40)

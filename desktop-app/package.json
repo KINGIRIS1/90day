@@ -24,6 +24,7 @@
     ],
     "files": [
       "build/**/*",
+      "electron/**/*",
       "public/electron.js",
       "public/preload.js",
       "python/**/*",

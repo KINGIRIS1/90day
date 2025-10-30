@@ -163,11 +163,11 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 ]
                 return short_code in ambiguous_types
             
-            # STEP 1: Try with 35% crop (fast & cheap)
-            print("📸 STEP 1: Quick scan with 35% crop (title area)...", file=sys.stderr)
+            # STEP 1: Try with 60% crop (fast & covers most content)
+            print("📸 STEP 1: Quick scan with 60% crop (title + body area)...", file=sys.stderr)
             start_time = time.time()
             
-            result_crop = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=0.35)
+            result_crop = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=0.6)
             
             crop_time = time.time() - start_time
             print(f"⏱️ Crop result: {result_crop.get('short_code')} (confidence: {result_crop.get('confidence'):.2f}, time: {crop_time:.1f}s)", file=sys.stderr)

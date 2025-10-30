@@ -113,7 +113,13 @@ AI sẽ tự động nhận là `GCNM` khi thấy các section đặc trưng:
 
 ### ❌ Not classified as GCN:
 
-1. **Other document sections**
+1. **DDKBD (Đơn đăng ký biến động) pages**
+   - Content: "II. XÁC NHẬN CỦA ỦY BAN NHÂN DÂN CẤP XÃ"
+   - Keyword: "ỦY BAN NHÂN DÂN" (People's Committee)
+   - This is DDKBD, NOT GCN!
+   - Result: `UNKNOWN`
+
+2. **Other document sections**
    - Content: "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG"
    - This is NOT a GCN section
    - This is from PCT or other documents

@@ -1157,11 +1157,26 @@ def parse_gemini_response(response_text):
                         print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
                         short_code = 'UNKNOWN'
                 
+                # Parse and validate page_number
+                page_number = result.get('page_number', None)
+                if page_number:
+                    # Convert to string and extract only digits
+                    page_str = str(page_number).strip()
+                    # Extract digits only: "3" or "Trang 3" → "3"
+                    digit_match = re.search(r'\d+', page_str)
+                    if digit_match:
+                        page_number = digit_match.group(0)
+                        print(f"📄 Page number detected: {page_number}", file=sys.stderr)
+                    else:
+                        print(f"⚠️ Invalid page_number format: '{page_str}', setting to null", file=sys.stderr)
+                        page_number = None
+                
                 return {
                     "short_code": short_code,
                     "confidence": float(result.get('confidence', 0)),
                     "reasoning": result.get('reasoning', 'AI classification'),
                     "title_position": result.get('title_position', 'unknown'),
+                    "page_number": page_number,
                     "method": "gemini_flash_ai"
                 }
         

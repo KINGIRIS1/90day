@@ -470,6 +470,9 @@ GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
 GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
 BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (KQ) → GTLQ
 PHIẾU TIẾP NHẬN HỒ SƠ, PHIẾU KIỂM SOÁT QUÁ TRÌNH → GTLQ
+  ⚠️ KHÁC với "PHIẾU KIỂM TRA HỒ SƠ" (→ PKTHS)
+  - KIỂM SOÁT QUÁ TRÌNH = Monitor/Control process (→ GTLQ)
+  - KIỂM TRA HỒ SƠ = Check/Inspect documents (→ PKTHS)
 GIẤY ỦY QUYỀN → GUQ
 GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU → GXNDKLD
 GIẤY XIN PHÉP XÂY DỰNG → GPXD
@@ -834,6 +837,9 @@ GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
 GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
 BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (KQ) → GTLQ
 PHIẾU TIẾP NHẬN HỒ SƠ, PHIẾU KIỂM SOÁT QUÁ TRÌNH → GTLQ
+  ⚠️ KHÁC với "PHIẾU KIỂM TRA HỒ SƠ" (→ PKTHS)
+  - KIỂM SOÁT QUÁ TRÌNH = Monitor/Control process (→ GTLQ)
+  - KIỂM TRA HỒ SƠ = Check/Inspect documents (→ PKTHS)
 GIẤY ỦY QUYỀN → GUQ
 GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU → GXNDKLD
 GIẤY XIN PHÉP XÂY DỰNG → GPXD

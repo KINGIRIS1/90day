@@ -195,19 +195,48 @@ Trang có text "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI" ở TOP 15%
 
 VÍ DỤ SAI:
 
-❌ SAI:
+❌ SAI - REFERENCE/MENTION (không phải title):
+Trang có "Mẫu số 17C..." ở TOP, trong body có "...theo Giấy chứng nhận quyền sử dụng đất số..."
+→ Đây là REFERENCE/MENTION, KHÔNG phải title
+→ "theo Giấy chứng nhận..." = Căn cứ/Tham chiếu
+→ Form 17C = TTHGD (Thỏa thuận hộ gia đình)
+→ short_code: "TTHGD"
+→ reasoning: "Form 17C, mentions to GCN are references only"
+
+❌ SAI - MENTION trong body:
 Trang có "Giấy chứng nhận" ở TOP, nhưng ở MIDDLE có text "...theo hợp đồng chuyển nhượng..."
 → KHÔNG phân loại là HDCQ
 → Chỉ mention trong body, không phải title
 → short_code: "GCNM" (dựa vào title ở TOP)
 → title_position: "top"
 
-❌ SAI:
+❌ SAI - Text ở MIDDLE:
 Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
 → Đây KHÔNG phải tiêu đề chính
 → title_position: "middle"
 → short_code: "UNKNOWN"
 → reasoning: "Text found in middle of page, not a main title"
+
+⚠️ QUAN TRỌNG - PHÂN BIỆT REFERENCE vs TITLE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ REFERENCES (bỏ qua khi classify):
+- "Căn cứ Giấy chứng nhận..."
+- "Theo Giấy chứng nhận số..."
+- "Kèm theo hợp đồng..."
+- "Theo quyết định..."
+- "...do...cấp ngày..."
+
+✅ ACTUAL TITLES (dùng để classify):
+- "GIẤY CHỨNG NHẬN" (ở đầu trang, chữ lớn, không có "căn cứ/theo")
+- "HỢP ĐỒNG CHUYỂN NHƯỢNG" (ở đầu trang, chữ lớn)
+- "ĐƠN ĐĂNG KÝ..." (ở đầu trang, chữ lớn)
+
+🔍 DẤU HIỆU NHẬN BIẾT REFERENCE:
+- Có từ "căn cứ", "theo", "kèm theo", "do...cấp"
+- Có số văn bản kèm theo (số AN..., số CS...)
+- Nằm trong câu văn dài, không standalone
+- Cỡ chữ BÌNH THƯỜNG, không nổi bật
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

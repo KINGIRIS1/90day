@@ -323,11 +323,18 @@ Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
 
 ⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
 
-✅ NẾU THẤY CÁC SECTION SAU → TRẢ VỀ GCNM (ngay cả không có title chính):
+✅ NẾU THẤY CẢ HAI SECTIONS SAU (KẾT HỢP) → TRẢ VỀ GCNM:
 
-1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"
+⚠️ CỰC KỲ QUAN TRỌNG: PHẢI CÓ CẢ HAI SECTIONS!
+
+1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" (thường ở phần trên)
+   +
+   "XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN" (thường ở phần dưới)
+   
    → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.8)
+   → PHẢI CÓ CẢ HAI: "Nội dung thay đổi" + "Xác nhận cơ quan"
+   → NẾU CHỈ CÓ MỘT TRONG HAI → KHÔNG phải GCNM → UNKNOWN
+   → Trả về: GCNM (confidence: 0.85)
 
 2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
    → Đây là trang 2 của GCNM

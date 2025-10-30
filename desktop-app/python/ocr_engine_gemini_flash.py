@@ -1075,41 +1075,21 @@ QUY TRÌNH KIỂM TRA:
 5. NẾU CÓ → Trả về mã chính xác, confidence: 0.9, title_position: "top"
 6. NẾU KHÔNG CÓ TIÊU ĐỀ Ở TOP → Kiểm tra GCNM continuation patterns
 7. NẾU VẪN KHÔNG → Trả về "UNKNOWN", confidence: 0.1
-8. 🆕 **KIỂM TRA SỐ TRANG** (nếu có):
-   - Tìm số trang ở BOTTOM của trang (70-100% area)
-   - Formats: "3", "Trang 3", "- 3 -", "Page 3"
-   - NẾU tìm thấy số trang → Trả về trong field "page_number"
 
 TRẢ VỀ JSON (BẮT BUỘC):
 {
   "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
   "confidence": 0.9 hoặc 0.1,
   "title_position": "top" hoặc "middle" hoặc "bottom" hoặc "none",
-  "page_number": "3" hoặc null,
-  "reasoning": "Giải thích ngắn gọn, bao gồm vị trí của tiêu đề và số trang (nếu có)"
+  "reasoning": "Giải thích ngắn gọn, bao gồm vị trí của tiêu đề"
 }
-
-🆕 VỀ FIELD "page_number":
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Tìm số trang ở BOTTOM/FOOTER của trang
-- Common formats:
-  • "3" (chỉ số)
-  • "Trang 3"
-  • "- 3 -"
-  • "Page 3"
-  • "Trang 3/5" (trả về "3")
-- NẾU THẤY số trang → Trả về: "page_number": "3"
-- NẾU KHÔNG THẤY → Trả về: "page_number": null
-- CHỈ trả về số (digits), không trả về chữ
-- VD: "Trang 3" → page_number: "3", không phải "Trang 3"
 
 ❗ NHẮC LẠI:
 - CHỈ phân loại dựa vào tiêu đề Ở TOP 30% của trang
 - BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
 - NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
 - NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
-- 🆕 LUÔN kiểm tra và trả về page_number (nếu có)
-- LUÔN trả về JSON format với fields: short_code, confidence, title_position, page_number, reasoning"""
+- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning"""
 
 
 def parse_gemini_response(response_text):

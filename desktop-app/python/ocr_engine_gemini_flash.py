@@ -137,11 +137,83 @@ def get_classification_prompt():
 Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
 Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
 
+🎯 PHÂN TÍCH VỊ TRÍ VĂN BẢN (POSITION-AWARE CLASSIFICATION)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ CỰC KỲ QUAN TRỌNG: CHỈ PHÂN LOẠI DỰA VÀO TEXT Ở PHẦN ĐẦU TRANG!
+
+📍 QUY TẮC VỊ TRÍ:
+
+1️⃣ **PHẦN ĐẦU TRANG (TOP 30%)**
+   - Đây là vùng TIÊU ĐỀ CHÍNH
+   - CHỈ text ở đây MỚI được dùng để phân loại
+   - Cỡ chữ LỚN, IN HOA, căn giữa
+   - VD: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
+
+2️⃣ **PHẦN GIỮA TRANG (MIDDLE 30-70%)**
+   - Đây là BODY CONTENT
+   - ❌ KHÔNG được phân loại dựa vào text ở đây
+   - Có thể có mentions của document types khác
+   - VD: "...theo hợp đồng chuyển nhượng đã ký..."
+   - → CHỈ LÀ MENTION, KHÔNG PHẢI TIÊU ĐỀ!
+
+3️⃣ **PHẦN CUỐI TRANG (BOTTOM 70-100%)**
+   - Đây là CHỮ KÝ, CON DẤU, GHI CHÚ
+   - ❌ KHÔNG được phân loại dựa vào text ở đây
+
+🔍 CÁCH PHÂN TÍCH:
+
+BƯỚC 1: Nhìn vào ảnh, ước lượng vị trí của các đoạn text
+- TOP 30%: Vùng tiêu đề
+- MIDDLE 30-70%: Vùng body
+- BOTTOM 70-100%: Vùng chữ ký
+
+BƯỚC 2: Tìm tiêu đề chính (PHẢI Ở TOP 30%)
+- Cỡ chữ lớn nhất
+- IN HOA
+- Căn giữa hoặc nổi bật
+- Ở gần đầu trang
+
+BƯỚC 3: Phân loại dựa vào tiêu đề TOP
+- NẾU tìm thấy tiêu đề khớp ở TOP → Phân loại theo đó
+- NẾU KHÔNG có tiêu đề ở TOP → Kiểm tra NGOẠI LỆ (GCN continuation)
+- NẾU thấy mentions ở MIDDLE/BOTTOM → BỎ QUA
+
+VÍ DỤ ĐÚNG:
+
+✅ ĐÚNG:
+Trang có text "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở TOP 20% (gần đầu trang, chữ lớn)
+→ title_position: "top"
+→ short_code: "HDCQ"
+→ confidence: 0.9
+
+✅ ĐÚNG:
+Trang có text "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI" ở TOP 15%
+→ title_position: "top"
+→ short_code: "DDKBD"
+→ confidence: 0.9
+
+VÍ DỤ SAI:
+
+❌ SAI:
+Trang có "Giấy chứng nhận" ở TOP, nhưng ở MIDDLE có text "...theo hợp đồng chuyển nhượng..."
+→ KHÔNG phân loại là HDCQ
+→ Chỉ mention trong body, không phải title
+→ short_code: "GCNM" (dựa vào title ở TOP)
+→ title_position: "top"
+
+❌ SAI:
+Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
+→ Đây KHÔNG phải tiêu đề chính
+→ title_position: "middle"
+→ short_code: "UNKNOWN"
+→ reasoning: "Text found in middle of page, not a main title"
+
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
-🔍 Sau đó kiểm tra tiêu đề:
+🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
   • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" → GCNM (GCN mới - tiêu đề DÀI)
   • "Giấy chứng nhận quyền sử dụng đất" (KHÔNG có "quyền sở hữu...") → GCNC (GCN cũ - tiêu đề NGẮN)
   • Nếu chỉ thấy "GIẤY CHỨNG NHẬN" mà không rõ tiếp theo → GCNC

@@ -1159,6 +1159,8 @@ def parse_gemini_response(response_text):
                 
                 # Parse and validate page_number
                 page_number = result.get('page_number', None)
+                print(f"🔍 Debug - page_number from Gemini: {page_number}", file=sys.stderr)
+                
                 if page_number:
                     # Convert to string and extract only digits
                     page_str = str(page_number).strip()
@@ -1170,6 +1172,8 @@ def parse_gemini_response(response_text):
                     else:
                         print(f"⚠️ Invalid page_number format: '{page_str}', setting to null", file=sys.stderr)
                         page_number = None
+                else:
+                    print(f"ℹ️ No page number in response", file=sys.stderr)
                 
                 return {
                     "short_code": short_code,

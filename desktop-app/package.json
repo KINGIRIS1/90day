@@ -12,6 +12,7 @@
     "electron-dev-win": "concurrently \"set PORT=3001 && set BROWSER=none && yarn start\" \"wait-on http://localhost:3001 && electron .\"",
     "electron-pack": "yarn build && electron-builder --dir",
     "electron-build": "yarn build && electron-builder",
+    "dist:win": "yarn build && electron-builder --win nsis",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {

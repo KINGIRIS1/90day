@@ -689,6 +689,27 @@ TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 - Có "HỘ GIA ĐÌNH" → TTHGD ✅
 - Có "VỢ CHỒNG" → PCTSVC ✅
 
+3. VBTK vs TTHGD - DỄ NHẦM (QUAN TRỌNG!):
+   - VBTK = "Văn bản thỏa thuận phân chia **DI SẢN THỪA KẾ**"
+     • Về INHERITANCE (chia di sản của người đã mất)
+     • Keywords: "DI SẢN THỪA KẾ", "KẾ THỪA", "NGƯỜI QUÁ CỐ"
+     • VD: "Thỏa thuận phân chia di sản thừa kế của ông/bà..."
+   
+   - TTHGD = "Thỏa thuận **HỘ GIA ĐÌNH**"
+     • Về FAMILY PROPERTY (chia tài sản gia đình đang sống)
+     • Keywords: "HỘ GIA ĐÌNH", "CÁC THÀNH VIÊN", "THỐNG NHẤT"
+     • VD: "Thỏa thuận phân chia tài sản hộ gia đình"
+   
+   🔑 KEYWORD QUYẾT ĐỊNH:
+   - Có "DI SẢN THỪA KẾ" → VBTK
+   - Có "HỘ GIA ĐÌNH" → TTHGD
+   - NẾU chỉ có "THỎA THUẬN PHÂN CHIA" mà KHÔNG rõ context → UNKNOWN
+
+4. SECTION HEADERS ≠ TITLES:
+   - "ĐIỀU 2: NỘI DUNG THỎA THUẬN PHÂN CHIA" → Section header, không phải title
+   - Đây là continuation page → UNKNOWN
+   - CHỈ main title mới dùng để classify
+
 3. PKTHS vs GTLQ - DỄ NHẦM:
    - PKTHS = "PHIẾU KIỂM **TRA** HỒ SƠ" (check/inspect)
    - GTLQ = "PHIẾU KIỂM **SOÁT** QUÁ TRÌNH" (monitor/control)

@@ -48,8 +48,8 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
         encoded_image = base64.b64encode(image_content).decode('utf-8')
         
         # Use direct REST API - v1beta is the standard API version
-        # Model: gemini-1.5-flash (stable Flash model)
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        # Model: gemini-2.5-flash (latest stable Flash model)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
         
         # Create request payload
         payload = {

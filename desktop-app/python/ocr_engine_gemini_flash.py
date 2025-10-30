@@ -302,6 +302,22 @@ VÍ DỤ PHÂN BIỆT:
 → KHÔNG classify theo "văn bản từ chối"
 → Classify: UNKNOWN hoặc GTLQ
 
+❌ SECTION HEADERS (không phải title):
+```
+ĐIỀU 2
+NỘI DUNG THỎA THUẬN PHÂN CHIA
+```
+→ "ĐIỀU 1:", "ĐIỀU 2:", "ĐIỀU 3:" = SECTION HEADERS, không phải MAIN TITLE
+→ Đây là continuation page (trang 2+)
+→ KHÔNG classify dựa vào section headers
+→ Classify: UNKNOWN (hoặc GTLQ nếu là supporting doc)
+
+⚠️ QUAN TRỌNG - BỎ QUA SECTION HEADERS:
+- "ĐIỀU 1:", "ĐIỀU 2:", "Điều 3:", "I.", "II.", "III." = Section numbering
+- "PHẦN I:", "PHẦN II:", "Chương 1:", "Chương 2:" = Part/Chapter headers
+- Đây KHÔNG phải main title
+- CHỈ classify dựa vào MAIN TITLE (không có số thứ tự, không có "Điều", "Phần")
+
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức

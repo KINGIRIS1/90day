@@ -349,12 +349,18 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     }
 
     console.log(`Spawning: ${pythonPath} ${scriptPath} ${filePath} ${ocrEngineType} ${cloudApiKey ? '[API_KEY]' : ''} ${cloudEndpoint || ''}`);
+    
+    // Get Python script directory for PYTHONPATH
+    const pythonScriptDir = path.dirname(scriptPath);
+    
     const childProcess = spawn(pythonPath, args, {
       encoding: 'utf8',
+      cwd: pythonScriptDir,  // Set working directory to Python script location
       env: {
         ...process.env,
         PYTHONIOENCODING: 'utf-8',
-        PYTHONUTF8: '1'
+        PYTHONUTF8: '1',
+        PYTHONPATH: pythonScriptDir  // Add Python script dir to PYTHONPATH
       }
     });
     let result = '';

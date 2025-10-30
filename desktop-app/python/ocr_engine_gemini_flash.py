@@ -466,7 +466,7 @@ GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
 GIẤY SANG NHƯỢNG ĐẤT → GSND
 GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
-  (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN")
+  (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN", "PHIẾU BÁO")
 GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
 BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (KQ) → GTLQ
 PHIẾU TIẾP NHẬN HỒ SƠ, PHIẾU KIỂM SOÁT QUÁ TRÌNH → GTLQ
@@ -827,7 +827,7 @@ GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
 GIẤY SANG NHƯỢNG ĐẤT → GSND
 GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
-  (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN")
+  (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN", "PHIẾU BÁO")
 GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
 BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (KQ) → GTLQ
 PHIẾU TIẾP NHẬN HỒ SƠ, PHIẾU KIỂM SOÁT QUÁ TRÌNH → GTLQ

@@ -226,17 +226,21 @@ Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
 - "Kèm theo hợp đồng..."
 - "Theo quyết định..."
 - "...do...cấp ngày..."
+- "...theo văn bản từ chối..." (lowercase, trong body)
+- "...đã từ chối nhận di sản theo văn bản từ chối..." (reference)
 
 ✅ ACTUAL TITLES (dùng để classify):
 - "GIẤY CHỨNG NHẬN" (ở đầu trang, chữ lớn, không có "căn cứ/theo")
 - "HỢP ĐỒNG CHUYỂN NHƯỢNG" (ở đầu trang, chữ lớn)
 - "ĐƠN ĐĂNG KÝ..." (ở đầu trang, chữ lớn)
+- "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" (ở đầu trang, chữ lớn, title case/uppercase)
 
 🔍 DẤU HIỆU NHẬN BIẾT REFERENCE:
-- Có từ "căn cứ", "theo", "kèm theo", "do...cấp"
-- Có số văn bản kèm theo (số AN..., số CS...)
+- Có từ "căn cứ", "theo", "kèm theo", "do...cấp", "đã từ chối...theo"
+- Có số văn bản kèm theo (số AN..., số CS..., số công chứng...)
 - Nằm trong câu văn dài, không standalone
 - Cỡ chữ BÌNH THƯỜNG, không nổi bật
+- Viết thường (lowercase): "văn bản từ chối" thay vì "VĂN BẢN TỪ CHỐI"
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -198,7 +198,6 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 "accuracy_estimate": f"{int(result.get('confidence', 0.5) * 100)}%",
                 "recommend_cloud_boost": False,
                 "avg_font_height": 0,
-                "page_number": result.get("page_number", None),  # NEW: Page number detection
                 "hybrid_stats": result.get('hybrid_stats', {})
             }
         

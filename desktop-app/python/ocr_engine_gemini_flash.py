@@ -243,9 +243,14 @@ Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
-  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" → GCNM (GCN mới - tiêu đề DÀI)
-  • "Giấy chứng nhận quyền sử dụng đất" (KHÔNG có "quyền sở hữu...") → GCNC (GCN cũ - tiêu đề NGẮN)
-  • Nếu chỉ thấy "GIẤY CHỨNG NHẬN" mà không rõ tiếp theo → GCNC
+  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" (AS TITLE, not reference) → GCNM (GCN mới - tiêu đề DÀI)
+  • "Giấy chứng nhận quyền sử dụng đất" (AS TITLE, not reference) → GCNC (GCN cũ - tiêu đề NGẮN)
+  • "Mẫu số 17C..." hoặc form code → Check body content for actual type
+
+⚠️ BỎ QUA các references:
+  • "Căn cứ Giấy chứng nhận..." → Reference, không phải title
+  • "Theo Giấy chứng nhận số..." → Reference, không phải title
+  • "Kèm theo hợp đồng..." → Reference, không phải title
 
 ⚠️ QUAN TRỌNG với tài liệu 2 trang ngang:
 - Nếu thấy nền cam/vàng với quốc huy ở bên PHẢI → Đây là GCNC

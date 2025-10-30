@@ -21,7 +21,13 @@
       "build/**/*",
       "public/electron.js",
       "public/preload.js",
-      "python/**/*"
+      "python/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "python/**/*",
+      "node_modules/electron-store/**/*"
     ],
     "extraResources": [
       {
@@ -34,15 +40,6 @@
       "buildResources": "assets",
       "output": "dist"
     },
-    "extraResources": [
-      {
-        "from": "python",
-        "to": "python",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
     "win": {
       "target": [
         "nsis"

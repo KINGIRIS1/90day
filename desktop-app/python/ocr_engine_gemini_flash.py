@@ -520,6 +520,9 @@ QUYẾT ĐỊNH XỬ PHẠT → QDXP
 📋 NHÓM 9: PHIẾU (8 loại)
 PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH → PCT
 PHIẾU KIỂM TRA HỒ SƠ → PKTHS
+  ⚠️ KHÁC với "PHIẾU KIỂM SOÁT QUÁ TRÌNH" (→ GTLQ)
+  - KIỂM TRA = Check/Inspect documents
+  - KIỂM SOÁT = Monitor/Control process
 PHIẾU TRÌNH KÝ HỒ SƠ CẤP GIẤY CHỨNG NHẬN → PKTHS
   (Variants: "PHIẾU TRÌNH KÝ HỒ SƠ")
 PHIẾU LẤY Ý KIẾN KHU DÂN CƯ → PLYKDC
@@ -881,6 +884,9 @@ QUYẾT ĐỊNH XỬ PHẠT → QDXP
 📋 NHÓM 9: PHIẾU (8 loại)
 PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH → PCT
 PHIẾU KIỂM TRA HỒ SƠ → PKTHS
+  ⚠️ KHÁC với "PHIẾU KIỂM SOÁT QUÁ TRÌNH" (→ GTLQ)
+  - KIỂM TRA = Check/Inspect documents
+  - KIỂM SOÁT = Monitor/Control process
 PHIẾU TRÌNH KÝ HỒ SƠ CẤP GIẤY CHỨNG NHẬN → PKTHS
   (Variants: "PHIẾU TRÌNH KÝ HỒ SƠ")
 PHIẾU LẤY Ý KIẾN KHU DÂN CƯ → PLYKDC

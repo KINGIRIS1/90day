@@ -551,7 +551,6 @@ VĂN BẢN ĐỀ NGHỊ THẨM ĐỊNH, PHÊ DUYỆT PHƯƠNG ÁN SDĐ → PDPAS
 VĂN BẢN THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ → VBTK
 VĂN BẢN THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH → TTHGD
   (Variants: "THỎA THUẬN QSDĐ HỘ GIA ĐÌNH", "THỎA THUẬN SỬ DỤNG ĐẤT HỘ GIA ĐÌNH", "PHÂN CHIA TÀI SẢN CHUNG HỘ GIA ĐÌNH", "VĂN BẢN THỎA THUẬN PHÂN CHIA TÀI SẢN...HỘ GIA ĐÌNH")
-  (Variants: "THỎA THUẬN QSDĐ HỘ GIA ĐÌNH", "THỎA THUẬN SỬ DỤNG ĐẤT HỘ GIA ĐÌNH")
 VĂN BẢN THOẢ THUẬN VỀ VIỆC CHẤM DỨT QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → CDLK
 VĂN BẢN THỎA THUẬN VỀ VIỆC XÁC LẬP QUYỀN HẠN CHẾ ĐỐI VỚI THỬA ĐẤT LIỀN KỀ → HCLK
 VĂN BẢN TỪ CHỐI NHẬN DI SẢN THỪA KẾ → VBTC

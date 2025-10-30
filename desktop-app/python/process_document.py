@@ -133,7 +133,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
     Returns classification result with confidence
     """
     try:
-        # Handle Gemini Flash (AI classification) - SMART HYBRID APPROACH
+        # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
         if ocr_engine_type == 'gemini-flash':
             if not cloud_api_key:
                 return {
@@ -142,112 +142,43 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     "method": "config_error"
                 }
             
-            print("🤖 Using Gemini Flash AI with SMART HYBRID approach", file=sys.stderr)
+            print("🤖 Using Gemini Flash AI with POSITION-AWARE classification", file=sys.stderr)
             
             # Import classification function
             from ocr_engine_gemini_flash import classify_document_gemini_flash
             from rule_classifier import classify_document_name_from_code
             import time
             
-            # Helper function to check if type is ambiguous
-            def is_ambiguous_type(short_code):
-                """
-                ONLY truly confusing cases that need full context
-                With 60% crop, most documents have enough info
-                Reduced list to minimize unnecessary full retries
-                """
-                ambiguous_types = [
-                    'UNKNOWN',      # Always retry if uncertain
-                    # Removed most ambiguous pairs since 60% crop provides enough context
-                ]
-                return short_code in ambiguous_types
-            
-            # STEP 1: Try with 60% crop (fast & covers most content)
-            print("📸 STEP 1: Quick scan with 60% crop (title + body area)...", file=sys.stderr)
+            # SINGLE SCAN with full image (position-aware)
+            print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
             start_time = time.time()
             
-            result_crop = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=0.6)
+            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
             
-            crop_time = time.time() - start_time
-            print(f"⏱️ Crop result: {result_crop.get('short_code')} (confidence: {result_crop.get('confidence'):.2f}, time: {crop_time:.1f}s)", file=sys.stderr)
+            scan_time = time.time() - start_time
+            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)
             
             # Check for errors
-            if result_crop.get("short_code") == "ERROR":
+            if result.get("short_code") == "ERROR":
                 return {
                     "success": False,
-                    "error": result_crop.get("reasoning", "Gemini Flash error"),
+                    "error": result.get("reasoning", "Gemini Flash error"),
                     "method": "gemini_flash_failed"
                 }
             
-            # STEP 2: Decide if we need full image retry
-            short_code_crop = result_crop.get("short_code", "UNKNOWN")
-            confidence_crop = result_crop.get("confidence", 0.0)
+            # Validate position-aware classification
+            title_position = result.get("title_position", "unknown")
+            short_code = result.get("short_code", "UNKNOWN")
             
-            # Confidence threshold for retry (adjusted for 60% crop)
-            CONFIDENCE_THRESHOLD = 0.85  # Increased from 0.8 since 60% has more context
-            # High confidence threshold (skip retry even for ambiguous)
-            HIGH_CONFIDENCE_THRESHOLD = 0.9
+            # If title found in middle/bottom (not top), it's likely a mention, not a title
+            if title_position in ["middle", "bottom"] and short_code != "UNKNOWN":
+                print(f"⚠️ Title found at {title_position} (not top), treating as mention", file=sys.stderr)
+                # Override to UNKNOWN since title is not at top
+                result["short_code"] = "UNKNOWN"
+                result["confidence"] = 0.1
+                result["reasoning"] = f"Text pattern found at {title_position}, not a main title"
             
-            # Don't retry if confidence is very high (≥0.9), even for ambiguous types
-            if confidence_crop >= HIGH_CONFIDENCE_THRESHOLD:
-                print(f"✅ Very high confidence ({confidence_crop:.2f}), skipping full retry", file=sys.stderr)
-                need_full_retry = False
-            else:
-                need_full_retry = (
-                    confidence_crop < CONFIDENCE_THRESHOLD or 
-                    is_ambiguous_type(short_code_crop)
-                )
-            
-            if need_full_retry:
-                print(f"⚠️ STEP 2: Low confidence ({confidence_crop:.2f}) or ambiguous type ({short_code_crop})", file=sys.stderr)
-                print("🔄 Retrying with FULL IMAGE (100%) for better accuracy...", file=sys.stderr)
-                print(f"   (Note: Already scanned 60% in step 1, now scanning remaining 40%)", file=sys.stderr)
-                
-                start_time = time.time()
-                result_full = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
-                full_time = time.time() - start_time
-                
-                print(f"⏱️ Full result: {result_full.get('short_code')} (confidence: {result_full.get('confidence'):.2f}, time: {full_time:.1f}s)", file=sys.stderr)
-                
-                # Check for errors
-                if result_full.get("short_code") == "ERROR":
-                    print("⚠️ Full image retry failed, using crop result", file=sys.stderr)
-                    result = result_crop
-                    method_used = "gemini_crop_only"
-                else:
-                    # Compare results and use the better one
-                    confidence_full = result_full.get("confidence", 0.0)
-                    short_code_full = result_full.get("short_code", "UNKNOWN")
-                    
-                    # Priority logic:
-                    # 1. If crop is UNKNOWN but full found something → Use full
-                    # 2. If both found something → Use higher confidence
-                    # 3. If full is UNKNOWN → Use crop
-                    
-                    if short_code_crop == "UNKNOWN" and short_code_full != "UNKNOWN":
-                        print(f"✅ Full image found type: {short_code_full} (crop was UNKNOWN)", file=sys.stderr)
-                        result = result_full
-                        method_used = "gemini_hybrid_full"
-                    elif short_code_full == "UNKNOWN" and short_code_crop != "UNKNOWN":
-                        print(f"✅ Crop result kept: {short_code_crop} (full was UNKNOWN)", file=sys.stderr)
-                        result = result_crop
-                        method_used = "gemini_hybrid_crop"
-                    elif confidence_full > confidence_crop:
-                        print(f"✅ Full image better: {short_code_full} ({confidence_full:.2f} > {confidence_crop:.2f})", file=sys.stderr)
-                        result = result_full
-                        method_used = "gemini_hybrid_full"
-                    else:
-                        print(f"✅ Crop was sufficient: {short_code_crop} ({confidence_crop:.2f} >= {confidence_full:.2f})", file=sys.stderr)
-                        result = result_crop
-                        method_used = "gemini_hybrid_crop"
-                
-                # Add statistics
-                result['hybrid_stats'] = {
-                    'crop_result': short_code_crop,
-                    'crop_confidence': confidence_crop,
-                    'full_result': result_full.get('short_code', 'N/A') if result_full.get("short_code") != "ERROR" else "ERROR",
-                    'full_confidence': result_full.get('confidence', 0.0) if result_full.get("short_code") != "ERROR" else 0.0,
-                    'crop_time': f"{crop_time:.1f}s",
+            method_used = "gemini_position_aware"
                     'full_time': f"{full_time:.1f}s" if result_full.get("short_code") != "ERROR" else "N/A",
                     'total_time': f"{crop_time + full_time:.1f}s" if result_full.get("short_code") != "ERROR" else f"{crop_time:.1f}s",
                     'used_full': result_full.get("short_code") != "ERROR"

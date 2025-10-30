@@ -42,7 +42,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✓ Dependencies installed" -ForegroundColor Green
 
 # Build React app
-Write-Host "`n[2/3] Building React app..." -ForegroundColor Cyan
+Write-Host "`n[2/4] Building React app..." -ForegroundColor Cyan
 yarn build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to build React app!" -ForegroundColor Red
@@ -51,8 +51,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "✓ React app built" -ForegroundColor Green
 
+# Clean old builds
+Write-Host "`n[3/4] Cleaning old builds..." -ForegroundColor Cyan
+if (Test-Path "dist") {
+    Remove-Item -Recurse -Force "dist"
+    Write-Host "✓ Old builds cleaned" -ForegroundColor Green
+}
+
 # Build Windows installer
-Write-Host "`n[3/3] Building Windows installer (NSIS)..." -ForegroundColor Cyan
+Write-Host "`n[4/4] Building Windows installer (NSIS)..." -ForegroundColor Cyan
 npx electron-builder --win --x64
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to build Windows installer!" -ForegroundColor Red

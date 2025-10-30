@@ -245,12 +245,28 @@ Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
   • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" (AS TITLE, not reference) → GCNM (GCN mới - tiêu đề DÀI)
   • "Giấy chứng nhận quyền sử dụng đất" (AS TITLE, not reference) → GCNC (GCN cũ - tiêu đề NGẮN)
-  • "Mẫu số 17C..." hoặc form code → Check body content for actual type
+  • "Mẫu số 17C..." → TTHGD (Văn bản thỏa thuận hộ gia đình)
+  • Form codes khác → Xem body content để xác định
 
-⚠️ BỎ QUA các references:
-  • "Căn cứ Giấy chứng nhận..." → Reference, không phải title
-  • "Theo Giấy chứng nhận số..." → Reference, không phải title
-  • "Kèm theo hợp đồng..." → Reference, không phải title
+⚠️ BỎ QUA các references (không phải title):
+  • "Căn cứ Giấy chứng nhận..." → Reference, không classify theo đây
+  • "Theo Giấy chứng nhận số..." → Reference, không classify theo đây  
+  • "Kèm theo hợp đồng..." → Reference, không classify theo đây
+  • "...do...cấp ngày..." → Reference, không classify theo đây
+
+🎯 QUY TẮC NHẬN DIỆN FORM CODES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NẾU trang có "Mẫu số" hoặc form code ở TOP mà không có title rõ ràng:
+- "Mẫu số 17C" → TTHGD (Văn bản thỏa thuận QSDĐ hộ gia đình)
+- Các form khác → Xem keywords trong body để xác định
+
+VÍ DỤ THỰC TẾ:
+✅ Trang có "Mẫu số 17C-CC/VBPCTSCHUNGHO" ở TOP
+   Body có: "Quyền sử dụng đất...theo Giấy chứng nhận..."
+   → "theo Giấy chứng nhận" là REFERENCE (not title)
+   → Form 17C → TTHGD
+   → short_code: "TTHGD"
+   → reasoning: "Form 17C indicates TTHGD document type"
 
 ⚠️ QUAN TRỌNG với tài liệu 2 trang ngang:
 - Nếu thấy nền cam/vàng với quốc huy ở bên PHẢI → Đây là GCNC

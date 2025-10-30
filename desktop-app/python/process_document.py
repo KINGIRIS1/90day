@@ -202,6 +202,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             if need_full_retry:
                 print(f"⚠️ STEP 2: Low confidence ({confidence_crop:.2f}) or ambiguous type ({short_code_crop})", file=sys.stderr)
                 print("🔄 Retrying with FULL IMAGE (100%) for better accuracy...", file=sys.stderr)
+                print(f"   (Note: Already scanned 60% in step 1, now scanning remaining 40%)", file=sys.stderr)
                 
                 start_time = time.time()
                 result_full = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)

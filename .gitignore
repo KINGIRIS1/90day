@@ -588,3 +588,7 @@ backend/temp_results/scan_result_aabe35c5.zip
 desktop-app/dist/linux-arm64-unpacked/90daychonhanh-desktop
 desktop-app/dist/90dayChonThanh-1.1.0-arm64.AppImage
 desktop-app/dist/win-unpacked/90dayChonThanh.exe
+-e 
+# Environment files
+*.env
+*.env.*

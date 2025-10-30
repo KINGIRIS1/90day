@@ -149,11 +149,11 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             from rule_classifier import classify_document_name_from_code
             import time
             
-            # SINGLE SCAN with 80% crop (position-aware, optimized for speed)
-            print("📸 Scanning TOP 80% of image with position-aware analysis...", file=sys.stderr)
+            # SINGLE SCAN with full image (position-aware)
+            print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
             start_time = time.time()
             
-            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=0.8)
+            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
             
             scan_time = time.time() - start_time
             print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)

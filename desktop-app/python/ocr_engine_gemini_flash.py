@@ -589,6 +589,17 @@ TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 - Có "HỘ GIA ĐÌNH" → TTHGD ✅
 - Có "VỢ CHỒNG" → PCTSVC ✅
 
+3. PKTHS vs GTLQ - DỄ NHẦM:
+   - PKTHS = "PHIẾU KIỂM **TRA** HỒ SƠ" (check/inspect)
+   - GTLQ = "PHIẾU KIỂM **SOÁT** QUÁ TRÌNH" (monitor/control)
+   - Keywords:
+     • "KIỂM TRA HỒ SƠ" → PKTHS
+     • "KIỂM SOÁT QUÁ TRÌNH" → GTLQ
+     • "KIỂM SOÁT...GIẢI QUYẾT HỒ SƠ" → GTLQ
+   - VD:
+     • "Phiếu kiểm tra hồ sơ" → PKTHS
+     • "Phiếu kiểm soát quá trình giải quyết hồ sơ" → GTLQ
+
 ❌ NẾU KHÔNG RÕ RÀNG → UNKNOWN (đừng đoán!)
 
 ⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU

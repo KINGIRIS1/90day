@@ -935,6 +935,7 @@ def parse_gemini_response(response_text):
                     "short_code": short_code,
                     "confidence": float(result.get('confidence', 0)),
                     "reasoning": result.get('reasoning', 'AI classification'),
+                    "title_position": result.get('title_position', 'unknown'),
                     "method": "gemini_flash_ai"
                 }
         

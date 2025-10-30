@@ -11,35 +11,38 @@ from PIL import Image
 import io
 
 
-def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.6):
+def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
     """
-    Classify Vietnamese land document using Gemini Flash 2.0 AI
+    Classify Vietnamese land document using Gemini Flash 2.0 AI with position awareness
     
     Args:
         image_path: Path to image file
         api_key: Google API key (BYOK)
-        crop_top_percent: Percentage of top image to process (default 0.6 = 60%)
+        crop_top_percent: Percentage of top image to process (default 1.0 = 100% for position analysis)
         
     Returns:
-        dict: Classification result with short_code, confidence, reasoning
+        dict: Classification result with short_code, confidence, reasoning, title_position
     """
     try:
         import requests
         
-        # Read and crop image to top portion (where title/header usually is)
+        # Read full image for position-aware analysis
         with Image.open(image_path) as img:
             width, height = img.size
             
-            # Crop to top N% (default 60%)
-            crop_height = int(height * crop_top_percent)
-            cropped_img = img.crop((0, 0, width, crop_height))
+            # Process full image or crop if specified
+            if crop_top_percent < 1.0:
+                crop_height = int(height * crop_top_percent)
+                processed_img = img.crop((0, 0, width, crop_height))
+                print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
+            else:
+                processed_img = img
+                print(f"🖼️ Processing full image: {width}x{height} (position-aware mode)", file=sys.stderr)
             
             # Convert to base64
             img_byte_arr = io.BytesIO()
-            cropped_img.save(img_byte_arr, format=img.format or 'PNG')
+            processed_img.save(img_byte_arr, format=img.format or 'PNG')
             image_content = img_byte_arr.getvalue()
-            
-            print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
         
         # Encode to base64
         encoded_image = base64.b64encode(image_content).decode('utf-8')

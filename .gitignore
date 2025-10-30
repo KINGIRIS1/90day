@@ -545,3 +545,7 @@ backend/temp_results/scan_result_aabe35c5.zip
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*

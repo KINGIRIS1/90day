@@ -193,6 +193,46 @@ Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
 - Body content: Danh sách, bảng biểu, nội dung chi tiết
 - → Trả về: UNKNOWN (Frontend sẽ tự động gán theo trang trước)
 
+🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
+
+✅ NẾU THẤY CÁC SECTION SAU → TRẢ VỀ GCNM (ngay cả không có title chính):
+
+1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.8)
+
+2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.8)
+
+3️⃣ "II. NỘI DUNG THAY ĐỔI" hoặc "III. XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.75)
+
+VÍ DỤ:
+
+✅ ĐÚNG: Trang chỉ có section "Nội dung thay đổi và cơ sở pháp lý"
+   → Không có title chính
+   → NHƯNG là GCN continuation page
+   → Trả về: GCNM (confidence: 0.8)
+
+✅ ĐÚNG: Trang sau HDCQ có section "Thửa đất, nhà ở và tài sản..."
+   → Không liên quan đến HDCQ
+   → Đây là GCN của người khác trong batch scan
+   → Trả về: GCNM (confidence: 0.8)
+
+✅ ĐÚNG: Trang có "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"
+   → Format chuẩn của GCN trang 2
+   → Trả về: GCNM (confidence: 0.75)
+
+❌ KHÔNG PHẢI GCN: Trang có "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG"
+   → Đây KHÔNG phải section của GCN
+   → Là section của PCT hoặc document khác
+   → Trả về: UNKNOWN
+
 🎯 NHẬN DIỆN TRANG GCN (Continuation):
 Trang 2+ của GCN thường có các section:
 - "Nội dung thay đổi và cơ sở pháp lý"
@@ -200,8 +240,9 @@ Trang 2+ của GCN thường có các section:
 - "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
 - "II. NỘI DUNG THAY ĐỔI..."
 - "III. XÁC NHẬN..."
-→ Nếu thấy những section này NHƯNG KHÔNG có title chính
-→ Trả về: UNKNOWN (đây là trang continuation của GCN)
+- Bảng thông tin thửa đất (số hiệu, diện tích...)
+→ Nếu thấy những section này → Trả về: GCNM (confidence: 0.75-0.85)
+→ KHÔNG trả về UNKNOWN như các continuation page khác!
 
 VÍ DỤ CHẤP NHẬN:
 - Thấy "HỢP ĐỒNG CHUYỂN NHUỢNG..." (lỗi chính tả) → HDCQ ✅

@@ -114,7 +114,7 @@ Nếu muốn dùng backend khác, có thể thay đổi trong Settings:
 | Backend | URL | Use Case |
 |---------|-----|----------|
 | **Railway** | `https://sohoavpdkct.up.railway.app` | Production (Always-on) |
-| **Emergent** | `https://docuscan-gemini.preview.emergentagent.com` | Development |
+| **Emergent** | `https://docusmart-vn.preview.emergentagent.com` | Development |
 | **Localhost** | `http://localhost:8001` | Local testing |
 
 ---

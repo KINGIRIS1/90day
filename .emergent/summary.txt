@@ -1,67 +1,54 @@
 <analysis>
-The AI engineer's work has focused primarily on enhancing the document classification system, particularly integrating and optimizing the Gemini Flash AI. The initial phase involved correcting the Gemini Flash model name to  across all relevant code files to resolve API errors. Subsequently, the engineer aligned Gemini's classification prompt with the existing detailed OpenAI Vision logic and expanded its knowledge to cover 98 specific document types. A significant architectural decision was the implementation of a Smart Hybrid classification strategy, which defaults to a fast 35% image crop and retries with a full image scan only for low-confidence or ambiguous classifications. Extensive debugging and prompt refinements were conducted to address issues like unnecessary full retries, N%a%n errors due to timeouts or invalid responses, and improving recognition for specific document types like GTLQ, PCTSVC, TTHGD, and PKTHS. The final ongoing task involves refining Gemini's prompt to correctly classify GCN continuation pages as .
+The AI engineer's work has significantly evolved the document classification system, primarily by enhancing the Gemini Flash AI integration and refining classification logic. Initially, the focus was on correct model naming () and expanding document type recognition. A major architectural shift occurred from a Smart Hybrid (crop-based retry) to a Position-Aware classification, where the AI analyzes the full image and classifies only if the title is in the top 30%, explicitly ignoring body mentions. Numerous bug fixes and prompt refinements were implemented to distinguish similar document types (e.g., GCNM vs. DDKBD, PKTHS vs. GTLQ, VBTK vs. TTHGD), handle references, and incorporate a Standalone Text Rule for titles. The attempt to detect handwritten page numbers for sequential naming was abandoned due to low reliability. The immediate task is to debug and fix the  issue.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land-related documents, designed for accurate classification and renaming using short codes. It supports single/batch scanning, history, PDF export, fuzzy matching, and keyword-based classification. Sequential documents require automatic title assignment for low-confidence or untitled scans. The app offers various OCR options: Tesseract, VietOCR, EasyOCR, and a Bring Your Own Key (BYOK) feature for Google Cloud Vision, Azure Computer Vision, and now Gemini Flash. It also includes a Rules Manager for UI-driven classification. Recent work focused on refining classification logic (uppercase checks, sequential naming, exact matching) and integrating Gemini Flash as a cost-effective AI classification option. The system also supports Cloud Boost (GPT-4 Vision) for high-accuracy fallback.
+The application is a desktop OCR scanner for Vietnamese land-related documents, designed for accurate classification and renaming using short codes. It supports single/batch scanning, history, PDF export, fuzzy matching, and keyword-based classification. Sequential documents require automatic title assignment for low-confidence or untitled scans. The app offers various OCR options: Tesseract, VietOCR, EasyOCR, and a Bring Your Own Key (BYOK) feature for Google Cloud Vision, Azure Computer Vision, and Gemini Flash. Cloud Boost (GPT-4 Vision) is available for high-accuracy fallback. Recent development refined classification to accurately identify GCNM continuation pages, differentiate similar document types like DDKBD, TTHGD, PCTSVC, PKTHS, and GTLQ, and distinguish main titles from body text references using Position-Aware and Standalone Text rules. A new feature request is Batch Scan from List using Excel/CSV.
 </product_requirements>
 
 <key_technical_concepts>
--   **Electron**: Desktop application framework for UI and IPC.
--   **React**: Frontend UI development.
--   **Python**: Backend for OCR, rule-based classification, and AI integration.
--   **Cloud OCR/AI**: Google Cloud Vision, Azure Computer Vision, Gemini Flash (for BYOK) and GPT-4 Vision (for Cloud Boost).
--   **Pillow**: Python library for image manipulation (cropping).
--   **requests**: Python library for HTTP API calls to Gemini.
--   **Fuzzy Matching & Regex**: For document title extraction and classification.
--   **Lazy Importing**: Optimizing Python OCR engine loading.
--   **Smart Hybrid Classification**: Adaptive cropping and AI model fallback strategy.
+- **Electron**: Desktop application framework for UI and IPC.
+- **React**: Frontend UI development.
+- **Python**: Backend for OCR, rule-based classification, and AI integration.
+- **Cloud OCR/AI**: Google Cloud Vision, Azure Computer Vision, Gemini Flash, GPT-4 Vision.
+- **Pillow**: Python library for image manipulation.
+- ****: Python library for HTTP API calls.
+- **Position-Aware Classification**: AI prompt engineering to classify based on text location.
+- **Standalone Text Rule**: Identifying titles by their isolated presentation.
 </key_technical_concepts>
 
 <code_architecture>
 
 
--   ****: Electron's main process.
-    -   **Importance**: Handles IPC communication, manages Python script execution, and API key storage/retrieval.
-    -   **Changes**: Updated Gemini Flash model name from  to  (line 1129). Increased OCR processing timeout from 30s to 60s (line 410).
--   ****: Production build of .
-    -   **Importance**: Ensures production environment reflects latest Electron logic.
-    -   **Changes**: Synchronized with  for Gemini model name and timeout increase.
--   ** (NEW)**: Gemini Flash AI OCR engine.
-    -   **Importance**: Integrates with Google's Gemini API for AI classification, handling image processing and API calls.
-    -   **Changes**: Model name . Updated classification prompt to align with OpenAI Vision's detailed structure, including all 98 document types. Enhanced prompt to differentiate between document title and body content. Added validation and sanitization for JSON responses to prevent N/A errors. Increased  timeout from 30s to 60s (line 73).
+-   ****: Electron's main process, handles IPC and Python script execution. Updated Gemini Flash model name to  and increased OCR timeout.
+-   ****: Production build of , synchronized with  changes.
+-   ****: Gemini Flash AI OCR engine. This file saw the most significant changes.
+    -   **Summary**: Updated to use . Initial crop logic (35% then 60%) was implemented and then reverted to 100% full image scanning to prioritize accuracy. The classification prompt was extensively refined to incorporate Position-Aware Classification (classifying only if the title is in the top 30% of the page), Standalone Text Rule (titles are on independent lines), and explicit differentiation logic for GCNM (continuation pages, distinguishing from DDKBD based on keywords like CƠ QUAN vs ỦY BAN NHÂN DÂN), TTHGD (expanded variants to include Phân chia tài sản hộ gia đình), PKTHS vs GTLQ (KIỂM TRA vs KIỂM SOÁT), and GTLQ (added VĂN BẢN KHAI NHẬN DI SẢN and PHIẾU BÁO). Error handling for JSON responses and increased API timeout were also implemented. Page number detection logic was added for testing but subsequently removed.
 -   ****: Orchestrates document processing and OCR engine selection.
-    -   **Importance**: Core logic for applying classification rules and AI models.
-    -   **Changes**: Implemented the Smart Hybrid approach: initially performs a 35% crop scan; if confidence is below 0.9 or the type is ambiguous (, , etc.), it retries with a full 100% image scan. Reduced the list of ambiguous types to prevent unnecessary full retries for high-confidence initial classifications. Improved error handling and logging.
--   ****: Contains the rule-based classification logic.
-    -   **Importance**: Defines  and fuzzy matching rules for document types.
-    -   **Changes**: Added multiple variants for GTLQ into . Added more keyword variants for , , and . Added better error handling in .
--   ****: Frontend component for scanning and displaying results.
-    -   **Importance**: Displays classification results and handles user interactions.
-    -   **Changes**: Added  helper function to ensure confidence values are always displayed as valid numbers, preventing  errors.
--   ** (NEW)**: Test script for Gemini API key.
-    -   **Importance**: Helps verify API key functionality.
-    -   **Changes**: Updated to use the correct  model.
--   **New Documentation Files**: , , , , , , , , , , ,  were created to document the implemented features, fixes, and architectural decisions.
--   **New Test Scripts**:  (for debugging model names).
+    -   **Summary**: The Smart Hybrid approach (35%/60% crop + retry) was removed in favor of a single 100% full image scan. Now leverages the  field from Gemini's response to validate classifications. Page number logging logic was temporarily added for testing, then removed.
+-   ****: Contains rule-based classification logic. Updated for GTLQ, PCTSVC, TTHGD, and PKTHS keyword variants and error handling.
+-   ****: Frontend component for scanning results. Added  to prevent  errors.
+-   ****: Backend for Cloud Boost (OpenAI Vision). Synchronized with the GCNM continuation page logic and Standalone Text Rule implemented in .
+-   **New Documentation Files**: , , , , , ,  (reverted).
 </code_architecture>
 
 <pending_tasks>
--   Implement the full logic for the all-in-one installer using .
--   Fine-tune remaining document types in .
--   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
--   Migrate or pin React/Webpack versions.
--   Test the backend with 5-10 real images to validate Hybrid OCR.
--   Update icon for macOS (.icns).
--   Implement license/activation key feature.
--   Implement Parallel Local Processing for batch scanning.
--   Update Gemini prompt to explicitly recognize GCN continuation pages as  (instead of ) when specific section headers (Nội dung thay đổi..., Thửa đất...) are present.
+- Implement the full logic for the all-in-one installer using .
+- Fine-tune remaining document types in .
+- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+- Migrate or pin React/Webpack versions.
+- Test the backend with 5-10 real images to validate Hybrid OCR.
+- Update icon for macOS (.icns).
+- Implement license/activation key feature.
+- Implement Parallel Local Processing for batch scanning.
+- Handle deep path length issues in the application.
+- Implement Batch Scan from List feature.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing user feedback regarding specific GCN (Giấy Chứng Nhận) continuation pages. The user reported that pages containing sections like Nội dung thay đổi và cơ sở pháp lý + Xác nhận cơ quan or Thửa đất, nhà ở và tài sản khác gắn liền với đất should be classified as  by default, even if they don't have a primary title. Currently, these pages might be classified as  or potentially misclassified if body text causes confusion. The AI engineer is planning to update the Gemini Flash prompt within  to incorporate this nuanced recognition logic, ensuring these specific content patterns lead to a  classification. This is a continuation of the ongoing efforts to refine the AI's classification accuracy based on complex document structures and specific user requirements.
+Immediately before this summary request, the AI engineer was investigating a critical build issue reported by the user: bản build npm run electron-build ko hoạt động (the build  is not working). The engineer had just started to diagnose this problem by examining the  file in  and was about to check for issues with the  file in the  directory, which is crucial for the production build. This task is currently in the initial diagnostic phase, aimed at ensuring the application can be successfully built and deployed.
 </current_work>
 
 <optional_next_step>
-Update the Gemini prompt in  to classify specific GCN continuation page content as .
+Investigate and fix the  issue.
 </optional_next_step>

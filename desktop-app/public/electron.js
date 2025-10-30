@@ -80,11 +80,14 @@ function getPythonScriptPath(scriptName) {
   if (isDev) {
     return path.join(__dirname, '../python', scriptName);
   } else {
-    // In production, Python files should be in resources/python (extraResources)
+    // In production, Python files should be in app/python (when asar: false)
     // Try multiple paths as fallback
     const paths = [
-      path.join(process.resourcesPath, 'python', scriptName),
+      path.join(process.resourcesPath, 'app', 'python', scriptName),  // asar: false
+      path.join(app.getAppPath(), 'python', scriptName),              // asar: false backup
+      path.join(process.resourcesPath, 'python', scriptName),          // extraResources
       path.join(process.resourcesPath, '..', 'python', scriptName),
+      path.join(path.dirname(process.execPath), 'resources', 'app', 'python', scriptName),
       path.join(path.dirname(process.execPath), 'resources', 'python', scriptName),
       path.join(path.dirname(process.execPath), 'python', scriptName)
     ];
@@ -98,7 +101,9 @@ function getPythonScriptPath(scriptName) {
     }
     
     // Fallback to first path if none found
-    console.warn(`Python script not found, using default path: ${paths[0]}`);
+    console.warn(`Python script not found in any location. Tried paths:`);
+    paths.forEach(p => console.warn(`  - ${p}`));
+    console.warn(`Using default path: ${paths[0]}`);
     return paths[0];
   }
 }

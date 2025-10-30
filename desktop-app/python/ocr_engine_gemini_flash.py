@@ -217,6 +217,21 @@ Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở MIDDLE (giữa trang)
 → short_code: "UNKNOWN"
 → reasoning: "Text found in middle of page, not a main title"
 
+❌ SAI - LOWERCASE REFERENCE trong body (QUAN TRỌNG):
+Trang có danh sách người thừa kế, trong body có "...đã từ chối nhận di sản theo văn bản từ chối nhận di sản số..."
+→ "văn bản từ chối" = lowercase, trong câu văn, có "theo" → REFERENCE
+→ KHÔNG có title chính ở TOP
+→ Đây là danh sách / continuation page
+→ short_code: "UNKNOWN" hoặc "GTLQ"
+→ reasoning: "No main title at top, 'văn bản từ chối' is lowercase reference in body text"
+
+✅ ĐÚNG - Nếu có TITLE thực sự:
+Trang có "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" ở TOP (chữ lớn, IN HOA)
+→ Đây là TITLE chính thức
+→ title_position: "top"
+→ short_code: "VBTC"
+→ reasoning: "Main title at top in uppercase"
+
 ⚠️ QUAN TRỌNG - PHÂN BIỆT REFERENCE vs TITLE:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

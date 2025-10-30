@@ -38,7 +38,11 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo.
-echo Step 3: Building Windows installer (NSIS)...
+echo Step 3: Cleaning old builds...
+if exist dist rmdir /s /q dist
+echo.
+
+echo Step 4: Building Windows installer (NSIS)...
 call npx electron-builder --win --x64
 if %ERRORLEVEL% NEQ 0 (
     echo ERROR: Failed to build Windows installer!

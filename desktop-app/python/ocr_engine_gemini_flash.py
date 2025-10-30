@@ -338,27 +338,36 @@ Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
 
 2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
    → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.8)
+   → Trả về: GCNM (confidence: 0.85)
 
-3️⃣ "II. NỘI DUNG THAY ĐỔI" hoặc "III. XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+3️⃣ CẢ HAI: "II. NỘI DUNG THAY ĐỔI" + "III. XÁC NHẬN CỦA CƠ QUAN"
+   → PHẢI CÓ CẢ HAI sections (II và III)
+   → NẾU CHỈ CÓ MỘT → UNKNOWN
    → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.75)
+   → Trả về: GCNM (confidence: 0.85)
 
 VÍ DỤ:
 
-✅ ĐÚNG: Trang chỉ có section "Nội dung thay đổi và cơ sở pháp lý"
-   → Không có title chính
-   → NHƯNG là GCN continuation page
-   → Trả về: GCNM (confidence: 0.8)
+✅ ĐÚNG: Trang có CẢ HAI sections
+   - "Nội dung thay đổi và cơ sở pháp lý" (ở trên)
+   + "Xác nhận của cơ quan có thẩm quyền" (ở dưới)
+   → Trả về: GCNM (confidence: 0.85)
 
-✅ ĐÚNG: Trang sau HDCQ có section "Thửa đất, nhà ở và tài sản..."
-   → Không liên quan đến HDCQ
-   → Đây là GCN của người khác trong batch scan
-   → Trả về: GCNM (confidence: 0.8)
+✅ ĐÚNG: Trang có "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
+   → Standalone section, đủ để nhận GCNM
+   → Trả về: GCNM (confidence: 0.85)
 
-✅ ĐÚNG: Trang có "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"
+✅ ĐÚNG: Trang có CẢ HAI sections "II. NỘI DUNG THAY ĐỔI" + "III. XÁC NHẬN CỦA CƠ QUAN"
    → Format chuẩn của GCN trang 2
-   → Trả về: GCNM (confidence: 0.75)
+   → Trả về: GCNM (confidence: 0.85)
+
+❌ SAI: Trang CHỈ có "Nội dung thay đổi..." NHƯNG KHÔNG có "Xác nhận cơ quan"
+   → Thiếu section bắt buộc
+   → Trả về: UNKNOWN
+
+❌ SAI: Trang CHỈ có "II. NỘI DUNG THAY ĐỔI" NHƯNG KHÔNG có "III. XÁC NHẬN..."
+   → Thiếu section III
+   → Trả về: UNKNOWN
 
 ❌ KHÔNG PHẢI GCN: Trang có "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG"
    → Đây KHÔNG phải section của GCN
@@ -366,14 +375,18 @@ VÍ DỤ:
    → Trả về: UNKNOWN
 
 🎯 NHẬN DIỆN TRANG GCN (Continuation):
-Trang 2+ của GCN thường có các section:
-- "Nội dung thay đổi và cơ sở pháp lý"
-- "Xác nhận của cơ quan có thẩm quyền"
+Trang 2+ của GCN thường có:
+
+✅ CẢ HAI sections KẾT HỢP:
+- "Nội dung thay đổi và cơ sở pháp lý" + "Xác nhận của cơ quan"
+- "II. NỘI DUNG THAY ĐỔI..." + "III. XÁC NHẬN..."
+
+✅ HOẶC standalone section:
 - "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
-- "II. NỘI DUNG THAY ĐỔI..."
-- "III. XÁC NHẬN..."
 - Bảng thông tin thửa đất (số hiệu, diện tích...)
-→ Nếu thấy những section này → Trả về: GCNM (confidence: 0.75-0.85)
+
+→ Nếu thấy CẢ HAI sections hoặc standalone "Thửa đất..." → GCNM (0.85)
+→ Nếu CHỈ CÓ MỘT trong hai sections → UNKNOWN
 → KHÔNG trả về UNKNOWN như các continuation page khác!
 
 VÍ DỤ CHẤP NHẬN:

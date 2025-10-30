@@ -11,14 +11,14 @@ from PIL import Image
 import io
 
 
-def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
+def classify_document_gemini_flash(image_path, api_key, crop_top_percent=0.8):
     """
     Classify Vietnamese land document using Gemini Flash 2.0 AI with position awareness
     
     Args:
         image_path: Path to image file
         api_key: Google API key (BYOK)
-        crop_top_percent: Percentage of top image to process (default 1.0 = 100% for position analysis)
+        crop_top_percent: Percentage of top image to process (default 0.8 = 80% for speed optimization)
         
     Returns:
         dict: Classification result with short_code, confidence, reasoning, title_position

@@ -184,8 +184,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             short_code_crop = result_crop.get("short_code", "UNKNOWN")
             confidence_crop = result_crop.get("confidence", 0.0)
             
-            # Confidence threshold for retry (default 0.8)
-            CONFIDENCE_THRESHOLD = 0.8
+            # Confidence threshold for retry (adjusted for 60% crop)
+            CONFIDENCE_THRESHOLD = 0.85  # Increased from 0.8 since 60% has more context
             # High confidence threshold (skip retry even for ambiguous)
             HIGH_CONFIDENCE_THRESHOLD = 0.9
             

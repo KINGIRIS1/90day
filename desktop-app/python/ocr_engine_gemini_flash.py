@@ -256,6 +256,51 @@ Trang có "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" ở TOP (chữ lớn, IN HOA)
 - Nằm trong câu văn dài, không standalone
 - Cỡ chữ BÌNH THƯỜNG, không nổi bật
 - Viết thường (lowercase): "văn bản từ chối" thay vì "VĂN BẢN TỪ CHỐI"
+- **NẰM CHUNG với các từ khác trên cùng dòng** (VD: "theo Giấy chứng nhận...", "...theo văn bản...")
+
+🎯 DẤU HIỆU NHẬN BIẾT TITLE (CỰC KỲ QUAN TRỌNG):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ TITLE phải NẰM ĐỘC LẬP:
+- **Mỗi dòng CHỈ có text của title, KHÔNG có text khác**
+- Có thể xuống dòng:
+  * Dòng 1: "VĂN BẢN"
+  * Dòng 2: "PHÂN CHIA TÀI SẢN..."
+  * → ĐỘC LẬP, mỗi dòng chỉ có title
+  
+- Hoặc một dòng duy nhất:
+  * "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+  * → ĐỘC LẬP, không có text khác
+
+❌ KHÔNG PHẢI TITLE nếu:
+- NẰM CHUNG với text khác: "theo Giấy chứng nhận quyền sử dụng đất số..."
+  * "Giấy chứng nhận" KHÔNG độc lập
+  * Có "theo" và "số..." trên cùng dòng/câu
+  * → Đây là REFERENCE, không phải TITLE
+
+- NẰM CHUNG với text khác: "...đã từ chối nhận di sản theo văn bản từ chối nhận di sản số..."
+  * "văn bản từ chối" KHÔNG độc lập
+  * Có nhiều từ khác trên cùng dòng
+  * → Đây là REFERENCE, không phải TITLE
+
+VÍ DỤ PHÂN BIỆT:
+
+✅ TITLE (độc lập):
+```
+                VĂN BẢN
+        PHÂN CHIA TÀI SẢN CHUNG
+           CỦA HỘ GIA ĐÌNH
+```
+→ Mỗi dòng ĐỘC LẬP, chỉ có title
+→ Classify: TTHGD
+
+❌ REFERENCE (không độc lập):
+```
+2. Ông Nguyễn Văn A đã từ chối nhận di sản theo văn bản từ chối nhận di sản số 123...
+```
+→ "văn bản từ chối" NẰM CHUNG với "đã từ chối", "theo", "số 123"
+→ KHÔNG classify theo "văn bản từ chối"
+→ Classify: UNKNOWN hoặc GTLQ
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

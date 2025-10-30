@@ -514,9 +514,83 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
   "reasoning": "Không thấy tiêu đề khớp chính xác với danh sách"
 }
 
+⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TIÊU ĐỀ CHÍNH (Main Title):
+- Nằm Ở ĐẦU trang, TRÊN CÙNG
+- Cỡ chữ LỚN, IN HOA, căn giữa
+- VD: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI..."
+- → CHỈ TIÊU ĐỀ CHÍNH mới dùng để phân loại!
+
+❌ KHÔNG PHÂN LOẠI DỰA VÀO:
+- Section headers (III. THÔNG TIN VỀ...)
+- Mentions trong body text
+- Danh sách đính kèm
+- Ghi chú cuối trang
+
+🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
+
+✅ NẾU THẤY CÁC SECTION SAU → TRẢ VỀ GCNM (ngay cả không có title chính):
+
+1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.85)
+
+2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.85)
+
+3️⃣ "II. NỘI DUNG THAY ĐỔI" hoặc "III. XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.8)
+
+4️⃣ "XÁC NHẬN CƠ QUAN" + bảng thông tin thửa đất (số hiệu, diện tích...)
+   → Đây là trang 2 của GCNM
+   → Trả về: GCNM (confidence: 0.8)
+
+VÍ DỤ THỰC TẾ:
+
+✅ ĐÚNG: Trang chỉ có section "Nội dung thay đổi và cơ sở pháp lý"
+   → Không có title chính
+   → NHƯNG là GCN continuation page
+   → Trả về: GCNM (confidence: 0.85)
+
+✅ ĐÚNG: Trang sau HDCQ có section "Thửa đất, nhà ở và tài sản..."
+   → Không liên quan đến HDCQ
+   → Đây là GCN của người khác trong batch scan
+   → Trả về: GCNM (confidence: 0.85)
+
+✅ ĐÚNG: Trang có "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"
+   → Format chuẩn của GCN trang 2
+   → Trả về: GCNM (confidence: 0.8)
+
+✅ ĐÚNG: Trang có "III. XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+   → Format chuẩn của GCN trang 2
+   → Trả về: GCNM (confidence: 0.8)
+
+❌ KHÔNG PHẢI GCN: Trang có "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG"
+   → Đây KHÔNG phải section của GCN
+   → Là section của PCT hoặc document khác
+   → Trả về: UNKNOWN
+
+🔍 CÁC DẤU HIỆU NHẬN BIẾT GCN CONTINUATION:
+- Có bảng thông tin thửa đất (số hiệu, diện tích, vị trí...)
+- Có section "Nội dung thay đổi", "Cơ sở pháp lý"
+- Có section "Xác nhận của cơ quan"
+- Có section "Thửa đất, nhà ở và tài sản khác"
+- Format dạng phiếu chính thức với các ô điền thông tin đất đai
+
+→ NẾU THẤY NHỮNG SECTION NÀY → TRẢ VỀ GCNM (confidence: 0.8-0.85)
+→ KHÔNG TRẢ VỀ UNKNOWN NHƯ CÁC CONTINUATION PAGE KHÁC!
+
 ⚠️ QUAN TRỌNG: Một tài liệu có thể có NHIỀU TRANG
   - Trang 1: Có tiêu đề "GIẤY CHỨNG NHẬN" → GCN
   - Trang 2, 3, 4...: Không có tiêu đề mới → Hệ thống sẽ tự động gán là GCN
+  - NGOẠI LỆ: Nếu trang có GCN continuation sections → Tự động nhận là GCNM
   - CHỈ KHI thấy tiêu đề MỚI khớp 100% → Mới đổi sang loại mới
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

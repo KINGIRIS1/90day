@@ -562,16 +562,25 @@ VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
 TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 
 1. TTHGD (Thỏa thuận hộ gia đình):
-   - Về QUYỀN SỬ DỤNG ĐẤT
-   - Giữa CÁC THÀNH VIÊN HỘ GIA ĐÌNH
-   - Keywords: "hộ gia đình", "quyền sử dụng đất", "QSDĐ"
-   - VD: "Thỏa thuận QSDĐ của hộ gia đình"
+   - Về QUYỀN SỬ DỤNG ĐẤT hoặc TÀI SẢN
+   - Giữa CÁC THÀNH VIÊN HỘ GIA ĐÌNH (family members)
+   - Keywords: "HỘ GIA ĐÌNH" (không có "vợ chồng")
+   - VD: 
+     • "Thỏa thuận QSDĐ của hộ gia đình"
+     • "Phân chia tài sản chung của HỘ GIA ĐÌNH"
+     • "Văn bản thỏa thuận...hộ gia đình"
 
 2. PCTSVC (Phân chia vợ chồng):
    - Về TÀI SẢN (đất đai, nhà cửa, tiền...)
-   - Giữa VỢ VÀ CHỒNG (ly hôn, chia tài sản)
-   - Keywords: "vợ chồng", "tài sản chung", "phân chia"
-   - VD: "Phân chia tài sản chung vợ chồng"
+   - Giữa VỢ VÀ CHỒNG (couple, marriage dissolution)
+   - Keywords: "VỢ CHỒNG" (KHÔNG có "hộ gia đình")
+   - VD: 
+     • "Phân chia tài sản chung VỢ CHỒNG"
+     • "Thỏa thuận phân chia...vợ chồng"
+
+🔑 KEYWORD QUYẾT ĐỊNH:
+- Có "HỘ GIA ĐÌNH" → TTHGD ✅
+- Có "VỢ CHỒNG" → PCTSVC ✅
 
 ❌ NẾU KHÔNG RÕ RÀNG → UNKNOWN (đừng đoán!)
 

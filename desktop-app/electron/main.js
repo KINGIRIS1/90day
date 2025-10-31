@@ -474,7 +474,7 @@ ipcMain.handle('export-rules', async () => {
   try {
     const result = await dialog.showSaveDialog(mainWindow, { title: 'Export Rules', defaultPath: 'rules-export.json', filters: [{ name: 'JSON Files', extensions: ['json'] }] });
     if (result.canceled) return { success: false, message: 'Export cancelled' };
-    return await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'export', result.filePath]);
+    return await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'export', result.filePath]);
   } catch (e) { return { success: false, error: e.message }; }
 });
 

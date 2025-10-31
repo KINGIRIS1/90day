@@ -451,7 +451,7 @@ function spawnJsonPython(args, timeoutMs = 10000) {
 }
 
 ipcMain.handle('get-rules', async () => {
-  try { return { success: true, rules: await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'get']) }; }
+  try { return { success: true, rules: await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'get']) }; }
   catch (e) { return { success: false, error: e.message }; }
 });
 

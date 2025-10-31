@@ -503,3 +503,89 @@ ipcMain.handle('generate-keyword-variants', async (event, keyword, includeTypos 
     return await spawnJsonPython([path.join(__dirname, '../python/keyword_variants.py'), keyword, includeTypos ? 'true' : 'false'], 5000);
   } catch (e) { return { success: false, error: e.message }; }
 });
+
+// ===== Cloud OCR API Key Management =====
+ipcMain.handle('save-api-key', async (event, { provider, apiKey }) => {
+  try {
+    if (!provider || typeof apiKey !== 'string') {
+      return { success: false, error: 'Thiếu provider hoặc apiKey' };
+    }
+    store.set(`cloudOCR.${provider}.apiKey`, apiKey);
+    return { success: true, message: `API key cho ${provider} đã lưu` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('get-api-key', async (event, provider) => {
+  try {
+    return store.get(`cloudOCR.${provider}.apiKey`, '');
+  } catch (error) {
+    return '';
+  }
+});
+
+ipcMain.handle('delete-api-key', async (event, provider) => {
+  try {
+    store.delete(`cloudOCR.${provider}.apiKey`);
+    if (provider === 'azure') {
+      store.delete('cloudOCR.azureEndpoint.apiKey');
+    }
+    return { success: true, message: `Đã xóa API key của ${provider}` };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => {
+  try {
+    const axios = require('axios');
+
+    if (provider === 'google') {
+      const testUrl = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+      const response = await axios.post(testUrl, {
+        requests: [{
+          image: { content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==' },
+          features: [{ type: 'TEXT_DETECTION', maxResults: 1 }]
+        }]
+      }, { timeout: 10000 });
+      if (response.status === 200) {
+        return { success: true, message: '✅ Google Cloud Vision API key hợp lệ' };
+      }
+      return { success: false, error: 'Google Vision test thất bại' };
+    }
+
+    if (provider === 'azure') {
+      if (!endpoint) return { success: false, error: 'Thiếu Azure endpoint' };
+      const normalizedEndpoint = endpoint.replace(/\/$/, '');
+      const testUrl = `${normalizedEndpoint}/vision/v3.2/read/analyze`;
+      const response = await axios.post(testUrl, { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Atomist_quote_from_Democritus.png/338px-Atomist_quote_from_Democritus.png' }, {
+        headers: { 'Ocp-Apim-Subscription-Key': apiKey, 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
+      if (response.status === 202) {
+        return { success: true, message: '✅ Azure Computer Vision API key hợp lệ' };
+      }
+      return { success: false, error: 'Azure test thất bại' };
+    }
+
+    if (provider === 'gemini') {
+      const testUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const response = await axios.post(testUrl, { contents: [{ parts: [{ text: 'Hello, this is a test.' }] }] }, { headers: { 'Content-Type': 'application/json' }, timeout: 10000 });
+      if (response.status === 200 && response.data && response.data.candidates) {
+        return { success: true, message: '✅ Gemini Flash API key hợp lệ' };
+      }
+      return { success: false, error: 'Gemini test thất bại' };
+    }
+
+    return { success: false, error: `Provider không hỗ trợ: ${provider}` };
+  } catch (error) {
+    let msg = error.message;
+    const status = error.response?.status;
+    if (status === 401 || status === 403) msg = 'API key không hợp lệ hoặc không có quyền';
+    else if (status === 429) msg = 'Quá giới hạn request';
+    else if (error.code === 'ENOTFOUND' || error.code === 'ETIMEDOUT') msg = 'Không thể kết nối tới Cloud API';
+    return { success: false, error: msg };
+  }
+});
+

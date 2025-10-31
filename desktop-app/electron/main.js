@@ -386,7 +386,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
   return results;
 });
 
-ipcMain.handle('get-config', () => store.get());
+ipcMain.handle('get-config', (event, key) => { try { return typeof key === 'string' ? store.get(key) : store.store; } catch (e) { return null; } });
 ipcMain.handle('set-config', (event, key, value) => { store.set(key, value); return true; });
 
 ipcMain.handle('get-backend-url', () => store.get('backendUrl', 'https://sohoavpdkct.up.railway.app'));

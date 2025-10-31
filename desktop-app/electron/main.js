@@ -461,7 +461,7 @@ ipcMain.handle('save-rule', async (event, docType, ruleData) => {
 });
 
 ipcMain.handle('delete-rule', async (event, docType) => {
-  try { return await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'delete', docType]); }
+  try { return await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'delete', docType]); }
   catch (e) { return { success: false, error: e.message }; }
 });
 

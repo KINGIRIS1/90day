@@ -482,7 +482,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
   try {
     const result = await dialog.showOpenDialog(mainWindow, { title: 'Import Rules', filters: [{ name: 'JSON Files', extensions: ['json'] }], properties: ['openFile'] });
     if (result.canceled) return { success: false, message: 'Import cancelled' };
-    return await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'import', result.filePaths[0], mergeBool ? 'true' : 'false']);
+    return await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'import', result.filePaths[0], mergeBool ? 'true' : 'false']);
   } catch (e) { return { success: false, error: e.message }; }
 });
 

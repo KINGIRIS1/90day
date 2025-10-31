@@ -456,7 +456,7 @@ ipcMain.handle('get-rules', async () => {
 });
 
 ipcMain.handle('save-rule', async (event, docType, ruleData) => {
-  try { return await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'save', docType, JSON.stringify(ruleData)]); }
+  try { return await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'save', docType, JSON.stringify(ruleData)]); }
   catch (e) { return { success: false, error: e.message }; }
 });
 

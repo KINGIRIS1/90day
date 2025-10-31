@@ -488,7 +488,7 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
 
 ipcMain.handle('open-rules-folder', async () => {
   try {
-    const res = await spawnJsonPython([path.join(__dirname, '../python/rules_manager.py'), 'folder']);
+    const res = await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'folder']);
     if (res.success && res.path) {
       const { shell } = require('electron');
       await shell.openPath(res.path);

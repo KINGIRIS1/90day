@@ -156,6 +156,16 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         
         result_data = response.json()
         
+        # Extract usage metadata
+        usage_metadata = result_data.get('usageMetadata', {})
+        usage_info = {
+            "input_tokens": usage_metadata.get('promptTokenCount', 0),
+            "output_tokens": usage_metadata.get('candidatesTokenCount', 0),
+            "total_tokens": usage_metadata.get('totalTokenCount', 0)
+        }
+        
+        print(f"📊 Tokens: input={usage_info['input_tokens']}, output={usage_info['output_tokens']}", file=sys.stderr)
+        
         # Extract text from response
         if 'candidates' in result_data and len(result_data['candidates']) > 0:
             candidate = result_data['candidates'][0]
@@ -167,13 +177,18 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                     
                     # Parse result
                     classification = parse_gemini_response(result_text)
+                    # Add usage and resize info
+                    classification['usage'] = usage_info
+                    classification['resize_info'] = resize_info
                     return classification
         
         # No valid response
         return {
             "short_code": "UNKNOWN",
             "confidence": 0.3,
-            "reasoning": "Could not parse Gemini response"
+            "reasoning": "Could not parse Gemini response",
+            "usage": usage_info,
+            "resize_info": resize_info
         }
         
     except ImportError as e:

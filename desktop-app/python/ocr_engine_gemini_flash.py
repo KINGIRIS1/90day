@@ -118,11 +118,14 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         if resize_info.get('resized'):
             print(f"💰 Cost savings: ~{resize_info['reduction_percent']:.0f}% fewer tokens", file=sys.stderr)
         
-        # Create request payload
+        # Create request payload with appropriate prompt
+        # Use simplified prompt for Flash Lite
+        prompt_text = get_classification_prompt_lite() if model_type == 'gemini-flash-lite' else get_classification_prompt()
+        
         payload = {
             "contents": [{
                 "parts": [
-                    {"text": get_classification_prompt()},
+                    {"text": prompt_text},
                     {
                         "inline_data": {
                             "mime_type": "image/jpeg",

@@ -110,14 +110,16 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
         if 'candidates' in result_data and len(result_data['candidates']) > 0:
             candidate = result_data['candidates'][0]
             if 'content' in candidate and 'parts' in candidate['content']:
-                parts = candidate['content']['parts']
-                if len(parts) > 0 and 'text' in parts[0]:
-                    result_text = parts[0]['text']
+                parts = candidate['content']['parts'] or []
+                # pick first non-empty text part
+                result_text = ''
+                for p in parts:
+                    if isinstance(p, dict) and isinstance(p.get('text'), str) and p.get('text').strip():
+                        result_text = p['text']
+                        break
+                if result_text:
                     print(f"🤖 Gemini response: {result_text[:200]}...", file=sys.stderr)
-                    
-                    # Parse result
                     classification = parse_gemini_response(result_text)
-                    # Attach usage tokens for cost estimation
                     classification['usage'] = parsed_usage
                     return classification
         

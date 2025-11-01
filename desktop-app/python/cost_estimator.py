@@ -116,7 +116,7 @@ def estimate_cost_per_page(width=3000, height=4000, model_type='gemini-flash',
     # Calculate cost without resize for comparison
     cost_without_resize = None
     if resize_applied:
-        tokens_no_resize = estimate_tokens_from_image_size(width, height)
+        tokens_no_resize = estimate_tokens_from_image_size(width, height, model_type)
         cost_without_resize = calculate_cost(
             tokens_no_resize['input_tokens'], 
             tokens_no_resize['output_tokens'], 

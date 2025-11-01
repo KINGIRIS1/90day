@@ -803,14 +803,14 @@ function CloudSettings() {
                     <>
                       <div className="flex justify-between items-center p-2 bg-white rounded">
                         <span>✅ Flash Lite + Resize ({maxWidth}x{maxHeight}):</span>
-                        <span className="font-bold text-green-700">$0.00085 (~0.85₫)</span>
+                        <span className="font-bold text-green-700">$0.00089 (~0.9₫)</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-100 rounded opacity-60">
                         <span>❌ Flash Lite (không resize):</span>
-                        <span className="font-medium">$0.00174 (~1.7₫)</span>
+                        <span className="font-medium">$0.00178 (~1.8₫)</span>
                       </div>
                       <div className="text-xs text-green-700 font-semibold ml-2">
-                        → Tiết kiệm: ~51% ($0.00089/trang)
+                        → Tiết kiệm: ~50% ($0.00089/trang)
                       </div>
                     </>
                   )}

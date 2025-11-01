@@ -151,39 +151,22 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
 
 def get_classification_prompt():
     """
-    System prompt for Vietnamese document classification
-    IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
-    UPDATED: More flexible matching (85-90% similarity acceptable)
+    JSON-only instruction for Vietnamese land document classification.
+    Must return exactly ONE line of JSON with fields: short_code, confidence, title_position, reasoning
     """
-    return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
-Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
-Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
+    return """
+Bạn là bộ phân loại tài liệu đất đai Việt Nam.
+HÃY TRẢ VỀ DUY NHẤT 1 DÒNG JSON (không có chữ thừa, không markdown, không giải thích), đúng schema:
+{"short_code":"<MÃ>", "confidence": <0..1>, "title_position":"top|middle|bottom|none", "reasoning":"<ngắn gọn>"}
 
-🎯 PHÂN TÍCH VỊ TRÍ VĂN BẢN (POSITION-AWARE CLASSIFICATION)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUY TẮC BẮT BUỘC:
+- CHỈ dựa vào TIÊU ĐỀ Ở TOP ~30% trang. Nếu không tìm thấy tiêu đề ở TOP → short_code="UNKNOWN", title_position="none".
+- KHÔNG dùng reference/mentions trong phần giữa/cuối trang để phân loại (ví dụ: "theo Giấy chứng nhận...", "kèm theo hợp đồng...").
+- Nếu không khớp rõ ràng với danh sách mã hợp lệ (HDCQ, DDKBD, TTHGD, PCTSVC, GCNM, GCNC, ...), hãy trả về short_code="UNKNOWN".
+- confidence từ 0..1, title_position một trong: top|middle|bottom|none.
 
-⚠️ CỰC KỲ QUAN TRỌNG: CHỈ PHÂN LOẠI DỰA VÀO TEXT Ở PHẦN ĐẦU TRANG!
-
-📍 QUY TẮC VỊ TRÍ:
-
-1️⃣ **PHẦN ĐẦU TRANG (TOP 30%)**
-   - Đây là vùng TIÊU ĐỀ CHÍNH
-   - CHỈ text ở đây MỚI được dùng để phân loại
-   - Cỡ chữ LỚN, IN HOA, căn giữa
-   - VD: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
-
-2️⃣ **PHẦN GIỮA TRANG (MIDDLE 30-70%)**
-   - Đây là BODY CONTENT
-   - ❌ KHÔNG được phân loại dựa vào text ở đây
-   - Có thể có mentions của document types khác
-   - VD: "...theo hợp đồng chuyển nhượng đã ký..."
-   - → CHỈ LÀ MENTION, KHÔNG PHẢI TIÊU ĐỀ!
-
-3️⃣ **PHẦN CUỐI TRANG (BOTTOM 70-100%)**
-   - Đây là CHỮ KÝ, CON DẤU, GHI CHÚ
-   - ❌ KHÔNG được phân loại dựa vào text ở đây
-
-... (prompt rút gọn cho brevity trong code) ...
+VÍ DỤ JSON HỢP LỆ (chỉ 1 dòng):
+{"short_code":"HDCQ","confidence":0.92,"title_position":"top","reasoning":"Title lớn ở đầu trang"}
 """
 
 

@@ -130,6 +130,22 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
 
             # Map Gemini result to rule_classifier format
             short_code = result.get("short_code", "UNKNOWN")
+            
+            # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
+            # Get all valid codes from rule_classifier
+            from rule_classifier import EXACT_TITLE_MAPPING, DOCUMENT_RULES
+            VALID_CODES = set(EXACT_TITLE_MAPPING.values())
+            VALID_CODES.update(DOCUMENT_RULES.keys())
+            
+            # If Gemini returns invalid code, force to UNKNOWN
+            if short_code not in VALID_CODES and short_code != "UNKNOWN":
+                print(f"⚠️ Gemini returned INVALID code '{short_code}' (not in 98 valid codes). Forcing to UNKNOWN.", file=sys.stderr)
+                print(f"   Original reasoning: {result.get('reasoning', 'N/A')}", file=sys.stderr)
+                result["short_code"] = "UNKNOWN"
+                result["confidence"] = 0.1
+                result["reasoning"] = f"AI returned invalid code '{short_code}' (not in system). Original: {result.get('reasoning', '')}"
+                short_code = "UNKNOWN"
+            
             doc_name = classify_document_name_from_code(short_code)
 
             # Usage tokens for cost estimation

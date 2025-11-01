@@ -115,6 +115,8 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
         print(f"📡 Sending request to {model_name}...", file=sys.stderr)
+        if resize_info.get('resized'):
+            print(f"💰 Cost savings: ~{resize_info['reduction_percent']:.0f}% fewer tokens", file=sys.stderr)
         
         # Create request payload
         payload = {
@@ -123,7 +125,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                     {"text": get_classification_prompt()},
                     {
                         "inline_data": {
-                            "mime_type": "image/png",
+                            "mime_type": "image/jpeg",
                             "data": encoded_image
                         }
                     }

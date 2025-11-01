@@ -1109,7 +1109,21 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
 - NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
 - NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
-- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning"""
+- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning
+
+🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)
+✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
+✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
+✅ KHÔNG đoán, KHÔNG sáng tạo, KHÔNG viết tắt tự do
+
+VÍ DỤ SAI:
+❌ "LCHO" (Lời chứng) → KHÔNG CÓ trong 98 mã → Phải trả về "UNKNOWN"
+❌ "VBCC" (Văn bản công chứng) → KHÔNG CÓ → Phải trả về "UNKNOWN"
+❌ "PKDT" (Phiếu kiểm tra đất) → KHÔNG CÓ → Phải trả về "UNKNOWN"
+
+→ CHỈ DÙNG MÃ TRONG DANH SÁCH 98 LOẠI PHÍA TRÊN!"""
 
 
 def parse_gemini_response(response_text):

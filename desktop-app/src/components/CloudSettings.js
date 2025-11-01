@@ -654,13 +654,53 @@ function CloudSettings() {
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded">
                 <p className="font-semibold mb-2">🤖 Ưu điểm AI Classification:</p>
-                <ul className="space-y-1">
+                <ul className="space-y-1 text-sm">
                   <li>✅ Hiểu context (quốc huy, layout, màu sắc)</li>
                   <li>✅ Không cần rules phức tạp</li>
                   <li>✅ Accuracy: 93-97%</li>
                   <li>✅ Direct classification từ image</li>
                   <li>✅ Returns reasoning (giải thích tại sao)</li>
                 </ul>
+                
+                <div className="mt-3 pt-3 border-t border-blue-200">
+                  <p className="font-semibold text-sm mb-2">💼 Chi phí khối lượng lớn (scan 3000x4000):</p>
+                  <div className="space-y-2">
+                    {ocrEngine === 'gemini-flash-lite' ? (
+                      <>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs">100 trang + resize:</span>
+                          <span className="text-xs font-semibold text-green-700">~$0.13 (~130₫)</span>
+                        </div>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs font-bold">1,000 trang + resize:</span>
+                          <span className="text-xs font-bold text-green-700">~$1.30 (~1,300₫)</span>
+                        </div>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs">10,000 trang + resize:</span>
+                          <span className="text-xs font-semibold text-green-700">~$13 (~13,000₫)</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs">100 trang + resize:</span>
+                          <span className="text-xs font-semibold text-green-700">~$0.40 (~400₫)</span>
+                        </div>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs font-bold">1,000 trang + resize:</span>
+                          <span className="text-xs font-bold text-green-700">~$4.00 (~4,000₫)</span>
+                        </div>
+                        <div className="flex justify-between p-2 bg-white rounded">
+                          <span className="text-xs">10,000 trang + resize:</span>
+                          <span className="text-xs font-semibold text-green-700">~$40 (~40,000₫)</span>
+                        </div>
+                      </>
+                    )}
+                    <p className="text-xs text-gray-500 italic mt-2">
+                      💡 Với Free tier (1,500 requests/ngày), bạn có thể scan miễn phí ~45,000 trang/tháng!
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

@@ -553,14 +553,25 @@ function CloudSettings() {
                 <li>Click "Test API Key" để verify</li>
               </ol>
               <div className="mt-4 p-3 bg-purple-100 rounded">
-                <p className="font-semibold mb-2">💰 Chi phí Gemini Flash:</p>
-                <ul className="space-y-1">
-                  <li>✅ <strong>Free tier: 45,000 requests/tháng</strong></li>
-                  <li>💵 <strong>$0.16 per 1,000 images</strong> (rẻ nhất!)</li>
-                  <li>📊 60K hồ sơ × 50 trang = 3M pages → <strong>~$500</strong></li>
-                  <li>🎯 Rẻ hơn 3.6x so với Google Vision ($1,800)</li>
-                  <li>🎯 Rẻ hơn 90x so với GPT-4 Vision ($45,000)</li>
-                </ul>
+                <p className="font-semibold mb-2">💰 Chi phí Gemini {ocrEngine === 'gemini-flash-lite' ? 'Flash Lite' : 'Flash'}:</p>
+                {ocrEngine === 'gemini-flash-lite' ? (
+                  <ul className="space-y-1">
+                    <li>✅ <strong>Free tier: 1,500 requests/ngày (45,000/tháng)</strong></li>
+                    <li>💵 <strong>Input: $0.10 per 1M tokens</strong></li>
+                    <li>💵 <strong>Output: $0.40 per 1M tokens</strong></li>
+                    <li>⚡ <strong>Tốc độ: 0.5-1s (NHANH NHẤT)</strong></li>
+                    <li>🎯 <strong>Tiết kiệm 3x input, 6.3x output so với Flash thường</strong></li>
+                    <li>📊 Ví dụ: 1,000 documents → <strong>~$0.20</strong> (vs Flash: $0.60)</li>
+                  </ul>
+                ) : (
+                  <ul className="space-y-1">
+                    <li>✅ <strong>Free tier: 1,500 requests/ngày (45,000/tháng)</strong></li>
+                    <li>💵 <strong>Input: $0.30 per 1M tokens</strong></li>
+                    <li>💵 <strong>Output: $2.50 per 1M tokens</strong></li>
+                    <li>🎯 <strong>Accuracy cao nhất: 93-97%</strong></li>
+                    <li>📊 Ví dụ: 1,000 documents → <strong>~$0.60</strong></li>
+                  </ul>
+                )}
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded">
                 <p className="font-semibold mb-2">🤖 Ưu điểm AI Classification:</p>

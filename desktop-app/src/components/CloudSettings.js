@@ -684,13 +684,45 @@ function CloudSettings() {
               </div>
 
               <div className="bg-green-50 rounded p-3 text-sm">
-                <p className="font-semibold mb-2">📊 Ước tính tiết kiệm:</p>
-                <ul className="space-y-1">
-                  <li>✅ Ảnh 4000x5600 → {maxWidth}x{maxHeight}: <strong>Tiết kiệm ~60-70% tokens</strong></li>
-                  <li>✅ Ảnh 3000x4200 → {maxWidth}x{maxHeight}: <strong>Tiết kiệm ~40-50% tokens</strong></li>
-                  <li>✅ Ảnh 2000x2800 → Giữ nguyên: <strong>Không mất phí thêm</strong></li>
-                  <li>✅ Độ chính xác OCR: <strong>Giảm &lt;5%</strong> (vẫn rất tốt cho documents)</li>
-                </ul>
+                <p className="font-semibold mb-2">💰 DỰ TOÁN CHI PHÍ 1 TRANG (scan 3000x4000):</p>
+                <div className="space-y-2">
+                  {ocrEngine === 'gemini-flash' ? (
+                    <>
+                      <div className="flex justify-between items-center p-2 bg-white rounded">
+                        <span>✅ Flash + Resize ({maxWidth}x{maxHeight}):</span>
+                        <span className="font-bold text-green-700">$0.004 (~4₫)</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-gray-100 rounded opacity-60">
+                        <span>❌ Flash (không resize):</span>
+                        <span className="font-medium">$0.0067 (~6.7₫)</span>
+                      </div>
+                      <div className="text-xs text-green-700 font-semibold ml-2">
+                        → Tiết kiệm: ~40% ($0.0027/trang)
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center p-2 bg-white rounded">
+                        <span>✅ Flash Lite + Resize ({maxWidth}x{maxHeight}):</span>
+                        <span className="font-bold text-green-700">$0.0013 (~1.3₫)</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-gray-100 rounded opacity-60">
+                        <span>❌ Flash Lite (không resize):</span>
+                        <span className="font-medium">$0.0022 (~2.2₫)</span>
+                      </div>
+                      <div className="text-xs text-green-700 font-semibold ml-2">
+                        → Tiết kiệm: ~40% ($0.0009/trang)
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="mt-3 pt-2 border-t border-green-200">
+                  <p className="text-xs text-gray-600">
+                    📊 <strong>1,000 trang với resize:</strong><br/>
+                    • Flash: ~$4 (tiết kiệm $2.7 so với không resize)<br/>
+                    • Flash Lite: ~$1.3 (tiết kiệm $0.9 so với không resize)
+                  </p>
+                </div>
               </div>
 
               <div className="bg-yellow-50 rounded p-3 text-sm">

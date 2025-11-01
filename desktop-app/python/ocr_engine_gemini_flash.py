@@ -942,24 +942,6 @@ CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
    "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
    PHẢI phân biệt rõ!
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (CHỈ CHỌN KHI KHỚP CHÍNH XÁC):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
-BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
-BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ) → HSKT
-BẢN VẼ HOÀN CÔNG → BVHC
-BẢN VẼ NHÀ → BVN
-SƠ ĐỒ DỰ KIẾN TÁCH THỬA → SDTT
-
-📋 NHÓM 2: BẢNG KÊ / DANH SÁCH (4 loại)
-BẢNG KÊ KHAI DIỆN TÍCH ĐANG SỬ DỤNG → BKKDT
-BẢNG LIỆT KÊ DANH SÁCH CÁC THỬA ĐẤT CẤP GIẤY → DSCG
-DANH SÁCH CHỦ SỬ DỤNG VÀ CÁC THỬA ĐẤT (MẪU 15) → DS15
-DANH SÁCH CÔNG KHAI HỒ SƠ CẤP GIẤY CNQSDĐ → DSCK
-
 📋 NHÓM 3: BIÊN BẢN (10 loại)
 BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN → BBBDG
 BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA → BBGD

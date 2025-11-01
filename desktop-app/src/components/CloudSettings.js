@@ -606,21 +606,21 @@ function CloudSettings() {
                         <>
                           <tr className="border-b border-purple-100">
                             <td className="py-1">2500x3500</td>
-                            <td className="text-right font-semibold text-green-700">$0.00089</td>
-                            <td className="text-right opacity-60">$0.00131</td>
-                            <td className="text-right text-green-600">32%</td>
+                            <td className="text-right font-semibold text-green-700">$0.00093</td>
+                            <td className="text-right opacity-60">$0.00135</td>
+                            <td className="text-right text-green-600">31%</td>
                           </tr>
                           <tr className="border-b border-purple-100 bg-purple-50">
                             <td className="py-1"><strong>3000x4000 ⭐</strong></td>
-                            <td className="text-right font-bold text-green-700">$0.00085</td>
-                            <td className="text-right opacity-60">$0.00174</td>
-                            <td className="text-right font-semibold text-green-600">51%</td>
+                            <td className="text-right font-bold text-green-700">$0.00089</td>
+                            <td className="text-right opacity-60">$0.00178</td>
+                            <td className="text-right font-semibold text-green-600">50%</td>
                           </tr>
                           <tr>
                             <td className="py-1">4000x5600</td>
-                            <td className="text-right font-semibold text-green-700">$0.00089</td>
-                            <td className="text-right opacity-60">$0.00313</td>
-                            <td className="text-right text-green-600">72%</td>
+                            <td className="text-right font-semibold text-green-700">$0.00093</td>
+                            <td className="text-right opacity-60">$0.00320</td>
+                            <td className="text-right text-green-600">71%</td>
                           </tr>
                         </>
                       ) : (

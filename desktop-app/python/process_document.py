@@ -87,7 +87,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
     """
     try:
         # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
-        if ocr_engine_type == 'gemini-flash':
+        if ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:
             if not cloud_api_key:
                 return {
                     "success": False,
@@ -95,7 +95,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     "method": "config_error"
                 }
 
-            print("🤖 Using Gemini Flash AI with POSITION-AWARE classification", file=sys.stderr)
+            model_type = 'Lite' if ocr_engine_type == 'gemini-flash-lite' else 'Flash'
+            print(f"🤖 Using Gemini {model_type} AI with POSITION-AWARE classification", file=sys.stderr)
 
             from ocr_engine_gemini_flash import classify_document_gemini_flash
             from rule_classifier import classify_document_name_from_code
@@ -104,7 +105,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
             start_time = time.time()
 
-            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0)
+            # Pass model type to classifier
+            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0, model_type=ocr_engine_type)
 
             scan_time = time.time() - start_time
             print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)

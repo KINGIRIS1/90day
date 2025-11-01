@@ -396,6 +396,22 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "reasoning": "Giải thích ngắn gọn"
 }
 
+🎯 VÍ DỤ THỰC TẾ:
+
+✅ ĐÚNG:
+- Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở top, chữ lớn
+  → {short_code: "HDCQ", title_position: "top", confidence: 0.9}
+
+- Trang có section "III. THÔNG TIN VỀ THỬA ĐẤT", không có tiêu đề
+  → {short_code: "GCNM", reasoning: "GCN continuation page"}
+
+❌ SAI:
+- Trang có "...theo hợp đồng chuyển nhượng số..."
+  → {short_code: "UNKNOWN", reasoning: "Reference only, not title"}
+
+- Trang có "HỢP ĐỒNG" ở giữa trang (middle)
+  → {short_code: "UNKNOWN", title_position: "middle"}
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!"""
 
 

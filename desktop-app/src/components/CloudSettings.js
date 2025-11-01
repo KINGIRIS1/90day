@@ -71,7 +71,7 @@ function CloudSettings() {
       if (ocrEngine === 'google' && googleKey.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'google', apiKey: googleKey.trim() });
       }
-      if (ocrEngine === 'gemini-flash' && geminiKey.trim()) {
+      if ((ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-lite') && geminiKey.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'gemini', apiKey: geminiKey.trim() });
       }
       if (ocrEngine === 'azure' && azureKey.trim() && azureEndpoint.trim()) {

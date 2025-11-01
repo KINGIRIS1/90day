@@ -19,6 +19,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         image_path: Path to image file
         api_key: Google API key (BYOK)
         crop_top_percent: Percentage of top image to process (default 1.0 = 100% for accurate position analysis)
+        model_type: 'gemini-flash' or 'gemini-flash-lite' (default: 'gemini-flash')
         
     Returns:
         dict: Classification result with short_code, confidence, reasoning, title_position

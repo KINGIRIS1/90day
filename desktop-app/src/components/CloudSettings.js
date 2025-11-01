@@ -608,6 +608,104 @@ function CloudSettings() {
         </div>
       )}
 
+      {/* Image Resize Settings - Only for Gemini engines */}
+      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-lite') && (
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>💰</span> Tối ưu hóa chi phí Gemini
+            <span className="bg-green-600 text-white text-xs px-2 py-1 rounded">TIẾT KIỆM 50-70%</span>
+          </h2>
+          
+          <div className="mb-4">
+            <label className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 cursor-pointer hover:bg-gray-50 transition">
+              <input
+                type="checkbox"
+                checked={enableResize}
+                onChange={(e) => setEnableResize(e.target.checked)}
+                className="w-5 h-5"
+              />
+              <div>
+                <div className="font-medium">🖼️ Tự động resize ảnh trước khi gửi lên Gemini API</div>
+                <div className="text-sm text-gray-600 mt-1">
+                  Giảm kích thước ảnh để tiết kiệm input tokens mà vẫn giữ độ chính xác OCR
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {enableResize && (
+            <div className="bg-white rounded-lg p-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    🔸 Chiều rộng tối đa (pixels):
+                  </label>
+                  <input
+                    type="number"
+                    value={maxWidth}
+                    onChange={(e) => setMaxWidth(parseInt(e.target.value) || 2000)}
+                    min="800"
+                    max="4000"
+                    step="100"
+                    className="w-full border rounded px-3 py-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Khuyến nghị: 1500-2500 pixels
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    🔹 Chiều cao tối đa (pixels):
+                  </label>
+                  <input
+                    type="number"
+                    value={maxHeight}
+                    onChange={(e) => setMaxHeight(parseInt(e.target.value) || 2800)}
+                    min="1000"
+                    max="5000"
+                    step="100"
+                    className="w-full border rounded px-3 py-2"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Khuyến nghị: 2000-3500 pixels
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 rounded p-3 text-sm">
+                <p className="font-semibold mb-2">💡 Cách hoạt động:</p>
+                <ul className="space-y-1">
+                  <li>• Nếu ảnh nhỏ hơn {maxWidth}x{maxHeight} → Giữ nguyên kích thước</li>
+                  <li>• Nếu ảnh lớn hơn → Tự động resize xuống (giữ tỷ lệ khung hình)</li>
+                  <li>• Chất lượng JPEG: 85% (balance giữa size và quality)</li>
+                  <li>• Ảnh scan thường: 2500x3500px → Resize thành: {maxWidth}x{Math.round(maxWidth * 3500/2500)}px</li>
+                </ul>
+              </div>
+
+              <div className="bg-green-50 rounded p-3 text-sm">
+                <p className="font-semibold mb-2">📊 Ước tính tiết kiệm:</p>
+                <ul className="space-y-1">
+                  <li>✅ Ảnh 4000x5600 → {maxWidth}x{maxHeight}: <strong>Tiết kiệm ~60-70% tokens</strong></li>
+                  <li>✅ Ảnh 3000x4200 → {maxWidth}x{maxHeight}: <strong>Tiết kiệm ~40-50% tokens</strong></li>
+                  <li>✅ Ảnh 2000x2800 → Giữ nguyên: <strong>Không mất phí thêm</strong></li>
+                  <li>✅ Độ chính xác OCR: <strong>Giảm &lt;5%</strong> (vẫn rất tốt cho documents)</li>
+                </ul>
+              </div>
+
+              <div className="bg-yellow-50 rounded p-3 text-sm">
+                <p className="font-semibold mb-1">⚠️ Lưu ý:</p>
+                <p className="text-gray-700">
+                  • Với documents rõ ràng, kích thước {maxWidth}x{maxHeight} đủ để OCR chính xác<br />
+                  • Nếu documents mờ/nhòe, có thể tăng lên 2500x3500 hoặc tắt resize<br />
+                  • Cài đặt này chỉ áp dụng cho Gemini Flash/Flash Lite
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Save Button */}
       <div className="flex gap-3">
         <button

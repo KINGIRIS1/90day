@@ -352,15 +352,41 @@ HCLK = Văn bản xác lập quyền hạn chế đất liền kề
 VBTC = Văn bản từ chối nhận di sản
 PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
-⚠️ DỄ NHẦM:
-- GCNM vs GCNC: Tiêu đề DÀI (có "quyền sở hữu...") = GCNM, NGẮN = GCNC
-- TTHGD vs PCTSVC: Có "HỘ GIA ĐÌNH" = TTHGD, có "VỢ CHỒNG" = PCTSVC
-- VBTK vs TTHGD: Có "DI SẢN THỪA KẾ" = VBTK, có "HỘ GIA ĐÌNH" = TTHGD
+⚠️ DỄ NHẦM (CỰC KỲ QUAN TRỌNG):
+
+1. GCNM vs GCNC:
+   - GCNM: Tiêu đề DÀI "...quyền sở hữu nhà ở và tài sản..."
+   - GCNC: Tiêu đề NGẮN "Giấy chứng nhận quyền sử dụng đất"
+   - NẾU có QUỐC HUY + nền cam/vàng → GCNC
+
+2. TTHGD vs PCTSVC vs VBTK:
+   - TTHGD: Có "HỘ GIA ĐÌNH" (không có "vợ chồng", không có "di sản")
+   - PCTSVC: Có "VỢ CHỒNG" (không có "hộ gia đình")
+   - VBTK: Có "DI SẢN THỪA KẾ" (về inheritance)
+
+3. GTLQ - PHIẾU TIẾP NHẬN (hay gặp):
+   - Có "GIẤY TIẾP NHẬN HỒ SƠ"
+   - Có "HẸN TRẢ KẾT QUẢ"
+   - Có bảng danh sách hồ sơ
+   - → GTLQ (không phải UNKNOWN)
+
+4. REFERENCE vs TITLE:
+   ❌ REFERENCE (BỎ QUA):
+   - "Căn cứ Giấy chứng nhận số..."
+   - "Theo hợp đồng chuyển nhượng số..."
+   - "...đã từ chối nhận di sản theo văn bản từ chối..."
+   
+   ✅ TITLE (DÙNG):
+   - "HỢP ĐỒNG CHUYỂN NHƯỢNG" (đứng riêng, IN HOA)
+   - "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" (đứng riêng, title case)
 
 🔍 QUY TRÌNH:
-1. Tìm tiêu đề ở TOP 30% trang (chữ lớn, IN HOA, nổi bật)
-2. Khớp CHÍNH XÁC với 1 trong 98 loại trên
-3. NẾU KHÔNG khớp → Trả về "UNKNOWN"
+1. Kiểm tra vị trí: Text ở TOP 30%?
+2. Kiểm tra độc lập: NẰM RIÊNG hay chung với text khác?
+3. Kiểm tra reference: Có "căn cứ/theo/số" không?
+4. NẾU pass 3 bước → Khớp với 98 loại
+5. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
+6. NẾU vẫn không → Trả về "UNKNOWN"
 
 📤 TRẢ VỀ JSON:
 {

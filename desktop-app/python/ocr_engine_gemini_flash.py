@@ -214,16 +214,32 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
 
 def get_classification_prompt_lite():
     """
-    OPTIMIZED prompt for Flash Lite - simpler, more direct, fewer tokens
-    Focuses on exact matching with minimal reasoning
-    Target: ~3500-4000 tokens (vs 5600 for full prompt)
+    OPTIMIZED prompt for Flash Lite with critical special cases
+    Balances simplicity with accuracy for edge cases
+    Target: ~1500-2000 tokens (60-65% reduction from full)
     """
     return """🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
 
-📋 TÌM TIÊU ĐỀ Ở ĐẦU TRANG (TOP 30%):
-- Tìm text LỚN NHẤT, IN HOA, căn giữa
-- CHỈ phân loại theo tiêu đề ở đầu trang
-- BỎ QUA text ở giữa/cuối trang
+📋 QUY TẮC VỊ TRÍ (QUAN TRỌNG):
+
+✅ CHỈ PHÂN LOẠI NẾU TIÊU ĐỀ Ở TOP 30%:
+- Text LỚN NHẤT, IN HOA, căn giữa
+- NẰM ĐỘC LẬP (không có text khác cùng dòng)
+- VD đúng: "HỢP ĐỒNG CHUYỂN NHƯỢNG" (riêng 1 dòng)
+- VD sai: "theo Giấy chứng nhận số..." (có "theo" + số)
+
+❌ BỎ QUA NẾU:
+- Text ở giữa/cuối trang (MIDDLE/BOTTOM)
+- Có từ: "căn cứ", "theo", "kèm theo", "số..."
+- NẰM CHUNG với text khác trên cùng dòng
+- Chữ thường trong câu văn
+
+⚠️ NGOẠI LỆ - GCNM CONTINUATION:
+NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
+- "III. THÔNG TIN VỀ THỬA ĐẤT"
+- "IV. THÔNG TIN VỀ TÀI SẢN GẮN LIỀN VỚI ĐẤT"
+- "V. THÔNG TIN VỀ HẠN CHẾ VỀ QUYỀN" + bảng
+→ Trả về GCNM (trang tiếp theo của GCN)
 
 ✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 

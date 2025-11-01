@@ -55,6 +55,8 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         # Model: gemini-2.5-flash or gemini-2.5-flash-lite
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
+        print(f"📡 Sending request to {model_name}...", file=sys.stderr)
+        
         # Create request payload
         payload = {
             "contents": [{

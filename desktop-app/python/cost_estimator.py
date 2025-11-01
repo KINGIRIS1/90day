@@ -5,18 +5,21 @@ Cost estimator for Gemini Flash OCR
 Provides predictive cost estimation based on image dimensions
 """
 
-def estimate_tokens_from_image_size(width, height):
+def estimate_tokens_from_image_size(width, height, model_type='gemini-flash'):
     """
     Estimate input tokens based on image dimensions
     Gemini calculates tokens approximately based on pixels
     
     Formula (approximate):
     - Each ~750 pixels ≈ 1 token
-    - Plus prompt tokens (~5600 for our optimized prompt)
+    - Plus prompt tokens:
+      * Flash: ~5600 tokens (comprehensive prompt)
+      * Flash Lite: ~1000 tokens (simplified prompt)
     
     Args:
         width: Image width in pixels
         height: Image height in pixels
+        model_type: 'gemini-flash' or 'gemini-flash-lite'
         
     Returns:
         dict: Estimated tokens breakdown
@@ -26,8 +29,11 @@ def estimate_tokens_from_image_size(width, height):
     # Image tokens: ~750 pixels per token (Gemini's approximate ratio)
     image_tokens = int(total_pixels / 750)
     
-    # Prompt tokens: ~5600 (our optimized prompt)
-    prompt_tokens = 5600
+    # Prompt tokens: Different for Flash vs Flash Lite
+    if model_type == 'gemini-flash-lite':
+        prompt_tokens = 1000  # Simplified prompt
+    else:
+        prompt_tokens = 5600  # Full comprehensive prompt
     
     # Total input tokens
     input_tokens = image_tokens + prompt_tokens

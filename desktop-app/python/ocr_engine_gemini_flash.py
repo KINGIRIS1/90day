@@ -753,7 +753,21 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - CHO PHÉP lỗi chính tả nhỏ, viết tắt, dấu câu
 - KHÔNG khớp nếu thiếu từ khóa phân biệt quan trọng
 - Frontend sẽ tự xử lý việc gán trang tiếp theo (sequential naming)
-- LUÔN trả về JSON format"""
+- LUÔN trả về JSON format
+
+🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)
+✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
+✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
+✅ KHÔNG đoán, KHÔNG sáng tạo, KHÔNG viết tắt tự do
+
+VÍ DỤ SAI:
+❌ "LCHO" (Lời chứng) → KHÔNG CÓ trong 98 mã → Phải trả về "UNKNOWN"
+❌ "VBCC" (Văn bản công chứng) → KHÔNG CÓ → Phải trả về "UNKNOWN"
+❌ "PKDT" (Phiếu kiểm tra đất) → KHÔNG CÓ → Phải trả về "UNKNOWN"
+
+→ CHỈ DÙNG MÃ TRONG DANH SÁCH 98 LOẠI PHÍA TRÊN!"""
     """
     System prompt for Vietnamese document classification
     IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency

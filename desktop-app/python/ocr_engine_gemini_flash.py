@@ -27,6 +27,9 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
     try:
         import requests
         
+        
+        # Determine model name
+        model_name = 'gemini-2.5-flash-lite' if model_type == 'gemini-flash-lite' else 'gemini-2.5-flash'
         # Read full image for position-aware analysis
         with Image.open(image_path) as img:
             width, height = img.size

@@ -31,9 +31,9 @@ def estimate_tokens_from_image_size(width, height, model_type='gemini-flash'):
     
     # Prompt tokens: Different for Flash vs Flash Lite
     if model_type == 'gemini-flash-lite':
-        prompt_tokens = 1000  # Simplified prompt
+        prompt_tokens = 1428  # Optimized prompt with critical special cases
     else:
-        prompt_tokens = 5600  # Full comprehensive prompt
+        prompt_tokens = 5632  # Full comprehensive prompt
     
     # Total input tokens
     input_tokens = image_tokens + prompt_tokens

@@ -107,8 +107,8 @@ def estimate_cost_per_page(width=3000, height=4000, model_type='gemini-flash',
         resize_applied = True
         reduction_percent = (1 - (final_width * final_height) / (width * height)) * 100
     
-    # Estimate tokens
-    tokens = estimate_tokens_from_image_size(final_width, final_height)
+    # Estimate tokens (with model-specific prompt tokens)
+    tokens = estimate_tokens_from_image_size(final_width, final_height, model_type)
     
     # Calculate cost
     cost = calculate_cost(tokens['input_tokens'], tokens['output_tokens'], model_type)

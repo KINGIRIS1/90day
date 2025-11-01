@@ -43,11 +43,21 @@ function CloudSettings() {
       const azure = await window.electronAPI.getApiKey('azure') || '';
       const azureEp = await window.electronAPI.getApiKey('azureEndpoint') || '';
       
+      // Load resize settings
+      const resizeEnabled = await window.electronAPI.getConfig('enableResize');
+      const resizeMaxWidth = await window.electronAPI.getConfig('maxWidth');
+      const resizeMaxHeight = await window.electronAPI.getConfig('maxHeight');
+      
       setOcrEngine(uiEngine);
       setGoogleKey(google);
       setGeminiKey(gemini);
       setAzureKey(azure);
       setAzureEndpoint(azureEp);
+      
+      // Set resize settings with defaults
+      setEnableResize(resizeEnabled !== null ? resizeEnabled : true);
+      setMaxWidth(resizeMaxWidth || 2000);
+      setMaxHeight(resizeMaxHeight || 2800);
     } catch (error) {
       console.error('Error loading settings:', error);
     }

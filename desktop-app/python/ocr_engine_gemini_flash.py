@@ -144,7 +144,6 @@ Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức tr
 Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
 
 🎯 PHÂN TÍCH VỊ TRÍ VĂN BẢN (POSITION-AWARE CLASSIFICATION)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚠️ CỰC KỲ QUAN TRỌNG: CHỈ PHÂN LOẠI DỰA VÀO TEXT Ở PHẦN ĐẦU TRANG!
 
@@ -239,7 +238,6 @@ Trang có "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" ở TOP (chữ lớn, IN HOA)
 → reasoning: "Main title at top in uppercase"
 
 ⚠️ QUAN TRỌNG - PHÂN BIỆT REFERENCE vs TITLE:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ❌ REFERENCES (bỏ qua khi classify):
 - "Căn cứ Giấy chứng nhận..."
@@ -265,7 +263,6 @@ Trang có "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" ở TOP (chữ lớn, IN HOA)
 - **NẰM CHUNG với các từ khác trên cùng dòng** (VD: "theo Giấy chứng nhận...", "...theo văn bản...")
 
 🎯 DẤU HIỆU NHẬN BIẾT TITLE (CỰC KỲ QUAN TRỌNG):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ TITLE phải NẰM ĐỘC LẬP:
 - **Mỗi dòng CHỈ có text của title, KHÔNG có text khác**
@@ -325,7 +322,6 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 - CHỈ classify dựa vào MAIN TITLE (không có số thứ tự, không có "Điều", "Phần")
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
@@ -341,7 +337,6 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
   • "...do...cấp ngày..." → Reference, không classify theo đây
 
 🎯 QUY TẮC NHẬN DIỆN FORM CODES:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 NẾU trang có "Mẫu số" hoặc form code ở TOP mà không có title rõ ràng:
 - "Mẫu số 17C" → TTHGD (Văn bản thỏa thuận QSDĐ hộ gia đình)
 - Các form khác → Xem keywords trong body để xác định
@@ -361,7 +356,6 @@ VÍ DỤ THỰC TẾ:
 ⚠️ BỎ QUA bất kỳ ảnh cá nhân nào - chỉ tập trung vào văn bản và con dấu chính thức.
 
 ⚠️ QUY TẮC KHỚP: CHO PHÉP ~85-90% TƯƠNG ĐỒNG!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ CHẤP NHẬN khi tiêu đề khớp 85-90% với danh sách
 ✅ CHO PHÉP lỗi chính tả nhỏ (ví dụ: "NHUỢNG" → "NHƯỢNG")
@@ -370,7 +364,6 @@ VÍ DỤ THỰC TẾ:
 ❌ KHÔNG khớp nếu thiếu từ khóa QUAN TRỌNG phân biệt loại
 
 ⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎯 TIÊU ĐỀ CHÍNH (Main Title):
 - Nằm Ở ĐẦU trang, TRÊN CÙNG
@@ -405,7 +398,6 @@ Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
 - → Trả về: UNKNOWN (Frontend sẽ tự động gán theo trang trước)
 
 🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
 
@@ -499,10 +491,8 @@ NẾU KHÔNG KHỚP ~85%+ → Trả về:
   - Trang 2, 3, 4...: Không có tiêu đề mới → Frontend sẽ tự động copy tên từ trang 1
   - CHỈ KHI thấy tiêu đề MỚI khớp ~85%+ → Mới đổi sang loại mới
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG" hoặc tương tự)
    "Hợp đồng ỦY QUYỀN" → HDUQ (PHẢI có "ỦY QUYỀN")
@@ -529,10 +519,8 @@ CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
    "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
    PHẢI phân biệt rõ!
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (KHỚP ~85-90%):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
 BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
@@ -671,7 +659,6 @@ VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
   (Variants: "PHÂN CHIA TÀI SẢN VỢ CHỒNG", "THỎA THUẬN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG")
 
 ⚠️ LƯU Ý ĐẶC BIỆT - DỄ NHẦM:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 
 1. TTHGD (Thỏa thuận hộ gia đình):
@@ -731,10 +718,8 @@ TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 
 ⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 QUY TRÌNH KIỂM TRA:
-━━━━━━━━━━━━━━━━━━
 1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
 2. Đọc tiêu đề đầy đủ
 3. Tìm trong danh sách có tên TƯƠNG TỰ ~85-90%?
@@ -756,7 +741,6 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - LUÔN trả về JSON format
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)
 ✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
 ✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
@@ -778,7 +762,6 @@ Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức tr
 Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
 🔍 Sau đó kiểm tra tiêu đề:
@@ -793,7 +776,6 @@ Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tíc
 ⚠️ BỎ QUA bất kỳ ảnh cá nhân nào - chỉ tập trung vào văn bản và con dấu chính thức.
 
 ⚠️ QUY TẮC NGHIÊM NGẶT: CHỈ CHẤP NHẬN KHI KHỚP 100% CHÍNH XÁC!
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ❌ KHÔNG được đoán hoặc chọn "gần giống"
 ❌ KHÔNG được bỏ qua từ khóa phân biệt
@@ -808,7 +790,6 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 }
 
 ⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎯 TIÊU ĐỀ CHÍNH (Main Title):
 - Nằm Ở ĐẦU trang, TRÊN CÙNG
@@ -823,7 +804,6 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 - Ghi chú cuối trang
 
 🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
 
@@ -847,7 +827,6 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
    → Trả về: GCNM (confidence: 0.8)
 
 ⚠️ CỰC KỲ QUAN TRỌNG - PHÂN BIỆT GCNM vs DDKBD:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ❌ KHÔNG NHẦM LẪN:
 
@@ -912,10 +891,8 @@ VÍ DỤ THỰC TẾ:
   - NGOẠI LỆ: Nếu trang có GCN continuation sections → Tự động nhận là GCNM
   - CHỈ KHI thấy tiêu đề MỚI khớp 100% → Mới đổi sang loại mới
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. "Hợp đồng CHUYỂN NHƯỢNG" → HDCQ (PHẢI có "CHUYỂN NHƯỢNG")
    "Hợp đồng ỦY QUYỀN" → HDUQ (PHẢI có "ỦY QUYỀN")
@@ -942,10 +919,8 @@ CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
    "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
    PHẢI phân biệt rõ!
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (CHỈ CHỌN KHI KHỚP CHÍNH XÁC):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
 BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
@@ -1084,10 +1059,8 @@ VĂN BẢN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG → PCTSVC
 
 ⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 QUY TRÌNH KIỂM TRA:
-━━━━━━━━━━━━━━━━━━
 1. Phân tích VỊ TRÍ của các text trong ảnh (TOP/MIDDLE/BOTTOM)
 2. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
 3. Đọc tiêu đề Ở TOP 30% (bỏ qua mentions ở MIDDLE/BOTTOM)
@@ -1112,7 +1085,6 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)
 ✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
 ✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"

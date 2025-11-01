@@ -942,51 +942,6 @@ CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
    "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
    PHẢI phân biệt rõ!
 
-📋 NHÓM 3: BIÊN BẢN (10 loại)
-BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN → BBBDG
-BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA → BBGD
-BIÊN BẢN CỦA HỘI ĐỒNG ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU → BBHDDK
-BIÊN BẢN KIỂM TRA NGHIỆM THU CÔNG TRÌNH XÂY DỰNG → BBNT
-BIÊN BẢN KIỂM TRA SAI SÓT TRÊN GIẤY CHỨNG NHẬN → BBKTSS
-BIÊN BẢN KIỂM TRA, XÁC MINH HIỆN TRẠNG SỬ DỤNG ĐẤT → BBKTHT
-BIÊN BẢN VỀ VIỆC KẾT THÚC CÔNG KHAI CÔNG BỐ DI CHÚC → BBKTDC
-BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI KẾT QUẢ KIỂM TRA HỒ SƠ ĐĂNG KÝ CẤP GCNQSD ĐẤT → KTCKCG
-BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI VỀ VIỆC MẤT GCNQSD ĐẤT → KTCKMG
-BIÊN LAI THU THUẾ SỬ DỤNG ĐẤT PHI NÔNG NGHIỆP → BLTT
-
-📋 NHÓM 4: GIẤY TỜ CÁ NHÂN (4 loại)
-CĂN CƯỚC CÔNG DÂN → CCCD
-GIẤY KHAI SINH → GKS
-GIẤY CHỨNG NHẬN KẾT HÔN → GKH
-DI CHÚC → DICHUC
-
-📋 NHÓM 5: GIẤY CHỨNG NHẬN (9 loại)
-GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN GẮN LIỀN VỚI ĐẤT → GCNM
-GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC (⚠️ NGẮN HƠN GCNM)
-GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
-GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
-GIẤY SANG NHƯỢNG ĐẤT → GSND
-GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
-  (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN", "PHIẾU BÁO")
-GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
-BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ (KQ) → GTLQ
-PHIẾU TIẾP NHẬN HỒ SƠ, PHIẾU KIỂM SOÁT QUÁ TRÌNH → GTLQ
-  ⚠️ KHÁC với "PHIẾU KIỂM TRA HỒ SƠ" (→ PKTHS)
-  - KIỂM SOÁT QUÁ TRÌNH = Monitor/Control process (→ GTLQ)
-  - KIỂM TRA HỒ SƠ = Check/Inspect documents (→ PKTHS)
-GIẤY ỦY QUYỀN → GUQ
-GIẤY XÁC NHẬN ĐĂNG KÝ LẦN ĐẦU → GXNDKLD
-GIẤY XIN PHÉP XÂY DỰNG → GPXD
-
-📋 NHÓM 6: HỢP ĐỒNG (7 loại) ⚠️ DỄ NHẦM
-HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT → HDCQ
-HỢP ĐỒNG ỦY QUYỀN → HDUQ
-HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT → HDTHC
-HỢP ĐỒNG THUÊ ĐẤT, ĐIỀU HỈNH HỢP ĐỒNG THUÊ ĐẤT → HDTD
-HỢP ĐỒNG THI CÔNG → HDTCO
-HỢP ĐỒNG MUA BÁN TÀI SẢN BÁN ĐẤU GIÁ → HDBDG
-HOÁ ĐƠN GIÁ TRỊ GIA TĂNG → hoadon
-
 📋 NHÓM 7: ĐƠN (15 loại) ⚠️ DỄ NHẦM
 ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDKBD (có "BIẾN ĐỘNG")
 ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK (không có "BIẾN ĐỘNG")

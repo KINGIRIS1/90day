@@ -11,6 +11,11 @@ function CloudSettings() {
   const [showGoogleGuide, setShowGoogleGuide] = useState(false);
   const [showGeminiGuide, setShowGeminiGuide] = useState(false);
   const [showAzureGuide, setShowAzureGuide] = useState(false);
+  
+  // Image resize settings
+  const [enableResize, setEnableResize] = useState(true);
+  const [maxWidth, setMaxWidth] = useState(2000);
+  const [maxHeight, setMaxHeight] = useState(2800);
 
   useEffect(() => {
     loadSettings();

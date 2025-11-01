@@ -93,6 +93,11 @@ function CloudSettings() {
         await window.electronAPI.saveApiKey({ provider: 'azure', apiKey: azureKey.trim() });
         await window.electronAPI.saveApiKey({ provider: 'azureEndpoint', apiKey: azureEndpoint.trim() });
       }
+      
+      // Save resize settings
+      await window.electronAPI.setConfig('enableResize', enableResize);
+      await window.electronAPI.setConfig('maxWidth', maxWidth);
+      await window.electronAPI.setConfig('maxHeight', maxHeight);
 
       alert('✅ Đã lưu cài đặt thành công!');
     } catch (error) {

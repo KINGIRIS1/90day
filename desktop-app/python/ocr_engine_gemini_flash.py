@@ -70,7 +70,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
             }]
         }
         
-        print(f"📡 Sending request to Gemini Flash...", file=sys.stderr)
+        print(f"📡 Sending request to {model_name}...", file=sys.stderr)
         
         # Send request (timeout 60s for large images)
         response = requests.post(

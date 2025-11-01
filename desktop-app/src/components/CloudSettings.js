@@ -477,11 +477,13 @@ function CloudSettings() {
       )}
 
       {/* Gemini Flash Setup */}
-      {ocrEngine === 'gemini-flash' && (
+      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-lite') && (
         <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span>🤖</span> Gemini Flash 2.0 API Key
-            <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded ml-2">RẺ NHẤT</span>
+            <span>🤖</span> Gemini {ocrEngine === 'gemini-flash-lite' ? '2.5 Flash Lite' : '2.5 Flash'} API Key
+            <span className={`text-white text-xs px-2 py-1 rounded ml-2 ${ocrEngine === 'gemini-flash-lite' ? 'bg-green-600' : 'bg-purple-600'}`}>
+              {ocrEngine === 'gemini-flash-lite' ? 'RẺ NHẤT - NHANH NHẤT' : 'ACCURACY CAO'}
+            </span>
           </h2>
 
           <div className="mb-4">

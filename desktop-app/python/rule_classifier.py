@@ -641,16 +641,29 @@ DOCUMENT_RULES = {
             "đơn đăng ký biến động", "biến động đất đai",
             "tài sản gắn liền", "đăng ký biến động",
             "đơn đăng ký biến động đất đai",
+            # Trang 2 DDKBD (KHÔNG phải GCNM)
+            "xác nhận của ủy ban nhân dân",
+            "xác nhận của ubnd",
+            "ủy ban nhân dân cấp xã",
+            "ủy ban nhân dân",
             # Không dấu (OCR thường bỏ dấu)
             "don dang ky bien dong", "bien dong dat dai",
             "tai san gan lien", "dang ky bien dong",
             "don dang ky bien dong dat dai",
+            "xac nhan cua uy ban nhan dan",
+            "xac nhan cua ubnd",
+            "uy ban nhan dan cap xa",
+            "uy ban nhan dan",
             # OCR common typos
             "dang ky bien dong", "bien dong",
             "đăng ký biến động đất",
             # Viết hoa (OCR thường đọc title là chữ hoa)
             "DON DANG KY BIEN DONG", "BIEN DONG DAT DAI",
-            "DANG KY BIEN DONG"
+            "DANG KY BIEN DONG",
+            "XÁC NHẬN CỦA ỦY BAN NHÂN DÂN",
+            "XÁC NHẬN CỦA UBND",
+            "ỦY BAN NHÂN DÂN CẤP XÃ",
+            "ỦY BAN NHÂN DÂN"
         ],
         "weight": 1.2,
         "min_matches": 1

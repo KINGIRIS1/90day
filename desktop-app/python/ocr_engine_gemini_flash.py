@@ -41,29 +41,35 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0):
             
             # Convert to base64
             img_byte_arr = io.BytesIO()
-            processed_img.save(img_byte_arr, format=img.format or 'PNG')
+            # Always encode PNG to avoid MIME mismatch
+            processed_img.save(img_byte_arr, format='PNG')
             image_content = img_byte_arr.getvalue()
         
         # Encode to base64
         encoded_image = base64.b64encode(image_content).decode('utf-8')
+        mime_type = "image/png"
         
         # Use direct REST API - v1beta is the standard API version
         # Model: gemini-2.5-flash (latest stable Flash model)
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
         
-        # Create request payload
+        # Create request payload (enforce JSON-only response and low temperature)
         payload = {
             "contents": [{
                 "parts": [
                     {"text": get_classification_prompt()},
                     {
                         "inline_data": {
-                            "mime_type": "image/png",
+                            "mime_type": mime_type,
                             "data": encoded_image
                         }
                     }
                 ]
-            }]
+            }],
+            "generationConfig": {
+                "temperature": 0.2,
+                "response_mime_type": "application/json"
+            }
         }
         
         print(f"📡 Sending request to Gemini Flash...", file=sys.stderr)

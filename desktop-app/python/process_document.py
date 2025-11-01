@@ -102,11 +102,26 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             from rule_classifier import classify_document_name_from_code
             import time
 
+            # Get resize settings from environment (set by Electron)
+            enable_resize = os.environ.get('ENABLE_RESIZE', 'true').lower() == 'true'
+            max_width = int(os.environ.get('MAX_WIDTH', '2000'))
+            max_height = int(os.environ.get('MAX_HEIGHT', '2800'))
+
             print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
+            if enable_resize:
+                print(f"💰 Smart resize enabled: max {max_width}x{max_height}px", file=sys.stderr)
             start_time = time.time()
 
-            # Pass model type to classifier
-            result = classify_document_gemini_flash(file_path, cloud_api_key, crop_top_percent=1.0, model_type=ocr_engine_type)
+            # Pass model type and resize settings to classifier
+            result = classify_document_gemini_flash(
+                file_path, 
+                cloud_api_key, 
+                crop_top_percent=1.0, 
+                model_type=ocr_engine_type,
+                enable_resize=enable_resize,
+                max_width=max_width,
+                max_height=max_height
+            )
 
             scan_time = time.time() - start_time
             print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)

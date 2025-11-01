@@ -284,9 +284,20 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     console.log(`Spawning: ${pyInfo.executable} ${args.map(a => (a === cloudApiKey ? '[API_KEY]' : a)).join(' ')}`);
 
     const pythonScriptDir = path.dirname(scriptPath);
+    
+    // Get resize settings from store
+    const enableResize = store.get('enableResize', true);
+    const maxWidth = store.get('maxWidth', 2000);
+    const maxHeight = store.get('maxHeight', 2800);
+    
     const child = spawn(pyInfo.executable, args, {
       cwd: pythonScriptDir,
-      env: buildPythonEnv({ GOOGLE_API_KEY: cloudApiKey || process.env.GOOGLE_API_KEY || '' }, pyInfo, pythonScriptDir)
+      env: buildPythonEnv({ 
+        GOOGLE_API_KEY: cloudApiKey || process.env.GOOGLE_API_KEY || '',
+        ENABLE_RESIZE: enableResize ? 'true' : 'false',
+        MAX_WIDTH: String(maxWidth),
+        MAX_HEIGHT: String(maxHeight)
+      }, pyInfo, pythonScriptDir)
     });
 
     let result = '';

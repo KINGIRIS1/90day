@@ -592,6 +592,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                 {typeof result.estimated_cost_usd === 'number' && (
                   <div className="mt-1 text-[11px] text-emerald-700">
                     Ước tính: ${result.estimated_cost_usd.toFixed(6)} {result.usage ? `(in ${result.usage.input_tokens || 0}, out ${result.usage.output_tokens || 0})` : ''}
+                    {result.resize_info && result.resize_info.resized && (
+                      <span className="ml-2 text-green-600" title={`Resized: ${result.resize_info.original_size} → ${result.resize_info.final_size}`}>
+                        📉 -{result.resize_info.reduction_percent}%
+                      </span>
+                    )}
                   </div>
                 )}
                 <div className="mt-2 p-2 bg-gray-50 border rounded"><InlineShortCodeEditor value={result.short_code} onChange={(newCode) => { setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r)); }} /></div>

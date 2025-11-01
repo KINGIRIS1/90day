@@ -58,7 +58,8 @@ function CloudSettings() {
         'offline-vietocr': 'vietocr',
         'google': 'google',
         'azure': 'azure',
-        'gemini-flash': 'gemini-flash'
+        'gemini-flash': 'gemini-flash',
+        'gemini-flash-lite': 'gemini-flash-lite'
       };
       
       const backendEngine = engineMapping[ocrEngine] || 'tesseract';

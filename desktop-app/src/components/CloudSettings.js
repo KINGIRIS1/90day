@@ -575,23 +575,82 @@ function CloudSettings() {
               <div className="mt-4 p-3 bg-purple-100 rounded">
                 <p className="font-semibold mb-2">💰 Chi phí Gemini {ocrEngine === 'gemini-flash-lite' ? 'Flash Lite' : 'Flash'}:</p>
                 {ocrEngine === 'gemini-flash-lite' ? (
-                  <ul className="space-y-1">
+                  <ul className="space-y-1 text-sm">
                     <li>✅ <strong>Free tier: 1,500 requests/ngày (45,000/tháng)</strong></li>
-                    <li>💵 <strong>Input: $0.10 per 1M tokens</strong></li>
-                    <li>💵 <strong>Output: $0.40 per 1M tokens</strong></li>
+                    <li>💵 Input: $0.10 per 1M tokens | Output: $0.40 per 1M tokens</li>
                     <li>⚡ <strong>Tốc độ: 0.5-1s (NHANH NHẤT)</strong></li>
-                    <li>🎯 <strong>Tiết kiệm 3x input, 6.3x output so với Flash thường</strong></li>
-                    <li>📊 Ví dụ: 1,000 documents → <strong>~$0.20</strong> (vs Flash: $0.60)</li>
+                    <li>🎯 Tiết kiệm 3x input, 6.3x output so với Flash thường</li>
                   </ul>
                 ) : (
-                  <ul className="space-y-1">
+                  <ul className="space-y-1 text-sm">
                     <li>✅ <strong>Free tier: 1,500 requests/ngày (45,000/tháng)</strong></li>
-                    <li>💵 <strong>Input: $0.30 per 1M tokens</strong></li>
-                    <li>💵 <strong>Output: $2.50 per 1M tokens</strong></li>
+                    <li>💵 Input: $0.30 per 1M tokens | Output: $2.50 per 1M tokens</li>
                     <li>🎯 <strong>Accuracy cao nhất: 93-97%</strong></li>
-                    <li>📊 Ví dụ: 1,000 documents → <strong>~$0.60</strong></li>
+                    <li>⚡ Tốc độ: 1-2s</li>
                   </ul>
                 )}
+                
+                <div className="mt-3 pt-3 border-t border-purple-200">
+                  <p className="font-semibold text-sm mb-2">📊 Bảng so sánh chi phí 1 trang:</p>
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-purple-200">
+                        <th className="text-left py-1">Kích thước ảnh</th>
+                        <th className="text-right py-1">+ Resize</th>
+                        <th className="text-right py-1">Không resize</th>
+                        <th className="text-right py-1">Tiết kiệm</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ocrEngine === 'gemini-flash-lite' ? (
+                        <>
+                          <tr className="border-b border-purple-100">
+                            <td className="py-1">2500x3500</td>
+                            <td className="text-right font-semibold text-green-700">$0.0013</td>
+                            <td className="text-right opacity-60">$0.0018</td>
+                            <td className="text-right text-green-600">24%</td>
+                          </tr>
+                          <tr className="border-b border-purple-100 bg-purple-50">
+                            <td className="py-1"><strong>3000x4000 ⭐</strong></td>
+                            <td className="text-right font-bold text-green-700">$0.0013</td>
+                            <td className="text-right opacity-60">$0.0022</td>
+                            <td className="text-right font-semibold text-green-600">40%</td>
+                          </tr>
+                          <tr>
+                            <td className="py-1">4000x5600</td>
+                            <td className="text-right font-semibold text-green-700">$0.0013</td>
+                            <td className="text-right opacity-60">$0.0036</td>
+                            <td className="text-right text-green-600">62%</td>
+                          </tr>
+                        </>
+                      ) : (
+                        <>
+                          <tr className="border-b border-purple-100">
+                            <td className="py-1">2500x3500</td>
+                            <td className="text-right font-semibold text-green-700">$0.0042</td>
+                            <td className="text-right opacity-60">$0.0054</td>
+                            <td className="text-right text-green-600">23%</td>
+                          </tr>
+                          <tr className="border-b border-purple-100 bg-purple-50">
+                            <td className="py-1"><strong>3000x4000 ⭐</strong></td>
+                            <td className="text-right font-bold text-green-700">$0.0041</td>
+                            <td className="text-right opacity-60">$0.0067</td>
+                            <td className="text-right font-semibold text-green-600">40%</td>
+                          </tr>
+                          <tr>
+                            <td className="py-1">4000x5600</td>
+                            <td className="text-right font-semibold text-green-700">$0.0042</td>
+                            <td className="text-right opacity-60">$0.0109</td>
+                            <td className="text-right text-green-600">62%</td>
+                          </tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                  <p className="text-xs text-gray-600 mt-2">
+                    ⭐ <strong>3000x4000</strong> = Kích thước scan điển hình (A4, 300 DPI)
+                  </p>
+                </div>
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded">
                 <p className="font-semibold mb-2">🤖 Ưu điểm AI Classification:</p>

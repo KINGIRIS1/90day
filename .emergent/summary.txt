@@ -1,49 +1,63 @@
 <analysis>
-The AI engineer's work primarily focused on resolving critical build and runtime issues for a desktop OCR application on Windows, especially concerning the integration of Python-based Gemini Flash AI. Initially, a Linux build was confirmed, but the user requested a Windows build, leading to the creation of manual build scripts and guides. The first major hurdle was the resulting Windows  being too small (84MB), indicating missing dependencies. This was traced to incorrect  configurations, necessitating multiple iterations of  and  settings.
+The trajectory details the AI engineer's work on a desktop OCR application, focusing on stabilizing the Windows Electron build and integrating Gemini Flash AI. Initially, the core challenge was addressing persistent Python dependency issues (, ) in production  builds that worked flawlessly in development mode. This led to extensive debugging of  configurations,  settings, and  management within .
 
-Despite configuration fixes, the application failed to scan files in production (installed ), consistently reporting  or . This revealed a profound difference between the development environment (where yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. worked) and the production build. The AI meticulously debugged Python version conflicts, incorrect Python script paths within the Electron build, and the failed attempt to bundle Python dependencies (), which inadvertently corrupted local  installations. The final proposed fix involves ensuring  correctly sets  for the production environment and cleaning up corrupted local Python packages from the source directory, thereby relying on system-wide Python installations. User frustration mounted due to recurring build issues and requests for simpler build methods and clarification on production environment specifics.
+The conversation then shifted to implementing user requirements: an all-in-one NSIS installer, dynamic system Python detection, robust Gemini Flash integration with API key management, and specific app metadata. This involved iterative fixes for build failures (,  path issues,  syntax), UI display problems (missing app logo), and runtime errors (missing Electron IPC handlers,  path). Recent efforts have concentrated on refining Gemini Flash OCR (addressing UNKNOWN results by correcting MIME types, enforcing JSON-only responses, and better parsing) and implementing cost tracking per scan, reflecting a transition from foundational build stability to feature refinement and usability.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land-related documents. Its core function is accurate classification and renaming using short codes, supporting single/batch scanning, history, PDF export, fuzzy matching, and keyword-based classification. A key feature is automatic title assignment for sequential documents with low confidence or no titles. The app offers various OCR engines: Tesseract, VietOCR, EasyOCR, and a Bring Your Own Key (BYOK) feature for Google Cloud Vision, Azure Computer Vision, and Gemini Flash. Cloud Boost (GPT-4 Vision) is available as a high-accuracy fallback. Recent refinements improved classification for GCNM continuation pages, differentiated similar document types (DDKBD, TTHGD, PCTSVC, PKTHS, GTLQ), and used Position-Aware and Standalone Text rules to distinguish titles from body text. A Batch Scan from List feature using Excel/CSV is a future requirement. The current work involved ensuring the Windows build and Gemini Flash OCR functionality are stable.
+The application is a desktop OCR scanner for Vietnamese land-related documents, designed for accurate classification and renaming. Key features include single/batch scanning, history, PDF export, fuzzy matching, keyword-based classification, and automatic title assignment for sequential documents. It supports multiple OCR engines (Tesseract, VietOCR, EasyOCR) and Bring Your Own Key (BYOK) for Google Cloud Vision, Azure Computer Vision, and Gemini Flash, with GPT-4 Vision as a high-accuracy fallback (Cloud Boost). Recent enhancements focused on improving classification for specific Vietnamese document types and utilizing Position-Aware and Standalone Text rules. The user explicitly requested an all-in-one NSIS (.exe) installer for Windows (x64), using system Python (3.10-3.12) with dynamic PYTHONPATH, enabling Gemini Flash AI, with , , and . The user also required displaying estimated costs per scan and total for batch scans using AI Studio Gemini API, and fixing UNKNOWN classification results.
 </product_requirements>
 
 <key_technical_concepts>
-- **Electron**: Desktop application framework for UI and IPC.
-- **React**: Frontend UI development.
-- **Python**: Backend for OCR, rule-based classification, and AI integration (Gemini Flash).
-- **Electron-builder**: Tool for packaging and building Electron applications.
-- **Position-Aware Classification**: AI prompt engineering based on text location.
-- **Standalone Text Rule**: Identifying titles by their isolated presentation.
-- **Python Environment Management**: Handling  with  and ,  for Electron.
+- **Electron**: Desktop application framework.
+- **React**: Frontend UI.
+- **Python**: Backend for OCR and AI (Gemini Flash).
+- **Electron-builder**: Packaging/building tool for Electron, including NSIS.
+- **NSIS**: Scriptable Windows installer system.
+- **Python Environment Management**: , , .
+- **Gemini Flash API**: AI for OCR and document classification, token-based pricing.
+- **IPC (Inter-Process Communication)**: Electron's mechanism for main/renderer process communication.
 </key_technical_concepts>
 
 <code_architecture>
-The application's architecture consists of a React frontend, an Electron desktop wrapper, and Python scripts for OCR and AI classification. The Python scripts are located within the Electron app's  directory in the production build.
+The application is structured into , , and  directories.
 
 
 
 -   ****:
-    -   **Summary**: Defines project metadata, scripts (, , ), and Electron-builder configuration.
-    -   **Changes**: Initially missing  and  from  array, leading to small build sizes.  setting was toggled between  and  for debugging.  config was added.  field was noted as missing.
+    -   **Summary**: Central configuration for Electron-builder, scripts, dependencies.
+    -   **Changes**:  field added. ,  configured.  array updated to include .  set to  with  architecture, ,  ().  points to .  now includes the  directory and potentially .  set to .  script added.
 -   ****:
-    -   **Summary**: Electron's main process, handles window creation, IPC, and spawning Python scripts. This is the source for .
-    -   **Changes**: Python script path resolution in  was modified to correctly locate scripts () when  is . Explicitly set  environment variable for spawned Python processes to include system site-packages.
+    -   **Summary**: Electron's main process, manages window lifecycle, IPC, and Python script execution.
+    -   **Changes**: Python script path resolution now uses  for production. Dynamic  is set by detecting system Python (3.12->3.11->3.10) via  and fetching  at runtime. Added IPC handlers for , , ,  to manage Cloud OCR API keys with . Updated  icon logic to use  from  in production. Proposed changes for robust cache pathing and single-instance lock.
 -   ****:
-    -   **Summary**: The compiled/production version of .
-    -   **Changes**: Synchronized with changes from .
+    -   **Summary**: Compiled version of .
+    -   **Changes**: Synchronized with  modifications.
 -   ****:
-    -   **Summary**: Python script implementing Gemini Flash AI OCR.
-    -   **Changes**: Model name was initially , then changed to  due to misdiagnosis by AI, then reverted back to . The exception handling was repeatedly modified to provide more detailed error messages, especially during debugging of dependency and   issues.
+    -   **Summary**: Python script for Gemini Flash AI OCR.
+    -   **Changes**: Modified to retrieve  (promptTokenCount, candidatesTokenCount) from Gemini API response. Forced image format to PNG and  to prevent MIME mismatches.  now includes  and  to enforce JSON-only output. Logic for parsing Gemini response updated to iterate through all  in  to find JSON. Prompt content refined to strictly demand JSON.
 -   ****:
-    -   **Summary**: Orchestrates document processing, calls specific OCR engines.
-    -   **Changes**: Modified to reflect the Python script arguments for OCR engine selection and API keys.
--   **New/Modified Build Scripts**: , , , , , , , , , , , , , , , , . These are temporary or guide files for the user to perform builds.
+    -   **Summary**: Orchestrates document processing and OCR engine calls.
+    -   **Changes**: Calculates  for Gemini Flash based on , , and rates from environment variables (, ). The estimated cost is returned in the JSON result.
+-   ****:
+    -   **Summary**: Main React component, handles routing and layout.
+    -   **Changes**: Updated the app logo display in the header to use  for correct path resolution in Electron builds. Requires  to be in .
+-   ****:
+    -   **Summary**: Handles document scanning and displays results.
+    -   **Changes**: Modified to display  and token counts (input, output) for individual scanned files when using Gemini Flash.
+-   ** (New File)**:
+    -   **Summary**: NSIS script for pre-installation Python checks.
+    -   **Changes**: Contains logic to check for Python 3.10-3.12 using  or Python 3.11.14 and shows a dialog if not found.
+-   ** (New File)**:
+    -   **Summary**: PowerShell script to clean up accidentally bundled Python package folders from .
+    -   **Changes**: Deletes directories like , , , , etc.
+-   ** (New/Modified File)**:
+    -   **Summary**: Build instructions for the NSIS installer on Windows.
+    -   **Changes**: Provides detailed steps for building, cleaning Python packages, and testing with logs.
 </code_architecture>
 
 <pending_tasks>
-- Implement the full logic for the all-in-one installer using .
+- Implement full logic for the all-in-one installer using . (Partially done, pre-check implemented, full custom installer logic in progress).
 - Fine-tune remaining document types in .
 - Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
 - Migrate or pin React/Webpack versions.
@@ -53,17 +67,26 @@ The application's architecture consists of a React frontend, an Electron desktop
 - Implement Parallel Local Processing for batch scanning.
 - Handle deep path length issues in the application.
 - Implement Batch Scan from List feature.
-- Address the slow startup of the app (initially attributed to , but not fully resolved).
+- Address the slow startup of the app.
+- Implement total cost for batch in UI (pending user confirmation from the last message).
+- Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
+- Implement a code patch for robust cache pathing and single-instance lock in .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was deep-diving into a persistent issue where the Electron application (built via ) could scan documents successfully in yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. mode but failed after installation (). The root cause was identified as a complex Python environment mismatch: the development environment used system-wide Python packages, while the production build's spawned Python process lacked access to these, leading to  and misleading Missing library: requests errors.
+Immediately before this summary, the AI engineer was focused on addressing persistent UNKNOWN classification results when using Gemini Flash OCR. The diagnosis pointed to issues in  related to:
+1.  **MIME type mismatch**: Images were being saved in one format (e.g., JPEG) but declared as another (PNG) to the API.
+2.  **Non-JSON-only prompt response**: Gemini model was not strictly returning JSON, causing parsing failures.
+3.  **Incomplete response parsing**: Only  was being checked, potentially missing JSON in other parts of the response.
 
-A previous attempt to bundle Python dependencies () into the  source folder inadvertently corrupted the  installation in the source, causing yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. to also fail subsequently. The most recent action was to explicitly add  to the environment variables when spawning Python from  to ensure the production build's Python process could locate globally installed dependencies. The AI has also suggested cleaning up the corrupted local  and other package folders from the source  directory as the immediate next step for the user, and has offered simpler build strategies like a portable build.
+To resolve this, the  file was modified to:
+-   **Enforce PNG format**: All images are now explicitly converted to PNG before base64 encoding, and  is correctly set to image/png.
+-   **Refine prompt and generation config**: The prompt was updated to strictly demand a single line of JSON, and  was set to  and  to encourage stable, JSON-only output.
+-   **Iterate through response parts**: The logic to extract text for JSON parsing now loops through all  to ensure the JSON content is found.
+
+Additionally, the AI engineer previously implemented the display of  and token counts (input/output) per scanned file in the  component, responding to the user's request for Gemini API cost visibility. The last user interaction was asking about current naming rules and document types, to which a detailed explanation was provided.
 </current_work>
 
 <optional_next_step>
-Instruct the user to delete the locally bundled Python package folders from  to resolve the  error in both dev and production.
+The next step is to get user confirmation for implementing the total cost for batch in the UI, as proposed in Chat Message 153.
 </optional_next_step>

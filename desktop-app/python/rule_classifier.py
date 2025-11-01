@@ -266,11 +266,20 @@ DOCUMENT_RULES = {
             "cộng hòa xã hội chủ nghĩa việt nam", "độc lập tự do hạnh phúc",
             "chi nhánh văn phòng đăng ký", "văn phòng đăng ký đất đai",
             "chứng nhan", "chứng nhận",
+            # GCN continuation page (trang 2)
+            "nội dung thay đổi và cơ sở pháp lý",
+            "xác nhận của cơ quan có thẩm quyền",
+            "xác nhận của cơ quan",
+            "thửa đất, nhà ở và tài sản khác",
             # Không dấu
             "giay chung nhan", "quyen su dung dat", "quyen so huu",
             "tai san gan lien", "cong hoa xa hoi chu nghia viet nam",
             "doc lap tu do hanh phuc", "van phong dang ky dat dai",
             "chung nhan",
+            "noi dung thay doi va co so phap ly",
+            "xac nhan cua co quan co tham quyen",
+            "xac nhan cua co quan",
+            "thua dat nha o va tai san khac",
             # Viết hoa (auto-generated)
             "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT",
             "GIẤY CHỨNG NHẬN",
@@ -281,7 +290,11 @@ DOCUMENT_RULES = {
             "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM",
             "ĐỘC LẬP TỰ DO HẠNH PHÚC",
             "CHI NHÁNH VĂN PHÒNG ĐĂNG KÝ",
-            "VĂN PHÒNG ĐĂNG KÝ ĐẤT ĐAI"
+            "VĂN PHÒNG ĐĂNG KÝ ĐẤT ĐAI",
+            "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ",
+            "XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN",
+            "XÁC NHẬN CỦA CƠ QUAN",
+            "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC"
         ],
         "weight": 1.5, "min_matches": 1
     },

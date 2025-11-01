@@ -11,7 +11,55 @@ from PIL import Image
 import io
 
 
-def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, model_type='gemini-flash'):
+def resize_image_smart(img, max_width=2000, max_height=2800):
+    """
+    Smart resize: Only resize if image exceeds max dimensions
+    Maintains aspect ratio
+    
+    Args:
+        img: PIL Image object
+        max_width: Maximum width in pixels
+        max_height: Maximum height in pixels
+        
+    Returns:
+        PIL Image object (resized or original)
+        dict: Resize info
+    """
+    width, height = img.size
+    
+    # Check if resize is needed
+    if width <= max_width and height <= max_height:
+        return img, {
+            "resized": False,
+            "original_size": f"{width}x{height}",
+            "final_size": f"{width}x{height}",
+            "reduction_percent": 0
+        }
+    
+    # Calculate resize ratio (maintain aspect ratio)
+    ratio_w = max_width / width
+    ratio_h = max_height / height
+    ratio = min(ratio_w, ratio_h)
+    
+    new_width = int(width * ratio)
+    new_height = int(height * ratio)
+    
+    # Use LANCZOS for high quality resize
+    resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    
+    reduction = (1 - (new_width * new_height) / (width * height)) * 100
+    
+    print(f"🔽 Image resized: {width}x{height} → {new_width}x{new_height} (-{reduction:.1f}% pixels)", file=sys.stderr)
+    
+    return resized_img, {
+        "resized": True,
+        "original_size": f"{width}x{height}",
+        "final_size": f"{new_width}x{new_height}",
+        "reduction_percent": round(reduction, 1)
+    }
+
+
+def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, model_type='gemini-flash', enable_resize=True, max_width=2000, max_height=2800):
     """
     Classify Vietnamese land document using Gemini Flash 2.0 AI with position awareness
     
@@ -20,6 +68,9 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         api_key: Google API key (BYOK)
         crop_top_percent: Percentage of top image to process (default 1.0 = 100% for accurate position analysis)
         model_type: 'gemini-flash' or 'gemini-flash-lite' (default: 'gemini-flash')
+        enable_resize: Enable smart resizing to reduce costs (default: True)
+        max_width: Maximum width for resize (default: 2000)
+        max_height: Maximum height for resize (default: 2800)
         
     Returns:
         dict: Classification result with short_code, confidence, reasoning, title_position
@@ -31,6 +82,7 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         # Determine model name
         model_name = 'gemini-2.5-flash-lite' if model_type == 'gemini-flash-lite' else 'gemini-2.5-flash'
         # Read full image for position-aware analysis
+        resize_info = {}
         with Image.open(image_path) as img:
             width, height = img.size
             
@@ -43,9 +95,16 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                 processed_img = img
                 print(f"🖼️ Processing full image: {width}x{height} (position-aware mode)", file=sys.stderr)
             
-            # Convert to base64
+            # Apply smart resize if enabled
+            if enable_resize:
+                processed_img, resize_info = resize_image_smart(processed_img, max_width, max_height)
+            
+            # Convert to base64 (use JPEG with quality 85 for better compression)
             img_byte_arr = io.BytesIO()
-            processed_img.save(img_byte_arr, format=img.format or 'PNG')
+            # Convert to RGB if needed (for JPEG)
+            if processed_img.mode in ('RGBA', 'LA', 'P'):
+                processed_img = processed_img.convert('RGB')
+            processed_img.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
             image_content = img_byte_arr.getvalue()
         
         # Encode to base64

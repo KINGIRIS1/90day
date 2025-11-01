@@ -212,6 +212,151 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         }
 
 
+def get_classification_prompt_lite():
+    """
+    OPTIMIZED prompt for Flash Lite - simpler, more direct, fewer tokens
+    Focuses on exact matching with minimal reasoning
+    Target: ~3500-4000 tokens (vs 5600 for full prompt)
+    """
+    return """🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
+
+📋 TÌM TIÊU ĐỀ Ở ĐẦU TRANG (TOP 30%):
+- Tìm text LỚN NHẤT, IN HOA, căn giữa
+- CHỈ phân loại theo tiêu đề ở đầu trang
+- BỎ QUA text ở giữa/cuối trang
+
+✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
+
+NHÓM 1 - GIẤY CHỨNG NHẬN:
+GCNM = Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất (MỚI - tiêu đề DÀI)
+GCNC = Giấy chứng nhận quyền sử dụng đất (CŨ - tiêu đề NGẮN)
+GCNB = Giấy chứng nhận bản sao
+GCNL = Giấy chứng nhận lãnh sự
+
+NHÓM 2 - HỢP ĐỒNG:
+HDCQ = Hợp đồng chuyển nhượng quyền sử dụng đất
+HDUQ = Hợp đồng ủy quyền
+HDGO = Hợp đồng góp vốn
+HDMB = Hợp đồng mua bán
+HDSD = Hợp đồng sử dụng
+HDTH = Hợp đồng cho thuê
+HDTG = Hợp đồng thế chấp
+HDTL = Hợp đồng tặng cho
+
+NHÓM 3 - ĐƠN:
+DDKBD = Đơn đăng ký biến động đất đai
+DXGCN = Đơn xin cấp giấy chứng nhận
+DXCMG = Đơn xin cấp lại giấy chứng nhận mất
+DXCHS = Đơn xin cấp lại giấy chứng nhận hỏng/sai
+DXDLT = Đơn xin điều lệ tổ chức
+DXMTQ = Đơn xin miễn thuế
+DXCMD = Đơn xin chuyển mục đích
+DXGD = Đơn xin giao đất
+DXTT = Đơn xin thuê đất
+DXTDSD = Đơn xin gia hạn thời hạn sử dụng đất
+
+NHÓM 4 - QUYẾT ĐỊNH:
+QDGD = Quyết định giao đất
+QDTT = Quyết định cho thuê đất
+QDCMD = Quyết định cho phép chuyển mục đích
+QDPH = Quyết định phê duyệt
+QDCG = Quyết định công nhận/cấp giấy
+QDTD = Quyết định thu hồi đất
+QDGT = Quyết định giá trị
+QDBT = Quyết định bồi thường
+
+NHÓM 5 - GIẤY:
+GUQ = Giấy ủy quyền
+GTLQ = Giấy tiếp nhận hồ sơ và hẹn trả kết quả
+GBD = Giấy biên nhận
+GCN = Giấy chứng nhận khác
+GTD = Giấy tờ đề nghị
+GXN = Giấy xác nhận
+GTK = Giấy tờ khác
+GCC = Giấy chứng tử (Chết)
+
+NHÓM 6 - BIÊN BẢN:
+BBND = Biên bản nghiệm thu
+BBKS = Biên bản kiểm kê
+BBTK = Biên bản thống kê
+BBTH = Biên bản tổng hợp
+BBDN = Biên bản định giá
+BBDG = Biên bản đo đạc
+BBGH = Biên bản giao nhận
+BBBT = Biên bản bàn giao
+BBHOP = Biên bản họp
+BBKK = Biên bản khác
+
+NHÓM 7 - BẢN:
+BVDS = Bản vẽ
+BSDD = Bản sao (duplicate)
+BCC = Bản cam đoan
+BDK = Bản đăng ký
+BKDK = Bản kê khai đất
+BGTVN = Bản giao thừa kế Việt Nam
+BGNNN = Bản giao thừa kế nước ngoài
+
+NHÓM 8 - SƠ ĐỒ:
+SDPT = Sơ đồ phân tích
+SDHV = Sơ đồ hiện trạng
+
+NHÓM 9 - PHIẾU:
+PKTHS = Phiếu kiểm tra hồ sơ
+PLYKDC = Phiếu lấy ý kiến dân cư
+PXNKQDD = Phiếu xác nhận kết quả đo đạc
+DKTC = Phiếu yêu cầu đăng ký biện pháp bảo đảm
+DKTD = Phiếu yêu cầu đăng ký thay đổi biện pháp bảo đảm
+DKXTC = Phiếu yêu cầu xóa đăng ký biện pháp bảo đảm
+QR = Quét mã QR
+
+NHÓM 10 - THÔNG BÁO:
+TBT = Thông báo thuế
+TBMG = Thông báo mất giấy
+TBCKCG = Thông báo công khai cấp giấy
+TBCKMG = Thông báo công khai mất giấy
+HTNVTC = Thông báo xác nhận hoàn thành nghĩa vụ tài chính
+TBCNBD = Thông báo cập nhật biến động
+CKDC = Thông báo công bố công khai di chúc
+HTBTH = Hoàn thành bồi thường hỗ trợ
+
+NHÓM 11 - TỜ:
+TKT = Tờ khai thuế
+TTr = Tờ trình về giao đất
+TTCG = Tờ trình về đăng ký đất đai
+
+NHÓM 12 - VĂN BẢN:
+CKTSR = Văn bản cam kết tài sản riêng
+VBCTCMD = Văn bản chấp thuận chuyển mục đích
+VBDNCT = Văn bản đề nghị chấp thuận chuyển nhượng
+PDPASDD = Văn bản đề nghị thẩm định phương án
+VBTK = Văn bản thỏa thuận phân chia di sản thừa kế
+TTHGD = Văn bản thỏa thuận hộ gia đình (Keyword: HỘ GIA ĐÌNH)
+CDLK = Văn bản chấm dứt quyền hạn chế đất liền kề
+HCLK = Văn bản xác lập quyền hạn chế đất liền kề
+VBTC = Văn bản từ chối nhận di sản
+PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
+
+⚠️ DỄ NHẦM:
+- GCNM vs GCNC: Tiêu đề DÀI (có "quyền sở hữu...") = GCNM, NGẮN = GCNC
+- TTHGD vs PCTSVC: Có "HỘ GIA ĐÌNH" = TTHGD, có "VỢ CHỒNG" = PCTSVC
+- VBTK vs TTHGD: Có "DI SẢN THỪA KẾ" = VBTK, có "HỘ GIA ĐÌNH" = TTHGD
+
+🔍 QUY TRÌNH:
+1. Tìm tiêu đề ở TOP 30% trang (chữ lớn, IN HOA, nổi bật)
+2. Khớp CHÍNH XÁC với 1 trong 98 loại trên
+3. NẾU KHÔNG khớp → Trả về "UNKNOWN"
+
+📤 TRẢ VỀ JSON:
+{
+  "short_code": "MÃ_CHÍNH_XÁC",
+  "confidence": 0.9,
+  "title_position": "top",
+  "reasoning": "Giải thích ngắn gọn"
+}
+
+❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!"""
+
+
 def get_classification_prompt():
     """
     System prompt for Vietnamese document classification

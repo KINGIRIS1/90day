@@ -669,30 +669,30 @@ function CloudSettings() {
                       <>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">100 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$0.13 (~130₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$0.085 (~85₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs font-bold">1,000 trang + resize:</span>
-                          <span className="text-xs font-bold text-green-700">~$1.30 (~1,300₫)</span>
+                          <span className="text-xs font-bold text-green-700">~$0.85 (~850₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">10,000 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$13 (~13,000₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$8.50 (~8,500₫)</span>
                         </div>
                       </>
                     ) : (
                       <>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">100 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$0.40 (~400₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$0.41 (~410₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs font-bold">1,000 trang + resize:</span>
-                          <span className="text-xs font-bold text-green-700">~$4.00 (~4,000₫)</span>
+                          <span className="text-xs font-bold text-green-700">~$4.10 (~4,100₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">10,000 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$40 (~40,000₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$41 (~41,000₫)</span>
                         </div>
                       </>
                     )}

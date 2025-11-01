@@ -421,27 +421,12 @@ Nếu trang KHÔNG có tiêu đề chính (title page), có thể có:
 3️⃣ CẢ HAI: "II. NỘI DUNG THAY ĐỔI" + "III. XÁC NHẬN CỦA CƠ QUAN"
    → PHẢI CÓ CẢ HAI sections (II và III)
    → NẾU CHỈ CÓ MỘT → UNKNOWN
-   → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.85)
-
 VÍ DỤ:
 
 ✅ ĐÚNG: Trang có CẢ HAI sections
-   - "Nội dung thay đổi và cơ sở pháp lý" (ở trên)
-   + "Xác nhận của cơ quan có thẩm quyền" (ở dưới)
-   → Trả về: GCNM (confidence: 0.85)
-
 ✅ ĐÚNG: Trang có "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
    → Standalone section, đủ để nhận GCNM
    → Trả về: GCNM (confidence: 0.85)
-
-✅ ĐÚNG: Trang có CẢ HAI sections "II. NỘI DUNG THAY ĐỔI" + "III. XÁC NHẬN CỦA CƠ QUAN"
-   → Format chuẩn của GCN trang 2
-   → Trả về: GCNM (confidence: 0.85)
-
-❌ SAI: Trang CHỈ có "Nội dung thay đổi..." NHƯNG KHÔNG có "Xác nhận cơ quan"
-   → Thiếu section bắt buộc
-   → Trả về: UNKNOWN
 
 ❌ SAI: Trang CHỈ có "II. NỘI DUNG THAY ĐỔI" NHƯNG KHÔNG có "III. XÁC NHẬN..."
    → Thiếu section III
@@ -456,9 +441,6 @@ VÍ DỤ:
 Trang 2+ của GCN thường có:
 
 ✅ CẢ HAI sections KẾT HỢP:
-- "Nội dung thay đổi và cơ sở pháp lý" + "Xác nhận của cơ quan"
-- "II. NỘI DUNG THAY ĐỔI..." + "III. XÁC NHẬN..."
-
 ✅ HOẶC standalone section:
 - "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
 - Bảng thông tin thửa đất (số hiệu, diện tích...)
@@ -475,10 +457,6 @@ VÍ DỤ CHẤP NHẬN:
 VÍ DỤ TỪ CHỐI:
 - Chỉ có section "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG" → UNKNOWN ❌
 - Body text mention "đăng ký biến động" → UNKNOWN ❌
-- Trang có "Nội dung thay đổi" nhưng không có title GCN → UNKNOWN ❌
-- "HỢP ĐỒNG" (không rõ loại) → UNKNOWN ❌
-- "QUYẾT ĐỊNH" (không rõ loại) → UNKNOWN ❌
-
 NẾU KHÔNG KHỚP ~85%+ → Trả về:
 {
   "short_code": "UNKNOWN",
@@ -811,31 +789,15 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
 
 1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"
    → Đây là trang 2 của GCNM
-   → PHẢI CÓ CẢ HAI: "Nội dung thay đổi" + "Cơ quan"
-   → Trả về: GCNM (confidence: 0.85)
-
 2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
-   → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.85)
-
 3️⃣ "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" (section II về thay đổi)
-   → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.8)
-
 4️⃣ "III. XÁC NHẬN CỦA CƠ QUAN" (PHẢI có từ "CƠ QUAN", KHÔNG phải "ỦY BAN NHÂN DÂN")
-   → Đây là trang 2 của GCNM
-   → Trả về: GCNM (confidence: 0.8)
-
 ⚠️ CỰC KỲ QUAN TRỌNG - PHÂN BIỆT GCNM vs DDKBD:
 
 ❌ KHÔNG NHẦM LẪN:
 
 GCNM (Giấy chứng nhận):
   ✅ "III. XÁC NHẬN CỦA CƠ QUAN"
-  ✅ "XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
-  → Keyword: "CƠ QUAN" (agency/authority)
-  → Thường là section III
-
 DDKBD (Đơn đăng ký biến động) - KHÔNG PHẢI GCN:
   ❌ "II. XÁC NHẬN CỦA ỦY BAN NHÂN DÂN CẤP XÃ"
   ❌ "XÁC NHẬN CỦA ỦY BAN NHÂN DÂN"
@@ -849,21 +811,12 @@ QUY TẮC:
 
 VÍ DỤ THỰC TẾ:
 
-✅ ĐÚNG: Trang có "Nội dung thay đổi và cơ sở pháp lý" + "Xác nhận của cơ quan"
-   → Có cả hai yếu tố của GCN
-   → Trả về: GCNM (confidence: 0.85)
-
 ✅ ĐÚNG: Trang có "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
    → Đặc trưng của GCN trang 2
    → Trả về: GCNM (confidence: 0.85)
 
 ✅ ĐÚNG: Trang có "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"
    → Format chuẩn của GCN trang 2
-   → Trả về: GCNM (confidence: 0.8)
-
-✅ ĐÚNG: Trang có "III. XÁC NHẬN CỦA CƠ QUAN"
-   → Format chuẩn của GCN trang 2
-   → Keyword: "CƠ QUAN"
    → Trả về: GCNM (confidence: 0.8)
 
 ❌ SAI: Trang có "II. XÁC NHẬN CỦA ỦY BAN NHÂN DÂN CẤP XÃ"
@@ -876,12 +829,6 @@ VÍ DỤ THỰC TẾ:
    → Trả về: UNKNOWN
 
 🔍 CÁC DẤU HIỆU NHẬN BIẾT GCN CONTINUATION:
-- Có section "Nội dung thay đổi và cơ sở pháp lý"
-- Có section "Xác nhận của CƠ QUAN" (KHÔNG phải "Ủy ban nhân dân")
-- Có section "Thửa đất, nhà ở và tài sản khác"
-- Có bảng thông tin thửa đất (số hiệu, diện tích, vị trí...)
-- Format dạng phiếu chính thức với các ô điền thông tin đất đai
-
 → NẾU THẤY NHỮNG SECTION NÀY (VỚI "CƠ QUAN") → TRẢ VỀ GCNM
 → NẾU THẤY "ỦY BAN NHÂN DÂN" → KHÔNG PHẢI GCNM → UNKNOWN
 

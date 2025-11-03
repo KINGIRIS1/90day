@@ -149,13 +149,60 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         print(f"📊 Response status: {response.status_code}", file=sys.stderr)
         
         if response.status_code != 200:
-            error_msg = f"API error {response.status_code}: {response.text[:200]}"
-            print(f"❌ {error_msg}", file=sys.stderr)
-            return {
-                "short_code": "ERROR",
-                "confidence": 0,
-                "reasoning": error_msg
-            }
+            error_text = response.text[:500]
+            
+            # Handle specific error cases
+            if response.status_code == 429:
+                # Rate limit exceeded
+                error_msg = "⚠️ VƯỢT QUÁ GIỚI HẠN REQUEST!\n\n"
+                
+                if "RATE_LIMIT_EXCEEDED" in error_text:
+                    error_msg += "🔥 Rate Limit: Quá nhiều requests trong thời gian ngắn\n"
+                    error_msg += "📌 Giải pháp:\n"
+                    error_msg += "  • Đợi 1-2 phút rồi thử lại\n"
+                    error_msg += "  • Giảm tốc độ scan (scan từng trang)\n"
+                elif "RESOURCE_EXHAUSTED" in error_text or "quota" in error_text.lower():
+                    error_msg += "📊 Free Tier hết quota (1,500 requests/ngày)\n"
+                    error_msg += "📌 Giải pháp:\n"
+                    error_msg += "  1. Đợi đến ngày mai (quota reset)\n"
+                    error_msg += "  2. Upgrade lên Paid tier tại: https://aistudio.google.com/\n"
+                    error_msg += "  3. Tạo API key mới với Gmail khác\n"
+                    error_msg += "  4. Dùng OCR offline (Tesseract/VietOCR) tạm thời\n"
+                else:
+                    error_msg += f"Chi tiết: {error_text}\n"
+                
+                print(f"❌ {error_msg}", file=sys.stderr)
+                return {
+                    "short_code": "ERROR",
+                    "confidence": 0,
+                    "reasoning": error_msg,
+                    "error_code": "RATE_LIMIT_EXCEEDED"
+                }
+            
+            elif response.status_code == 403:
+                error_msg = "🔐 API KEY KHÔNG HỢP LỆ hoặc BỊ KHÓA!\n"
+                error_msg += "📌 Giải pháp:\n"
+                error_msg += "  • Kiểm tra API key trong Settings\n"
+                error_msg += "  • Tạo API key mới tại: https://aistudio.google.com/\n"
+                error_msg += "  • Enable Generative Language API\n"
+                print(f"❌ {error_msg}", file=sys.stderr)
+                return {
+                    "short_code": "ERROR",
+                    "confidence": 0,
+                    "reasoning": error_msg,
+                    "error_code": "INVALID_API_KEY"
+                }
+            
+            else:
+                # Generic error
+                error_msg = f"API error {response.status_code}: {error_text}"
+                print(f"❌ {error_msg}", file=sys.stderr)
+                return {
+                    "short_code": "ERROR",
+                    "confidence": 0,
+                    "reasoning": error_msg,
+                    "error_code": f"HTTP_{response.status_code}"
+                }
         
         result_data = response.json()
         

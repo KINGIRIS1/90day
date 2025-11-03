@@ -52,6 +52,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   
   // Quota error handling
   const [quotaError, setQuotaError] = useState(null);
+  
+  // Rate limit control - delay between requests (ms)
+  const [requestDelay, setRequestDelay] = useState(1200); // Default 1.2s = 50 requests/min
 
   // Load config (guard electron)
   useEffect(() => {

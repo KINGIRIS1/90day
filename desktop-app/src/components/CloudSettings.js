@@ -696,9 +696,17 @@ function CloudSettings() {
                         </div>
                       </>
                     )}
-                    <p className="text-xs text-gray-500 italic mt-2">
-                      💡 Với Free tier (1,500 requests/ngày), bạn có thể scan miễn phí ~45,000 trang/tháng!
-                    </p>
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                      <p className="font-semibold mb-1">💡 Free Tier Limits:</p>
+                      <ul className="space-y-1 ml-3">
+                        <li>• <strong>1,500 requests/ngày</strong> (reset 0:00 UTC = 7:00 AM VN)</li>
+                        <li>• <strong>~60 requests/phút</strong> (rate limit)</li>
+                        <li>• <strong>45,000 requests/tháng</strong> miễn phí!</li>
+                      </ul>
+                      <p className="mt-2 text-yellow-700">
+                        ⚠️ Nếu vượt quota → Chuyển sang OCR Offline hoặc đợi reset!
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

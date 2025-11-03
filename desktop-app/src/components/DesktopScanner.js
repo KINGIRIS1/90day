@@ -185,6 +185,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const processOffline = async (file) => {
     try {
       const result = await window.electronAPI.processDocumentOffline(file.path);
+      
+      // Check for quota/rate limit errors
+      if (result && result.error && typeof result.error === 'string') {
+        if (result.error.includes('QUÁ GIỚI HẠN') || 
+            result.error_code === 'RATE_LIMIT_EXCEEDED' ||
+            result.error_code === 'INVALID_API_KEY') {
+          setQuotaError(result.error);
+          setProcessing(false);
+          return { success: false, error: result.error, method: 'quota_exceeded' };
+        }
+      }
+      
       return result;
     } catch (error) {
       return { success: false, error: error.message, method: 'offline_failed' };

@@ -467,6 +467,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   return (
     <div className="space-y-4">
+      {/* Quota Warning Modal */}
+      {quotaError && <QuotaWarning error={quotaError} />}
       {/* Tab Navigation */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="flex">

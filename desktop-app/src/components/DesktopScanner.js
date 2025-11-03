@@ -310,9 +310,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       let result = await processOffline(file);
       
       // 🔧 ADD DELAY: Tránh vượt Rate Limit (60 requests/phút)
-      // Delay 1.2s → Max 50 requests/phút (an toàn)
+      // User configurable delay để tránh rate limit
       if (i < filesToProcess.length - 1) { // Không delay ở file cuối
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        await new Promise(resolve => setTimeout(resolve, requestDelay));
       }
       
       if (stopRef.current) {

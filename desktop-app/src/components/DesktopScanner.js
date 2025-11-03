@@ -510,6 +510,37 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           {/* File Selection */}
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
             <h2 className="text-base font-semibold text-gray-900 mb-3">Quét File</h2>
+            
+            {/* Rate Limit Control */}
+            <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  ⏱️ Delay giữa các request (tránh Rate Limit):
+                </label>
+                <span className="text-sm font-bold text-blue-700">
+                  {requestDelay}ms = ~{Math.floor(60000 / (requestDelay + 1000))} requests/phút
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="3000"
+                step="100"
+                value={requestDelay}
+                onChange={(e) => setRequestDelay(parseInt(e.target.value))}
+                className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+                disabled={processing}
+              />
+              <div className="flex justify-between text-xs text-gray-600 mt-1">
+                <span>0ms (60/phút ⚠️)</span>
+                <span>1000ms (30/phút ✅)</span>
+                <span>2000ms (20/phút 🐢)</span>
+              </div>
+              <p className="text-xs text-gray-600 mt-2">
+                💡 <strong>Khuyến nghị:</strong> 1200ms (~50/phút) để tránh vượt limit 60 requests/phút
+              </p>
+            </div>
+            
             <div className="flex flex-wrap gap-2">
               <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
                 <span>📁</span><span>Chọn file</span>

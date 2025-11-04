@@ -457,13 +457,14 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
    - VBTK: Có "DI SẢN THỪA KẾ" (về inheritance)
 
 4. GTLQ vs PKTHS (QUAN TRỌNG):
-   ❌ SAI: Nhầm "Phiếu kiểm soát" với "Phiếu kiểm tra"
+   ❌ SAI: Nhầm "Phiếu kiểm soát" với "Phiếu kiểm tra/trình ký"
    ✅ ĐÚNG:
    - GTLQ: "PHIẾU KIỂM SOÁT QUÁ TRÌNH" hoặc "GIẤY TIẾP NHẬN HỒ SƠ"
      • Keywords: "hẹn trả", "kiểm soát quá trình", "giải quyết hồ sơ"
      • Có bảng tracking với chữ ký
-   - PKTHS: "PHIẾU KIỂM TRA HỒ SƠ"
-     • Keywords: "kiểm tra", "hồ sơ đầy đủ", "checklist"
+   - PKTHS: "PHIẾU KIỂM TRA HỒ SƠ" hoặc "PHIẾU TRÌNH KÝ HỒ SƠ"
+     • Keywords: "kiểm tra", "trình ký", "cấp giấy chứng nhận", "hồ sơ đầy đủ"
+     • Form inspection/review để trình ký
 
 5. REFERENCE vs TITLE:
    ❌ REFERENCE (BỎ QUA):

@@ -211,6 +211,10 @@ TITLE_TEMPLATES = {
 
 # NEW: Document type configuration with required title keywords
 DOCUMENT_TYPE_CONFIG = {
+    "GCN": {
+        "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "giay chung nhan", "chứng nhận"],
+        "weight": 1.6
+    },
     "GCNM": {
         "required_in_title": ["giấy chứng nhận", "GIẤY CHỨNG NHẬN", "giay chung nhan", "chứng nhận"],
         "weight": 1.5

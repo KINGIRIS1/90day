@@ -284,7 +284,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     if (gcnDocs.length === 0) {
       console.log('✅ No GCN documents found in batch');
-      return results;
+      return normalizedResults;
     }
     
     console.log(`📋 Found ${gcnDocs.length} GCN document(s) to process`);
@@ -305,7 +305,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         
         grouped[prefix].push({
           ...doc,
-          _originalIndex: results.indexOf(doc),
+          _originalIndex: normalizedResults.indexOf(doc),
           _certPrefix: prefix,
           _certNumber: parseInt(number, 10)
         });
@@ -315,7 +315,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`📊 Grouped into ${Object.keys(grouped).length} prefix(es):`, Object.keys(grouped));
     
     // Process each group
-    const updatedResults = [...results];
+    const updatedResults = [...normalizedResults];
     
     Object.entries(grouped).forEach(([prefix, docs]) => {
       if (docs.length === 1) {

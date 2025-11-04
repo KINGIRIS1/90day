@@ -827,7 +827,7 @@ function CloudSettings() {
                   <p className="text-xs text-gray-600">
                     📊 <strong>1,000 trang với resize:</strong><br/>
                     • Flash: ~$4.10 (tiết kiệm $2.67 so với không resize)<br/>
-                    • Flash Lite: ~$0.89 (tiết kiệm $0.89 so với không resize) 🎉
+                    • Flash Lite: ~$0.96 (tiết kiệm $0.95 so với không resize) 🎉
                   </p>
                 </div>
               </div>

@@ -565,7 +565,36 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 - Trang là form "ĐƠN ĐĂNG KÝ" nhưng classify thành GCNM
   → ❌ SAI! Phải là DDKBD (form khác certificate)
 
-❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!"""
+❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!
+
+📋 VÍ DỤ RESPONSE FORMAT:
+
+Example 1 - GCN Document:
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy và màu hồng",
+  "certificate_number": "DP 947330"
+}
+
+Example 2 - Non-GCN Document:
+{
+  "short_code": "HDCQ",
+  "confidence": 0.92,
+  "title_position": "top",
+  "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
+  "certificate_number": null
+}
+
+Example 3 - Unknown Document:
+{
+  "short_code": "UNKNOWN",
+  "confidence": 0.3,
+  "title_position": "middle",
+  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
+  "certificate_number": null
+}"""
 
 
 def get_classification_prompt():

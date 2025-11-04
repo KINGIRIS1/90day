@@ -748,6 +748,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         </div>
       )}
 
+      {/* GCN Post-Processing Status */}
+      {postProcessingStatus && (
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-sm p-4 border-2 border-green-200 animate-pulse">
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl">
+              {postProcessingStatus.startsWith('✅') ? '✅' : '🔄'}
+            </div>
+            <span className="text-gray-800 font-semibold text-lg">
+              {postProcessingStatus}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Paused State - File Scan */}
       {activeTab === 'files' && isPaused && remainingFiles.length > 0 && (
         <div className="bg-orange-50 rounded-xl shadow-sm p-4 border border-orange-200">

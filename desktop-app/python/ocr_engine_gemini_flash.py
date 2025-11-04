@@ -436,6 +436,15 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
      • Có QUỐC HUY, serial number
      • Layout: Giấy tờ chính thức, không có ô trống
 
+1b. TLBDDC vs GCNM (DỄ NHẦM):
+   ❌ SAI: Nhầm "Trích lục bản đồ" thành GCNM
+   ✅ ĐÚNG:
+   - TLBDDC: Title "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH"
+     • Là MAP EXTRACT (bản đồ với thửa đất)
+     • Visual: Có sơ đồ, ranh giới, tọa độ
+     • Keywords: "bản đồ", "trích lục", "ranh giới"
+   - GCNM: Là text document, không phải map
+
 2. GCNM vs GCNC:
    - GCNM: Tiêu đề DÀI "...quyền sở hữu nhà ở và tài sản..."
    - GCNC: Tiêu đề NGẮN "Giấy chứng nhận quyền sử dụng đất"

@@ -277,19 +277,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         return r;
       });
     
-    // STEP 2: Find all GCN documents with certificate numbers
-    const gcnDocs = normalizedResults.filter(r => 
-      r.short_code === 'GCN' && 
-      r.certificate_number && 
-      r.certificate_number.trim() !== ''
-    );
+    // STEP 2: Find all GCN documents
+    const allGcnDocs = normalizedResults.filter(r => r.short_code === 'GCN');
     
-    if (gcnDocs.length === 0) {
+    if (allGcnDocs.length === 0) {
       console.log('✅ No GCN documents found in batch');
       return normalizedResults;
     }
     
-    console.log(`📋 Found ${gcnDocs.length} GCN document(s) to process`);
+    console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
+    
+    // Separate GCNs with and without certificate numbers
+    const gcnDocs = allGcnDocs.filter(r => r.certificate_number && r.certificate_number.trim() !== '');
+    const gcnWithoutCert = allGcnDocs.filter(r => !r.certificate_number || r.certificate_number.trim() === '');
+    
+    console.log(`  📋 With certificate number: ${gcnDocs.length}`);
+    console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
     
     // Group by prefix (first 2 letters of certificate number)
     const grouped = {};

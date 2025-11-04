@@ -324,6 +324,10 @@ DDKBD = Đơn đăng ký biến động đất đai, tài sản gắn liền v�
   • Title: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI"
   • Keywords: "biến động", "nội dung biến động", "nhận chuyển nhượng"
   • Form có sections: thông tin người dùng đất, nội dung biến động, giấy tờ kèm theo
+DCK = Đơn cam kết, Giấy cam kết
+  • Title: "GIẤY CAM KẾT" hoặc "ĐƠN CAM KẾT"
+  • Variants: "GIẤY CAM KẾT\n(V/v chọn thửa đất...)", "ĐƠN CAM KẾT"
+  • Keywords: "cam kết", "xin cam kết"
 DXGCN = Đơn xin cấp giấy chứng nhận
 DXCMG = Đơn xin cấp lại giấy chứng nhận mất
 DXCHS = Đơn xin cấp lại giấy chứng nhận hỏng/sai

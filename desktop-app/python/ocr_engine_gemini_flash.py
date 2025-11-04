@@ -809,15 +809,20 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
    → Trả về: short_code = "GCN" (generic, không phải GCNM/GCNC)
    → BẮT BUỘC: Tìm số chứng nhận ở góc dưới
 
-📋 FORMAT SỐ GCN (3 LOẠI):
-   1. [2 chữ cái][6 số]: "DE 334187", "DP 947330" (cũ)
-   2. [2 chữ cái][8 số]: "AA 01085158" (mới)
-   3. [4 chữ cái][6 số]: "S6AQ 227162" (đặc biệt)
+📋 FORMAT SỐ GCN (2 LOẠI CHÍNH):
+   1. [2 chữ cái][6 số]: "DE 334187", "DP 947330" → GCNC (cũ, màu đỏ)
+   2. [2 chữ cái][8 số]: "AA 01085158" → GCNM (mới, màu hồng)
+   
+   ⚠️ Lưu ý: Nếu thấy [4 chữ cái][6 số] (ví dụ: "S6AB 227162")
+   → Đây là lỗi OCR (đọc nhầm "AB" thành "S6AB")
+   → Loại này thường là GCN màu đỏ → GCNC (cũ)
+   
    Vị trí: Góc dưới (bottom), thường bên phải
    
 ⚠️ QUY TẮC SO SÁNH:
    - 8 số vs 6 số → 8 số = GCNM (mới), 6 số = GCNC (cũ)
    - Cùng format → So sánh số thứ tự
+   - 4 chữ cái (lỗi OCR) → GCNC (cũ) by default
 
 ✅ RESPONSE ĐÚNG:
 {

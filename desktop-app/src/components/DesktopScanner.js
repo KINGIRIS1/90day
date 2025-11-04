@@ -326,9 +326,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           number = match[1];
           console.log(`⚠️ Certificate with no prefix: ${certNumber} → Default GCNC`);
         } else {
-          // Invalid format (likely "số vào sổ" with 5 digits)
-          console.log(`⚠️ Invalid certificate format (not 6/8 digits): ${certNumber} → Ignored`);
-          unrecognizedCerts.push(doc);
+          // Invalid format - identify what type
+          const digitMatch = certNumber.match(/\d+/);
+          const digitCount = digitMatch ? digitMatch[0].length : 0;
+          
+          let reason = 'unknown format';
+          if (digitCount === 5) {
+            reason = 'likely "số vào sổ" (5 digits)';
+          } else if (digitCount >= 10) {
+            reason = 'likely "mã vạch/barcode" (10+ digits)';
+          } else if (digitCount < 6) {
+            reason = 'too short (< 6 digits)';
+          } else {
+            reason = 'invalid format';
+          }
+          
+          console.log(`⚠️ Invalid certificate format (${reason}): ${certNumber} → Ignored`);
+          unrecognizedCerts.push({ ...doc, _invalidReason: reason });
           return; // Skip to next document
         }
       }

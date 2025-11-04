@@ -392,7 +392,11 @@ DKXTC = Phiếu yêu cầu xóa đăng ký biện pháp bảo đảm
 QR = Quét mã QR
 
 NHÓM 10 - THÔNG BÁO:
-TBT = Thông báo thuế
+TBT = Thông báo thuế (general tax notice)
+TBNT = Thông báo nộp tiền
+  • Title: "THÔNG BÁO NỘP TIỀN"
+  • Về nghĩa vụ tài chính đất đai
+  • Keywords: "nộp tiền", "nghĩa vụ tài chính", "thuế chuyển nhượng"
 TBMG = Thông báo mất giấy
 TBCKCG = Thông báo công khai cấp giấy
 TBCKMG = Thông báo công khai mất giấy

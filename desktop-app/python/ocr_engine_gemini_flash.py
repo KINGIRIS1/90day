@@ -304,17 +304,21 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 ✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
-GCNM = Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất (MỚI - tiêu đề DÀI)
-  • ⚠️ NHẬN DIỆN QUA SỐ GCN (bottom-right): [2 chữ cái][6 số]
-  • CASE A - Cùng 2 chữ: Chữ số đầu LẺ (1,3,5,7,9) → GCNM
-  • CASE B - Khác 2 chữ: Alphabet sau (AC > AB, DQ > DP) → GCNM
-  • Ví dụ: "DP 947330" (9 lẻ) → GCNM, "AB 123456" (1 lẻ) → GCNM
-GCNC = Giấy chứng nhận quyền sử dụng đất (CŨ - tiêu đề NGẮN)
-  • ⚠️ NHẬN DIỆN QUA SỐ GCN (bottom-right): [2 chữ cái][6 số]
-  • CASE A - Cùng 2 chữ: Chữ số đầu CHẴN (0,2,4,6,8) → GCNC
-  • CASE B - Khác 2 chữ: Alphabet trước (AB < AC, DP < DQ) → GCNC
-  • Ví dụ: "DP 817194" (8 chẵn) → GCNC, "AB 023456" (0 chẵn) → GCNC
-  • ⚠️ CHỈ áp dụng khi có: quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
+GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT)
+  • Title: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (dài hoặc ngắn)
+  • ⚠️ QUAN TRỌNG: KHÔNG phân loại GCNM/GCNC
+  • ⚠️ BẮT BUỘC: Tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
+  • Response: "GCN" + certificate_number: "DP 947330"
+  • Lý do: Frontend sẽ so sánh TẤT CẢ GCN trong batch, số nhỏ = cũ, số lớn = mới
+  • Example:
+    ```json
+    {
+      "short_code": "GCN",
+      "certificate_number": "DP 947330",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận với quốc huy và số GCN"
+    }
+    ```
 GCNB = Giấy chứng nhận bản sao
 GCNL = Giấy chứng nhận lãnh sự
 

@@ -452,6 +452,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     });
     
+    // Handle unrecognized certificate formats
+    if (unrecognizedCerts.length > 0) {
+      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with unrecognized certificate format:`);
+      unrecognizedCerts.forEach(doc => {
+        const index = normalizedResults.indexOf(doc);
+        // Default to GCNC (old) for unrecognized formats
+        updatedResults[index] = {
+          ...doc,
+          short_code: 'GCNC',
+          reasoning: `${doc.reasoning || 'GCN'} - Unrecognized certificate format (${doc.certificate_number}), defaulting to GCNC`,
+          gcn_classification_note: `📌 Unrecognized format (${doc.certificate_number}) → GCNC (default old)`
+        };
+        console.log(`  ✅ ${doc.certificate_number} → GCNC (unrecognized format)`);
+      });
+    }
+    
     // Handle GCN documents without certificate numbers
     if (gcnWithoutCert.length > 0) {
       console.log(`\n📄 Processing ${gcnWithoutCert.length} GCN(s) without certificate numbers:`);

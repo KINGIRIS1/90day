@@ -1354,9 +1354,9 @@ def parse_gemini_response(response_text):
                     short_code = 'UNKNOWN'
                 else:
                     # Sanitize short_code - remove invalid characters
-                    # Valid format: All uppercase letters, no special chars except underscore
+                    # Keep original case (some codes like TTr have lowercase)
                     original_code = short_code
-                    short_code = re.sub(r'[^A-Z0-9_]', '', short_code.upper())
+                    short_code = re.sub(r'[^A-Za-z0-9_]', '', short_code)
                     
                     if short_code != original_code:
                         print(f"⚠️ Sanitized short_code: '{original_code}' → '{short_code}'", file=sys.stderr)

@@ -294,42 +294,64 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`  📋 With certificate number: ${gcnDocs.length}`);
     console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
     
-    // Group by prefix - support formats:
-    // 1. [2 letters][6 numbers]: DE 334187 (old, red)
-    // 2. [2 letters][8 numbers]: AA 01085158 (new, pink)
-    // 3. [4 letters][6 numbers]: S6AB 227162 (OCR error, usually old red → GCNC)
+    // Group by prefix - support multiple formats:
+    // 1. [2 letters][6-8 numbers]: DE 334187, AA 01085158
+    // 2. [4 letters][6 numbers]: S6AB 227162 (OCR error → GCNC)
+    // 3. [numbers only]: 085914 (no prefix → GCNC default)
+    // 4. [letters][dot][numbers]: CN.03126 (normalize to CN 03126)
     const grouped = {};
+    const unrecognizedCerts = []; // Track unrecognized formats
+    
     gcnDocs.forEach((doc, originalIndex) => {
       const certNumber = doc.certificate_number.trim();
-      // Match all formats (2-4 letters to catch OCR errors)
-      const match = certNumber.match(/^([A-Z]{2,4})\s*(\d{6,8})$/i);
+      
+      // Try multiple patterns
+      let match = null;
+      let prefix = null;
+      let number = null;
+      
+      // Pattern 1: Standard [letters][space/dot][numbers]
+      match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{4,8})$/i);
       
       if (match) {
-        const prefix = match[1].toUpperCase();
-        const number = match[2];
-        const digitCount = number.length;
-        const letterCount = prefix.length;
-        const isOcrError = letterCount === 4; // 4 letters = OCR error (S6AB instead of AB)
-        
-        if (!grouped[prefix]) {
-          grouped[prefix] = [];
-        }
-        
-        grouped[prefix].push({
-          ...doc,
-          _originalIndex: normalizedResults.indexOf(doc),
-          _certPrefix: prefix,
-          _certNumber: parseInt(number, 10),
-          _digitCount: digitCount,
-          _letterCount: letterCount,
-          _isOcrError: isOcrError
-        });
-        
-        if (isOcrError) {
-          console.log(`⚠️ OCR error detected: ${certNumber} (4 letters) → Will classify as GCNC (old)`);
-        }
+        prefix = match[1].toUpperCase();
+        number = match[2];
       } else {
-        console.log(`⚠️ Certificate number format not recognized: ${certNumber}`);
+        // Pattern 2: Numbers only (no prefix)
+        match = certNumber.match(/^(\d{4,8})$/);
+        if (match) {
+          prefix = 'NO_PREFIX';
+          number = match[1];
+          console.log(`⚠️ Certificate with no prefix: ${certNumber} → Default GCNC`);
+        } else {
+          console.log(`⚠️ Certificate format not recognized: ${certNumber} → Default GCNC`);
+          unrecognizedCerts.push(doc);
+          return; // Skip to next document
+        }
+      }
+      
+      const digitCount = number.length;
+      const letterCount = prefix === 'NO_PREFIX' ? 0 : prefix.length;
+      const isOcrError = letterCount === 4; // 4 letters = OCR error
+      const hasNoPrefix = prefix === 'NO_PREFIX';
+      
+      if (!grouped[prefix]) {
+        grouped[prefix] = [];
+      }
+      
+      grouped[prefix].push({
+        ...doc,
+        _originalIndex: normalizedResults.indexOf(doc),
+        _certPrefix: prefix,
+        _certNumber: parseInt(number, 10),
+        _digitCount: digitCount,
+        _letterCount: letterCount,
+        _isOcrError: isOcrError,
+        _hasNoPrefix: hasNoPrefix
+      });
+      
+      if (isOcrError) {
+        console.log(`⚠️ OCR error detected: ${certNumber} (4 letters) → Will classify as GCNC`);
       }
     });
     

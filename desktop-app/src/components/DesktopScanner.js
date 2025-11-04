@@ -294,20 +294,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`  📋 With certificate number: ${gcnDocs.length}`);
     console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
     
-    // Group by prefix - support 3 formats:
-    // 1. [2 letters][6 numbers]: DE 334187
-    // 2. [2 letters][8 numbers]: AA 01085158
-    // 3. [4 letters][6 numbers]: S6AQ 227162
+    // Group by prefix - support formats:
+    // 1. [2 letters][6 numbers]: DE 334187 (old, red)
+    // 2. [2 letters][8 numbers]: AA 01085158 (new, pink)
+    // 3. [4 letters][6 numbers]: S6AB 227162 (OCR error, usually old red → GCNC)
     const grouped = {};
     gcnDocs.forEach((doc, originalIndex) => {
       const certNumber = doc.certificate_number.trim();
-      // Match all 3 formats
+      // Match all formats (2-4 letters to catch OCR errors)
       const match = certNumber.match(/^([A-Z]{2,4})\s*(\d{6,8})$/i);
       
       if (match) {
         const prefix = match[1].toUpperCase();
         const number = match[2];
         const digitCount = number.length;
+        const letterCount = prefix.length;
+        const isOcrError = letterCount === 4; // 4 letters = OCR error (S6AB instead of AB)
         
         if (!grouped[prefix]) {
           grouped[prefix] = [];
@@ -318,8 +320,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           _originalIndex: normalizedResults.indexOf(doc),
           _certPrefix: prefix,
           _certNumber: parseInt(number, 10),
-          _digitCount: digitCount
+          _digitCount: digitCount,
+          _letterCount: letterCount,
+          _isOcrError: isOcrError
         });
+        
+        if (isOcrError) {
+          console.log(`⚠️ OCR error detected: ${certNumber} (4 letters) → Will classify as GCNC (old)`);
+        }
       } else {
         console.log(`⚠️ Certificate number format not recognized: ${certNumber}`);
       }

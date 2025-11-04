@@ -1428,7 +1428,12 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
 - NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
 - NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
-- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning
+- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, certificate_number
+
+📋 CERTIFICATE_NUMBER (Chỉ cho GCN):
+- Nếu phân loại GCNM hoặc GCNC → Tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
+- Trả về trong field "certificate_number": "DP 947330" hoặc "AB 123456"
+- Nếu KHÔNG phải GCN → "certificate_number": null
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)

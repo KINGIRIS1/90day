@@ -4,28 +4,30 @@ Test script to verify GCN certificate number validation logic
 """
 
 def test_case_a_same_prefix():
-    """Test CASE A: Same 2 letters (EVEN/ODD rule)"""
+    """Test CASE A: Same 2 letters (First digit EVEN/ODD rule)"""
     print("=" * 70)
-    print("TEST CASE A: Same Prefix (EVEN/ODD Rule)")
+    print("TEST CASE A: Same Prefix (First Digit EVEN/ODD Rule)")
     print("=" * 70)
     
     test_cases = [
-        ("DP", "947330", "GCNM"),  # ODD
-        ("DP", "817194", "GCNC"),  # EVEN
-        ("AB", "123456", "GCNC"),  # EVEN
-        ("AB", "123457", "GCNM"),  # ODD
-        ("AC", "000000", "GCNC"),  # EVEN (0 is even)
-        ("AC", "000001", "GCNM"),  # ODD
-        ("ZZ", "999999", "GCNM"),  # ODD
-        ("AA", "888888", "GCNC"),  # EVEN
+        ("DP", "947330", "GCNM"),  # First digit = 9 (ODD)
+        ("DP", "817194", "GCNC"),  # First digit = 8 (EVEN)
+        ("AB", "123456", "GCNM"),  # First digit = 1 (ODD)
+        ("AB", "323456", "GCNM"),  # First digit = 3 (ODD)
+        ("AC", "000000", "GCNC"),  # First digit = 0 (EVEN)
+        ("AC", "100001", "GCNM"),  # First digit = 1 (ODD)
+        ("ZZ", "999999", "GCNM"),  # First digit = 9 (ODD)
+        ("AA", "888888", "GCNC"),  # First digit = 8 (EVEN)
+        ("BB", "456789", "GCNC"),  # First digit = 4 (EVEN)
+        ("CC", "567890", "GCNM"),  # First digit = 5 (ODD)
     ]
     
     passed = 0
     failed = 0
     
     for prefix, number, expected in test_cases:
-        number_int = int(number)
-        is_even = (number_int % 2 == 0)
+        first_digit = int(number[0])  # Get first digit
+        is_even = (first_digit % 2 == 0)
         predicted = "GCNC" if is_even else "GCNM"
         
         status = "✅ PASS" if predicted == expected else "❌ FAIL"
@@ -35,7 +37,7 @@ def test_case_a_same_prefix():
             failed += 1
             
         print(f"\n{prefix} {number}:")
-        print(f"  • Number: {number_int} ({'EVEN' if is_even else 'ODD'})")
+        print(f"  • First digit: {first_digit} ({'EVEN' if is_even else 'ODD'})")
         print(f"  • Predicted: {predicted}")
         print(f"  • Expected: {expected}")
         print(f"  • {status}")

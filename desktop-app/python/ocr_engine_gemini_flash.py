@@ -404,29 +404,42 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 ⚠️ DỄ NHẦM (CỰC KỲ QUAN TRỌNG):
 
-1. GCNM vs GCNC:
+1. DDKBD vs GCNM (QUAN TRỌNG NHẤT):
+   ❌ SAI: Nhầm "Đơn đăng ký biến động" thành GCNM
+   ✅ ĐÚNG:
+   - DDKBD: Title "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI"
+     • Là FORM đăng ký (có blank fields)
+     • Keywords: "Nội dung biến động", "Giấy tờ kèm theo"
+     • Layout: Form với các ô trống điền thông tin
+   - GCNM: Title "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..."
+     • Là CERTIFICATE (đã fill sẵn thông tin)
+     • Có QUỐC HUY, serial number
+     • Layout: Giấy tờ chính thức, không có ô trống
+
+2. GCNM vs GCNC:
    - GCNM: Tiêu đề DÀI "...quyền sở hữu nhà ở và tài sản..."
    - GCNC: Tiêu đề NGẮN "Giấy chứng nhận quyền sử dụng đất"
    - NẾU có QUỐC HUY + nền cam/vàng → GCNC
 
-2. TTHGD vs PCTSVC vs VBTK:
+3. TTHGD vs PCTSVC vs VBTK:
    - TTHGD: Có "HỘ GIA ĐÌNH" (không có "vợ chồng", không có "di sản")
    - PCTSVC: Có "VỢ CHỒNG" (không có "hộ gia đình")
    - VBTK: Có "DI SẢN THỪA KẾ" (về inheritance)
 
-3. GTLQ - PHIẾU TIẾP NHẬN (hay gặp):
+4. GTLQ - PHIẾU TIẾP NHẬN (hay gặp):
    - Có "GIẤY TIẾP NHẬN HỒ SƠ"
    - Có "HẸN TRẢ KẾT QUẢ"
    - Có bảng danh sách hồ sơ
    - → GTLQ (không phải UNKNOWN)
 
-4. REFERENCE vs TITLE:
+5. REFERENCE vs TITLE:
    ❌ REFERENCE (BỎ QUA):
    - "Căn cứ Giấy chứng nhận số..."
    - "Theo hợp đồng chuyển nhượng số..."
    - "...đã từ chối nhận di sản theo văn bản từ chối..."
    
    ✅ TITLE (DÙNG):
+   - "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG" (đứng riêng, IN HOA)
    - "HỢP ĐỒNG CHUYỂN NHƯỢNG" (đứng riêng, IN HOA)
    - "VĂN BẢN TỪ CHỐI NHẬN DI SẢN" (đứng riêng, title case)
 

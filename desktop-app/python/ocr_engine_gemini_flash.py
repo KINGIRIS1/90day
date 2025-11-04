@@ -912,6 +912,13 @@ CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
    "Hợp đồng ủy quyền" → HDUQ (là HỢP ĐỒNG ủy quyền)
    PHẢI phân biệt rõ!
 
+6. "BIÊN BẢN Xác minh thực địa/hiện trạng..." → BBKTHT
+   Variants:
+   - "BIÊN BẢN\nXác minh thực địa thửa đất..." → BBKTHT
+   - "BIÊN BẢN\nKiểm tra xác minh hiện trạng..." → BBKTHT
+   - "BIÊN BẢN\nXác minh hiện trạng sử dụng đất" → BBKTHT
+   ⚠️ Từ khóa: "XÁC MINH" + ("THỰC ĐỊA" hoặc "HIỆN TRẠNG") → BBKTHT
+
 
 DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (KHỚP ~85-90%):
 

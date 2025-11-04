@@ -453,6 +453,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setResults([...newResults]);
     }
 
+    // Post-process GCN documents after batch completion
+    console.log('🔄 Batch scan complete, post-processing GCN documents...');
+    const finalResults = postProcessGCNBatch(newResults);
+    setResults(finalResults);
+
     setProcessing(false);
   };
 

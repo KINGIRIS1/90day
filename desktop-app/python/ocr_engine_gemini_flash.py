@@ -462,8 +462,16 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 🎯 VÍ DỤ THỰC TẾ:
 
 ✅ ĐÚNG:
+- Trang có "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI" ở top
+  → {short_code: "DDKBD", title_position: "top", confidence: 0.95}
+  → Reasoning: "Đơn form, có blank fields, keyword 'biến động'"
+
 - Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở top, chữ lớn
   → {short_code: "HDCQ", title_position: "top", confidence: 0.9}
+
+- Trang có "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." + QUỐC HUY
+  → {short_code: "GCNM", confidence: 0.95}
+  → Reasoning: "Certificate với quốc huy, filled data"
 
 - Trang có section "III. THÔNG TIN VỀ THỬA ĐẤT", không có tiêu đề
   → {short_code: "GCNM", reasoning: "GCN continuation page"}
@@ -474,6 +482,9 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 - Trang có "HỢP ĐỒNG" ở giữa trang (middle)
   → {short_code: "UNKNOWN", title_position: "middle"}
+
+- Trang là form "ĐƠN ĐĂNG KÝ" nhưng classify thành GCNM
+  → ❌ SAI! Phải là DDKBD (form khác certificate)
 
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!"""
 

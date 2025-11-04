@@ -372,6 +372,9 @@ BBDG = Biên bản đo đạc
 BBGH = Biên bản giao nhận
 BBBT = Biên bản bàn giao
 BBHOP = Biên bản họp
+BBKTHT = Biên bản kiểm tra, xác minh hiện trạng
+  • Title: "BIÊN BẢN" + "Xác minh thực địa..." hoặc "Kiểm tra xác minh hiện trạng..."
+  • Variants: "xác minh thực địa", "xác minh hiện trạng"
 BBKK = Biên bản khác
 
 NHÓM 7 - BẢN:

@@ -257,6 +257,96 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     return result;
   };
 
+  // Post-process GCN documents after batch completion
+  const postProcessGCNBatch = (results) => {
+    console.log('🔄 Post-processing GCN batch...');
+    
+    // Find all GCN documents with certificate numbers
+    const gcnDocs = results.filter(r => 
+      r.short_code === 'GCN' && 
+      r.certificate_number && 
+      r.certificate_number.trim() !== ''
+    );
+    
+    if (gcnDocs.length === 0) {
+      console.log('✅ No GCN documents found in batch');
+      return results;
+    }
+    
+    console.log(`📋 Found ${gcnDocs.length} GCN document(s) to process`);
+    
+    // Group by prefix (first 2 letters of certificate number)
+    const grouped = {};
+    gcnDocs.forEach((doc, originalIndex) => {
+      const certNumber = doc.certificate_number.trim();
+      const match = certNumber.match(/^([A-Z]{2})\s*(\d{6})$/i);
+      
+      if (match) {
+        const prefix = match[1].toUpperCase();
+        const number = match[2];
+        
+        if (!grouped[prefix]) {
+          grouped[prefix] = [];
+        }
+        
+        grouped[prefix].push({
+          ...doc,
+          _originalIndex: results.indexOf(doc),
+          _certPrefix: prefix,
+          _certNumber: parseInt(number, 10)
+        });
+      }
+    });
+    
+    console.log(`📊 Grouped into ${Object.keys(grouped).length} prefix(es):`, Object.keys(grouped));
+    
+    // Process each group
+    const updatedResults = [...results];
+    
+    Object.entries(grouped).forEach(([prefix, docs]) => {
+      if (docs.length === 1) {
+        // Only 1 GCN with this prefix - classify as GCNC (default to old)
+        console.log(`📄 ${prefix}: Only 1 document, defaulting to GCNC`);
+        const doc = docs[0];
+        updatedResults[doc._originalIndex] = {
+          ...doc,
+          short_code: 'GCNC',
+          reasoning: `${doc.reasoning || 'GCN'} - Single certificate in batch (default: old format)`,
+          gcn_classification_note: '📌 Single GCN in batch → GCNC (default)'
+        };
+      } else {
+        // Multiple GCNs - sort by certificate number
+        const sorted = [...docs].sort((a, b) => a._certNumber - b._certNumber);
+        
+        console.log(`📊 ${prefix}: ${sorted.length} documents, sorting...`);
+        sorted.forEach((doc, idx) => {
+          console.log(`  ${idx + 1}. ${prefix} ${String(doc._certNumber).padStart(6, '0')} (index: ${doc._originalIndex})`);
+        });
+        
+        // Smallest number = GCNC (old), others = GCNM (new)
+        sorted.forEach((doc, idx) => {
+          const isOldest = (idx === 0);
+          const classification = isOldest ? 'GCNC' : 'GCNM';
+          const note = isOldest 
+            ? `📌 Smallest number in batch → GCNC (old format)`
+            : `📌 Larger than ${prefix} ${String(sorted[0]._certNumber).padStart(6, '0')} → GCNM (new format)`;
+          
+          console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(6, '0')} → ${classification} ${isOldest ? '(oldest)' : '(newer)'}`);
+          
+          updatedResults[doc._originalIndex] = {
+            ...doc,
+            short_code: classification,
+            reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${isOldest ? 'oldest' : 'newer'} in batch)`,
+            gcn_classification_note: note
+          };
+        });
+      }
+    });
+    
+    console.log('✅ GCN post-processing complete');
+    return updatedResults;
+  };
+
   // Progressive file processing (vừa quét vừa hiện)
   const handleProcessFiles = async (useCloudBoost = false, isResume = false) => {
     let filesToProcess = selectedFiles;

@@ -454,9 +454,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
 
     // Post-process GCN documents after batch completion
-    console.log('🔄 Batch scan complete, post-processing GCN documents...');
+    console.log('=' .repeat(70));
+    console.log('🔄 BATCH SCAN COMPLETE - POST-PROCESSING GCN DOCUMENTS');
+    console.log('=' .repeat(70));
+    console.log(`📊 Total files scanned: ${newResults.length}`);
+    console.log(`📋 GCN files found: ${newResults.filter(r => r.short_code === 'GCN').length}`);
+    
     const finalResults = postProcessGCNBatch(newResults);
-    setResults(finalResults);
+    
+    console.log('=' .repeat(70));
+    console.log('✅ POST-PROCESSING COMPLETE - UPDATING UI');
+    console.log('=' .repeat(70));
+    
+    // Force UI update
+    setResults([...finalResults]);
 
     setProcessing(false);
   };

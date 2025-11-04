@@ -1371,10 +1371,26 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
 - LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, certificate_number
 
-📋 CERTIFICATE_NUMBER (Chỉ cho GCN):
-- Nếu phân loại GCNM hoặc GCNC → Tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
+📋 CERTIFICATE_NUMBER (BẮT BUỘC CHO GCN):
+- ⚠️ Nếu phân loại "GCN" → BẮT BUỘC tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
 - Trả về trong field "certificate_number": "DP 947330" hoặc "AB 123456"
 - Nếu KHÔNG phải GCN → "certificate_number": null
+
+VÍ DỤ CHO GCN:
+✅ ĐÚNG:
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng",
+  "certificate_number": "DP 947330"
+}
+
+❌ SAI (không được trả về GCNM/GCNC):
+{
+  "short_code": "GCNM",  // ❌ SAI - phải là "GCN"
+  "confidence": 0.95
+}
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", ...)

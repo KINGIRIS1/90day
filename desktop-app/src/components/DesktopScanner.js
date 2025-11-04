@@ -360,6 +360,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     console.log('✅ GCN post-processing complete');
     return updatedResults;
+    } catch (error) {
+      console.error('❌ Error in GCN post-processing:', error);
+      console.error('Stack trace:', error.stack);
+      // Return original results if processing fails
+      return results;
+    }
   };
 
   // Progressive file processing (vừa quét vừa hiện)

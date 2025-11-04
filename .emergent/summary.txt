@@ -1,20 +1,23 @@
 <analysis>
-The trajectory chronicles the AI engineer's work on a desktop OCR application, starting with crucial stability fixes for the Windows Electron build and Python dependencies. Subsequent efforts focused on core feature implementation: an all-in-one NSIS installer, dynamic system Python detection, and Gemini Flash AI integration with cost tracking. A major challenge involved resolving UNKNOWN classification results from Gemini Flash, leading to iterative refinements in  for MIME types, JSON response enforcement, and comprehensive prompt expansion to include all 98 document types and specialized handling for forms like GTLQ. The AI engineer also added UI options for selecting between Gemini Flash and the more cost-effective Flash Lite, addressed issues where Flash Lite generated invalid codes by reinforcing prompt strictness, and significantly optimized the Flash prompt by deduplicating content and examples, achieving a 42.1% token reduction. The immediate next step, following user approval, is to implement smart image resizing to further reduce Gemini API costs without compromising accuracy.
+The previous AI engineer successfully transformed a desktop OCR application for Vietnamese land documents. Initial efforts stabilized the Windows Electron build and integrated Gemini Flash AI, including cost tracking and resolving UNKNOWN classifications through detailed prompt engineering. Significant work was dedicated to cost optimization via prompt deduplication (42.1% token reduction) and implementing smart image resizing with user-configurable settings.
+
+Key challenges involved fine-tuning classification for numerous Vietnamese document types, leading to iterative prompt refinements for Flash Lite, and robustly addressing API rate limits by adding a user-adjustable delay for sequential file processing. The engineer also provided comprehensive user education on Gemini API billing tiers and troubleshooting quota issues. The work culminated in fixing specific classification errors in Flash Lite, including adding visual recognition cues. The immediate next task, where the trajectory ended, is to resolve a case-sensitivity issue in document code validation for the TTr code.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, aiming for accurate classification and renaming. It supports single/batch scanning, history, PDF export, fuzzy matching, keyword classification, and automatic title assignment. It integrates various OCR engines (Tesseract, VietOCR, EasyOCR) and cloud-based options like Google Cloud Vision, Azure Computer Vision, and Gemini Flash, with GPT-4 Vision for Cloud Boost. Recent focus included enhancing classification for specific Vietnamese document types using Position-Aware and Standalone Text rules. User explicitly requested an all-in-one NSIS Windows x64 installer using system Python (3.10-3.12), enabling Gemini Flash AI with , , and . Critical requirements included displaying estimated costs per scan/batch for Gemini API, fixing UNKNOWN classifications (especially for GTLQ and specific text patterns like Nội dung thay đổi), providing an option to switch between Gemini Flash and Flash Lite, and optimizing prompt tokens and image size to reduce API costs while maintaining accuracy.
+The application is a desktop OCR scanner for Vietnamese land documents, designed to accurately classify and rename documents. It supports single and batch scanning, history management, PDF export, fuzzy matching, keyword classification, and automatic title assignment. It integrates multiple OCR engines including Tesseract, VietOCR, EasyOCR, and cloud-based solutions like Google Cloud Vision, Azure Computer Vision, and Gemini Flash (with GPT-4 Vision for Cloud Boost). Recent focus has been on improving classification for specific Vietnamese document types using Position-Aware and Standalone Text rules. Key user requests included an all-in-one NSIS Windows x64 installer using system Python (3.10-3.12), enabling Gemini Flash AI (AppName: 90dayChonThanh, Company: Nguyen Thin Trung, Version: 1.1.0), displaying estimated costs per scan/batch, fixing UNKNOWN classifications (especially for GTLQ and specific text patterns), providing a UI option to switch between Gemini Flash and Flash Lite, and optimizing prompt tokens and image size to reduce API costs while maintaining accuracy.
 </product_requirements>
 
 <key_technical_concepts>
-- **Electron**: Desktop application framework.
-- **React**: Frontend UI development.
-- **Python**: Backend for OCR processing and AI integration.
-- **Electron-builder**: Tool for packaging Electron apps, including NSIS installers.
-- **NSIS**: Windows installer system used for creating the  package.
-- **Python Environment Management**: Handling  and  for dynamic Python detection.
-- **Gemini Flash API**: Google's multimodal AI for OCR and classification, with token-based pricing.
-- **IPC (Inter-Process Communication)**: Electron's mechanism for communication between main and renderer processes.
+-   **Electron**: Desktop app framework.
+-   **React**: Frontend UI.
+-   **Python**: Backend for OCR and AI.
+-   **Electron-builder/NSIS**: Packaging Windows installers.
+-   **Python Environment Management**: Dynamic  detection.
+-   **Gemini Flash API**: Google's multimodal AI for OCR and classification, token-based pricing.
+-   **IPC**: Electron's inter-process communication.
+-   **Prompt Engineering**: Optimizing LLM inputs for specific tasks.
+-   **Image Processing**: Using PIL for resizing.
 </key_technical_concepts>
 
 <code_architecture>
@@ -23,46 +26,56 @@ The application is structured into , , and  directories.
 
 
 -   ****:
-    -   **Summary**: Central configuration for Electron-builder, scripts, dependencies.
-    -   **Changes**: , , ,  (including ),  (x64, productName, artifactName), ,  (python, icon.ico), ,  script were added or updated.
+    -   **Summary**: Configuration for Electron-builder, scripts.
+    -   **Changes**:  script added for Windows compatibility (yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.).
 -   ****:
-    -   **Summary**: Electron's main process, manages window lifecycle, IPC, and Python script execution.
-    -   **Changes**: Python script path resolution now uses  for production. Dynamic  is set by detecting system Python (3.12->3.11->3.10). Added IPC handlers for , , ,  using . Updated  icon logic to use  from . Critically, updated  to correctly pass the selected  (e.g., ) to the Python script.
+    -   **Summary**: Electron's main process, window management, IPC, Python execution.
+    -   **Changes**: Added IPC handlers for  and  to manage general settings, including image resizing and request delay. Updated  to pass , , , and  as environment variables to the Python script.
 -   ****:
     -   **Summary**: Compiled version of .
     -   **Changes**: Synchronized with  modifications.
 -   ****:
     -   **Summary**: Python script for Gemini Flash AI OCR and classification.
-    -   **Changes**: Initially modified to retrieve , enforce PNG image format (), set  to  and , and iterate through all  for JSON parsing. A user-provided file dramatically expanded  to include all 98 document codes, specific examples for GTLQ and GCNM continuation pages, and refined position-aware rules. The  function was updated to dynamically set the Gemini API URL based on the  argument ( or ). The prompt was later heavily optimized by deduplicating lists, examples, and decorative elements, resulting in a 42.1% token reduction.
+    -   **Changes**:
+        -   Added image resizing logic (using PIL) before sending to Gemini API, based on , ,  settings, returning .
+        -   Implemented two distinct prompt functions:  for Flash (full, detailed) and  for Flash Lite (optimized, concise).
+        -   Logic to dynamically select between these prompts based on .
+        -    was iteratively refined to include specific rule examples (e.g., DDKBD, GTLQ, PKTHS, PCT, GNT, TBT) and visual recognition hints (e.g., quốc huy) while avoiding new code creation, reverting .
+        -   Added error handling for API errors (rate limits, quota exhaustion).
+        -   **Current Issue**:  at line 1359 is forcing all codes to uppercase, causing a validation failure for codes like 'TTr' which are case-sensitive in the valid codes list.
 -   ****:
     -   **Summary**: Orchestrates document processing and OCR engine calls.
-    -   **Changes**: Calculates  based on tokens and environment variables. Modified  to accept and pass  to the OCR engine. Added validation to check if the  returned by Gemini is valid, preventing the model from generating unknown codes.
--   ****:
-    -   **Summary**: Contains the rule-based document classification logic.
-    -   **Changes**: Added specific keywords (e.g., xác nhận của cơ quan, xác nhận của ủy ban nhân dân) to its  to improve distinction between GCNM and DDKBD.
+    -   **Changes**: Modified  to accept and pass , , , and  to the OCR engine.
+-   ** (NEW)**:
+    -   **Summary**: New script to calculate and display estimated costs for different Gemini models (Flash, Flash Lite) with and without image resizing.
+    -   **Changes**: Created to provide a clear breakdown of pricing.
 -   ****:
     -   **Summary**: Main React component.
-    -   **Changes**: Updated the app logo display in the header to use  for correct path resolution.
+    -   **Changes**: App logo path updated to use .
 -   ****:
     -   **Summary**: Handles document scanning and displays results.
-    -   **Changes**: Modified to display  and token counts (input, output) for individual scanned files when using Gemini Flash.
+    -   **Changes**:
+        -   Now displays , token counts, and  for scanned files.
+        -   **Added  state and a UI slider** for users to configure delay between sequential scans.
+        -   Implemented a  function within the scan loop () to prevent rate limit issues, this was added to the existing sequential processing.
+        -   Integrated the new  component and updated error handling to show quota warnings.
 -   ****:
-    -   **Summary**: Manages cloud OCR engine settings, including API key and model selection.
-    -   **Changes**: Implemented UI with radio buttons to allow users to select between Gemini 2.5 Flash and Gemini 2.5 Flash Lite. The  and  logic was adjusted to store and retrieve the selected model type alongside the API key. Pricing descriptions were updated to reflect the cost differences.
--   ****:
-    -   **Summary**: NSIS script for pre-installation Python checks.
-    -   **Changes**: Contains logic to check for Python 3.10-3.12 versions.
--   ****:
-    -   **Summary**: PowerShell script to clean up accidentally bundled Python package folders.
-    -   **Changes**: New script to delete Python package directories (e.g., , ).
--   ****:
-    -   **Summary**: Build instructions for the NSIS installer on Windows.
-    -   **Changes**: Provides detailed steps for building and testing.
+    -   **Summary**: Manages cloud OCR engine settings, API key, and model selection.
+    -   **Changes**:
+        -   Implemented UI radio buttons for Gemini Flash/Flash Lite selection, storing selected model with API key.
+        -   **Added UI section for image resize settings**: enable/disable toggle, max width/height inputs.
+        -   Added UI for displaying the cost estimation table from .
+        -   Includes guidance on Gemini API quota management.
+-   ** (NEW)**:
+    -   **Summary**: New React component to display warnings about Gemini API rate limits or quota exhaustion.
+    -   **Changes**: Created to inform users about API limits and guide them on resolution.
+-   **New Markdown Files**: , , , , , ,  were created to document features and troubleshooting steps.
 </code_architecture>
 
 <pending_tasks>
 - Implement full logic for the all-in-one installer using .
-- Fine-tune remaining document types in .
+- Fine-tune remaining document types in  and .
 - Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
 - Migrate or pin React/Webpack versions.
 - Test the backend with 5-10 real images to validate Hybrid OCR.
@@ -72,16 +85,16 @@ The application is structured into , , and  directories.
 - Handle deep path length issues in the application.
 - Implement Batch Scan from List feature.
 - Address the slow startup of the app.
-- Implement total cost for batch in UI (pending user confirmation).
 - Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
 - Implement a code patch for robust cache pathing and single-instance lock in .
-- Create a separate, optimized prompt specifically for Flash Lite (as requested but not yet implemented).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was deep into cost optimization for the Gemini Flash OCR, primarily through prompt engineering. The user had observed higher-than-expected costs despite a significant discount on their Gemini Flash usage. The AI engineer previously performed extensive deduplication and consolidation of the classification prompt within . This included merging two different 98 document types lists, removing redundant decorative elements, and optimizing repeated GCNM continuation examples. This critical optimization successfully reduced the prompt's token count by 42.1% (from 9,723 to 5,632 tokens), leading to an estimated 42% cost saving for input tokens. The user confirmed the optimized prompt's accuracy. Following this, the discussion shifted to further cost reduction methods, specifically image resizing. The AI engineer analyzed the impact of image resizing on quality and cost, concluding that smart resizing (limiting dimensions while maintaining aspect ratio) would offer significant cost savings with minimal quality impact. The user has explicitly approved this approach.
+Immediately before this summary request, the AI engineer was diagnosing a classification error for the document code TTr (Tờ trình) when using Gemini Flash Lite. The user provided console logs indicating that Gemini returned TTr correctly, but the application's internal validation system was flagging it as an INVALID code TTR after sanitization.
+
+The AI engineer successfully identified the root cause: a line in  (specifically, ) was forcing all returned document codes to uppercase before validation. This caused a mismatch with the stored list of valid codes, which includes TTr with a lowercase 'r'. The problem is a case-sensitivity issue introduced by an aggressive sanitization step in the Python OCR engine. The fix needs to ensure that the sanitization process respects the expected casing for document codes or that the validation is case-insensitive.
 </current_work>
 
 <optional_next_step>
-Implement intelligent image resizing (e.g., max 2000x2800 pixels) for images sent to Gemini API to further reduce input token costs.
+Adjust the  sanitization logic in  to correctly handle case-sensitive document codes like TTr.
 </optional_next_step>

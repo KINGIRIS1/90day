@@ -522,7 +522,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
     }
 
-    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done' } : t));
+    // Post-process GCN documents for this child folder
+    console.log(`🔄 Child folder scan complete (${childPath}), post-processing GCN documents...`);
+    const finalChildResults = postProcessGCNBatch(childResults);
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
   };
 
   // Scan all child folders with pause support

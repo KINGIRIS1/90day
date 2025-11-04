@@ -1003,8 +1003,10 @@ GIẤY CHỨNG NHẬN KẾT HÔN → GKH
 DI CHÚC → DICHUC
 
 📋 NHÓM 5: GIẤY CHỨNG NHẬN (9 loại)
-GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT, QUYỀN SỞ HỮU TÀI SẢN GẮN LIỀN VỚI ĐẤT → GCNM
-GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → GCNC (⚠️ NGẮN HƠN GCNM)
+GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT (bất kỳ variant) → GCN
+  ⚠️ BẮT BUỘC: Tìm số GCN ở góc dưới (format: [2 chữ][6 số])
+  ⚠️ Trả về: "GCN" + certificate_number (ví dụ: "DP 947330")
+  ⚠️ Frontend sẽ xử lý batch để phân loại cũ/mới (GCNC/GCNM)
 GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
 GIẤY SANG NHƯỢNG ĐẤT → GSND

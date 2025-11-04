@@ -809,9 +809,15 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
    → Trả về: short_code = "GCN" (generic, không phải GCNM/GCNC)
    → BẮT BUỘC: Tìm số chứng nhận ở góc dưới
 
-📋 SỐ CHỨNG NHẬN FORMAT: [2 CHỮ CÁI] [6 CHỮ SỐ]
-   Ví dụ: "DE 334187", "DP 947330", "AB 123456"
+📋 FORMAT SỐ GCN (3 LOẠI):
+   1. [2 chữ cái][6 số]: "DE 334187", "DP 947330" (cũ)
+   2. [2 chữ cái][8 số]: "AA 01085158" (mới)
+   3. [4 chữ cái][6 số]: "S6AQ 227162" (đặc biệt)
    Vị trí: Góc dưới (bottom), thường bên phải
+   
+⚠️ QUY TẮC SO SÁNH:
+   - 8 số vs 6 số → 8 số = GCNM (mới), 6 số = GCNC (cũ)
+   - Cùng format → So sánh số thứ tự
 
 ✅ RESPONSE ĐÚNG:
 {

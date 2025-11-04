@@ -469,19 +469,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     });
     
-    // Handle invalid certificate formats (likely "số vào sổ", not real certificate)
+    // Handle invalid certificate formats (số vào sổ, mã vạch, etc.)
     if (unrecognizedCerts.length > 0) {
-      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with invalid certificate format (likely "số vào sổ"):`);
+      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with invalid certificate format:`);
       unrecognizedCerts.forEach(doc => {
         const index = normalizedResults.indexOf(doc);
+        const reason = doc._invalidReason || 'invalid format';
+        
         // Default to GCNC (old) for invalid formats
         updatedResults[index] = {
           ...doc,
           short_code: 'GCNC',
-          reasoning: `${doc.reasoning || 'GCN'} - Invalid certificate format (${doc.certificate_number}), likely "số vào sổ", defaulting to GCNC`,
-          gcn_classification_note: `📌 Invalid format (${doc.certificate_number}) - likely "số vào sổ" → GCNC (default old)`
+          reasoning: `${doc.reasoning || 'GCN'} - Invalid certificate format (${doc.certificate_number}), ${reason}, defaulting to GCNC`,
+          gcn_classification_note: `📌 Invalid format: ${reason} (${doc.certificate_number}) → GCNC (default)`
         };
-        console.log(`  ✅ ${doc.certificate_number} → GCNC (invalid format, likely "số vào sổ")`);
+        console.log(`  ✅ ${doc.certificate_number} → GCNC (${reason})`);
       });
     }
     

@@ -483,11 +483,26 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const gcnCount = newResults.filter(r => r.short_code === 'GCN' || r.short_code === 'GCNM' || r.short_code === 'GCNC').length;
     console.log(`📋 GCN/GCNM/GCNC files found: ${gcnCount}`);
     
+    // Show notification
+    if (gcnCount > 0) {
+      setPostProcessingStatus(`🔄 Đang phân loại ${gcnCount} GCN documents...`);
+    }
+    
     const finalResults = postProcessGCNBatch(newResults);
     
     console.log('======================================================================');
     console.log('✅ POST-PROCESSING COMPLETE - UPDATING UI');
     console.log('======================================================================');
+    
+    // Update notification
+    if (gcnCount > 0) {
+      const gcncCount = finalResults.filter(r => r.short_code === 'GCNC').length;
+      const gcnmCount = finalResults.filter(r => r.short_code === 'GCNM').length;
+      setPostProcessingStatus(`✅ Hoàn tất: ${gcncCount} GCNC, ${gcnmCount} GCNM`);
+      
+      // Clear after 5 seconds
+      setTimeout(() => setPostProcessingStatus(null), 5000);
+    }
     
     // Force UI update
     setResults([...finalResults]);

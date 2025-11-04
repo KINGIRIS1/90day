@@ -306,8 +306,11 @@ HDTH = Hợp đồng cho thuê
 HDTG = Hợp đồng thế chấp
 HDTL = Hợp đồng tặng cho
 
-NHÓM 3 - ĐƠN:
-DDKBD = Đơn đăng ký biến động đất đai
+NHÓM 3 - ĐƠN (APPLICATION FORMS):
+DDKBD = Đơn đăng ký biến động đất đai, tài sản gắn liền với đất
+  • Title: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI"
+  • Keywords: "biến động", "nội dung biến động", "nhận chuyển nhượng"
+  • Form có sections: thông tin người dùng đất, nội dung biến động, giấy tờ kèm theo
 DXGCN = Đơn xin cấp giấy chứng nhận
 DXCMG = Đơn xin cấp lại giấy chứng nhận mất
 DXCHS = Đơn xin cấp lại giấy chứng nhận hỏng/sai

@@ -2274,6 +2274,7 @@ def classify_by_rules(text: str, title_text: str = None, confidence_threshold: f
 def classify_document_name_from_code(short_code: str) -> str:
     """Get full document name from short code"""
     code_to_name = {
+        "GCN": "Giấy chứng nhận quyền sử dụng đất (Generic - sẽ phân loại sau batch)",
         "GCNM": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất",
         "GCNC": "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất (Bản chính)",
         "BMT": "Bản mô tả ranh giới, mốc giới thửa đất",

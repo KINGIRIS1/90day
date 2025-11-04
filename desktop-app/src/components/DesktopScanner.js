@@ -294,37 +294,40 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`  📋 With certificate number: ${gcnDocs.length}`);
     console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
     
-    // Group by prefix - support multiple formats:
-    // 1. [2 letters][6-8 numbers]: DE 334187, AA 01085158
-    // 2. [4 letters][6 numbers]: S6AB 227162 (OCR error → GCNC)
-    // 3. [numbers only]: 085914 (no prefix → GCNC default)
-    // 4. [letters][dot][numbers]: CN.03126 (normalize to CN 03126)
+    // Group by prefix - ONLY accept valid GCN certificate numbers:
+    // 1. [2 letters][6 numbers]: DE 334187 (old, red)
+    // 2. [2 letters][8 numbers]: AA 01085158 (new, pink)
+    // 3. [4 letters][6 numbers]: S6AB 227162 (OCR error → GCNC)
+    // 
+    // ⚠️ IGNORE 5-digit numbers (e.g., CS 09068, CN.03126)
+    // → These are "Số vào sổ cấp GCN", NOT real certificate numbers!
     const grouped = {};
-    const unrecognizedCerts = []; // Track unrecognized formats
+    const unrecognizedCerts = []; // Track unrecognized/invalid formats
     
     gcnDocs.forEach((doc, originalIndex) => {
       const certNumber = doc.certificate_number.trim();
       
-      // Try multiple patterns
+      // Try to match VALID certificate patterns
       let match = null;
       let prefix = null;
       let number = null;
       
-      // Pattern 1: Standard [letters][space/dot][numbers]
-      match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{4,8})$/i);
+      // Pattern 1: [2-4 letters][space/dot][6 or 8 digits ONLY]
+      match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{6}|\d{8})$/i);
       
       if (match) {
         prefix = match[1].toUpperCase();
         number = match[2];
       } else {
-        // Pattern 2: Numbers only (no prefix)
-        match = certNumber.match(/^(\d{4,8})$/);
+        // Pattern 2: [6 or 8 digits only] (no prefix)
+        match = certNumber.match(/^(\d{6}|\d{8})$/);
         if (match) {
           prefix = 'NO_PREFIX';
           number = match[1];
           console.log(`⚠️ Certificate with no prefix: ${certNumber} → Default GCNC`);
         } else {
-          console.log(`⚠️ Certificate format not recognized: ${certNumber} → Default GCNC`);
+          // Invalid format (likely "số vào sổ" with 5 digits)
+          console.log(`⚠️ Invalid certificate format (not 6/8 digits): ${certNumber} → Ignored`);
           unrecognizedCerts.push(doc);
           return; // Skip to next document
         }

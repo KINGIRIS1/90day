@@ -306,14 +306,14 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 NHÓM 1 - GIẤY CHỨNG NHẬN:
 GCNM = Giấy chứng nhận quyền sử dụng đất, quyền sở hữu nhà ở và tài sản khác gắn liền với đất (MỚI - tiêu đề DÀI)
   • ⚠️ NHẬN DIỆN QUA SỐ GCN (bottom-right): [2 chữ cái][6 số]
-  • CASE A - Cùng 2 chữ: Số LẺ (947330, 123457) → GCNM
+  • CASE A - Cùng 2 chữ: Chữ số đầu LẺ (1,3,5,7,9) → GCNM
   • CASE B - Khác 2 chữ: Alphabet sau (AC > AB, DQ > DP) → GCNM
-  • Ví dụ: "DP 947330" (lẻ) → GCNM, "AC 123456" (C > B) → GCNM
+  • Ví dụ: "DP 947330" (9 lẻ) → GCNM, "AB 123456" (1 lẻ) → GCNM
 GCNC = Giấy chứng nhận quyền sử dụng đất (CŨ - tiêu đề NGẮN)
   • ⚠️ NHẬN DIỆN QUA SỐ GCN (bottom-right): [2 chữ cái][6 số]
-  • CASE A - Cùng 2 chữ: Số CHẴN (817194, 123456) → GCNC
+  • CASE A - Cùng 2 chữ: Chữ số đầu CHẴN (0,2,4,6,8) → GCNC
   • CASE B - Khác 2 chữ: Alphabet trước (AB < AC, DP < DQ) → GCNC
-  • Ví dụ: "DP 817194" (chẵn) → GCNC, "AB 123456" (B < C) → GCNC
+  • Ví dụ: "DP 817194" (8 chẵn) → GCNC, "AB 023456" (0 chẵn) → GCNC
   • ⚠️ CHỈ áp dụng khi có: quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
 GCNB = Giấy chứng nhận bản sao
 GCNL = Giấy chứng nhận lãnh sự

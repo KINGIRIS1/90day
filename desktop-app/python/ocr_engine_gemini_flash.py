@@ -746,6 +746,47 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
+🎯 ƯU TIÊN 2: NHẬN DIỆN GCN DỰA VÀO SỐ GCN (BOTTOM RIGHT)
+
+⚠️ CHỈ ÁP DỤNG NẾU CÓ CẢ 3 ĐIỀU KIỆN:
+1. Có quốc huy Việt Nam ✅
+2. Có màu hồng/đỏ đặc trưng của GCN ✅
+3. Title có "GIẤY CHỨNG NHẬN" ✅
+
+📋 FORMAT SỐ GCN: [2 CHỮ CÁI] [6 CHỮ SỐ]
+   Vị trí: Góc dưới (bottom), thường bên phải
+   Ví dụ: "DP 947330", "AB 123456", "AC 000001"
+
+🔢 QUY TẮC PHÂN LOẠI:
+
+**CASE A - CÙNG 2 CHỮ CÁI (ví dụ: DP vs DP, AB vs AB):**
+   → Xét 6 CHỮ SỐ (even/odd):
+   • Số CHẴN (123456, 817194, 000000) → GCNC (cũ - ngắn)
+   • Số LẺ (123457, 947330, 000001) → GCNM (mới - dài)
+   
+   Ví dụ:
+   ✅ "DP 817194" → 817194 CHẴN → GCNC
+   ✅ "DP 947330" → 947330 LẺ → GCNM
+   ✅ "AB 123456" → 123456 CHẴN → GCNC
+   ✅ "AB 123457" → 123457 LẺ → GCNM
+
+**CASE B - KHÁC 2 CHỮ CÁI (ví dụ: AB vs AC, DP vs DQ):**
+   → Xét thứ tự ALPHABET:
+   • Alphabet ĐI TRƯỚC → GCNC (cũ - ngắn)
+   • Alphabet ĐI SAU → GCNM (mới - dài)
+   • Thứ tự: AA < AB < AC < AD < ... < ZZ
+   
+   Ví dụ:
+   ✅ "AB 123456" vs "AC 123456" → AB < AC → AB=GCNC, AC=GCNM
+   ✅ "DP 000000" vs "DQ 000000" → DP < DQ → DP=GCNC, DQ=GCNM
+   ✅ "AA 999999" → AA đầu tiên → GCNC
+   ✅ "ZZ 000001" → ZZ cuối cùng → GCNM
+
+⚠️ LƯU Ý QUAN TRỌNG:
+- KHÔNG áp dụng cho giấy tờ KHÔNG CÓ MÀU (đen trắng)
+- CHỈ áp dụng khi thấy quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
+- Số GCN OVERRIDE title text nếu conflict (số GCN chính xác hơn)
+
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
   • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" (AS TITLE, not reference) → GCNM (GCN mới - tiêu đề DÀI)
   • "Giấy chứng nhận quyền sử dụng đất" (AS TITLE, not reference) → GCNC (GCN cũ - tiêu đề NGẮN)

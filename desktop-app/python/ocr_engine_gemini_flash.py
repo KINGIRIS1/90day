@@ -334,6 +334,14 @@ QDBT = Quyết định bồi thường
 NHÓM 5 - GIẤY:
 GUQ = Giấy ủy quyền
 GTLQ = Giấy tiếp nhận hồ sơ và hẹn trả kết quả
+  • Title: "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ"
+  • Hoặc "PHIẾU KIỂM SOÁT QUÁ TRÌNH GIẢI QUYẾT HỒ SƠ"
+  • Keywords: "hồ sơ", "hẹn trả", "kiểm soát quá trình"
+  • Có bảng tracking hồ sơ
+GNT = Giấy nộp tiền vào ngân sách nhà nước
+  • Title: "GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC"
+  • Form ngân hàng (VietinBank, etc)
+  • Keywords: "ngân sách", "nộp tiền", "kho bạc"
 GBD = Giấy biên nhận
 GCN = Giấy chứng nhận khác
 GTD = Giấy tờ đề nghị

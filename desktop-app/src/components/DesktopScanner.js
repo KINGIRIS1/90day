@@ -259,21 +259,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   // Post-process GCN documents after batch completion
   const postProcessGCNBatch = (results) => {
-    console.log('🔄 Post-processing GCN batch...');
-    
-    // STEP 1: Convert any old GCNM/GCNC to GCN (Gemini sometimes still returns old codes)
-    const normalizedResults = results.map(r => {
-      if (r.short_code === 'GCNM' || r.short_code === 'GCNC') {
-        console.log(`🔄 Converting ${r.short_code} → GCN for file: ${r.fileName}`);
-        return {
-          ...r,
-          short_code: 'GCN',
-          original_short_code: r.short_code,
-          reasoning: `${r.reasoning || ''} (Normalized from ${r.short_code} to GCN for batch processing)`
-        };
-      }
-      return r;
-    });
+    try {
+      console.log('🔄 Post-processing GCN batch...');
+      
+      // STEP 1: Convert any old GCNM/GCNC to GCN (Gemini sometimes still returns old codes)
+      const normalizedResults = results.map(r => {
+        if (r.short_code === 'GCNM' || r.short_code === 'GCNC') {
+          console.log(`🔄 Converting ${r.short_code} → GCN for file: ${r.fileName}`);
+          return {
+            ...r,
+            short_code: 'GCN',
+            original_short_code: r.short_code,
+            reasoning: `${r.reasoning || ''} (Normalized from ${r.short_code} to GCN for batch processing)`
+          };
+        }
+        return r;
+      });
     
     // STEP 2: Find all GCN documents with certificate numbers
     const gcnDocs = normalizedResults.filter(r => 

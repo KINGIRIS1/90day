@@ -459,10 +459,18 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
      • Keywords: "bản vẽ", "trích lục", "đo tách", "chỉnh lý"
    - GCNM: Là text document, không phải map
 
-2. GCNM vs GCNC:
-   - GCNM: Tiêu đề DÀI "...quyền sở hữu nhà ở và tài sản..."
-   - GCNC: Tiêu đề NGẮN "Giấy chứng nhận quyền sử dụng đất"
-   - NẾU có QUỐC HUY + nền cam/vàng → GCNC
+2. GCNM vs GCNC (QUỐC HUY LÀ KEY):
+   ✅ GCNC (CŨ - có quốc huy):
+   - Có QUỐC HUY rõ ràng ở top center
+   - Nền màu cam/vàng/vintage
+   - Tiêu đề NGẮN: "Giấy chứng nhận quyền sử dụng đất"
+   - Layout: Classic, older style
+   
+   ✅ GCNM (MỚI - KHÔNG có quốc huy):
+   - KHÔNG có quốc huy (hoặc quốc huy rất nhỏ)
+   - Nền trắng/modern
+   - Tiêu đề DÀI: "...quyền sử dụng đất, quyền sở hữu nhà ở và tài sản gắn liền với đất"
+   - Layout: Modern, detailed sections
 
 3. TTHGD vs PCTSVC vs VBTK:
    - TTHGD: Có "HỘ GIA ĐÌNH" (không có "vợ chồng", không có "di sản")

@@ -769,15 +769,15 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 🔢 QUY TẮC PHÂN LOẠI:
 
 **CASE A - CÙNG 2 CHỮ CÁI (ví dụ: DP vs DP, AB vs AB):**
-   → Xét 6 CHỮ SỐ (even/odd):
-   • Số CHẴN (123456, 817194, 000000) → GCNC (cũ - ngắn)
-   • Số LẺ (123457, 947330, 000001) → GCNM (mới - dài)
+   → Xét CHỮ SỐ ĐẦU TIÊN của 6 chữ số (even/odd):
+   • Chữ số đầu CHẴN (0,2,4,6,8) → GCNC (cũ - ngắn)
+   • Chữ số đầu LẺ (1,3,5,7,9) → GCNM (mới - dài)
    
    Ví dụ:
-   ✅ "DP 817194" → 817194 CHẴN → GCNC
-   ✅ "DP 947330" → 947330 LẺ → GCNM
-   ✅ "AB 123456" → 123456 CHẴN → GCNC
-   ✅ "AB 123457" → 123457 LẺ → GCNM
+   ✅ "DP 817194" → Chữ số đầu = 8 (CHẴN) → GCNC
+   ✅ "DP 947330" → Chữ số đầu = 9 (LẺ) → GCNM
+   ✅ "AB 123456" → Chữ số đầu = 1 (LẺ) → GCNM
+   ✅ "AB 023456" → Chữ số đầu = 0 (CHẴN) → GCNC
 
 **CASE B - KHÁC 2 CHỮ CÁI (ví dụ: AB vs AC, DP vs DQ):**
    → Xét thứ tự ALPHABET:

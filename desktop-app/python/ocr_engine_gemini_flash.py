@@ -59,62 +59,6 @@ def resize_image_smart(img, max_width=2000, max_height=2800):
     }
 
 
-def validate_gcn_by_certificate_number(text_content, initial_classification):
-    """
-    Validate GCN classification (GCNM vs GCNC) based on certificate number at bottom
-    
-    Rules:
-    - Format: [2 letters][6 digits] (e.g., DP 947330, AB 123456)
-    - CASE A - Same 2 letters: Even number → GCNC, Odd number → GCNM
-    - CASE B - Different 2 letters: Alphabetical order determines old/new
-    
-    Args:
-        text_content: Full OCR text from document
-        initial_classification: Initial classification result from Gemini
-        
-    Returns:
-        str: Validated classification (GCNM or GCNC) or original if not GCN
-    """
-    import re
-    
-    # Only validate if initial classification is GCN-related
-    if initial_classification not in ['GCNM', 'GCNC']:
-        return initial_classification
-    
-    # Look for certificate number pattern at bottom (last 30% of text)
-    lines = text_content.split('\n')
-    bottom_lines = lines[-int(len(lines) * 0.3):] if len(lines) > 10 else lines
-    bottom_text = '\n'.join(bottom_lines)
-    
-    # Pattern: 2 letters + optional space + 6 digits
-    cert_pattern = r'\b([A-Z]{2})\s*(\d{6})\b'
-    matches = re.findall(cert_pattern, bottom_text, re.IGNORECASE)
-    
-    if not matches:
-        print(f"⚠️ No certificate number found, keeping initial: {initial_classification}", file=sys.stderr)
-        return initial_classification
-    
-    # Use the last match (most likely the certificate number)
-    letters, numbers = matches[-1]
-    letters = letters.upper()
-    
-    print(f"📋 Found certificate number: {letters} {numbers}", file=sys.stderr)
-    
-    # Validate: Check if number is even or odd
-    number_value = int(numbers)
-    is_even = (number_value % 2 == 0)
-    
-    validated_classification = 'GCNC' if is_even else 'GCNM'
-    
-    if validated_classification != initial_classification:
-        print(f"🔄 Certificate validation override: {initial_classification} → {validated_classification}", file=sys.stderr)
-        print(f"   Reason: Certificate {letters} {numbers} ({'EVEN' if is_even else 'ODD'}) → {validated_classification}", file=sys.stderr)
-    else:
-        print(f"✅ Certificate validation confirms: {validated_classification}", file=sys.stderr)
-    
-    return validated_classification
-
-
 def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, model_type='gemini-flash', enable_resize=True, max_width=2000, max_height=2800):
     """
     Classify Vietnamese land document using Gemini Flash 2.0 AI with position awareness

@@ -455,19 +455,19 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     });
     
-    // Handle unrecognized certificate formats
+    // Handle invalid certificate formats (likely "số vào sổ", not real certificate)
     if (unrecognizedCerts.length > 0) {
-      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with unrecognized certificate format:`);
+      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with invalid certificate format (likely "số vào sổ"):`);
       unrecognizedCerts.forEach(doc => {
         const index = normalizedResults.indexOf(doc);
-        // Default to GCNC (old) for unrecognized formats
+        // Default to GCNC (old) for invalid formats
         updatedResults[index] = {
           ...doc,
           short_code: 'GCNC',
-          reasoning: `${doc.reasoning || 'GCN'} - Unrecognized certificate format (${doc.certificate_number}), defaulting to GCNC`,
-          gcn_classification_note: `📌 Unrecognized format (${doc.certificate_number}) → GCNC (default old)`
+          reasoning: `${doc.reasoning || 'GCN'} - Invalid certificate format (${doc.certificate_number}), likely "số vào sổ", defaulting to GCNC`,
+          gcn_classification_note: `📌 Invalid format (${doc.certificate_number}) - likely "số vào sổ" → GCNC (default old)`
         };
-        console.log(`  ✅ ${doc.certificate_number} → GCNC (unrecognized format)`);
+        console.log(`  ✅ ${doc.certificate_number} → GCNC (invalid format, likely "số vào sổ")`);
       });
     }
     

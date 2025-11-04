@@ -138,6 +138,11 @@ EXACT_TITLE_MAPPING = {
 
 # Title templates for fuzzy matching (các mẫu title chuẩn)
 TITLE_TEMPLATES = {
+    "GCN": [
+        "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT",
+        "GIẤY CHỨNG NHẬN",
+        "GIAY CHUNG NHAN QUYEN SU DUNG DAT"
+    ],
     "GCNM": [
         "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT QUYỀN SỞ HỮU NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT",
         "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT",

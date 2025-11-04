@@ -44,6 +44,23 @@ function createWindow() {
 
   if (isDev) mainWindow.webContents.openDevTools();
 
+  // Handle close event with confirmation dialog
+  mainWindow.on('close', (e) => {
+    const choice = dialog.showMessageBoxSync(mainWindow, {
+      type: 'question',
+      buttons: ['Có', 'Không'],
+      title: 'Xác nhận thoát',
+      message: 'Bạn có chắc chắn muốn thoát ứng dụng?',
+      defaultId: 1,
+      cancelId: 1
+    });
+    
+    // If user clicks "Không" (No), prevent window from closing
+    if (choice === 1) {
+      e.preventDefault();
+    }
+  });
+
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 

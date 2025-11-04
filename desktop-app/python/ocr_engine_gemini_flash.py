@@ -789,8 +789,7 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 - NẾU không tìm thấy số GCN → certificate_number: null
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
-  • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" (AS TITLE, not reference) → GCNM (GCN mới - tiêu đề DÀI)
-  • "Giấy chứng nhận quyền sử dụng đất" (AS TITLE, not reference) → GCNC (GCN cũ - tiêu đề NGẮN)
+  • "Giấy chứng nhận quyền sử dụng đất..." (bất kỳ variant) → GCN (tìm certificate_number)
   • "Mẫu số 17C..." → TTHGD (Văn bản thỏa thuận hộ gia đình)
   • Form codes khác → Xem body content để xác định
 

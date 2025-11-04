@@ -304,21 +304,25 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 ✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
-GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT)
+🚨 GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT) 🚨
   • Title: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (dài hoặc ngắn)
-  • ⚠️ QUAN TRỌNG: KHÔNG phân loại GCNM/GCNC
-  • ⚠️ BẮT BUỘC: Tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
-  • Response: "GCN" + certificate_number: "DP 947330"
-  • Lý do: Frontend sẽ so sánh TẤT CẢ GCN trong batch, số nhỏ = cũ, số lớn = mới
-  • Example:
-    ```json
+  • ❌ TUYỆT ĐỐI KHÔNG trả về "GCNM" hoặc "GCNC" ❌
+  • ✅ CHỈ trả về "GCN" (generic)
+  • ⚠️ BẮT BUỘC: Tìm số chứng nhận ở góc dưới (format: [2 chữ cái][6 số])
+  • Response: "GCN" + certificate_number (ví dụ: "DE 334187", "DP 947330")
+  • Lý do: Frontend sẽ so sánh batch, số nhỏ = cũ, số lớn = mới
+  • ✅ ĐÚNG:
     {
       "short_code": "GCN",
-      "certificate_number": "DP 947330",
+      "certificate_number": "DE 334187",
       "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận với quốc huy và số GCN"
+      "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, số DE 334187"
     }
-    ```
+  • ❌ SAI (không bao giờ làm):
+    {
+      "short_code": "GCNM",  // ❌ Phải là "GCN"
+      ...
+    }
 GCNB = Giấy chứng nhận bản sao
 GCNL = Giấy chứng nhận lãnh sự
 

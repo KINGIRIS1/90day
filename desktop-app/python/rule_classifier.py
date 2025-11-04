@@ -265,8 +265,20 @@ DOCUMENT_TYPE_CONFIG = {
     },
 }
 
-# COMPLETE Document type rules - 95 types
+# COMPLETE Document type rules - 96 types (added GCN)
 DOCUMENT_RULES = {
+    "GCN": {
+        "keywords": [
+            # Generic GCN - will be classified to GCNC/GCNM after batch
+            "giấy chứng nhận quyền sử dụng đất", "giấy chứng nhận", "giầy chứng nhận",
+            "quyền sử dụng đất", "cộng hòa xã hội chủ nghĩa việt nam",
+            # Không dấu
+            "giay chung nhan quyen su dung dat", "giay chung nhan",
+            "quyen su dung dat", "cong hoa xa hoi chu nghia viet nam"
+        ],
+        "min_keywords": 2,
+        "confidence_boost": 0.05
+    },
     "GCNM": {
         "keywords": [
             # Có dấu

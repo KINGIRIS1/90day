@@ -1451,13 +1451,27 @@ def parse_gemini_response(response_text):
                         print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
                         short_code = 'UNKNOWN'
                 
-                return {
+                # Extract certificate_number if present (for GCN)
+                certificate_number = result.get('certificate_number', None)
+                if certificate_number and isinstance(certificate_number, str):
+                    certificate_number = certificate_number.strip()
+                    if certificate_number.lower() in ['null', 'none', 'n/a', '']:
+                        certificate_number = None
+                
+                response_dict = {
                     "short_code": short_code,
                     "confidence": float(result.get('confidence', 0)),
                     "reasoning": result.get('reasoning', 'AI classification'),
                     "title_position": result.get('title_position', 'unknown'),
                     "method": "gemini_flash_ai"
                 }
+                
+                # Add certificate_number if available
+                if certificate_number:
+                    response_dict["certificate_number"] = certificate_number
+                    print(f"📋 Certificate number extracted: {certificate_number}", file=sys.stderr)
+                
+                return response_dict
         
         # If no JSON found, try to extract from text
         print(f"⚠️ No JSON found, parsing text response", file=sys.stderr)

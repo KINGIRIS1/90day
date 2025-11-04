@@ -755,46 +755,38 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
-🎯 ƯU TIÊN 2: NHẬN DIỆN GCN DỰA VÀO SỐ GCN (BOTTOM RIGHT)
+🎯 ƯU TIÊN 2: NHẬN DIỆN GCN VÀ TRẢ VỀ SỐ CHỨNG NHẬN
 
-⚠️ CHỈ ÁP DỤNG NẾU CÓ CẢ 3 ĐIỀU KIỆN:
-1. Có quốc huy Việt Nam ✅
-2. Có màu hồng/đỏ đặc trưng của GCN ✅
-3. Title có "GIẤY CHỨNG NHẬN" ✅
+⚠️ QUY TẮC MỚI - BATCH POST-PROCESSING:
+- NẾU thấy Giấy chứng nhận (quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN")
+- → Trả về: short_code = "GCN" (KHÔNG phân biệt cũ/mới)
+- → BẮT BUỘC: Tìm và trả về certificate_number ở góc dưới
 
 📋 FORMAT SỐ GCN: [2 CHỮ CÁI] [6 CHỮ SỐ]
    Vị trí: Góc dưới (bottom), thường bên phải
    Ví dụ: "DP 947330", "AB 123456", "AC 000001"
 
-🔢 QUY TẮC PHÂN LOẠI:
+📤 RESPONSE FORMAT CHO GCN:
+```json
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng",
+  "certificate_number": "DP 947330"
+}
+```
 
-**CASE A - CÙNG 2 CHỮ CÁI (ví dụ: DP vs DP, AB vs AB):**
-   → Xét CHỮ SỐ ĐẦU TIÊN của 6 chữ số (even/odd):
-   • Chữ số đầu CHẴN (0,2,4,6,8) → GCNC (cũ - ngắn)
-   • Chữ số đầu LẺ (1,3,5,7,9) → GCNM (mới - dài)
-   
-   Ví dụ:
-   ✅ "DP 817194" → Chữ số đầu = 8 (CHẴN) → GCNC
-   ✅ "DP 947330" → Chữ số đầu = 9 (LẺ) → GCNM
-   ✅ "AB 123456" → Chữ số đầu = 1 (LẺ) → GCNM
-   ✅ "AB 023456" → Chữ số đầu = 0 (CHẴN) → GCNC
+⚠️ QUAN TRỌNG:
+- KHÔNG phân loại GCNM/GCNC ngay
+- Frontend sẽ so sánh TẤT CẢ GCN trong batch
+- Sau đó phân loại: Số NHỎ = cũ (GCNC), Số LỚN = mới (GCNM)
+- Điều này xử lý được trường hợp GCNM ở đầu, GCNC ở cuối batch
 
-**CASE B - KHÁC 2 CHỮ CÁI (ví dụ: AB vs AC, DP vs DQ):**
-   → Xét thứ tự ALPHABET:
-   • Alphabet ĐI TRƯỚC → GCNC (cũ - ngắn)
-   • Alphabet ĐI SAU → GCNM (mới - dài)
-   • Thứ tự: AA < AB < AC < AD < ... < ZZ
-   
-   Ví dụ:
-   ✅ "AB 123456" vs "AC 123456" → AB < AC → AB=GCNC, AC=GCNM
-   ✅ "DP 000000" vs "DQ 000000" → DP < DQ → DP=GCNC, DQ=GCNM
-   ✅ "AA 999999" → AA đầu tiên → GCNC
-   ✅ "ZZ 000001" → ZZ cuối cùng → GCNM
-
-⚠️ LƯU Ý QUAN TRỌNG:
+⚠️ LƯU Ý:
 - KHÔNG áp dụng cho giấy tờ KHÔNG CÓ MÀU (đen trắng)
 - CHỈ áp dụng khi thấy quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
-- Số GCN OVERRIDE title text nếu conflict (số GCN chính xác hơn)
+- NẾU không tìm thấy số GCN → certificate_number: null
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
   • "Giấy chứng nhận quyền sử dụng đất, quyền sở hữu tài sản gắn liền với đất" (AS TITLE, not reference) → GCNM (GCN mới - tiêu đề DÀI)

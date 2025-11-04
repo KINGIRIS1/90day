@@ -421,7 +421,7 @@ HTBTH = Hoàn thành bồi thường hỗ trợ
 
 NHÓM 11 - TỜ:
 TKT = Tờ khai thuế
-TTr = Tờ trình về giao đất
+TTr = Tờ trình về giao đất (⚠️ "TTr" với "r" viết thường)
 TTCG = Tờ trình về đăng ký đất đai
 
 NHÓM 12 - VĂN BẢN:

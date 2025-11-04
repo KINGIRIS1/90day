@@ -114,8 +114,8 @@ def test_real_world_examples():
         cert_parts = example["cert_number"].split()
         prefix = cert_parts[0]
         number = cert_parts[1]
-        number_int = int(number)
-        is_even = (number_int % 2 == 0)
+        first_digit = int(number[0])
+        is_even = (first_digit % 2 == 0)
         predicted = "GCNC" if is_even else "GCNM"
         
         status = "✅ PASS" if predicted == example["expected"] else "❌ FAIL"
@@ -123,7 +123,7 @@ def test_real_world_examples():
         print(f"\nExample {i}:")
         print(f"  • Certificate: {example['cert_number']}")
         print(f"  • Title: {example['title']}")
-        print(f"  • Number Analysis: {number_int} ({'EVEN' if is_even else 'ODD'})")
+        print(f"  • First digit: {first_digit} ({'EVEN' if is_even else 'ODD'})")
         print(f"  • Predicted: {predicted}")
         print(f"  • Expected: {example['expected']}")
         print(f"  • Reason: {example['reason']}")

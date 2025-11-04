@@ -342,31 +342,55 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           gcn_classification_note: '📌 Single GCN in batch → GCNC (default)'
         };
       } else {
-        // Multiple GCNs - sort by certificate number
-        const sorted = [...docs].sort((a, b) => a._certNumber - b._certNumber);
+        // Multiple GCNs - check if same format or mixed format
+        const digitCounts = [...new Set(docs.map(d => d._digitCount))];
         
-        console.log(`📊 ${prefix}: ${sorted.length} documents, sorting...`);
-        sorted.forEach((doc, idx) => {
-          console.log(`  ${idx + 1}. ${prefix} ${String(doc._certNumber).padStart(6, '0')} (index: ${doc._originalIndex})`);
-        });
-        
-        // Smallest number = GCNC (old), others = GCNM (new)
-        sorted.forEach((doc, idx) => {
-          const isOldest = (idx === 0);
-          const classification = isOldest ? 'GCNC' : 'GCNM';
-          const note = isOldest 
-            ? `📌 Smallest number in batch → GCNC (old format)`
-            : `📌 Larger than ${prefix} ${String(sorted[0]._certNumber).padStart(6, '0')} → GCNM (new format)`;
+        if (digitCounts.length === 1) {
+          // Same format - sort by number
+          const sorted = [...docs].sort((a, b) => a._certNumber - b._certNumber);
           
-          console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(6, '0')} → ${classification} ${isOldest ? '(oldest)' : '(newer)'}`);
+          console.log(`📊 ${prefix}: ${sorted.length} documents, same format (${digitCounts[0]} digits), sorting...`);
+          sorted.forEach((doc, idx) => {
+            console.log(`  ${idx + 1}. ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} (index: ${doc._originalIndex})`);
+          });
           
-          updatedResults[doc._originalIndex] = {
-            ...doc,
-            short_code: classification,
-            reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${isOldest ? 'oldest' : 'newer'} in batch)`,
-            gcn_classification_note: note
-          };
-        });
+          // Smallest number = GCNC (old), others = GCNM (new)
+          sorted.forEach((doc, idx) => {
+            const isOldest = (idx === 0);
+            const classification = isOldest ? 'GCNC' : 'GCNM';
+            const note = isOldest 
+              ? `📌 Smallest number in batch → GCNC (old format)`
+              : `📌 Larger than ${prefix} ${String(sorted[0]._certNumber).padStart(sorted[0]._digitCount, '0')} → GCNM (new format)`;
+            
+            console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} → ${classification} ${isOldest ? '(oldest)' : '(newer)'}`);
+            
+            updatedResults[doc._originalIndex] = {
+              ...doc,
+              short_code: classification,
+              reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${isOldest ? 'oldest' : 'newer'} in batch)`,
+              gcn_classification_note: note
+            };
+          });
+        } else {
+          // Mixed format (8 digits vs 6 digits) - 8 digits = new, 6 digits = old
+          console.log(`📊 ${prefix}: ${sorted.length} documents, mixed formats (${digitCounts.join(', ')} digits)`);
+          
+          docs.forEach(doc => {
+            const classification = doc._digitCount === 8 ? 'GCNM' : 'GCNC';
+            const note = doc._digitCount === 8
+              ? `📌 8-digit format → GCNM (new format)`
+              : `📌 6-digit format → GCNC (old format)`;
+            
+            console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} (${doc._digitCount} digits) → ${classification}`);
+            
+            updatedResults[doc._originalIndex] = {
+              ...doc,
+              short_code: classification,
+              reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${doc._digitCount}-digit format)`,
+              gcn_classification_note: note
+            };
+          });
+        }
       }
     });
     

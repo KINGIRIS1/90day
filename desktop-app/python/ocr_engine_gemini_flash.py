@@ -788,37 +788,48 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Đây là tài liệu chính thức
 
-🎯 ƯU TIÊN 2: NHẬN DIỆN GCN VÀ TRẢ VỀ SỐ CHỨNG NHẬN
+🚨 QUY TẮC CỰC KỲ QUAN TRỌNG - GIẤY CHỨNG NHẬN (GCN)
 
-⚠️ QUY TẮC MỚI - BATCH POST-PROCESSING:
-- NẾU thấy Giấy chứng nhận (quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN")
-- → Trả về: short_code = "GCN" (KHÔNG phân biệt cũ/mới)
-- → BẮT BUỘC: Tìm và trả về certificate_number ở góc dưới
+❌ TUYỆT ĐỐI KHÔNG BAO GIỜ TRẢ VỀ "GCNM" HOẶC "GCNC" ❌
 
-📋 FORMAT SỐ GCN: [2 CHỮ CÁI] [6 CHỮ SỐ]
+⚠️ NẾU thấy Giấy chứng nhận (quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"):
+   → Trả về: short_code = "GCN" (generic, không phải GCNM/GCNC)
+   → BẮT BUỘC: Tìm số chứng nhận ở góc dưới
+
+📋 SỐ CHỨNG NHẬN FORMAT: [2 CHỮ CÁI] [6 CHỮ SỐ]
+   Ví dụ: "DE 334187", "DP 947330", "AB 123456"
    Vị trí: Góc dưới (bottom), thường bên phải
-   Ví dụ: "DP 947330", "AB 123456", "AC 000001"
 
-📤 RESPONSE FORMAT CHO GCN:
-```json
+✅ RESPONSE ĐÚNG:
 {
   "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng",
-  "certificate_number": "DP 947330"
+  "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, số DE 334187",
+  "certificate_number": "DE 334187"
 }
-```
 
-⚠️ QUAN TRỌNG:
-- KHÔNG phân loại GCNM/GCNC ngay
-- Frontend sẽ so sánh TẤT CẢ GCN trong batch
-- Sau đó phân loại: Số NHỎ = cũ (GCNC), Số LỚN = mới (GCNM)
-- Điều này xử lý được trường hợp GCNM ở đầu, GCNC ở cuối batch
+❌ RESPONSE SAI (KHÔNG BAO GIỜ LÀM NHƯ VẦY):
+{
+  "short_code": "GCNM",  // ❌ SAI - Phải là "GCN"
+  "confidence": 0.95,
+  ...
+}
 
-⚠️ LƯU Ý:
-- KHÔNG áp dụng cho giấy tờ KHÔNG CÓ MÀU (đen trắng)
-- CHỈ áp dụng khi thấy quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
+{
+  "short_code": "GCNC",  // ❌ SAI - Phải là "GCN"
+  "confidence": 0.95,
+  ...
+}
+
+⚠️ TẠI SAO PHẢI TRẢ VỀ "GCN"?
+- Không thể xác định cũ/mới khi scan TỪNG file riêng lẻ
+- Cần so sánh TẤT CẢ GCN trong batch (số nhỏ = cũ, số lớn = mới)
+- Frontend sẽ xử lý batch post-processing để phân loại GCNC/GCNM
+
+⚠️ ĐIỀU KIỆN:
+- CHỈ áp dụng khi có: quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
+- KHÔNG áp dụng cho giấy tờ đen trắng
 - NẾU không tìm thấy số GCN → certificate_number: null
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:

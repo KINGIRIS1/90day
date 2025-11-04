@@ -100,13 +100,13 @@ def test_real_world_examples():
             "cert_number": "DP 947330",
             "title": "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT...",
             "expected": "GCNM",
-            "reason": "947330 is ODD"
+            "reason": "First digit 9 is ODD"
         },
         {
             "cert_number": "DP 817194",
             "title": "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT...",
             "expected": "GCNC",
-            "reason": "817194 is EVEN"
+            "reason": "First digit 8 is EVEN"
         }
     ]
     

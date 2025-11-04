@@ -1237,7 +1237,36 @@ VÍ DỤ SAI:
 ❌ "VBCC" (Văn bản công chứng) → KHÔNG CÓ → Phải trả về "UNKNOWN"
 ❌ "PKDT" (Phiếu kiểm tra đất) → KHÔNG CÓ → Phải trả về "UNKNOWN"
 
-→ CHỈ DÙNG MÃ TRONG DANH SÁCH 98 LOẠI PHÍA TRÊN!"""
+→ CHỈ DÙNG MÃ TRONG DANH SÁCH 98 LOẠI PHÍA TRÊN!
+
+📋 VÍ DỤ RESPONSE FORMAT:
+
+Example 1 - GCN Document:
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy và màu hồng",
+  "certificate_number": "DP 947330"
+}
+
+Example 2 - Regular Document (HDCN):
+{
+  "short_code": "HDCN",
+  "confidence": 0.92,
+  "title_position": "top",
+  "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
+  "certificate_number": null
+}
+
+Example 3 - Unknown Document:
+{
+  "short_code": "UNKNOWN",
+  "confidence": 0.3,
+  "title_position": "middle",
+  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
+  "certificate_number": null
+}"""
     """
     System prompt for Vietnamese document classification
     IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency

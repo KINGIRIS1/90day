@@ -569,25 +569,34 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 📋 VÍ DỤ RESPONSE FORMAT:
 
-Example 1 - GCN Document:
+✅ Example 1 - GCN Document (ĐÚNG):
 {
   "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy và màu hồng",
-  "certificate_number": "DP 947330"
+  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy, màu hồng, số DE 334187",
+  "certificate_number": "DE 334187"
 }
 
-Example 2 - Non-GCN Document:
+❌ TUYỆT ĐỐI KHÔNG LÀM NHƯ VẦY (SAI):
 {
-  "short_code": "HDCQ",
+  "short_code": "GCNM",  // ❌ SAI! Phải là "GCN"
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận...",
+  "certificate_number": "DE 334187"
+}
+
+✅ Example 2 - Non-GCN Document:
+{
+  "short_code": "HDCN",
   "confidence": 0.92,
   "title_position": "top",
   "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
   "certificate_number": null
 }
 
-Example 3 - Unknown Document:
+✅ Example 3 - Unknown Document:
 {
   "short_code": "UNKNOWN",
   "confidence": 0.3,

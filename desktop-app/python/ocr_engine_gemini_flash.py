@@ -435,13 +435,13 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
      • Có QUỐC HUY, serial number
      • Layout: Giấy tờ chính thức, không có ô trống
 
-1b. TLBDDC vs GCNM (DỄ NHẦM):
+1b. HSKT vs GCNM (DỄ NHẦM):
    ❌ SAI: Nhầm "Trích lục bản đồ" thành GCNM
    ✅ ĐÚNG:
-   - TLBDDC: Title "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH"
-     • Là MAP EXTRACT (bản đồ với thửa đất)
+   - HSKT: Title "BẢN VẼ" hoặc "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH"
+     • Là MAP/DRAWING (bản vẽ, trích lục, đo tách)
      • Visual: Có sơ đồ, ranh giới, tọa độ
-     • Keywords: "bản đồ", "trích lục", "ranh giới"
+     • Keywords: "bản vẽ", "trích lục", "đo tách", "chỉnh lý"
    - GCNM: Là text document, không phải map
 
 2. GCNM vs GCNC:

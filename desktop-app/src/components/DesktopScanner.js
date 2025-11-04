@@ -339,7 +339,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const updatedResults = [...normalizedResults];
     
     Object.entries(grouped).forEach(([prefix, docs]) => {
-      if (docs.length === 1) {
+      // Check if any document has OCR error (4 letters)
+      const hasOcrError = docs.some(d => d._isOcrError);
+      
+      if (hasOcrError) {
+        // OCR error detected (4 letters) - classify as GCNC (old, red)
+        console.log(`⚠️ ${prefix}: OCR error detected (4 letters), classifying as GCNC`);
+        docs.forEach(doc => {
+          updatedResults[doc._originalIndex] = {
+            ...doc,
+            short_code: 'GCNC',
+            reasoning: `${doc.reasoning || 'GCN'} - OCR error (4 letters), usually red GCN → GCNC`,
+            gcn_classification_note: '📌 OCR error (4 letters) → GCNC (old format, red)'
+          };
+          console.log(`  ✅ ${doc.certificate_number} → GCNC (OCR error, 4 letters)`);
+        });
+      } else if (docs.length === 1) {
         // Only 1 GCN with this prefix - classify as GCNC (default to old)
         console.log(`📄 ${prefix}: Only 1 document, defaulting to GCNC`);
         const doc = docs[0];

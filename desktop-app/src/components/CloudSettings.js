@@ -669,15 +669,15 @@ function CloudSettings() {
                       <>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">100 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$0.089 (~89₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$0.096 (~96₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs font-bold">1,000 trang + resize:</span>
-                          <span className="text-xs font-bold text-green-700">~$0.89 (~890₫)</span>
+                          <span className="text-xs font-bold text-green-700">~$0.96 (~960₫)</span>
                         </div>
                         <div className="flex justify-between p-2 bg-white rounded">
                           <span className="text-xs">10,000 trang + resize:</span>
-                          <span className="text-xs font-semibold text-green-700">~$8.90 (~8,900₫)</span>
+                          <span className="text-xs font-semibold text-green-700">~$9.60 (~9,600₫)</span>
                         </div>
                       </>
                     ) : (

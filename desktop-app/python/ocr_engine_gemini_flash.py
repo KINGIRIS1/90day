@@ -1043,6 +1043,7 @@ HOÀN THÀNH CÔNG TÁC BỒI THƯỜNG HỖ TRỢ → HTBTH
 📋 NHÓM 11: TỜ KHAI / TỜ TRÌNH (3 loại)
 TỜ KHAI THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TKT
 TỜ TRÌNH VỀ GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → TTr
+  ⚠️ CHÚ Ý: "TTr" với chữ "r" viết thường (không phải "TTR")
 TỜ TRÌNH VỀ VIỆC ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT (UBND XÃ) → TTCG
 
 📋 NHÓM 12: VĂN BẢN (10 loại)

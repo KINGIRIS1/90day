@@ -55,6 +55,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   
   // Rate limit control - delay between requests (ms)
   const [requestDelay, setRequestDelay] = useState(1200); // Default 1.2s = 50 requests/min
+  const [postProcessingStatus, setPostProcessingStatus] = useState(null); // Show post-processing notification
 
   // Load config (guard electron)
   useEffect(() => {

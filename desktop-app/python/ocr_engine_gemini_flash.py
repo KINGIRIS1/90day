@@ -380,6 +380,8 @@ SDHV = Sơ đồ hiện trạng
 
 NHÓM 9 - PHIẾU:
 PKTHS = Phiếu kiểm tra hồ sơ
+  • Title: "PHIẾU KIỂM TRA HỒ SƠ" hoặc "PHIẾU TRÌNH KÝ HỒ SƠ CẤP GIẤY CHỨNG NHẬN"
+  • Keywords: "kiểm tra hồ sơ", "trình ký", "cấp giấy chứng nhận"
   • KHÔNG phải "Phiếu kiểm soát" (→ GTLQ)
 PLYKDC = Phiếu lấy ý kiến dân cư
 PXNKQDD = Phiếu xác nhận kết quả đo đạc

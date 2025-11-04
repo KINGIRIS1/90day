@@ -368,8 +368,12 @@ SDHV = Sơ đồ hiện trạng
 
 NHÓM 9 - PHIẾU:
 PKTHS = Phiếu kiểm tra hồ sơ
+  • KHÔNG phải "Phiếu kiểm soát" (→ GTLQ)
 PLYKDC = Phiếu lấy ý kiến dân cư
 PXNKQDD = Phiếu xác nhận kết quả đo đạc
+PCT = Phiếu chuyển thông tin để xác định nghĩa vụ tài chính
+  • Title: "PHIẾU CHUYỂN THÔNG TIN ĐỂ XÁC ĐỊNH NGHĨA VỤ TÀI CHÍNH"
+  • Từ Văn phòng đăng ký đất đai gửi Cơ quan thuế
 DKTC = Phiếu yêu cầu đăng ký biện pháp bảo đảm
 DKTD = Phiếu yêu cầu đăng ký thay đổi biện pháp bảo đảm
 DKXTC = Phiếu yêu cầu xóa đăng ký biện pháp bảo đảm

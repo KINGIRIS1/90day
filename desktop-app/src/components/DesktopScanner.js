@@ -362,6 +362,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     });
     
+    // Handle GCN documents without certificate numbers
+    if (gcnWithoutCert.length > 0) {
+      console.log(`\n📄 Processing ${gcnWithoutCert.length} GCN(s) without certificate numbers:`);
+      gcnWithoutCert.forEach(doc => {
+        const index = normalizedResults.indexOf(doc);
+        // Default to GCNM (assume newer format if no cert number)
+        updatedResults[index] = {
+          ...doc,
+          short_code: 'GCNM',
+          reasoning: `${doc.reasoning || 'GCN'} - No certificate number, defaulting to GCNM`,
+          gcn_classification_note: '📌 No certificate number → GCNM (default)'
+        };
+        console.log(`  ✅ ${doc.fileName} → GCNM (no certificate number)`);
+      });
+    }
+    
     console.log('✅ GCN post-processing complete');
     return updatedResults;
     } catch (error) {

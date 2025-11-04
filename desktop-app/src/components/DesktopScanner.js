@@ -373,7 +373,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           });
         } else {
           // Mixed format (8 digits vs 6 digits) - 8 digits = new, 6 digits = old
-          console.log(`📊 ${prefix}: ${sorted.length} documents, mixed formats (${digitCounts.join(', ')} digits)`);
+          console.log(`📊 ${prefix}: ${docs.length} documents, mixed formats (${digitCounts.join(', ')} digits)`);
           
           docs.forEach(doc => {
             const classification = doc._digitCount === 8 ? 'GCNM' : 'GCNC';

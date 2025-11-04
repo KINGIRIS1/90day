@@ -524,9 +524,13 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 - Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở top, chữ lớn
   → {short_code: "HDCQ", title_position: "top", confidence: 0.9}
 
-- Trang có "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." + QUỐC HUY
+- Trang có QUỐC HUY rõ + nền cam + "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT"
+  → {short_code: "GCNC", confidence: 0.95}
+  → Reasoning: "Classic certificate với quốc huy, nền màu, tiêu đề ngắn"
+
+- Trang có tiêu đề dài "...quyền sở hữu nhà ở...", KHÔNG có quốc huy rõ
   → {short_code: "GCNM", confidence: 0.95}
-  → Reasoning: "Certificate với quốc huy, filled data"
+  → Reasoning: "Modern certificate, tiêu đề dài, no prominent emblem"
 
 - Trang có section "III. THÔNG TIN VỀ THỬA ĐẤT", không có tiêu đề
   → {short_code: "GCNM", reasoning: "GCN continuation page"}

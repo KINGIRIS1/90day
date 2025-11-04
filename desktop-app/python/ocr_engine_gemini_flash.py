@@ -267,9 +267,10 @@ def get_classification_prompt_lite():
     """
     return """🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
 
-📋 QUY TẮC VỊ TRÍ (QUAN TRỌNG):
+📋 QUY TẮC PHÂN LOẠI (QUAN TRỌNG):
 
-✅ CHỈ PHÂN LOẠI NẾU TIÊU ĐỀ Ở TOP 30%:
+🔍 1. VỊ TRÍ TIÊU ĐỀ (TOP 30%):
+✅ CHỈ PHÂN LOẠI NẾU:
 - Text LỚN NHẤT, IN HOA, căn giữa
 - NẰM ĐỘC LẬP (không có text khác cùng dòng)
 - VD đúng: "HỢP ĐỒNG CHUYỂN NHƯỢNG" (riêng 1 dòng)
@@ -280,6 +281,18 @@ def get_classification_prompt_lite():
 - Có từ: "căn cứ", "theo", "kèm theo", "số..."
 - NẰM CHUNG với text khác trên cùng dòng
 - Chữ thường trong câu văn
+
+👁️ 2. VISUAL INDICATORS (QUAN TRỌNG):
+✅ QUỐC HUY (National Emblem):
+- Có QUỐC HUY ở top center → GCNC (Giấy chứng nhận CŨ - màu cam/vàng)
+- Có QUỐC HUY + "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM" → Giấy tờ chính thức
+- Không có quốc huy + tiêu đề dài "quyền sở hữu nhà ở..." → GCNM (MỚI)
+
+✅ LAYOUT RECOGNITION:
+- CERTIFICATE: Có quốc huy, serial number, filled data, formal layout
+- FORM: Có blank fields, ô trống, checkbox, table để điền
+- MAP: Có sơ đồ, ranh giới, coordinates, visual diagram
+- NOTICE: Header quan, footer chữ ký, structured sections
 
 ⚠️ NGOẠI LỆ - GCNM CONTINUATION:
 NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):

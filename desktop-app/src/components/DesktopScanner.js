@@ -294,15 +294,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`  📋 With certificate number: ${gcnDocs.length}`);
     console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
     
-    // Group by prefix (first 2 letters of certificate number)
+    // Group by prefix - support 3 formats:
+    // 1. [2 letters][6 numbers]: DE 334187
+    // 2. [2 letters][8 numbers]: AA 01085158
+    // 3. [4 letters][6 numbers]: S6AQ 227162
     const grouped = {};
     gcnDocs.forEach((doc, originalIndex) => {
       const certNumber = doc.certificate_number.trim();
-      const match = certNumber.match(/^([A-Z]{2})\s*(\d{6})$/i);
+      // Match all 3 formats
+      const match = certNumber.match(/^([A-Z]{2,4})\s*(\d{6,8})$/i);
       
       if (match) {
         const prefix = match[1].toUpperCase();
         const number = match[2];
+        const digitCount = number.length;
         
         if (!grouped[prefix]) {
           grouped[prefix] = [];
@@ -312,8 +317,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           ...doc,
           _originalIndex: normalizedResults.indexOf(doc),
           _certPrefix: prefix,
-          _certNumber: parseInt(number, 10)
+          _certNumber: parseInt(number, 10),
+          _digitCount: digitCount
         });
+      } else {
+        console.log(`⚠️ Certificate number format not recognized: ${certNumber}`);
       }
     });
     

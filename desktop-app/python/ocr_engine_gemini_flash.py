@@ -1527,21 +1527,23 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
 - NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
 - NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
-- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, certificate_number
+- LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, issue_date, issue_date_confidence
 
-📋 CERTIFICATE_NUMBER (BẮT BUỘC CHO GCN):
-- ⚠️ Nếu phân loại "GCN" → BẮT BUỘC tìm số GCN ở góc dưới (format: [2 chữ cái][6 số])
-- Trả về trong field "certificate_number": "DP 947330" hoặc "AB 123456"
-- Nếu KHÔNG phải GCN → "certificate_number": null
+📋 ISSUE_DATE (BẮT BUỘC CHO GCN):
+- ⚠️ Nếu phân loại "GCN" → BẮT BUỘC tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
+- Format: DD/MM/YYYY (e.g., "01/01/2012") hoặc MM/YYYY hoặc YYYY nếu mờ
+- Trả về trong fields: "issue_date": "01/01/2012", "issue_date_confidence": "full"
+- Nếu KHÔNG phải GCN → "issue_date": null, "issue_date_confidence": null
 
-VÍ DỤ CHO GCN:
+VÍ DỤ CHO GCN (Trang 2 - có ngày cấp):
 ✅ ĐÚNG:
 {
   "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng",
-  "certificate_number": "DP 947330"
+  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng, ngày cấp 01/01/2012",
+  "issue_date": "01/01/2012",
+  "issue_date_confidence": "full"
 }
 
 ❌ SAI (không được trả về GCNM/GCNC):

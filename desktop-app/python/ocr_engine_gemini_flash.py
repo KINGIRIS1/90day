@@ -318,9 +318,14 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • ⚠️ BẮT BUỘC 2: Tìm NGÀY CẤP (có thể ở trang 1 hoặc trang 2, có thể viết tay)
     - GCN A3 (2 trang lớn): Ngày cấp thường ở trang 2
     - GCN A4 (1 trang nhỏ): Ngày cấp thường ở trang 1 (bottom)
-    - Format: DD/MM/YYYY (ví dụ: "14/04/2025", "27/10/2021")
+    - Các format có thể gặp:
+      * Format 1: "DD/MM/YYYY" (ví dụ: "14/04/2025", "27/10/2021")
+      * Format 2: "Ngày DD tháng MM năm YYYY" (ví dụ: "Ngày 25 tháng 8 năm 2010")
+      * Format 3: "DD.MM.YYYY" hoặc "DD-MM-YYYY"
     - Nếu mờ: MM/YYYY (ví dụ: "02/2012") hoặc YYYY (ví dụ: "2012")
-    - Tìm text gần "Ngày cấp", "Cấp ngày", "ngày..tháng..năm"
+    - Tìm text gần: "Ngày cấp", "Cấp ngày", "Ngày...tháng...năm", "TM. UBND"
+    - ⚠️ Quan trọng: Nếu thấy format "Ngày XX tháng YY năm ZZZZ" → chuyển thành "XX/YY/ZZZZ"
+    - Ví dụ: "Ngày 25 tháng 8 năm 2010" → trả về "25/08/2010" hoặc "25/8/2010"
   
   • Response: "GCN" + color + issue_date + issue_date_confidence
   • Lý do: Frontend sẽ phân loại theo:

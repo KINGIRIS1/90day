@@ -260,30 +260,72 @@ const Settings = () => {
 
       {/* App Information */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Thông tin ứng dụng
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">
+          Thông tin App
         </h2>
         
         <div className="space-y-3 text-sm">
           <div className="flex justify-between py-2 border-b">
-            <span className="text-gray-600">Phiên bản:</span>
-            <span className="font-medium text-gray-900">1.0.0</span>
-          </div>
-          <div className="flex justify-between py-2 border-b">
             <span className="text-gray-600">Nền tảng:</span>
-            <span className="font-medium text-gray-900">
-              {window.electronAPI?.platform || 'Unknown'}
-            </span>
+            <span className="font-medium text-gray-900">Windows Desktop (Electron)</span>
           </div>
           <div className="flex justify-between py-2 border-b">
+            <span className="text-gray-600">Công ty:</span>
+            <span className="font-medium text-gray-900">Nguyen Thin Trung</span>
+          </div>
+          <div className="flex justify-between py-2 border-b">
+            <span className="text-gray-600">Version:</span>
+            <span className="font-medium text-gray-900">1.1.0</span>
+          </div>
+          <div className="flex justify-between py-2">
             <span className="text-gray-600">OCR Engine:</span>
             <span className="font-medium text-gray-900">{ocrEngine}</span>
           </div>
-          <div className="flex justify-between py-2">
-            <span className="text-gray-600">Cloud Boost:</span>
-            <span className="font-medium text-gray-900">
-              {backendUrl ? '✓ Đã cấu hình' : '✗ Chưa cấu hình'}
-            </span>
+        </div>
+      </div>
+
+      {/* Developer Information */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">
+          👨‍💻 Người Phát Triển
+        </h2>
+        
+        <div className="space-y-4">
+          <div className="flex items-start space-x-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-2xl font-bold shadow-md">
+              NT
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-semibold text-gray-900">Nguyen Thin Trung</h3>
+              <p className="text-sm text-gray-600 mt-1">Software Developer</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Phần mềm được phát triển để hỗ trợ số hóa tài liệu đất đai Việt Nam, 
+                sử dụng công nghệ AI và OCR tiên tiến.
+              </p>
+            </div>
+          </div>
+          
+          <div className="pt-3 border-t space-y-2">
+            <div className="flex items-center text-sm">
+              <span className="text-gray-600 w-24">📧 Email:</span>
+              <span className="text-blue-600 font-medium">contact@90daychonthanh.vn</span>
+            </div>
+            <div className="flex items-center text-sm">
+              <span className="text-gray-600 w-24">🌐 Website:</span>
+              <span className="text-blue-600 font-medium">www.90daychonthanh.vn</span>
+            </div>
+            <div className="flex items-center text-sm">
+              <span className="text-gray-600 w-24">📱 Hotline:</span>
+              <span className="text-gray-900 font-medium">1900-xxxx</span>
+            </div>
+          </div>
+          
+          <div className="pt-3 border-t">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              <strong className="text-gray-700">Lưu ý:</strong> Phần mềm này được bảo vệ bởi luật sở hữu trí tuệ. 
+              Nghiêm cấm sao chép, phân phối hoặc sử dụng cho mục đích thương mại 
+              mà không có sự cho phép bằng văn bản từ tác giả.
+            </p>
           </div>
         </div>
       </div>

@@ -73,6 +73,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       const engine = await api.getConfig('ocrEngine') || 'tesseract';
       setCurrentOcrEngine(engine);
       
+      // Load request delay from config
+      const savedDelay = await api.getConfig('requestDelay');
+      if (savedDelay !== undefined && savedDelay !== null) {
+        setRequestDelay(parseInt(savedDelay));
+        console.log(`⏱️ Loaded request delay: ${savedDelay}ms`);
+      }
+      
       console.log('🔍 Current OCR Engine:', engine);
     };
     try { loadConfig(); } catch {}

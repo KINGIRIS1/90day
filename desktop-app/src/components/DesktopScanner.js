@@ -478,16 +478,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
     
     // Step 2: Classify remaining pairs by date
-    if (pairsWithoutColor.length > 0) {
+    if (pairsNeedDateComparison.length > 0) {
       console.log('\n📅 Classifying remaining pairs by date...');
+      console.log(`  📊 ${pairsNeedDateComparison.length} pair(s) need date comparison`);
       
-      if (pairsWithoutColor.length === 1) {
-        // Only 1 pair without color → default GCNM
-        console.log('📄 Only 1 pair without color → Default GCNM');
-        const pair = pairsWithoutColor[0];
+      if (pairsNeedDateComparison.length === 1) {
+        // Only 1 pair → default GCNM
+        console.log('📄 Only 1 pair → Default GCNM');
+        const pair = pairsNeedDateComparison[0];
         const classification = 'GCNM';
         const dateStr = pair.issueDate || 'không có ngày cấp';
-        const note = `Không detect màu, chỉ 1 GCN → GCNM (mặc định)`;
+        const colorStr = pair.color ? `màu ${pair.color}` : 'không detect màu';
+        const note = `${colorStr}, chỉ 1 GCN → GCNM (mặc định)`;
         
         [pair.page1, pair.page2].filter(Boolean).forEach(page => {
           const index = normalizedResults.indexOf(page);
@@ -500,7 +502,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         });
       } else {
         // Multiple pairs → sort by date
-        const sortedPairs = [...pairsWithoutColor].sort((a, b) => {
+        const sortedPairs = [...pairsNeedDateComparison].sort((a, b) => {
           if (!a.parsedDate && !b.parsedDate) return 0;
           if (!a.parsedDate) return 1;
           if (!b.parsedDate) return -1;
@@ -510,7 +512,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         console.log('\n📊 Sorted pairs by date:');
         sortedPairs.forEach((pair, idx) => {
           const dateStr = pair.issueDate || 'null';
-          console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr}`);
+          const colorStr = pair.color || 'unknown';
+          console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr} (color: ${colorStr})`);
         });
         
         // Classify: oldest = GCNC, others = GCNM
@@ -518,11 +521,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           const isOldest = (idx === 0 && pair.parsedDate !== null);
           const classification = isOldest ? 'GCNC' : 'GCNM';
           const dateStr = pair.issueDate || 'không có ngày cấp';
+          const colorStr = pair.color ? `màu ${pair.color}` : 'không detect màu';
           const note = isOldest 
-            ? `Không detect màu, ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
+            ? `${colorStr}, ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
             : pair.parsedDate 
-              ? `Không detect màu, ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
-              : `Không detect màu, không có ngày cấp → GCNM (mặc định)`;
+              ? `${colorStr}, ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
+              : `${colorStr}, không có ngày cấp → GCNM (mặc định)`;
           
           console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
           

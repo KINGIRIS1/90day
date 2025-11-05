@@ -84,6 +84,7 @@ if (only_1_pair) {
 
 ### Example Response:
 
+**Format 1 (DD/MM/YYYY):**
 ```json
 {
   "short_code": "GCN",
@@ -92,6 +93,18 @@ if (only_1_pair) {
   "issue_date_confidence": "full",
   "confidence": 0.95,
   "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021"
+}
+```
+
+**Format 2 (Ngày...tháng...năm):**
+```json
+{
+  "short_code": "GCN",
+  "color": "pink",
+  "issue_date": "25/8/2010",
+  "issue_date_confidence": "full",
+  "confidence": 0.95,
+  "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 25/8/2010 (từ 'Ngày 25 tháng 8 năm 2010')"
 }
 ```
 

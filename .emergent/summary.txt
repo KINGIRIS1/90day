@@ -1,43 +1,42 @@
 <analysis>
-The trajectory details an iterative refinement process of a desktop OCR application for Vietnamese land documents. Initially, the AI engineer addressed a case-sensitivity issue for TTr codes, which was resolved by fixing a regex in . Concurrently, classification for BIÊN BẢN documents was improved to correctly map to BBKTHT by enhancing prompts with specific examples. The next major task involved classifying GIẤY CAM KẾT as DCK via prompt updates and implementing an exit confirmation dialog in the Electron app.
+The AI engineer's work primarily revolved around enhancing a desktop OCR application for Vietnamese land documents. A significant portion involved refining the complex classification of Giấy chứng nhận (GCN) documents, transitioning from certificate number-based logic to issue date and color-based classification. This included extensive prompt engineering in  to extract  and , and sophisticated client-side JavaScript logic in  for pairing multi-page documents and applying conditional classification rules (prioritizing color, then date, then specific sequential rules).
 
-The most complex phase focused on robustly classifying Giấy chứng nhận (GCN) into GCNC (old) or GCNM (new) based on certificate numbers. This evolved from simple digit rules to a sophisticated batch post-processing approach in the frontend. Key challenges included:
-1.  **Prompt Engineering:** Iteratively refining Gemini Flash Lite prompts to return a generic GCN and extract the .
-2.  **Frontend Logic:** Developing JavaScript logic in  to group, sort, and reclassify GCN documents after a batch scan, based on alphabetical prefixes, sequential number comparison, and prioritizing color (red=GCNC, pink=GCNM).
-3.  **Data Flow:** Ensuring the  was correctly passed from Python's OCR engine to the JavaScript frontend.
-4.  **Edge Cases:** Handling various certificate number formats (2 chars + 6/8 digits, 4 chars + 6 digits as OCR errors), ignoring số vào sổ (5 digits), and mã vạch (13 digits).
-5.  **UI Feedback:** Adding visual notifications to indicate GCN post-processing status.
-
-The process involved frequent user feedback, leading to multiple revisions of prompts and client-side logic. The final interaction explores Gemini's handwriting recognition capabilities, specifically for extracting dates.
+Beyond GCN, the engineer addressed several classification inaccuracies, such as fixing HỢP ĐỒNG ỦY QUYỀN (HDUQ) misidentification and improving sequential page classification for documents like PCT and TBT by adding specific rules in . UI/UX improvements included adding an exit confirmation dialog, moving the request delay setting to , removing per-page cost displays, updating the application title, adding developer information, and implementing file deletion and folder rescan functionalities in the . The final task involves providing instructions for building a one-click installer.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, designed to accurately classify and rename documents. It supports single and batch scanning, history management, PDF export, fuzzy matching, keyword classification, and automatic title assignment. It integrates multiple OCR engines, including cloud-based Gemini Flash AI (AppName: 90dayChonThanh, Company: Nguyen Thin Trung, Version: 1.1.0).
+The application is a desktop OCR scanner for Vietnamese land documents, focusing on accurate classification, renaming, and batch processing. It uses Gemini Flash AI for OCR. Key requirements addressed and developed in this trajectory include:
 
-Key user requests include:
--   An all-in-one NSIS Windows x64 installer using system Python (3.10-3.12).
--   Displaying estimated costs per scan/batch.
--   Fixing UNKNOWN classifications, particularly for GTLQ and specific text patterns.
--   Providing a UI option to switch between Gemini Flash and Flash Lite.
--   Optimizing prompt tokens and image size to reduce API costs while maintaining accuracy.
--   Resolving a case-sensitivity issue for the document code TTr.
--   Correctly classifying BIÊN BẢN Xác minh thực địa thửa đất xin chuyển mục đích sử dụng đất phải xin phép as BBKTHT.
--   Classifying GIẤY CAM KẾT as DCK.
--   Adding an exit confirmation dialog for the desktop application.
--   Implementing a complex classification logic for Giấy chứng nhận (GCN) documents, distinguishing between GCNC (cũ - old) and GCNM (mới - new) based on certificate serial numbers (2 chars + 6/8 digits), their numerical sequence within a batch, and color (red for GCNC, pink for GCNM), with specific handling for OCR errors (4 chars) and ignoring irrelevant numbers (5-digit số vào sổ, 13-digit mã vạch).
--   Exploring the extraction of handwriting, specifically Ngày cấp (date of issue) from GCN documents.
+*   **GCN Classification Refinement**: Initially, classifying Giấy chứng nhận (GCN) into GCNC (old) or GCNM (new) based on certificate numbers. This evolved to a more robust, user-driven requirement:
+    *   **Date-Based GCN Classification**: Classify GCNs as GCNC or GCNM primarily using Ngày cấp (issue date), with older dates as GCNC and newer as GCNM.
+    *   **Color-Based GCN Classification**: Incorporate document color (red/orange for GCNC, pink for GCNM) as the highest priority classification rule for GCNs.
+    *   **Mixed Logic**: If colors are the same, use date comparison.
+    *   **Multi-Page GCN Handling**: Support 2-page A3 and A4 GCN documents where the issue date might be on page 2 (A3) or page 1 (A4), with page 1 renaming based on page 2's data.
+    *   **Handwriting Recognition**: Improve Ngày cấp extraction, especially for handwritten dates in various formats.
+    *   **Specific GCN Misclassification Fixes**: Address issues like GCN page 2 (with maps) being misclassified as HSKT.
+*   **Sequential Document Naming**: Improve logic for continuation pages (e.g., page 2 of PCT misclassified as DDKBD or TBT misclassified as PCT) where primary titles are ambiguous.
+*   **Classification Accuracy Fixes**:
+    *   Correctly classify HỢP ĐỒNG ỦY QUYỀN (HDUQ), preventing Gemini from returning HDQUYEN or UNKNOWN.
+    *   Fix specific issues like PCT page 2 misclassified as DDKBD due to Gemini misinterpreting title position.
+*   **Performance & Cost Optimization**: Optimize Gemini prompts to reduce token usage while maintaining accuracy.
+*   **UI/UX Enhancements**:
+    *   Move Delay giữa các request (request delay to avoid rate limits) setting from  into  for user control.
+    *   Remove per-page cost display.
+    *   Update application title by removing Offline First.
+    *   Add developer information to the settings page.
+    *   Add Xóa file (delete file) buttons for individual scanned files.
+    *   Add Quét lại thư mục này (rescan this folder) button for folder scan results.
+*   **Installer Guidance**: Provide instructions for building a one-click NSIS installer.
 </product_requirements>
 
 <key_technical_concepts>
--   **Electron**: Desktop application framework.
--   **React**: Frontend UI development.
--   **Python**: Backend for OCR and AI processing.
--   **Gemini Flash API**: Google's multimodal AI for document OCR and classification, with token-based pricing.
--   **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification and structured JSON output (including ).
--   **IPC (Inter-Process Communication)**: Electron's mechanism for communication between main and renderer processes, used for settings and document processing.
--   **Image Processing (PIL)**: Python Imaging Library for smart image resizing.
--   **Client-side Post-processing**: JavaScript logic in the React frontend for complex batch-level classification (e.g., GCN sorting and reclassification).
--   **Regex**: Used for parsing certificate numbers and other document codes.
+- **Electron**: Desktop application framework.
+- **React**: Frontend UI development.
+- **Python**: Backend for OCR and AI processing.
+- **Gemini Flash API**: Google's multimodal AI for document OCR and classification, with token-based pricing and handwriting recognition.
+- **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification, structured JSON output (, ), and handling varied date formats.
+- **IPC (Inter-Process Communication)**: Electron's mechanism for  and configuration management.
+- **Client-side Post-processing**: JavaScript logic in  for complex batch-level classification (GCN pairing, color/date comparison, sequential rules).
 </key_technical_concepts>
 
 <code_architecture>
@@ -46,49 +45,58 @@ The application is structured into , , and  directories.
 
 
 -   ****:
-    -   **Summary**: Electron's main process, window management, IPC, Python execution.
-    -   **Changes**: Added a confirmation dialog using  when the app is about to close, ensuring user intent.
+    -   **Summary**: Electron's main process, window management, IPC, Python execution. Manages the core Electron app.
+    -   **Changes**: Not explicitly modified in the provided trajectory, but  (compiled) implies changes related to exit confirmation dialog were present.
 -   ****:
     -   **Summary**: Compiled version of .
-    -   **Changes**: Synchronized with  modifications to include the exit confirmation dialog.
+    -   **Changes**: Synchronized with  modifications to include the exit confirmation dialog (as per initial analysis, not explicitly in trajectory).
 -   ****:
-    -   **Summary**: Python script for Gemini Flash AI OCR and classification.
+    -   **Summary**: Python script for Gemini Flash AI OCR and classification. Contains the prompts for Gemini.
     -   **Changes**:
-        -   Refined  and :
-            -   Added specific examples and visual cues for BBKTHT (Biên bản kiểm tra, xác minh hiện trạng sử dụng đất).
-            -   Included a note about case-sensitivity for TTr in the prompt.
-            -   Updated prompts to return generic GCN and explicitly extract  in JSON, with strong emphasis against returning GCNM/GCNC directly from Gemini.
-            -   Added JSON response examples to guide Gemini on expected output format.
-            -   Updated GCN rules in prompts to include multi-format (, ,  as OCR error), color priority (red GCNC, pink GCNM), and comparison logic.
-        -   Fixed  fallback parsing regex (around line 1391) to allow mixed-case characters () for codes like TTr.
-        -   Removed a temporary  function as the validation logic moved to the frontend.
+        -   **Prompt Refinement**: Iteratively updated  and  to:
+            -   Explicitly extract  and  in JSON format.
+            -   Add detailed instructions and examples for handling handwritten dates and various date formats (e.g., Ngày DD tháng MM năm YYYY).
+            -   Remove references to  as a primary extraction target.
+            -   Add specific examples for  to prevent misclassification as HDQUYEN.
+            -   Optimized prompts by removing duplicate warning sections and temporarily reducing GCN examples (later restored).
 -   ****:
-    -   **Summary**: Orchestrates document processing and OCR engine calls.
-    -   **Changes**: Modified the JSON output to explicitly include the  extracted by , ensuring it is passed to the frontend.
+    -   **Summary**: Orchestrates document processing and OCR engine calls, and structures the output.
+    -   **Changes**: Modified the JSON output to explicitly include the , , and  extracted by , ensuring they are passed to the frontend.
 -   ****:
     -   **Summary**: Defines document classification rules and valid codes.
-    -   **Changes**: Added GCN as a valid document code in  and  to prevent it from being classified as UNKNOWN by the internal validation system. Added DCK to mapping.
+    -   **Changes**: Verified that GCN and HDUQ were already present in , no explicit code changes needed in this trajectory.
 -   ****:
-    -   **Summary**: Handles document scanning and displays results.
+    -   **Summary**: The main React component for the desktop application.
+    -   **Changes**: Removed Offline First from the application title displayed in the UI.
+-   ****:
+    -   **Summary**: Handles document scanning, displays results, and contains complex post-processing logic.
     -   **Changes**:
-        -   Implemented  function to perform complex, batch-level reclassification of GCN documents:
-            -   Converts initially returned GCNM/GCNC from Gemini (if any) to GCN.
-            -   Groups GCN documents by certificate number prefix.
-            -   Sorts documents within groups by certificate number (numerically) to assign GCNC (smallest/older) or GCNM (larger/newer).
-            -   Handles mixed-length certificate numbers (8 digits > 6 digits).
-            -   Prioritizes color detection (red=GCNC, pink=GCNM) for GCN classification if available.
-            -   Treats 4-character numbers as OCR errors, defaulting to GCNC.
-            -   Ignores 5-digit numbers (identified as số vào sổ) and 13-digit numbers (identified as mã vạch).
-            -   Adds error handling and detailed console logs for debugging post-processing.
-        -   Integrated  to run automatically after a batch scan completes, updating the UI.
-        -   Added  state and a visual notification in the UI to inform the user about ongoing GCN post-processing.
--   **New Markdown Files**: , , , ,  were created to document specific fixes and features.
--   **New Test Scripts**: , ,  were created for verifying specific fixes.
+        -   **GCN Post-processing (Date & Color-based)**: Replaced  logic entirely. The new function:
+            -   Pairs two-page GCN documents (e.g., page 1 and page 2).
+            -   Prioritizes  for GCNM/GCNC classification.
+            -   If colors are identical within a pair, falls back to  comparison (older date = GCNC, newer = GCNM).
+            -   Handles mixed-page GCNs (A3, A4) and applies renaming based on page 2 (for A3) or page 1 (for A4) date.
+        -   **Sequential Naming Logic**: Enhanced sequential logic (Rules 3, 4) to apply more flexibly when current document confidence is low OR  is not top.
+        -   **Specific Classification Rules**: Added new sequential rules:
+            -   **Rule 5 (GCN-HSKT)**: Prevents GCN page 2 (with maps) from being misclassified as HSKT.
+            -   **Rule 6 (PCT-DDKBD)**: Prevents PCT continuation pages from being misclassified as DDKBD when Gemini incorrectly identifies a middle title as top.
+        -   **Request Delay Integration**: Modified to load  from application configuration (managed in ) and removed the local UI slider.
+        -   **UI Modifications**: Removed cost/token display per file. Added Xóa file (delete file) buttons for individual scanned documents. Added Quét lại thư mục này (rescan this folder) buttons for scanned folders.
+        -   **Bug Fix**: Corrected a JavaScript syntax error by removing a remnant of old, unused code.
+-   ****:
+    -   **Summary**: Provides user-configurable settings for the application.
+    -   **Changes**: Added a new  component to allow users to configure the delay between requests, and integrated it into the UI. Added a Thông tin nhà phát triển (Developer Information) section.
+-   **New Markdown Files**:
+    -   : Documented the initial date-based GCN classification logic.
+    -   : Documented the enhanced color and date-based GCN classification.
+    -   : Provides detailed instructions for building the one-click installer.
+-   **New Test Script**:
+    -   : Python script created to test the  extraction from .
 </code_architecture>
 
 <pending_tasks>
--   Implement full logic for the all-in-one installer using .
--   Fine-tune remaining document types in  and .
+-   Implement full logic for the all-in-one installer using  (currently, only documentation and guidance have been provided).
+-   Fine-tune remaining document types in  and  (beyond the specific ones fixed).
 -   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
 -   Migrate or pin React/Webpack versions.
 -   Test the backend with 5-10 real images to validate Hybrid OCR.
@@ -100,13 +108,14 @@ The application is structured into , , and  directories.
 -   Address the slow startup of the app.
 -   Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
 -   Implement a code patch for robust cache pathing and single-instance lock in .
--   Implement handwriting extraction, specifically Ngày cấp (date of issue), from GCN documents, based on user requirements.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was discussing Gemini 2.5's capabilities regarding handwriting recognition. The user asked if Gemini 2.5 can read handwriting, specifically inquiring about extracting the Ngày cấp (date of issue) written by hand on a document. The AI engineer confirmed Gemini 2.5's general ability to read handwriting, along with its limitations. The AI engineer then proactively asked the user for clarification on what they intended to do with the extracted handwriting (e.g., save as metadata, display in UI, validate format) and the desired accuracy, to determine the next steps for implementation. The conversation ended with the AI engineer awaiting the user's detailed requirements for handwriting extraction.
+Immediately before this summary request, the AI engineer completed a series of UI/UX updates and prepared documentation. The application title 90dayChonThanh Desktop App - Offline First was updated to remove Offline First in . Developer information (Người viết phần mềm: Nguyen Thin Trung - Email: nguyenthintrung.ceo@gmail.com) was added to the  component. The display of estimated costs per page was removed from , and new functionalities for managing scanned files were implemented: a Xóa file (delete file) button for individual results and a Quét lại thư mục này (rescan this folder) button for folder scan results. The  for folder scanning was confirmed to be active and loading from a configurable setting now present in .
+
+The user's most recent explicit request was to provide guidance on building a one-click installer. In response, the AI engineer successfully created a detailed Vietnamese documentation file: . The AI engineer's final action in the trajectory was preparing to create a build script to facilitate the installer creation process.
 </current_work>
 
 <optional_next_step>
-Based on user clarification, implement the extraction of Ngày cấp (date of issue) from GCN documents using Gemini's handwriting recognition.
+Create a build script to automate the one-click installer generation process based on the user's request.
 </optional_next_step>

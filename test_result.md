@@ -83,11 +83,11 @@ user_problem_statement: |
 backend:
   - task: "Python OCR Engine for Desktop"
     implemented: true
-    working: true
+    working: "needs_testing"
     file: "/app/desktop-app/python/process_document.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "needs_testing"
         agent: "main"
@@ -95,6 +95,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE VALIDATION PASSED - Rule change 80%→75% implemented and working. GTLQ mapping correctly configured with fuzzy title matching. EasyOCR workflow simulated (top 40% crop). Tier 1 fuzzy match triggers for GTLQ with confidence >=0.7. HDUQ prioritized over HDCQ in title matching. All synthetic title tests passed. Source code validation confirmed similarity_threshold = 0.75, GTLQ templates, and fuzzy matching implementation. Core classification logic validated through simulation."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔄 MAJOR CHANGE: GCN Classification - Switched from certificate_number to issue_date (ngày cấp). Updated Gemini prompts to extract issue_date with flexible formats (DD/MM/YYYY, MM/YYYY, YYYY). Modified process_document.py to pass issue_date and issue_date_confidence fields. Needs testing with real GCN documents."
+  
+  - task: "Gemini Flash - Issue Date Extraction"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/desktop-app/python/ocr_engine_gemini_flash.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Updated Gemini prompts (both lite and full) to extract issue_date from GCN documents. Supports handwriting recognition with flexible formats: full (DD/MM/YYYY), partial (MM/YYYY), year_only (YYYY), not_found. Returns issue_date and issue_date_confidence in JSON response. Needs testing with real handwritten dates."
 
 frontend:
   - task: "Desktop App - Electron + React"

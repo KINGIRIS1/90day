@@ -902,13 +902,15 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 
 ⚠️ TẠI SAO PHẢI TRẢ VỀ "GCN"?
 - Không thể xác định cũ/mới khi scan TỪNG file riêng lẻ
-- Cần so sánh TẤT CẢ GCN trong batch (số nhỏ = cũ, số lớn = mới)
-- Frontend sẽ xử lý batch post-processing để phân loại GCNC/GCNM
+- Cần so sánh NGÀY CẤP của TẤT CẢ GCN trong batch
+- Frontend sẽ xử lý batch post-processing để phân loại GCNC/GCNM:
+  * Ngày nhỏ hơn = GCNC (cũ)
+  * Ngày lớn hơn = GCNM (mới)
 
 ⚠️ ĐIỀU KIỆN:
 - CHỈ áp dụng khi có: quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"
 - KHÔNG áp dụng cho giấy tờ đen trắng
-- NẾU không tìm thấy số GCN → certificate_number: null
+- NẾU không tìm thấy ngày cấp → issue_date: null, issue_date_confidence: "not_found"
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
   • "Giấy chứng nhận quyền sử dụng đất..." (bất kỳ variant) → GCN (tìm certificate_number)

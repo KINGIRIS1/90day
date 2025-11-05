@@ -124,7 +124,7 @@ frontend:
         agent: "main"
         comment: "Created Electron desktop app with React UI. Features: file/folder picker, offline OCR processing, cloud boost option, settings page with OCR engine selection. IPC communication via preload.js. Needs testing in electron-dev mode."
   
-  - task: "Desktop Scanner Component"
+  - task: "Desktop Scanner Component - GCN Date-Based Classification"
     implemented: true
     working: "needs_testing"
     file: "/app/desktop-app/src/components/DesktopScanner.js"
@@ -135,6 +135,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "Main scanning UI with two processing modes: Offline OCR (free, 85-95% depending on engine) and Cloud Boost (paid, 93%+). Shows confidence bars, method badges, and recommendations. Needs electron testing."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔄 MAJOR REWRITE: postProcessGCNBatch() - Commented out old certificate_number logic. Implemented new date-based classification: 1) Pair documents (trang 1+2), 2) Extract issue_date from trang 2, 3) Compare dates between pairs, 4) Oldest = GCNC, newer = GCNM. Added parseIssueDate() helper. Supports flexible date formats (DD/MM/YYYY, MM/YYYY, YYYY). Needs testing with batch GCN scans."
   
   - task: "Settings - OCR Engine Selection"
     implemented: true

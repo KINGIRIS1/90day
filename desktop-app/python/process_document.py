@@ -146,6 +146,18 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             # Map Gemini result to rule_classifier format
             short_code = result.get("short_code", "UNKNOWN")
             
+            # ✅ CODE ALIAS MAPPING: Map alternate codes to standard codes
+            CODE_ALIASES = {
+                "HDTG": "HDCQ",  # Hợp đồng tặng cho → Hợp đồng chuyển nhượng, tặng cho
+            }
+            
+            # Apply alias mapping if needed
+            if short_code in CODE_ALIASES:
+                original_code = short_code
+                short_code = CODE_ALIASES[short_code]
+                result["short_code"] = short_code
+                print(f"🔄 Mapped code '{original_code}' → '{short_code}'", file=sys.stderr)
+            
             # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
             # Get all valid codes from rule_classifier
             from rule_classifier import EXACT_TITLE_MAPPING, DOCUMENT_RULES

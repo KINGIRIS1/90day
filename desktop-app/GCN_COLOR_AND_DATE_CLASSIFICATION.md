@@ -73,7 +73,12 @@ if (only_1_pair) {
 2. **issue_date** (string): "DD/MM/YYYY", "MM/YYYY", "YYYY", null
    - A3: Thường ở trang 2
    - A4: Thường ở trang 1 (bottom)
-   - Flexible format nếu mờ
+   - **Multiple formats supported**:
+     * Format 1: "DD/MM/YYYY" (e.g., "14/04/2025")
+     * Format 2: "Ngày DD tháng MM năm YYYY" (e.g., "Ngày 25 tháng 8 năm 2010")
+       - Gemini converts to "DD/MM/YYYY" → "25/8/2010"
+     * Format 3: "DD.MM.YYYY" or "DD-MM-YYYY"
+   - Flexible format nếu mờ (MM/YYYY or YYYY)
 
 3. **issue_date_confidence** (string): "full", "partial", "year_only", "not_found"
 

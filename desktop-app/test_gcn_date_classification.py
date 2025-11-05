@@ -5,6 +5,10 @@ Test GCN Date-Based Classification
 Verify that Gemini prompts request issue_date extraction
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'python'))
+
 from ocr_engine_gemini_flash import get_classification_prompt_lite, get_classification_prompt
 
 def test_prompts():

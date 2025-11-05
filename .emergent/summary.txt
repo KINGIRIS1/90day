@@ -1,23 +1,43 @@
 <analysis>
-The previous AI engineer successfully transformed a desktop OCR application for Vietnamese land documents. Initial efforts stabilized the Windows Electron build and integrated Gemini Flash AI, including cost tracking and resolving UNKNOWN classifications through detailed prompt engineering. Significant work was dedicated to cost optimization via prompt deduplication (42.1% token reduction) and implementing smart image resizing with user-configurable settings.
+The trajectory details an iterative refinement process of a desktop OCR application for Vietnamese land documents. Initially, the AI engineer addressed a case-sensitivity issue for TTr codes, which was resolved by fixing a regex in . Concurrently, classification for BIÊN BẢN documents was improved to correctly map to BBKTHT by enhancing prompts with specific examples. The next major task involved classifying GIẤY CAM KẾT as DCK via prompt updates and implementing an exit confirmation dialog in the Electron app.
 
-Key challenges involved fine-tuning classification for numerous Vietnamese document types, leading to iterative prompt refinements for Flash Lite, and robustly addressing API rate limits by adding a user-adjustable delay for sequential file processing. The engineer also provided comprehensive user education on Gemini API billing tiers and troubleshooting quota issues. The work culminated in fixing specific classification errors in Flash Lite, including adding visual recognition cues. The immediate next task, where the trajectory ended, is to resolve a case-sensitivity issue in document code validation for the TTr code.
+The most complex phase focused on robustly classifying Giấy chứng nhận (GCN) into GCNC (old) or GCNM (new) based on certificate numbers. This evolved from simple digit rules to a sophisticated batch post-processing approach in the frontend. Key challenges included:
+1.  **Prompt Engineering:** Iteratively refining Gemini Flash Lite prompts to return a generic GCN and extract the .
+2.  **Frontend Logic:** Developing JavaScript logic in  to group, sort, and reclassify GCN documents after a batch scan, based on alphabetical prefixes, sequential number comparison, and prioritizing color (red=GCNC, pink=GCNM).
+3.  **Data Flow:** Ensuring the  was correctly passed from Python's OCR engine to the JavaScript frontend.
+4.  **Edge Cases:** Handling various certificate number formats (2 chars + 6/8 digits, 4 chars + 6 digits as OCR errors), ignoring số vào sổ (5 digits), and mã vạch (13 digits).
+5.  **UI Feedback:** Adding visual notifications to indicate GCN post-processing status.
+
+The process involved frequent user feedback, leading to multiple revisions of prompts and client-side logic. The final interaction explores Gemini's handwriting recognition capabilities, specifically for extracting dates.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, designed to accurately classify and rename documents. It supports single and batch scanning, history management, PDF export, fuzzy matching, keyword classification, and automatic title assignment. It integrates multiple OCR engines including Tesseract, VietOCR, EasyOCR, and cloud-based solutions like Google Cloud Vision, Azure Computer Vision, and Gemini Flash (with GPT-4 Vision for Cloud Boost). Recent focus has been on improving classification for specific Vietnamese document types using Position-Aware and Standalone Text rules. Key user requests included an all-in-one NSIS Windows x64 installer using system Python (3.10-3.12), enabling Gemini Flash AI (AppName: 90dayChonThanh, Company: Nguyen Thin Trung, Version: 1.1.0), displaying estimated costs per scan/batch, fixing UNKNOWN classifications (especially for GTLQ and specific text patterns), providing a UI option to switch between Gemini Flash and Flash Lite, and optimizing prompt tokens and image size to reduce API costs while maintaining accuracy.
+The application is a desktop OCR scanner for Vietnamese land documents, designed to accurately classify and rename documents. It supports single and batch scanning, history management, PDF export, fuzzy matching, keyword classification, and automatic title assignment. It integrates multiple OCR engines, including cloud-based Gemini Flash AI (AppName: 90dayChonThanh, Company: Nguyen Thin Trung, Version: 1.1.0).
+
+Key user requests include:
+-   An all-in-one NSIS Windows x64 installer using system Python (3.10-3.12).
+-   Displaying estimated costs per scan/batch.
+-   Fixing UNKNOWN classifications, particularly for GTLQ and specific text patterns.
+-   Providing a UI option to switch between Gemini Flash and Flash Lite.
+-   Optimizing prompt tokens and image size to reduce API costs while maintaining accuracy.
+-   Resolving a case-sensitivity issue for the document code TTr.
+-   Correctly classifying BIÊN BẢN Xác minh thực địa thửa đất xin chuyển mục đích sử dụng đất phải xin phép as BBKTHT.
+-   Classifying GIẤY CAM KẾT as DCK.
+-   Adding an exit confirmation dialog for the desktop application.
+-   Implementing a complex classification logic for Giấy chứng nhận (GCN) documents, distinguishing between GCNC (cũ - old) and GCNM (mới - new) based on certificate serial numbers (2 chars + 6/8 digits), their numerical sequence within a batch, and color (red for GCNC, pink for GCNM), with specific handling for OCR errors (4 chars) and ignoring irrelevant numbers (5-digit số vào sổ, 13-digit mã vạch).
+-   Exploring the extraction of handwriting, specifically Ngày cấp (date of issue) from GCN documents.
 </product_requirements>
 
 <key_technical_concepts>
--   **Electron**: Desktop app framework.
--   **React**: Frontend UI.
--   **Python**: Backend for OCR and AI.
--   **Electron-builder/NSIS**: Packaging Windows installers.
--   **Python Environment Management**: Dynamic  detection.
--   **Gemini Flash API**: Google's multimodal AI for OCR and classification, token-based pricing.
--   **IPC**: Electron's inter-process communication.
--   **Prompt Engineering**: Optimizing LLM inputs for specific tasks.
--   **Image Processing**: Using PIL for resizing.
+-   **Electron**: Desktop application framework.
+-   **React**: Frontend UI development.
+-   **Python**: Backend for OCR and AI processing.
+-   **Gemini Flash API**: Google's multimodal AI for document OCR and classification, with token-based pricing.
+-   **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification and structured JSON output (including ).
+-   **IPC (Inter-Process Communication)**: Electron's mechanism for communication between main and renderer processes, used for settings and document processing.
+-   **Image Processing (PIL)**: Python Imaging Library for smart image resizing.
+-   **Client-side Post-processing**: JavaScript logic in the React frontend for complex batch-level classification (e.g., GCN sorting and reclassification).
+-   **Regex**: Used for parsing certificate numbers and other document codes.
 </key_technical_concepts>
 
 <code_architecture>
@@ -26,75 +46,67 @@ The application is structured into , , and  directories.
 
 
 -   ****:
-    -   **Summary**: Configuration for Electron-builder, scripts.
-    -   **Changes**:  script added for Windows compatibility (yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.).
--   ****:
     -   **Summary**: Electron's main process, window management, IPC, Python execution.
-    -   **Changes**: Added IPC handlers for  and  to manage general settings, including image resizing and request delay. Updated  to pass , , , and  as environment variables to the Python script.
+    -   **Changes**: Added a confirmation dialog using  when the app is about to close, ensuring user intent.
 -   ****:
     -   **Summary**: Compiled version of .
-    -   **Changes**: Synchronized with  modifications.
+    -   **Changes**: Synchronized with  modifications to include the exit confirmation dialog.
 -   ****:
     -   **Summary**: Python script for Gemini Flash AI OCR and classification.
     -   **Changes**:
-        -   Added image resizing logic (using PIL) before sending to Gemini API, based on , ,  settings, returning .
-        -   Implemented two distinct prompt functions:  for Flash (full, detailed) and  for Flash Lite (optimized, concise).
-        -   Logic to dynamically select between these prompts based on .
-        -    was iteratively refined to include specific rule examples (e.g., DDKBD, GTLQ, PKTHS, PCT, GNT, TBT) and visual recognition hints (e.g., quốc huy) while avoiding new code creation, reverting .
-        -   Added error handling for API errors (rate limits, quota exhaustion).
-        -   **Current Issue**:  at line 1359 is forcing all codes to uppercase, causing a validation failure for codes like 'TTr' which are case-sensitive in the valid codes list.
+        -   Refined  and :
+            -   Added specific examples and visual cues for BBKTHT (Biên bản kiểm tra, xác minh hiện trạng sử dụng đất).
+            -   Included a note about case-sensitivity for TTr in the prompt.
+            -   Updated prompts to return generic GCN and explicitly extract  in JSON, with strong emphasis against returning GCNM/GCNC directly from Gemini.
+            -   Added JSON response examples to guide Gemini on expected output format.
+            -   Updated GCN rules in prompts to include multi-format (, ,  as OCR error), color priority (red GCNC, pink GCNM), and comparison logic.
+        -   Fixed  fallback parsing regex (around line 1391) to allow mixed-case characters () for codes like TTr.
+        -   Removed a temporary  function as the validation logic moved to the frontend.
 -   ****:
     -   **Summary**: Orchestrates document processing and OCR engine calls.
-    -   **Changes**: Modified  to accept and pass , , , and  to the OCR engine.
--   ** (NEW)**:
-    -   **Summary**: New script to calculate and display estimated costs for different Gemini models (Flash, Flash Lite) with and without image resizing.
-    -   **Changes**: Created to provide a clear breakdown of pricing.
+    -   **Changes**: Modified the JSON output to explicitly include the  extracted by , ensuring it is passed to the frontend.
 -   ****:
-    -   **Summary**: Main React component.
-    -   **Changes**: App logo path updated to use .
+    -   **Summary**: Defines document classification rules and valid codes.
+    -   **Changes**: Added GCN as a valid document code in  and  to prevent it from being classified as UNKNOWN by the internal validation system. Added DCK to mapping.
 -   ****:
     -   **Summary**: Handles document scanning and displays results.
     -   **Changes**:
-        -   Now displays , token counts, and  for scanned files.
-        -   **Added  state and a UI slider** for users to configure delay between sequential scans.
-        -   Implemented a  function within the scan loop () to prevent rate limit issues, this was added to the existing sequential processing.
-        -   Integrated the new  component and updated error handling to show quota warnings.
--   ****:
-    -   **Summary**: Manages cloud OCR engine settings, API key, and model selection.
-    -   **Changes**:
-        -   Implemented UI radio buttons for Gemini Flash/Flash Lite selection, storing selected model with API key.
-        -   **Added UI section for image resize settings**: enable/disable toggle, max width/height inputs.
-        -   Added UI for displaying the cost estimation table from .
-        -   Includes guidance on Gemini API quota management.
--   ** (NEW)**:
-    -   **Summary**: New React component to display warnings about Gemini API rate limits or quota exhaustion.
-    -   **Changes**: Created to inform users about API limits and guide them on resolution.
--   **New Markdown Files**: , , , , , ,  were created to document features and troubleshooting steps.
+        -   Implemented  function to perform complex, batch-level reclassification of GCN documents:
+            -   Converts initially returned GCNM/GCNC from Gemini (if any) to GCN.
+            -   Groups GCN documents by certificate number prefix.
+            -   Sorts documents within groups by certificate number (numerically) to assign GCNC (smallest/older) or GCNM (larger/newer).
+            -   Handles mixed-length certificate numbers (8 digits > 6 digits).
+            -   Prioritizes color detection (red=GCNC, pink=GCNM) for GCN classification if available.
+            -   Treats 4-character numbers as OCR errors, defaulting to GCNC.
+            -   Ignores 5-digit numbers (identified as số vào sổ) and 13-digit numbers (identified as mã vạch).
+            -   Adds error handling and detailed console logs for debugging post-processing.
+        -   Integrated  to run automatically after a batch scan completes, updating the UI.
+        -   Added  state and a visual notification in the UI to inform the user about ongoing GCN post-processing.
+-   **New Markdown Files**: , , , ,  were created to document specific fixes and features.
+-   **New Test Scripts**: , ,  were created for verifying specific fixes.
 </code_architecture>
 
 <pending_tasks>
-- Implement full logic for the all-in-one installer using .
-- Fine-tune remaining document types in  and .
-- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
-- Migrate or pin React/Webpack versions.
-- Test the backend with 5-10 real images to validate Hybrid OCR.
-- Update icon for macOS (.icns).
-- Implement license/activation key feature.
-- Implement Parallel Local Processing for batch scanning.
-- Handle deep path length issues in the application.
-- Implement Batch Scan from List feature.
-- Address the slow startup of the app.
-- Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
-- Implement a code patch for robust cache pathing and single-instance lock in .
+-   Implement full logic for the all-in-one installer using .
+-   Fine-tune remaining document types in  and .
+-   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+-   Migrate or pin React/Webpack versions.
+-   Test the backend with 5-10 real images to validate Hybrid OCR.
+-   Update icon for macOS (.icns).
+-   Implement license/activation key feature.
+-   Implement Parallel Local Processing for batch scanning.
+-   Handle deep path length issues in the application.
+-   Implement Batch Scan from List feature.
+-   Address the slow startup of the app.
+-   Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
+-   Implement a code patch for robust cache pathing and single-instance lock in .
+-   Implement handwriting extraction, specifically Ngày cấp (date of issue), from GCN documents, based on user requirements.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was diagnosing a classification error for the document code TTr (Tờ trình) when using Gemini Flash Lite. The user provided console logs indicating that Gemini returned TTr correctly, but the application's internal validation system was flagging it as an INVALID code TTR after sanitization.
-
-The AI engineer successfully identified the root cause: a line in  (specifically, ) was forcing all returned document codes to uppercase before validation. This caused a mismatch with the stored list of valid codes, which includes TTr with a lowercase 'r'. The problem is a case-sensitivity issue introduced by an aggressive sanitization step in the Python OCR engine. The fix needs to ensure that the sanitization process respects the expected casing for document codes or that the validation is case-insensitive.
+Immediately before this summary request, the AI engineer was discussing Gemini 2.5's capabilities regarding handwriting recognition. The user asked if Gemini 2.5 can read handwriting, specifically inquiring about extracting the Ngày cấp (date of issue) written by hand on a document. The AI engineer confirmed Gemini 2.5's general ability to read handwriting, along with its limitations. The AI engineer then proactively asked the user for clarification on what they intended to do with the extracted handwriting (e.g., save as metadata, display in UI, validate format) and the desired accuracy, to determine the next steps for implementation. The conversation ended with the AI engineer awaiting the user's detailed requirements for handwriting extraction.
 </current_work>
 
 <optional_next_step>
-Adjust the  sanitization logic in  to correctly handle case-sensitive document codes like TTr.
+Based on user clarification, implement the extraction of Ngày cấp (date of issue) from GCN documents using Gemini's handwriting recognition.
 </optional_next_step>

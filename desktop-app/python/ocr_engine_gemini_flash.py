@@ -326,37 +326,41 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • Lý do: Frontend sẽ phân loại theo:
     1. Ưu tiên 1: Màu sắc (red = GCNC, pink = GCNM)
     2. Ưu tiên 2: Ngày cấp (nếu không detect được màu)
-  • ✅ ĐÚNG:
+  • ✅ ĐÚNG (GCN đỏ/cam - cũ):
     {
       "short_code": "GCN",
-      "issue_date": "01/01/2012",
+      "color": "red",
+      "issue_date": "27/10/2021",
       "issue_date_confidence": "full",
       "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, ngày cấp 01/01/2012"
+      "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021"
     }
-  • ✅ ĐÚNG (nếu mờ):
+  • ✅ ĐÚNG (GCN hồng - mới):
     {
       "short_code": "GCN",
-      "issue_date": "02/2012",
-      "issue_date_confidence": "partial",
+      "color": "pink",
+      "issue_date": "14/04/2025",
+      "issue_date_confidence": "full",
       "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận, chỉ đọc được tháng/năm: 02/2012"
+      "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025"
     }
-  • ✅ ĐÚNG (nếu rất mờ):
+  • ✅ ĐÚNG (không detect được màu):
     {
       "short_code": "GCN",
-      "issue_date": "2012",
-      "issue_date_confidence": "year_only",
+      "color": "unknown",
+      "issue_date": "01/01/2012",
+      "issue_date_confidence": "full",
       "confidence": 0.9,
-      "reasoning": "Giấy chứng nhận, chỉ đọc được năm: 2012"
+      "reasoning": "Giấy chứng nhận, không xác định được màu, ngày cấp 01/01/2012"
     }
-  • ✅ ĐÚNG (không tìm thấy):
+  • ✅ ĐÚNG (không tìm thấy ngày):
     {
       "short_code": "GCN",
+      "color": "pink",
       "issue_date": null,
       "issue_date_confidence": "not_found",
       "confidence": 0.9,
-      "reasoning": "Giấy chứng nhận, không tìm thấy ngày cấp (có thể trang 1)"
+      "reasoning": "Giấy chứng nhận màu hồng, không tìm thấy ngày cấp (có thể trang 1 hoặc trang 2)"
     }
   • ❌ SAI (không bao giờ làm):
     {

@@ -308,12 +308,24 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • Title: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (dài hoặc ngắn)
   • ❌ TUYỆT ĐỐI KHÔNG trả về "GCNM" hoặc "GCNC" ❌
   • ✅ CHỈ trả về "GCN" (generic)
-  • ⚠️ BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
-    - Format: DD/MM/YYYY (ví dụ: "01/01/2012", "15/03/2013")
-    - Nếu mờ chỉ đọc được: MM/YYYY (ví dụ: "02/2012") hoặc chỉ năm YYYY (ví dụ: "2012")
-    - Tìm text gần "Ngày cấp", "Cấp ngày", hoặc ô có handwriting date
-  • Response: "GCN" + issue_date + issue_date_confidence
-  • Lý do: Frontend sẽ so sánh ngày cấp giữa các GCN, ngày nhỏ = cũ (GCNC), ngày lớn = mới (GCNM)
+  
+  • ⚠️ BẮT BUỘC 1: Xác định MÀU SẮC của giấy (COLOR DETECTION - QUAN TRỌNG NHẤT)
+    - Màu ĐỎ/CAM (red/orange): GCN cũ → color: "red"
+    - Màu HỒNG (pink): GCN mới → color: "pink"
+    - Không xác định được: color: "unknown"
+    - Ví dụ: Nếu thấy màu nền đỏ cam → color: "red", nếu màu hồng → color: "pink"
+  
+  • ⚠️ BẮT BUỘC 2: Tìm NGÀY CẤP (có thể ở trang 1 hoặc trang 2, có thể viết tay)
+    - GCN A3 (2 trang lớn): Ngày cấp thường ở trang 2
+    - GCN A4 (1 trang nhỏ): Ngày cấp thường ở trang 1 (bottom)
+    - Format: DD/MM/YYYY (ví dụ: "14/04/2025", "27/10/2021")
+    - Nếu mờ: MM/YYYY (ví dụ: "02/2012") hoặc YYYY (ví dụ: "2012")
+    - Tìm text gần "Ngày cấp", "Cấp ngày", "ngày..tháng..năm"
+  
+  • Response: "GCN" + color + issue_date + issue_date_confidence
+  • Lý do: Frontend sẽ phân loại theo:
+    1. Ưu tiên 1: Màu sắc (red = GCNC, pink = GCNM)
+    2. Ưu tiên 2: Ngày cấp (nếu không detect được màu)
   • ✅ ĐÚNG:
     {
       "short_code": "GCN",

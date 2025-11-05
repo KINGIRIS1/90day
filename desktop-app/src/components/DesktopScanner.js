@@ -1263,6 +1263,40 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                     </div>
                   )}
                   
+                  {/* Rescan folder button */}
+                  {t.status === 'done' && (t.results || []).length > 0 && (
+                    <div className="mb-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">
+                            📂 {t.name} - {(t.results || []).length} files
+                          </div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            Phát hiện lỗi nhiều file? Quét lại thư mục này để sửa
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm(`Quét lại thư mục "${t.name}"?\n\nTất cả kết quả cũ sẽ bị xóa và quét lại từ đầu.`)) {
+                              const idx = childTabs.findIndex(x => x.path === t.path);
+                              if (idx >= 0) {
+                                // Reset status and results
+                                setChildTabs(prev => prev.map((ct, i) => 
+                                  i === idx ? { ...ct, status: 'pending', results: [] } : ct
+                                ));
+                                // Rescan this folder
+                                await scanChildFolder(idx);
+                              }
+                            }
+                          }}
+                          className="ml-4 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors"
+                        >
+                          🔄 Quét lại thư mục này
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className={`grid gap-3 ${gridColsClass}`}>
                     {(t.results || []).map((r, idx) => (
                       <div key={idx} className="p-3 border rounded-lg bg-white">

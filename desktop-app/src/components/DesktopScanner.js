@@ -339,45 +339,45 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
      *   
      *   // Pattern 1: [2-4 letters][space/dot][6 or 8 digits ONLY]
      *   match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{6}|\d{8})$/i);
-      
-      if (match) {
-        prefix = match[1].toUpperCase();
-        number = match[2];
-      } else {
-        // Pattern 2: [6 or 8 digits only] (no prefix)
-        match = certNumber.match(/^(\d{6}|\d{8})$/);
-        if (match) {
-          prefix = 'NO_PREFIX';
-          number = match[1];
-          console.log(`⚠️ Certificate with no prefix: ${certNumber} → Default GCNC`);
-        } else {
-          // Invalid format - identify what type
-          const digitMatch = certNumber.match(/\d+/);
-          const digitCount = digitMatch ? digitMatch[0].length : 0;
-          
-          let reason = 'unknown format';
-          if (digitCount === 5) {
-            reason = 'likely "số vào sổ" (5 digits)';
-          } else if (digitCount >= 10) {
-            reason = 'likely "mã vạch/barcode" (10+ digits)';
-          } else if (digitCount < 6) {
-            reason = 'too short (< 6 digits)';
-          } else {
-            reason = 'invalid format';
-          }
-          
-          console.log(`⚠️ Invalid certificate format (${reason}): ${certNumber} → Ignored`);
-          unrecognizedCerts.push({ ...doc, _invalidReason: reason });
-          return; // Skip to next document
-        }
-      }
-      
-      const digitCount = number.length;
-      const letterCount = prefix === 'NO_PREFIX' ? 0 : prefix.length;
-      const isOcrError = letterCount === 4; // 4 letters = OCR error
-      const hasNoPrefix = prefix === 'NO_PREFIX';
-      
-      if (!grouped[prefix]) {
+     *   
+     *   if (match) {
+     *     prefix = match[1].toUpperCase();
+     *     number = match[2];
+     *   } else {
+     *     // Pattern 2: [6 or 8 digits only] (no prefix)
+     *     match = certNumber.match(/^(\d{6}|\d{8})$/);
+     *     if (match) {
+     *       prefix = 'NO_PREFIX';
+     *       number = match[1];
+     *       console.log(`⚠️ Certificate with no prefix: ${certNumber} → Default GCNC`);
+     *     } else {
+     *       // Invalid format - identify what type
+     *       const digitMatch = certNumber.match(/\d+/);
+     *       const digitCount = digitMatch ? digitMatch[0].length : 0;
+     *       
+     *       let reason = 'unknown format';
+     *       if (digitCount === 5) {
+     *         reason = 'likely "số vào sổ" (5 digits)';
+     *       } else if (digitCount >= 10) {
+     *         reason = 'likely "mã vạch/barcode" (10+ digits)';
+     *       } else if (digitCount < 6) {
+     *         reason = 'too short (< 6 digits)';
+     *       } else {
+     *         reason = 'invalid format';
+     *       }
+     *       
+     *       console.log(`⚠️ Invalid certificate format (${reason}): ${certNumber} → Ignored`);
+     *       unrecognizedCerts.push({ ...doc, _invalidReason: reason });
+     *       return; // Skip to next document
+     *     }
+     *   }
+     *   
+     *   const digitCount = number.length;
+     *   const letterCount = prefix === 'NO_PREFIX' ? 0 : prefix.length;
+     *   const isOcrError = letterCount === 4; // 4 letters = OCR error
+     *   const hasNoPrefix = prefix === 'NO_PREFIX';
+     *   
+     *   if (!grouped[prefix]) {
         grouped[prefix] = [];
       }
       

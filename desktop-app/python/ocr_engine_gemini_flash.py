@@ -1745,7 +1745,7 @@ def parse_gemini_response(response_text):
                 return response_dict
         
         # If no JSON found, try to extract from text
-        print(f"⚠️ No JSON found, parsing text response", file=sys.stderr)
+        print("⚠️ No JSON found, parsing text response", file=sys.stderr)
         
         # Look for short_code pattern (allow mixed case like TTr)
         code_match = re.search(r'(?:short_code|code)[\s:]+["\']?([A-Za-z0-9_]+)["\']?', response_text, re.IGNORECASE)

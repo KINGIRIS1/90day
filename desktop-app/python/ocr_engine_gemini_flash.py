@@ -1580,21 +1580,39 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - Trả về trong fields: "issue_date": "25/8/2010", "issue_date_confidence": "full"
 - Nếu KHÔNG phải GCN → "issue_date": null, "issue_date_confidence": null
 
-VÍ DỤ CHO GCN (Trang 2 - có ngày cấp):
+VÍ DỤ CHO GCN (có ngày cấp format DD/MM/YYYY):
 ✅ ĐÚNG:
 {
   "short_code": "GCN",
+  "color": "pink",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận với quốc huy và màu hồng, ngày cấp 01/01/2012",
-  "issue_date": "01/01/2012",
+  "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 14/04/2025",
+  "issue_date": "14/04/2025",
   "issue_date_confidence": "full"
 }
 
-❌ SAI (không được trả về GCNM/GCNC):
+VÍ DỤ CHO GCN (format "Ngày...tháng...năm"):
+✅ ĐÚNG (đọc được "Ngày 25 tháng 8 năm 2010"):
 {
-  "short_code": "GCNM",  // ❌ SAI - phải là "GCN"
-  "confidence": 0.95
+  "short_code": "GCN",
+  "color": "pink",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 25/8/2010 (từ 'Ngày 25 tháng 8 năm 2010')",
+  "issue_date": "25/8/2010",
+  "issue_date_confidence": "full"
+}
+
+✅ ĐÚNG (GCN không có ngày cấp):
+{
+  "short_code": "GCN",
+  "color": "pink",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận màu hồng, không tìm thấy ngày cấp",
+  "issue_date": null,
+  "issue_date_confidence": "not_found"
 }
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:

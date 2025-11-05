@@ -1272,7 +1272,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                             📂 {t.name} - {(t.results || []).length} files
                           </div>
                           <div className="text-xs text-gray-600 mt-1">
-                            Phát hiện lỗi nhiều file? Quét lại thư mục này để sửa
+                            Nếu bạn phát hiện nhiều file bị lỗi. Hãy sử dụng tính năng quét lại thư mục này để sửa
                           </div>
                         </div>
                         <button

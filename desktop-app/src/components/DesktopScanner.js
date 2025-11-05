@@ -292,6 +292,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
+      // Rule 5: Special case - GCN + HSKT (common mistake for GCN page 2 with map/diagram)
+      if ((lastType.short_code === 'GCN' || lastType.short_code === 'GCNM' || lastType.short_code === 'GCNC') 
+          && result.short_code === 'HSKT') {
+        console.log(`🔄 Sequential: GCN page 2 detected as HSKT (sơ đồ thửa đất) → Override to ${lastType.short_code}`);
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.75, lastType.confidence * 0.92),
+          original_confidence: result.confidence,
+          original_short_code: result.short_code,
+          applied_sequential_logic: true,
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (trang 2 có sơ đồ thửa đất, nhầm với HSKT)`
+        };
+      }
+      
       // No sequential applied - this is a new document
       if (result.title_boost_applied && result.confidence >= 0.80) {
         console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${formatConfidence(result.confidence)}%)`);

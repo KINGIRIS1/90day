@@ -308,6 +308,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         };
       }
       
+      // Rule 6: Special case - PCT + DDKBD (common mistake for PCT page 2 with "ĐĂNG KÝ BIẾN ĐỘNG" section)
+      if (lastType.short_code === 'PCT' && result.short_code === 'DDKBD') {
+        console.log(`🔄 Sequential: PCT page 2 detected as DDKBD (section "ĐĂNG KÝ BIẾN ĐỘNG") → Override to PCT`);
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.75, lastType.confidence * 0.92),
+          original_confidence: result.confidence,
+          original_short_code: result.short_code,
+          applied_sequential_logic: true,
+          note: `📄 Trang tiếp theo của PCT (trang 2 có section "ĐĂNG KÝ BIẾN ĐỘNG", nhầm với DDKBD)`
+        };
+      }
+      
       // No sequential applied - this is a new document
       if (result.title_boost_applied && result.confidence >= 0.80) {
         console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${formatConfidence(result.confidence)}%)`);

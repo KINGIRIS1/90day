@@ -913,7 +913,7 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 - NẾU không tìm thấy ngày cấp → issue_date: null, issue_date_confidence: "not_found"
 
 🔍 Sau đó kiểm tra tiêu đề Ở TOP 30%:
-  • "Giấy chứng nhận quyền sử dụng đất..." (bất kỳ variant) → GCN (tìm certificate_number)
+  • "Giấy chứng nhận quyền sử dụng đất..." (bất kỳ variant) → GCN (tìm issue_date)
   • "Mẫu số 17C..." → TTHGD (Văn bản thỏa thuận hộ gia đình)
   • Form codes khác → Xem body content để xác định
 

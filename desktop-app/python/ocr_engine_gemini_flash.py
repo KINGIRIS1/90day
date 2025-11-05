@@ -259,6 +259,36 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         }
 
 
+def get_shared_gcn_rules():
+    """Shared GCN rules for both lite and full prompts"""
+    return """
+🚨 GCN RULES (Giấy chứng nhận quyền sử dụng đất):
+  • ❌ NEVER return "GCNM" or "GCNC" ❌
+  • ✅ ALWAYS return "GCN" (generic)
+  • Extract: color ("red"/"orange"/"pink"), issue_date, issue_date_confidence
+  • Frontend handles GCNC/GCNM classification via color + date comparison
+
+📅 ISSUE DATE EXTRACTION:
+  • Formats: "DD/MM/YYYY", "Ngày DD tháng MM năm YYYY", "MM/YYYY", "YYYY"
+  • Convert "Ngày 25 tháng 8 năm 2010" → "25/8/2010"
+  • Confidence: "full"/"partial"/"year_only"/"not_found"
+"""
+
+def get_shared_warning():
+    """Shared warning for code creation"""
+    return """
+🚨 DO NOT CREATE NEW CODES:
+❌ NO self-created codes (e.g., "LCHO", "VBCC", "HDQUYEN")
+✅ ONLY use codes from 98-type list above
+✅ If no match → return "UNKNOWN"
+
+⚠️ COMMON MISTAKES:
+❌ "HỢP ĐỒNG ỦY QUYỀN" → "HDQUYEN" (WRONG! Must be "HDUQ")
+❌ "GIẤY ỦY QUYỀN" → "HDQUYEN" (WRONG! Must be "GUQ")
+✅ "HỢP ĐỒNG ỦY QUYỀN" → "HDUQ" ✓
+✅ "GIẤY ỦY QUYỀN" → "GUQ" ✓
+"""
+
 def get_classification_prompt_lite():
     """
     OPTIMIZED prompt for Flash Lite with critical special cases

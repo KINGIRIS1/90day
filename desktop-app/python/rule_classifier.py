@@ -137,6 +137,7 @@ EXACT_TITLE_MAPPING = {
     "THỎA THUẬN PHÂN CHIA TÀI SẢN CHUNG VỢ CHỒNG": "PCTSVC",
     "VĂN BẢN THỎA THUẬN PHÂN CHIA TÀI SẢN VỢ CHỒNG": "PCTSVC",
     "PHÂN CHIA TÀI SẢN VỢ CHỒNG": "PCTSVC",
+    "VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG": "PCTSVC",
 }
 
 # Title templates for fuzzy matching (các mẫu title chuẩn)

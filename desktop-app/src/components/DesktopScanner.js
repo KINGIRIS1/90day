@@ -261,7 +261,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   // Post-process GCN documents after batch completion
   const postProcessGCNBatch = (results) => {
     try {
-      console.log('🔄 Post-processing GCN batch...');
+      console.log('🔄 Post-processing GCN batch (DATE-BASED classification)...');
       
       // STEP 1: Convert any old GCNM/GCNC to GCN (Gemini sometimes still returns old codes)
       const normalizedResults = results.map(r => {
@@ -287,33 +287,58 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
     
-    // Separate GCNs with and without certificate numbers
-    const gcnDocs = allGcnDocs.filter(r => r.certificate_number && r.certificate_number.trim() !== '');
-    const gcnWithoutCert = allGcnDocs.filter(r => !r.certificate_number || r.certificate_number.trim() === '');
+    // NEW LOGIC: Pair documents (trang 1 + trang 2)
+    // Scan order: trang 1 (index 0) → trang 2 (index 1) → trang 1 (index 2) → trang 2 (index 3)...
+    // Trang 2 (index lẻ) có ngày cấp, trang 1 (index chẵn) không có hoặc có thể có
     
-    console.log(`  📋 With certificate number: ${gcnDocs.length}`);
-    console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
-    
-    // Group by prefix - ONLY accept valid GCN certificate numbers:
-    // 1. [2 letters][6 numbers]: DE 334187 (old, red)
-    // 2. [2 letters][8 numbers]: AA 01085158 (new, pink)
-    // 3. [4 letters][6 numbers]: S6AB 227162 (OCR error → GCNC)
-    // 
-    // ⚠️ IGNORE 5-digit numbers (e.g., CS 09068, CN.03126)
-    // → These are "Số vào sổ cấp GCN", NOT real certificate numbers!
-    const grouped = {};
-    const unrecognizedCerts = []; // Track unrecognized/invalid formats
-    
-    gcnDocs.forEach((doc, originalIndex) => {
-      const certNumber = doc.certificate_number.trim();
+    const pairs = [];
+    for (let i = 0; i < allGcnDocs.length; i += 2) {
+      const page1 = allGcnDocs[i];
+      const page2 = allGcnDocs[i + 1];
       
-      // Try to match VALID certificate patterns
-      let match = null;
-      let prefix = null;
-      let number = null;
-      
-      // Pattern 1: [2-4 letters][space/dot][6 or 8 digits ONLY]
-      match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{6}|\d{8})$/i);
+      if (page1 && page2) {
+        pairs.push({ page1, page2, pairIndex: i / 2 });
+        console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1) + ${page2.fileName} (trang 2)`);
+      } else if (page1) {
+        // Lẻ page (chỉ có trang 1, không có trang 2)
+        pairs.push({ page1, page2: null, pairIndex: i / 2 });
+        console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1 only, no pair)`);
+      }
+    }
+    
+    console.log(`📋 Total pairs: ${pairs.length}`);
+    
+    /* ============================================
+     * COMMENTED OUT: OLD LOGIC (certificate_number based)
+     * ============================================
+     * 
+     * // Separate GCNs with and without certificate numbers
+     * const gcnDocs = allGcnDocs.filter(r => r.certificate_number && r.certificate_number.trim() !== '');
+     * const gcnWithoutCert = allGcnDocs.filter(r => !r.certificate_number || r.certificate_number.trim() === '');
+     * 
+     * console.log(`  📋 With certificate number: ${gcnDocs.length}`);
+     * console.log(`  📋 Without certificate number: ${gcnWithoutCert.length}`);
+     * 
+     * // Group by prefix - ONLY accept valid GCN certificate numbers:
+     * // 1. [2 letters][6 numbers]: DE 334187 (old, red)
+     * // 2. [2 letters][8 numbers]: AA 01085158 (new, pink)
+     * // 3. [4 letters][6 numbers]: S6AB 227162 (OCR error → GCNC)
+     * // 
+     * // ⚠️ IGNORE 5-digit numbers (e.g., CS 09068, CN.03126)
+     * // → These are "Số vào sổ cấp GCN", NOT real certificate numbers!
+     * const grouped = {};
+     * const unrecognizedCerts = []; // Track unrecognized/invalid formats
+     * 
+     * gcnDocs.forEach((doc, originalIndex) => {
+     *   const certNumber = doc.certificate_number.trim();
+     *   
+     *   // Try to match VALID certificate patterns
+     *   let match = null;
+     *   let prefix = null;
+     *   let number = null;
+     *   
+     *   // Pattern 1: [2-4 letters][space/dot][6 or 8 digits ONLY]
+     *   match = certNumber.match(/^([A-Z]{2,4})[\s.]*(\d{6}|\d{8})$/i);
       
       if (match) {
         prefix = match[1].toUpperCase();

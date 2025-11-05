@@ -1091,7 +1091,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                 <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">{getMethodBadge(result.method)}<span className="ml-auto font-semibold">{formatConfidence(result.confidence)}%</span></div>
                 <div className="mt-2 text-xs text-gray-600">Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
                 <div className="mt-2 p-2 bg-gray-50 border rounded"><InlineShortCodeEditor value={result.short_code} onChange={(newCode) => { setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r)); }} /></div>
-                {result.previewUrl && (<button onClick={() => setSelectedPreview(result.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">Phóng to ảnh</button>)}
+                
+                {/* Action Buttons */}
+                <div className="mt-2 flex gap-2">
+                  {result.previewUrl && (
+                    <button
+                      onClick={() => setSelectedPreview(result.previewUrl)}
+                      className="flex-1 text-xs text-blue-600 hover:bg-blue-50 py-1 px-2 rounded border border-blue-200"
+                    >
+                      🔍 Phóng to
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Xóa file "${result.fileName}"?`)) {
+                        setResults(prev => prev.filter((_, i) => i !== idx));
+                      }
+                    }}
+                    className="flex-1 text-xs text-red-600 hover:bg-red-50 py-1 px-2 rounded border border-red-200"
+                  >
+                    🗑️ Xóa
+                  </button>
+                </div>
               </div>
             ))}
           </div>

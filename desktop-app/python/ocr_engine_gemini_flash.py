@@ -662,7 +662,7 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "issue_date": "01/01/2012"
 }
 
-✅ Example 3 - Non-GCN Document:
+✅ Example 3 - HDCN Document:
 {
   "short_code": "HDCN",
   "confidence": 0.92,
@@ -672,7 +672,17 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "issue_date_confidence": null
 }
 
-✅ Example 4 - Unknown Document:
+✅ Example 4 - HDUQ Document (HỢP ĐỒNG ỦY QUYỀN):
+{
+  "short_code": "HDUQ",
+  "confidence": 0.98,
+  "title_position": "top",
+  "reasoning": "Hợp đồng ủy quyền - tiêu đề lớn ở top",
+  "issue_date": null,
+  "issue_date_confidence": null
+}
+
+✅ Example 5 - Unknown Document:
 {
   "short_code": "UNKNOWN",
   "confidence": 0.3,

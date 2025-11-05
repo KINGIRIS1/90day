@@ -401,6 +401,11 @@ DDKBD = Đơn đăng ký biến động đất đai, tài sản gắn liền v�
   • Title: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI"
   • Keywords: "biến động", "nội dung biến động", "nhận chuyển nhượng"
   • Form có sections: thông tin người dùng đất, nội dung biến động, giấy tờ kèm theo
+  • ⚠️ KHÔNG dùng cho đơn tách/hợp thửa (dùng DXTHT)
+DXTHT = Đơn xin (đề nghị) tách thửa đất, hợp thửa đất
+  • Title: "ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT" hoặc "ĐƠN XIN TÁCH THỬA"
+  • Keywords: "tách thửa", "hợp thửa", "tách", "hợp"
+  • ⚠️ Ưu tiên DXTHT nếu có từ "tách" hoặc "hợp" trong title
 DCK = Đơn cam kết, Giấy cam kết
   • Title: "GIẤY CAM KẾT" hoặc "ĐƠN CAM KẾT"
   • Variants: "GIẤY CAM KẾT\n(V/v chọn thửa đất...)", "ĐƠN CAM KẾT"

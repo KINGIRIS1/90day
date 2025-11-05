@@ -1258,16 +1258,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                           <span className="ml-auto font-semibold">{formatConfidence(r.confidence)}%</span>
                         </div>
                         <div className="mt-2 text-xs text-gray-600">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
-                        {typeof r.estimated_cost_usd === 'number' && (
-                          <div className="mt-1 text-[11px] text-emerald-700">
-                            Ước tính: ${r.estimated_cost_usd.toFixed(6)} {r.usage ? `(in ${r.usage.input_tokens || 0}, out ${r.usage.output_tokens || 0})` : ''}
-                            {r.resize_info && r.resize_info.resized && (
-                              <span className="ml-2 text-green-600" title={`Resized: ${r.resize_info.original_size} → ${r.resize_info.final_size}`}>
-                                📉 -{r.resize_info.reduction_percent}%
-                              </span>
-                            )}
-                          </div>
-                        )}
                         <div className="mt-2 p-2 bg-gray-50 border rounded">
                           <InlineShortCodeEditor
                             value={r.short_code}

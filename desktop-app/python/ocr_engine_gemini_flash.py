@@ -305,51 +305,10 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
 🚨 GCN (Giấy chứng nhận): ❌ NEVER "GCNM"/"GCNC" → Always "GCN" + color + issue_date
-  • ✅ ĐÚNG (GCN đỏ/cam - cũ, format DD/MM/YYYY):
-    {
-      "short_code": "GCN",
-      "color": "red",
-      "issue_date": "27/10/2021",
-      "issue_date_confidence": "full",
-      "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021"
-    }
-  • ✅ ĐÚNG (GCN hồng - mới, format DD/MM/YYYY):
-    {
-      "short_code": "GCN",
-      "color": "pink",
-      "issue_date": "14/04/2025",
-      "issue_date_confidence": "full",
-      "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025"
-    }
-  • ✅ ĐÚNG (GCN format "Ngày...tháng...năm"):
-    {
-      "short_code": "GCN",
-      "color": "pink",
-      "issue_date": "25/8/2010",
-      "issue_date_confidence": "full",
-      "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 25/8/2010 (từ 'Ngày 25 tháng 8 năm 2010')"
-    }
-  • ✅ ĐÚNG (không detect được màu):
-    {
-      "short_code": "GCN",
-      "color": "unknown",
-      "issue_date": "01/01/2012",
-      "issue_date_confidence": "full",
-      "confidence": 0.9,
-      "reasoning": "Giấy chứng nhận, không xác định được màu, ngày cấp 01/01/2012"
-    }
-  • ✅ ĐÚNG (không tìm thấy ngày):
-    {
-      "short_code": "GCN",
-      "color": "pink",
-      "issue_date": null,
-      "issue_date_confidence": "not_found",
-      "confidence": 0.9,
-      "reasoning": "Giấy chứng nhận màu hồng, không tìm thấy ngày cấp (có thể trang 1 hoặc trang 2)"
-    }
+  ✅ Examples:
+  {"short_code": "GCN", "color": "red", "issue_date": "27/10/2021", "issue_date_confidence": "full", "confidence": 0.95}
+  {"short_code": "GCN", "color": "pink", "issue_date": "25/8/2010", "issue_date_confidence": "full", "confidence": 0.95}
+  {"short_code": "GCN", "color": "pink", "issue_date": null, "issue_date_confidence": "not_found", "confidence": 0.9}
   • ❌ SAI (không bao giờ làm):
     {
       "short_code": "GCNM",  // ❌ Phải là "GCN"

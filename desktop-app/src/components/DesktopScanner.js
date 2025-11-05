@@ -887,34 +887,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
             <h2 className="text-base font-semibold text-gray-900 mb-3">Quét File</h2>
             
-            {/* Rate Limit Control */}
+            {/* Request Delay Info (Read-only) */}
             <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">
-                  ⏱️ Delay giữa các request (tránh Rate Limit):
-                </label>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    ⏱️ Delay giữa các request:
+                  </label>
+                  <div className="text-xs text-gray-600 mt-1">
+                    💡 Chỉnh delay trong <strong>Settings</strong> để tránh Rate Limit
+                  </div>
+                </div>
                 <span className="text-sm font-bold text-blue-700">
-                  {requestDelay}ms = ~{Math.floor(60000 / (requestDelay + 1000))} requests/phút
+                  {requestDelay}ms
                 </span>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="3000"
-                step="100"
-                value={requestDelay}
-                onChange={(e) => setRequestDelay(parseInt(e.target.value))}
-                className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                disabled={processing}
-              />
-              <div className="flex justify-between text-xs text-gray-600 mt-1">
-                <span>0ms (60/phút ⚠️)</span>
-                <span>1000ms (30/phút ✅)</span>
-                <span>2000ms (20/phút 🐢)</span>
-              </div>
-              <p className="text-xs text-gray-600 mt-2">
-                💡 <strong>Khuyến nghị:</strong> 1200ms (~50/phút) để tránh vượt limit 60 requests/phút
-              </p>
             </div>
             
             <div className="flex flex-wrap gap-2">

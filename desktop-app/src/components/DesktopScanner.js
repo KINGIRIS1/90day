@@ -228,6 +228,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   const applySequentialNaming = (result, lastType) => {
     if (result.success && lastType) {
+      // Rule 1: UNKNOWN → always use lastKnown
       if (result.short_code === 'UNKNOWN') {
         console.log(`🔄 Sequential: UNKNOWN → ${lastType.short_code}`);
         return {
@@ -241,6 +242,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           note: `📄 Trang tiếp theo của ${lastType.short_code} (không nhận dạng được)`
         };
       }
+      
+      // Rule 2: No title boost (no title or rejected title) → use lastKnown
       if (!result.title_boost_applied) {
         const reason = result.title_extracted_via_pattern 
           ? "title rejected by classifier (uppercase < 70% or low similarity)"
@@ -258,7 +261,39 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           note: `📄 Trang tiếp theo của ${lastType.short_code} (${reason})`
         };
       }
-      if (result.title_boost_applied) {
+      
+      // Rule 3: Title not at top (middle/bottom) + low confidence → likely continuation
+      if (result.title_position && result.title_position !== 'top' && result.confidence < 0.85) {
+        console.log(`🔄 Sequential: Title at ${result.title_position} + low confidence (${formatConfidence(result.confidence)}%) → Override ${result.short_code} to ${lastType.short_code}`);
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.70, lastType.confidence * 0.90),
+          original_confidence: result.confidence,
+          original_short_code: result.short_code,
+          applied_sequential_logic: true,
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (title at ${result.title_position}, confidence ${formatConfidence(result.confidence)}%)`
+        };
+      }
+      
+      // Rule 4: Different doc type but low confidence → might be continuation
+      if (result.short_code !== lastType.short_code && result.confidence < 0.80) {
+        console.log(`🔄 Sequential: Different doc (${result.short_code} vs ${lastType.short_code}) + low confidence (${formatConfidence(result.confidence)}%) → Override to ${lastType.short_code}`);
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.70, lastType.confidence * 0.88),
+          original_confidence: result.confidence,
+          original_short_code: result.short_code,
+          applied_sequential_logic: true,
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (detected as ${result.short_code} with low confidence)`
+        };
+      }
+      
+      // No sequential applied - this is a new document
+      if (result.title_boost_applied && result.confidence >= 0.80) {
         console.log(`✅ No sequential: Title accepted by classifier → New document ${result.short_code} (confidence: ${formatConfidence(result.confidence)}%)`);
       }
     }

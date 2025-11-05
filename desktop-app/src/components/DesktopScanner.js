@@ -386,16 +386,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
      * END OF COMMENTED OUT CODE
      * ============================================ */
     
-    // NEW LOGIC: Extract issue dates from pairs and compare
-    const pairsWithDates = pairs.map(pair => {
-      // Trang 2 có ngày cấp
-      const issueDate = pair.page2 ? pair.page2.issue_date : null;
-      const issueDateConfidence = pair.page2 ? pair.page2.issue_date_confidence : null;
+    // NEW LOGIC: Extract color and issue dates from pairs
+    const pairsWithData = pairs.map(pair => {
+      // Try to get color from both pages (prioritize page1, then page2)
+      const color = pair.page1?.color || pair.page2?.color || null;
       
+      // Try to get issue_date from both pages (can be on page1 for A4, or page2 for A3)
+      const issueDate = pair.page1?.issue_date || pair.page2?.issue_date || null;
+      const issueDateConfidence = pair.page1?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+      
+      console.log(`  🎨 Pair ${pair.pairIndex + 1}: color = ${color || 'unknown'}`);
       console.log(`  📅 Pair ${pair.pairIndex + 1}: issue_date = ${issueDate || 'null'} (${issueDateConfidence || 'N/A'})`);
       
       return {
         ...pair,
+        color,
         issueDate,
         issueDateConfidence,
         parsedDate: parseIssueDate(issueDate, issueDateConfidence)

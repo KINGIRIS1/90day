@@ -174,7 +174,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             OUTPUT_RATE_PER_M = float(os.environ.get('GEMINI_OUTPUT_RATE_PER_M', '2.50') or 0)
             estimated_cost_usd = (input_tokens * INPUT_RATE_PER_M + output_tokens * OUTPUT_RATE_PER_M) / 1_000_000.0
 
-            # Extract issue_date and issue_date_confidence for GCN documents
+            # Extract color, issue_date and issue_date_confidence for GCN documents
+            color = result.get("color", None)
             issue_date = result.get("issue_date", None)
             issue_date_confidence = result.get("issue_date_confidence", None)
             
@@ -188,6 +189,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 "title_boost_applied": True if short_code != "UNKNOWN" else False,
                 "title_extracted_via_pattern": True if short_code != "UNKNOWN" else False,
                 "reasoning": result.get("reasoning", ""),
+                "color": color,
                 "issue_date": issue_date,
                 "issue_date_confidence": issue_date_confidence,
                 "method": method_used,

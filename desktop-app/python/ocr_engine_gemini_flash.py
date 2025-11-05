@@ -386,7 +386,8 @@ GCNB = Giấy chứng nhận bản sao
 GCNL = Giấy chứng nhận lãnh sự
 
 NHÓM 2 - HỢP ĐỒNG:
-HDCQ = Hợp đồng chuyển nhượng quyền sử dụng đất
+HDCQ = Hợp đồng chuyển nhượng quyền sử dụng đất (bao gồm cả hợp đồng tặng cho)
+HDTG = Hợp đồng tặng cho quyền sử dụng đất (alias của HDCQ, có thể dùng cả 2)
 HDUQ = Hợp đồng ủy quyền
 HDGO = Hợp đồng góp vốn
 HDMB = Hợp đồng mua bán

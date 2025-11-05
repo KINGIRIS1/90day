@@ -304,7 +304,7 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 ✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
-{get_shared_gcn_rules()}
+🚨 GCN (Giấy chứng nhận): ❌ NEVER "GCNM"/"GCNC" → Always "GCN" + color + issue_date
   • ✅ ĐÚNG (GCN đỏ/cam - cũ, format DD/MM/YYYY):
     {
       "short_code": "GCN",

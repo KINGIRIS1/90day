@@ -1356,7 +1356,8 @@ VÍ DỤ SAI:
   "confidence": 0.92,
   "title_position": "top",
   "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
-  "certificate_number": null
+  "issue_date": null,
+  "issue_date_confidence": null
 }
 
 ✅ Example 3 - Unknown Document:
@@ -1365,7 +1366,8 @@ VÍ DỤ SAI:
   "confidence": 0.3,
   "title_position": "middle",
   "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
-  "certificate_number": null
+  "issue_date": null,
+  "issue_date_confidence": null
 }"""
     """
     System prompt for Vietnamese document classification

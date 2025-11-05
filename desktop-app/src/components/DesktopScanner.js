@@ -513,41 +513,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
-  // OLD FUNCTION END - Removed old logic below
-  const __OLD_POST_PROCESS_FUNCTION_REFERENCE = () => {
-    /*
-    // This is the old logic that was commented out above
-    // It used certificate_number for classification
-    // Now we use issue_date instead
-    // Kept here for reference only
-    
-        updatedResults[index] = {
-          ...doc,
-          short_code: 'GCNM',
-          reasoning: `${doc.reasoning || 'GCN'} - No certificate number, defaulting to GCNM`,
-          gcn_classification_note: '📌 No certificate number → GCNM (default)'
-        };
-        console.log(`  ✅ ${doc.fileName} → GCNM (no certificate number)`);
-      });
-    }
-    
-    console.log('✅ GCN post-processing complete');
-    return updatedResults;
-    } catch (error) {
-      console.error('❌ Error in GCN post-processing:', error);
-      console.error('Stack trace:', error.stack);
-      // Return original results if processing fails
-      return results;
-    }
-  };
-  */
-  // Removing this commented section to keep code clean
-  /*
-  ==========================
-  OLD LOGIC ENDS HERE
-  ==========================
-  */
-  };
+
+
         updatedResults[index] = {
           ...doc,
           short_code: 'GCNM',

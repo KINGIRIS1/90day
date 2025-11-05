@@ -513,27 +513,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
-
-
-        updatedResults[index] = {
-          ...doc,
-          short_code: 'GCNM',
-          reasoning: `${doc.reasoning || 'GCN'} - No certificate number, defaulting to GCNM`,
-          gcn_classification_note: '📌 No certificate number → GCNM (default)'
-        };
-        console.log(`  ✅ ${doc.fileName} → GCNM (no certificate number)`);
-      });
-    }
-    
-    console.log('✅ GCN post-processing complete');
-    return updatedResults;
-    } catch (error) {
-      console.error('❌ Error in GCN post-processing:', error);
-      console.error('Stack trace:', error.stack);
-      // Return original results if processing fails
-      return results;
-    }
-  };
+  // Progressive file processing (vừa quét vừa hiện)
 
   // Progressive file processing (vừa quét vừa hiện)
   const handleProcessFiles = async (useCloudBoost = false, isResume = false) => {

@@ -304,11 +304,79 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 ✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
-🚨 GCN (Giấy chứng nhận): ❌ NEVER "GCNM"/"GCNC" → Always "GCN" + color + issue_date
-  ✅ Examples:
-  {"short_code": "GCN", "color": "red", "issue_date": "27/10/2021", "issue_date_confidence": "full", "confidence": 0.95}
-  {"short_code": "GCN", "color": "pink", "issue_date": "25/8/2010", "issue_date_confidence": "full", "confidence": 0.95}
-  {"short_code": "GCN", "color": "pink", "issue_date": null, "issue_date_confidence": "not_found", "confidence": 0.9}
+🚨 GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT) 🚨
+  • Title: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (dài hoặc ngắn)
+  • ❌ TUYỆT ĐỐI KHÔNG trả về "GCNM" hoặc "GCNC" ❌
+  • ✅ CHỈ trả về "GCN" (generic)
+  
+  • ⚠️ BẮT BUỘC 1: Xác định MÀU SẮC của giấy (COLOR DETECTION - QUAN TRỌNG NHẤT)
+    - Màu ĐỎ/CAM (red/orange): GCN cũ → color: "red"
+    - Màu HỒNG (pink): GCN mới → color: "pink"
+    - Không xác định được: color: "unknown"
+    - Ví dụ: Nếu thấy màu nền đỏ cam → color: "red", nếu màu hồng → color: "pink"
+  
+  • ⚠️ BẮT BUỘC 2: Tìm NGÀY CẤP (có thể ở trang 1 hoặc trang 2, có thể viết tay)
+    - GCN A3 (2 trang lớn): Ngày cấp thường ở trang 2
+    - GCN A4 (1 trang nhỏ): Ngày cấp thường ở trang 1 (bottom)
+    - Các format có thể gặp:
+      * Format 1: "DD/MM/YYYY" (ví dụ: "14/04/2025", "27/10/2021")
+      * Format 2: "Ngày DD tháng MM năm YYYY" (ví dụ: "Ngày 25 tháng 8 năm 2010")
+      * Format 3: "DD.MM.YYYY" hoặc "DD-MM-YYYY"
+    - Nếu mờ: MM/YYYY (ví dụ: "02/2012") hoặc YYYY (ví dụ: "2012")
+    - Tìm text gần: "Ngày cấp", "Cấp ngày", "Ngày...tháng...năm", "TM. UBND"
+    - ⚠️ Quan trọng: Nếu thấy format "Ngày XX tháng YY năm ZZZZ" → chuyển thành "XX/YY/ZZZZ"
+    - Ví dụ: "Ngày 25 tháng 8 năm 2010" → trả về "25/08/2010" hoặc "25/8/2010"
+  
+  • Response: "GCN" + color + issue_date + issue_date_confidence
+  • Lý do: Frontend sẽ phân loại theo:
+    1. Ưu tiên 1: Màu sắc (red = GCNC, pink = GCNM)
+    2. Ưu tiên 2: Ngày cấp (nếu không detect được màu)
+
+  • ✅ ĐÚNG (GCN đỏ/cam - cũ, format DD/MM/YYYY):
+    {
+      "short_code": "GCN",
+      "color": "red",
+      "issue_date": "27/10/2021",
+      "issue_date_confidence": "full",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021"
+    }
+  • ✅ ĐÚNG (GCN hồng - mới, format DD/MM/YYYY):
+    {
+      "short_code": "GCN",
+      "color": "pink",
+      "issue_date": "14/04/2025",
+      "issue_date_confidence": "full",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025"
+    }
+  • ✅ ĐÚNG (GCN format "Ngày...tháng...năm"):
+    {
+      "short_code": "GCN",
+      "color": "pink",
+      "issue_date": "25/8/2010",
+      "issue_date_confidence": "full",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 25/8/2010 (từ 'Ngày 25 tháng 8 năm 2010')"
+    }
+  • ✅ ĐÚNG (không detect được màu):
+    {
+      "short_code": "GCN",
+      "color": "unknown",
+      "issue_date": "01/01/2012",
+      "issue_date_confidence": "full",
+      "confidence": 0.9,
+      "reasoning": "Giấy chứng nhận, không xác định được màu, ngày cấp 01/01/2012"
+    }
+  • ✅ ĐÚNG (không tìm thấy ngày):
+    {
+      "short_code": "GCN",
+      "color": "pink",
+      "issue_date": null,
+      "issue_date_confidence": "not_found",
+      "confidence": 0.9,
+      "reasoning": "Giấy chứng nhận màu hồng, không tìm thấy ngày cấp (có thể trang 1 hoặc trang 2)"
+    }
   • ❌ SAI (không bao giờ làm):
     {
       "short_code": "GCNM",  // ❌ Phải là "GCN"

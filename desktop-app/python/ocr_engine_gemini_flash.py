@@ -308,15 +308,43 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • Title: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (dài hoặc ngắn)
   • ❌ TUYỆT ĐỐI KHÔNG trả về "GCNM" hoặc "GCNC" ❌
   • ✅ CHỈ trả về "GCN" (generic)
-  • ⚠️ BẮT BUỘC: Tìm số chứng nhận ở góc dưới (format: [2 chữ cái][6 số])
-  • Response: "GCN" + certificate_number (ví dụ: "DE 334187", "DP 947330")
-  • Lý do: Frontend sẽ so sánh batch, số nhỏ = cũ, số lớn = mới
+  • ⚠️ BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
+    - Format: DD/MM/YYYY (ví dụ: "01/01/2012", "15/03/2013")
+    - Nếu mờ chỉ đọc được: MM/YYYY (ví dụ: "02/2012") hoặc chỉ năm YYYY (ví dụ: "2012")
+    - Tìm text gần "Ngày cấp", "Cấp ngày", hoặc ô có handwriting date
+  • Response: "GCN" + issue_date + issue_date_confidence
+  • Lý do: Frontend sẽ so sánh ngày cấp giữa các GCN, ngày nhỏ = cũ (GCNC), ngày lớn = mới (GCNM)
   • ✅ ĐÚNG:
     {
       "short_code": "GCN",
-      "certificate_number": "DE 334187",
+      "issue_date": "01/01/2012",
+      "issue_date_confidence": "full",
       "confidence": 0.95,
-      "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, số DE 334187"
+      "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, ngày cấp 01/01/2012"
+    }
+  • ✅ ĐÚNG (nếu mờ):
+    {
+      "short_code": "GCN",
+      "issue_date": "02/2012",
+      "issue_date_confidence": "partial",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận, chỉ đọc được tháng/năm: 02/2012"
+    }
+  • ✅ ĐÚNG (nếu rất mờ):
+    {
+      "short_code": "GCN",
+      "issue_date": "2012",
+      "issue_date_confidence": "year_only",
+      "confidence": 0.9,
+      "reasoning": "Giấy chứng nhận, chỉ đọc được năm: 2012"
+    }
+  • ✅ ĐÚNG (không tìm thấy):
+    {
+      "short_code": "GCN",
+      "issue_date": null,
+      "issue_date_confidence": "not_found",
+      "confidence": 0.9,
+      "reasoning": "Giấy chứng nhận, không tìm thấy ngày cấp (có thể trang 1)"
     }
   • ❌ SAI (không bao giờ làm):
     {

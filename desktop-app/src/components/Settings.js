@@ -40,6 +40,93 @@ const AutoFallbackSetting = () => {
   );
 };
 
+const RequestDelaySetting = () => {
+  const [delay, setDelay] = useState(1200); // Default 1.2s
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const savedDelay = await window.electronAPI.getConfig('requestDelay');
+      if (savedDelay !== undefined && savedDelay !== null) {
+        setDelay(parseInt(savedDelay));
+      }
+    })();
+  }, []);
+
+  const handleChange = async (newDelay) => {
+    setDelay(newDelay);
+    await window.electronAPI.setConfig('requestDelay', newDelay);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  };
+
+  const requestsPerMinute = Math.floor(60000 / (delay + 1000));
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <div className="font-medium text-gray-900 mb-1">⏱️ Delay giữa các request (tránh Rate Limit)</div>
+        <div className="text-sm text-gray-500 mb-3">
+          Điều chỉnh delay để tránh vượt giới hạn API (60 requests/phút).
+          <br />
+          <span className="text-xs text-orange-600">
+            ⚠️ Lưu ý: Flash Lite có rate limit thấp hơn Flash, nên dùng delay cao hơn.
+          </span>
+        </div>
+      </div>
+      
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm text-gray-700">Delay hiện tại:</span>
+        <span className="text-sm font-bold text-blue-700">
+          {delay}ms = ~{requestsPerMinute} requests/phút
+        </span>
+      </div>
+      
+      <input
+        type="range"
+        min="0"
+        max="3000"
+        step="100"
+        value={delay}
+        onChange={(e) => handleChange(parseInt(e.target.value))}
+        className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+      />
+      
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>0ms (nhanh nhất)</span>
+        <span>1500ms (khuyến nghị)</span>
+        <span>3000ms (an toàn nhất)</span>
+      </div>
+      
+      {/* Presets */}
+      <div className="flex gap-2 mt-3">
+        <button
+          onClick={() => handleChange(800)}
+          className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-lg"
+        >
+          Flash (800ms)
+        </button>
+        <button
+          onClick={() => handleChange(1500)}
+          className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded-lg"
+        >
+          Flash Lite (1500ms)
+        </button>
+        <button
+          onClick={() => handleChange(2500)}
+          className="px-3 py-1 text-xs bg-green-100 hover:bg-green-200 rounded-lg"
+        >
+          An toàn (2500ms)
+        </button>
+      </div>
+      
+      {saved && (
+        <div className="text-xs text-green-700">✓ Đã lưu</div>
+      )}
+    </div>
+  );
+};
+
 const Settings = () => {
   const [backendUrl, setBackendUrl] = useState('');
   const [saved, setSaved] = useState(false);

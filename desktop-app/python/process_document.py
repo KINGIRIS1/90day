@@ -149,6 +149,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             # ✅ CODE ALIAS MAPPING: Map alternate codes to standard codes
             CODE_ALIASES = {
                 "HDTG": "HDCQ",  # Hợp đồng tặng cho → Hợp đồng chuyển nhượng, tặng cho
+                "BVDS": "HSKT",  # Bản vẽ đo sơ / Bản đồ địa chính → Hồ sơ kỹ thuật
             }
             
             # Apply alias mapping if needed

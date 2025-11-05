@@ -245,6 +245,19 @@ const Settings = () => {
         <AutoFallbackSetting />
       </div>
 
+      {/* Request Delay Setting */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Cài đặt Rate Limit
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          <strong>Quan trọng:</strong> Điều chỉnh delay giữa các request để tránh vượt giới hạn API.
+          <br />
+          Flash Lite có rate limit thấp hơn Flash, khuyến nghị dùng delay cao hơn.
+        </p>
+        <RequestDelaySetting />
+      </div>
+
       {/* App Information */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">

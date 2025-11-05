@@ -340,43 +340,109 @@ File: `assets/installer.nsh`
 
 ---
 
-## 🚀 Build Script Nhanh (One Command)
+## 🚀 Build Scripts Tự Động (One-Click)
 
-Tạo file `build.bat`:
+Project đã được tích hợp sẵn **3 build scripts** để bạn build installer dễ dàng:
 
-```batch
-@echo off
-echo ========================================
-echo  BUILD 90dayChonThanh INSTALLER
-echo ========================================
-echo.
+### **Script 1: `build-installer.bat` (Recommended)**
 
-echo [1/4] Cleaning Python vendor...
-powershell -ExecutionPolicy Bypass -File .\python\scripts\clean-local-python.ps1
+**Khi nào dùng:** Build lần đầu tiên hoặc build đầy đủ
 
-echo.
-echo [2/4] Installing dependencies...
-call yarn install
+**Tính năng:**
+- ✅ Tự động kiểm tra prerequisites (Node.js, Yarn, Python, NSIS)
+- ✅ Clean Python vendor directories
+- ✅ Install dependencies
+- ✅ Build React + Electron + Installer
+- ✅ Verify output và hiển thị thông tin chi tiết
 
-echo.
-echo [3/4] Building React app...
-call yarn build
+**Cách dùng:**
+```bash
+# Mở Command Prompt trong thư mục desktop-app
+cd C:\path\to\desktop-app
 
-echo.
-echo [4/4] Building Windows installer...
-call yarn dist:win
-
-echo.
-echo ========================================
-echo  BUILD COMPLETE!
-echo ========================================
-echo Installer: dist\90dayChonThanh Setup 1.1.0.exe
-pause
+# Chạy script
+build-installer.bat
 ```
 
-**Sử dụng:**
+---
+
+### **Script 2: `build-installer.ps1` (PowerShell)**
+
+**Khi nào dùng:** Giống build-installer.bat nhưng với PowerShell (nâng cao)
+
+**Tính năng:**
+- ✅ Tương tự .bat script
+- ✅ Giao diện đẹp hơn với màu sắc
+- ✅ Xử lý lỗi tốt hơn
+- ✅ Hỗ trợ UTF-8 tiếng Việt tốt hơn
+
+**Cách dùng:**
+```powershell
+# Mở PowerShell trong thư mục desktop-app
+cd C:\path\to\desktop-app
+
+# Cho phép chạy script (chỉ cần làm 1 lần)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Chạy script
+.\build-installer.ps1
+```
+
+---
+
+### **Script 3: `quick-build.bat` (Fast Rebuild)**
+
+**Khi nào dùng:** Build nhanh sau khi đã build thành công 1 lần
+
+**Tính năng:**
+- ⚡ Nhanh nhất (2-3 phút)
+- ⚡ Không kiểm tra prerequisites
+- ⚡ Không cài lại dependencies
+- ⚡ Chỉ rebuild code và tạo installer
+
+**Cách dùng:**
 ```bash
-build.bat
+# Chỉ cần chạy
+quick-build.bat
+```
+
+**⚠️ Lưu ý:** Chỉ dùng khi:
+- Đã build thành công 1 lần trước đó
+- Không thay đổi dependencies trong package.json
+- Chỉ thay đổi source code (React/Python)
+
+---
+
+### **Script 4: `test-installer.bat` (Test Installer)**
+
+**Khi nào dùng:** Sau khi build xong, muốn test installer
+
+**Tính năng:**
+- 🧪 Kiểm tra file installer tồn tại
+- 🧪 Hiển thị thông tin file (size, location)
+- 🧪 Kiểm tra app đã cài chưa
+- 🧪 Chạy installer hoặc mở dist folder
+
+**Cách dùng:**
+```bash
+# Sau khi build xong
+test-installer.bat
+```
+
+---
+
+## 📚 Tài Liệu Build Chi Tiết
+
+Xem file **`BUILD_README.md`** để biết:
+- Hướng dẫn chi tiết từng bước
+- Prerequisites và cách cài đặt
+- Xử lý lỗi thường gặp
+- Tùy chỉnh installer
+- Tips & best practices
+
+```bash
+# Đọc BUILD_README.md để biết thêm
+notepad BUILD_README.md
 ```
 
 ---

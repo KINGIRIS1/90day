@@ -331,7 +331,7 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • Lý do: Frontend sẽ phân loại theo:
     1. Ưu tiên 1: Màu sắc (red = GCNC, pink = GCNM)
     2. Ưu tiên 2: Ngày cấp (nếu không detect được màu)
-  • ✅ ĐÚNG (GCN đỏ/cam - cũ):
+  • ✅ ĐÚNG (GCN đỏ/cam - cũ, format DD/MM/YYYY):
     {
       "short_code": "GCN",
       "color": "red",
@@ -340,7 +340,7 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
       "confidence": 0.95,
       "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021"
     }
-  • ✅ ĐÚNG (GCN hồng - mới):
+  • ✅ ĐÚNG (GCN hồng - mới, format DD/MM/YYYY):
     {
       "short_code": "GCN",
       "color": "pink",
@@ -348,6 +348,15 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
       "issue_date_confidence": "full",
       "confidence": 0.95,
       "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025"
+    }
+  • ✅ ĐÚNG (GCN format "Ngày...tháng...năm"):
+    {
+      "short_code": "GCN",
+      "color": "pink",
+      "issue_date": "25/8/2010",
+      "issue_date_confidence": "full",
+      "confidence": 0.95,
+      "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 25/8/2010 (từ 'Ngày 25 tháng 8 năm 2010')"
     }
   • ✅ ĐÚNG (không detect được màu):
     {

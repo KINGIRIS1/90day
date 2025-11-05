@@ -464,10 +464,11 @@ BSDD = Bản sao (duplicate)
 BCC = Bản cam đoan
 BDK = Bản đăng ký
 BKDK = Bản kê khai đất
-HSKT = Bản vẽ (Trích lục, đo tách, chỉnh lý)
-  • Title: "BẢN VẼ" hoặc "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH"
-  • Map extract, technical drawings
+HSKT = Bản vẽ (Trích lục, đo tách, chỉnh lý, bản đồ địa chính)
+  • Title: "BẢN VẼ" hoặc "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH" hoặc "ĐỒ ĐẠC CHÍNH LÝ BẢN ĐỒ ĐỊA CHÍNH"
+  • Map extract, technical drawings, cadastral maps with scale (TỈ LỆ 1:500, etc.)
   • KHÔNG phải GCNM (certificate)
+BVDS = Bản vẽ đo sơ / Bản đồ địa chính (alias của HSKT, có thể dùng cả 2)
 BGTVN = Bản giao thừa kế Việt Nam
 BGNNN = Bản giao thừa kế nước ngoài
 

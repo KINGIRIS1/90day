@@ -848,30 +848,43 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
 
 ⚠️ NẾU thấy Giấy chứng nhận (quốc huy + màu hồng/đỏ + "GIẤY CHỨNG NHẬN"):
    → Trả về: short_code = "GCN" (generic, không phải GCNM/GCNC)
-   → BẮT BUỘC: Tìm số chứng nhận ở góc dưới
+   → BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
 
-📋 FORMAT SỐ GCN (2 LOẠI CHÍNH):
-   1. [2 chữ cái][6 số]: "DE 334187", "DP 947330" → GCNC (cũ, màu đỏ)
-   2. [2 chữ cái][8 số]: "AA 01085158" → GCNM (mới, màu hồng)
+📋 TÌM NGÀY CẤP (ISSUE DATE):
+   • Vị trí: Thường ở trang 2, gần cuối trang, có thể viết tay
+   • Text gần: "Ngày cấp", "Cấp ngày", hoặc ô có handwriting date
+   • Format:
+     - Đầy đủ: DD/MM/YYYY (ví dụ: "01/01/2012", "15/03/2013")
+     - Nếu mờ: MM/YYYY (ví dụ: "02/2012", "04/2013")
+     - Nếu rất mờ: YYYY (ví dụ: "2012", "2013")
+   • Lý do: Frontend sẽ so sánh ngày cấp giữa các GCN:
+     - Ngày nhỏ hơn = GCNC (cũ)
+     - Ngày lớn hơn = GCNM (mới)
    
-   ⚠️ Lưu ý: Nếu thấy [4 chữ cái][6 số] (ví dụ: "S6AB 227162")
-   → Đây là lỗi OCR (đọc nhầm "AB" thành "S6AB")
-   → Loại này thường là GCN màu đỏ → GCNC (cũ)
-   
-   Vị trí: Góc dưới (bottom), thường bên phải
-   
-⚠️ QUY TẮC SO SÁNH:
-   - 8 số vs 6 số → 8 số = GCNM (mới), 6 số = GCNC (cũ)
-   - Cùng format → So sánh số thứ tự
-   - 4 chữ cái (lỗi OCR) → GCNC (cũ) by default
+   ⚠️ Confidence levels:
+   - "full": Đọc được đầy đủ DD/MM/YYYY
+   - "partial": Chỉ đọc được MM/YYYY
+   - "year_only": Chỉ đọc được YYYY
+   - "not_found": Không tìm thấy (có thể là trang 1)
 
-✅ RESPONSE ĐÚNG:
+✅ RESPONSE ĐÚNG (Trang 2 - có ngày cấp):
 {
   "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, số DE 334187",
-  "certificate_number": "DE 334187"
+  "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, ngày cấp 01/01/2012",
+  "issue_date": "01/01/2012",
+  "issue_date_confidence": "full"
+}
+
+✅ RESPONSE ĐÚNG (Trang 1 - không có ngày cấp):
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận với quốc huy, màu hồng, trang 1",
+  "issue_date": null,
+  "issue_date_confidence": "not_found"
 }
 
 ❌ RESPONSE SAI (KHÔNG BAO GIỜ LÀM NHƯ VẦY):

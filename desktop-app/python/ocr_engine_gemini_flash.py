@@ -601,13 +601,24 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 📋 VÍ DỤ RESPONSE FORMAT:
 
-✅ Example 1 - GCN Document (ĐÚNG):
+✅ Example 1 - GCN Document Trang 2 (có ngày cấp):
 {
   "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy, màu hồng, số DE 334187",
-  "certificate_number": "DE 334187"
+  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy, màu hồng, ngày cấp 01/01/2012",
+  "issue_date": "01/01/2012",
+  "issue_date_confidence": "full"
+}
+
+✅ Example 2 - GCN Document Trang 1 (không có ngày cấp):
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận quyền sử dụng đất với quốc huy, trang 1",
+  "issue_date": null,
+  "issue_date_confidence": "not_found"
 }
 
 ❌ TUYỆT ĐỐI KHÔNG LÀM NHƯ VẦY (SAI):
@@ -616,25 +627,27 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "confidence": 0.95,
   "title_position": "top",
   "reasoning": "Giấy chứng nhận...",
-  "certificate_number": "DE 334187"
+  "issue_date": "01/01/2012"
 }
 
-✅ Example 2 - Non-GCN Document:
+✅ Example 3 - Non-GCN Document:
 {
   "short_code": "HDCN",
   "confidence": 0.92,
   "title_position": "top",
   "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
-  "certificate_number": null
+  "issue_date": null,
+  "issue_date_confidence": null
 }
 
-✅ Example 3 - Unknown Document:
+✅ Example 4 - Unknown Document:
 {
   "short_code": "UNKNOWN",
   "confidence": 0.3,
   "title_position": "middle",
   "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
-  "certificate_number": null
+  "issue_date": null,
+  "issue_date_confidence": null
 }"""
 
 

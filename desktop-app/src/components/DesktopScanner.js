@@ -407,34 +407,75 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       };
     });
     
-    // Classification logic: Priority 1 = Color, Priority 2 = Date
+    // Classification logic: Priority 1 = Color (if different), Priority 2 = Date
     console.log('\n📊 Classifying GCN pairs...');
     
-    // Step 1: Classify by color (highest priority)
-    const pairsWithColor = pairsWithData.filter(p => p.color && (p.color === 'red' || p.color === 'orange' || p.color === 'pink'));
-    const pairsWithoutColor = pairsWithData.filter(p => !p.color || (p.color !== 'red' && p.color !== 'orange' && p.color !== 'pink'));
+    // Check if there are different colors in batch
+    const colors = pairsWithData.map(p => p.color).filter(Boolean);
+    const uniqueColors = [...new Set(colors)];
+    const hasMixedColors = uniqueColors.length > 1;
+    const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
     
-    console.log(`  🎨 ${pairsWithColor.length} pair(s) with color detected`);
-    console.log(`  ⚪ ${pairsWithoutColor.length} pair(s) without color → will use date`);
+    console.log(`  🎨 Unique colors detected: ${uniqueColors.join(', ') || 'none'}`);
+    console.log(`  🎨 Mixed colors (red vs pink)? ${hasMixedColors && hasRedAndPink ? 'Yes' : 'No'}`);
     
-    // Classify pairs with color
-    pairsWithColor.forEach(pair => {
-      const classification = (pair.color === 'red' || pair.color === 'orange') ? 'GCNC' : 'GCNM';
-      const colorName = (pair.color === 'red' || pair.color === 'orange') ? 'đỏ/cam (cũ)' : 'hồng (mới)';
-      const note = `Màu ${colorName} → ${classification}`;
+    // Step 1: Only classify by color if there are DIFFERENT colors (red vs pink)
+    const pairsClassifiedByColor = [];
+    const pairsNeedDateComparison = [];
+    
+    if (hasMixedColors && hasRedAndPink) {
+      // Mixed colors (red vs pink) → use color to classify
+      console.log(`  🎨 Mixed colors detected → Classify by color`);
       
-      console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
-      
-      [pair.page1, pair.page2].filter(Boolean).forEach(page => {
-        const index = normalizedResults.indexOf(page);
-        normalizedResults[index] = {
-          ...page,
-          short_code: classification,
-          reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-          gcn_classification_note: `📌 ${note} (phân loại theo màu)`
-        };
+      pairsWithData.forEach(pair => {
+        if (pair.color === 'red' || pair.color === 'orange') {
+          // Red/orange → GCNC
+          const classification = 'GCNC';
+          const colorName = 'đỏ/cam (cũ)';
+          const note = `Màu ${colorName} → ${classification}`;
+          
+          console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
+          
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: classification,
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note} (phân loại theo màu)`
+            };
+          });
+          
+          pairsClassifiedByColor.push(pair);
+        } else if (pair.color === 'pink') {
+          // Pink → GCNM
+          const classification = 'GCNM';
+          const colorName = 'hồng (mới)';
+          const note = `Màu ${colorName} → ${classification}`;
+          
+          console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
+          
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: classification,
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note} (phân loại theo màu)`
+            };
+          });
+          
+          pairsClassifiedByColor.push(pair);
+        } else {
+          // No color or unknown → need date comparison
+          pairsNeedDateComparison.push(pair);
+        }
       });
-    });
+    } else {
+      // All same color or no color → need date comparison
+      console.log(`  📅 All same color or no color → Classify by date`);
+      pairsNeedDateComparison.push(...pairsWithData);
+    }
     
     // Step 2: Classify remaining pairs by date
     if (pairsWithoutColor.length > 0) {

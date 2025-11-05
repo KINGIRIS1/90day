@@ -1401,7 +1401,7 @@ VÍ DỤ SAI:
   ...
 }
 
-✅ Example 2 - Regular Document (HDCN):
+✅ Example 2 - HDCN Document:
 {
   "short_code": "HDCN",
   "confidence": 0.92,
@@ -1411,7 +1411,17 @@ VÍ DỤ SAI:
   "issue_date_confidence": null
 }
 
-✅ Example 3 - Unknown Document:
+✅ Example 3 - HDUQ Document (HỢP ĐỒNG ỦY QUYỀN):
+{
+  "short_code": "HDUQ",
+  "confidence": 0.98,
+  "title_position": "top",
+  "reasoning": "Hợp đồng ủy quyền - tiêu đề lớn ở top",
+  "issue_date": null,
+  "issue_date_confidence": null
+}
+
+✅ Example 4 - Unknown Document:
 {
   "short_code": "UNKNOWN",
   "confidence": 0.3,

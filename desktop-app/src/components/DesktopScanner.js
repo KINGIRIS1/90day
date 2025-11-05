@@ -378,146 +378,176 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
      *   const hasNoPrefix = prefix === 'NO_PREFIX';
      *   
      *   if (!grouped[prefix]) {
-        grouped[prefix] = [];
-      }
+     *     grouped[prefix] = [];
+     *   }
+     *   
+     *   grouped[prefix].push({...}); ... rest of old logic
+     * ============================================
+     * END OF COMMENTED OUT CODE
+     * ============================================ */
+    
+    // NEW LOGIC: Extract issue dates from pairs and compare
+    const pairsWithDates = pairs.map(pair => {
+      // Trang 2 có ngày cấp
+      const issueDate = pair.page2 ? pair.page2.issue_date : null;
+      const issueDateConfidence = pair.page2 ? pair.page2.issue_date_confidence : null;
       
-      grouped[prefix].push({
-        ...doc,
-        _originalIndex: normalizedResults.indexOf(doc),
-        _certPrefix: prefix,
-        _certNumber: parseInt(number, 10),
-        _digitCount: digitCount,
-        _letterCount: letterCount,
-        _isOcrError: isOcrError,
-        _hasNoPrefix: hasNoPrefix
+      console.log(`  📅 Pair ${pair.pairIndex + 1}: issue_date = ${issueDate || 'null'} (${issueDateConfidence || 'N/A'})`);
+      
+      return {
+        ...pair,
+        issueDate,
+        issueDateConfidence,
+        parsedDate: parseIssueDate(issueDate, issueDateConfidence)
+      };
+    });
+    
+    // So sánh ngày cấp giữa các pairs
+    console.log('\n📊 Comparing issue dates between pairs...');
+    
+    if (pairsWithDates.length === 1) {
+      // Chỉ có 1 pair → default GCNM
+      console.log('📄 Only 1 pair → Default GCNM');
+      const pair = pairsWithDates[0];
+      const classification = 'GCNM';
+      const note = 'Only one GCN pair in batch → GCNM (default)';
+      
+      // Apply to both pages
+      [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+        const index = normalizedResults.indexOf(page);
+        normalizedResults[index] = {
+          ...page,
+          short_code: classification,
+          reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+          gcn_classification_note: `📌 ${note}`
+        };
+      });
+    } else {
+      // Multiple pairs → compare dates
+      // Sort by date (oldest first)
+      const sortedPairs = [...pairsWithDates].sort((a, b) => {
+        if (!a.parsedDate && !b.parsedDate) return 0;
+        if (!a.parsedDate) return 1; // No date goes to end
+        if (!b.parsedDate) return -1;
+        return a.parsedDate.comparable - b.parsedDate.comparable;
       });
       
-      if (isOcrError) {
-        console.log(`⚠️ OCR error detected: ${certNumber} (4 letters) → Will classify as GCNC`);
-      }
-    });
-    
-    console.log(`📊 Grouped into ${Object.keys(grouped).length} prefix(es):`, Object.keys(grouped));
-    
-    // Process each group
-    const updatedResults = [...normalizedResults];
-    
-    Object.entries(grouped).forEach(([prefix, docs]) => {
-      // Check special cases
-      const hasOcrError = docs.some(d => d._isOcrError);
-      const hasNoPrefix = docs.some(d => d._hasNoPrefix);
+      console.log('\n📊 Sorted pairs by date:');
+      sortedPairs.forEach((pair, idx) => {
+        const dateStr = pair.issueDate || 'null';
+        const confidence = pair.issueDateConfidence || 'N/A';
+        console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr} (${confidence})`);
+      });
       
-      if (hasOcrError) {
-        // OCR error detected (4 letters) - classify as GCNC (old, red)
-        console.log(`⚠️ ${prefix}: OCR error detected (4 letters), classifying as GCNC`);
-        docs.forEach(doc => {
-          updatedResults[doc._originalIndex] = {
-            ...doc,
-            short_code: 'GCNC',
-            reasoning: `${doc.reasoning || 'GCN'} - OCR error (4 letters), usually red GCN → GCNC`,
-            gcn_classification_note: '📌 OCR error (4 letters) → GCNC (old format, red)'
-          };
-          console.log(`  ✅ ${doc.certificate_number} → GCNC (OCR error, 4 letters)`);
-        });
-      } else if (hasNoPrefix) {
-        // No prefix (numbers only) - default to GCNC (old)
-        console.log(`⚠️ ${prefix}: No prefix (numbers only), classifying as GCNC`);
-        docs.forEach(doc => {
-          updatedResults[doc._originalIndex] = {
-            ...doc,
-            short_code: 'GCNC',
-            reasoning: `${doc.reasoning || 'GCN'} - Certificate has no prefix (${doc.certificate_number}), default to old format`,
-            gcn_classification_note: '📌 No prefix → GCNC (old format, default)'
-          };
-          console.log(`  ✅ ${doc.certificate_number} → GCNC (no prefix)`);
-        });
-      } else if (docs.length === 1) {
-        // Only 1 GCN with this prefix - classify as GCNC (default to old)
-        console.log(`📄 ${prefix}: Only 1 document, defaulting to GCNC`);
-        const doc = docs[0];
-        updatedResults[doc._originalIndex] = {
-          ...doc,
-          short_code: 'GCNC',
-          reasoning: `${doc.reasoning || 'GCN'} - Single certificate in batch (default: old format)`,
-          gcn_classification_note: '📌 Single GCN in batch → GCNC (default)'
-        };
-      } else {
-        // Multiple GCNs - check if same format or mixed format
-        const digitCounts = [...new Set(docs.map(d => d._digitCount))];
+      // Classify: oldest = GCNC, others = GCNM
+      sortedPairs.forEach((pair, idx) => {
+        const isOldest = (idx === 0 && pair.parsedDate !== null);
+        const classification = isOldest ? 'GCNC' : 'GCNM';
+        const dateStr = pair.issueDate || 'không có ngày cấp';
+        const note = isOldest 
+          ? `Ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
+          : pair.parsedDate 
+            ? `Ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
+            : `Không có ngày cấp → GCNM (mặc định)`;
         
-        if (digitCounts.length === 1) {
-          // Same format - sort by number
-          const sorted = [...docs].sort((a, b) => a._certNumber - b._certNumber);
-          
-          console.log(`📊 ${prefix}: ${sorted.length} documents, same format (${digitCounts[0]} digits), sorting...`);
-          sorted.forEach((doc, idx) => {
-            console.log(`  ${idx + 1}. ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} (index: ${doc._originalIndex})`);
-          });
-          
-          // Smallest number = GCNC (old), others = GCNM (new)
-          sorted.forEach((doc, idx) => {
-            const isOldest = (idx === 0);
-            const classification = isOldest ? 'GCNC' : 'GCNM';
-            const note = isOldest 
-              ? `📌 Smallest number in batch → GCNC (old format)`
-              : `📌 Larger than ${prefix} ${String(sorted[0]._certNumber).padStart(sorted[0]._digitCount, '0')} → GCNM (new format)`;
-            
-            console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} → ${classification} ${isOldest ? '(oldest)' : '(newer)'}`);
-            
-            updatedResults[doc._originalIndex] = {
-              ...doc,
-              short_code: classification,
-              reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${isOldest ? 'oldest' : 'newer'} in batch)`,
-              gcn_classification_note: note
-            };
-          });
-        } else {
-          // Mixed format (8 digits vs 6 digits) - 8 digits = new, 6 digits = old
-          console.log(`📊 ${prefix}: ${docs.length} documents, mixed formats (${digitCounts.join(', ')} digits)`);
-          
-          docs.forEach(doc => {
-            const classification = doc._digitCount === 8 ? 'GCNM' : 'GCNC';
-            const note = doc._digitCount === 8
-              ? `📌 8-digit format → GCNM (new format)`
-              : `📌 6-digit format → GCNC (old format)`;
-            
-            console.log(`  ✅ ${prefix} ${String(doc._certNumber).padStart(doc._digitCount, '0')} (${doc._digitCount} digits) → ${classification}`);
-            
-            updatedResults[doc._originalIndex] = {
-              ...doc,
-              short_code: classification,
-              reasoning: `${doc.reasoning || 'GCN'} - Certificate ${doc.certificate_number} (${doc._digitCount}-digit format)`,
-              gcn_classification_note: note
-            };
-          });
-        }
-      }
-    });
-    
-    // Handle invalid certificate formats (số vào sổ, mã vạch, etc.)
-    if (unrecognizedCerts.length > 0) {
-      console.log(`\n⚠️ Processing ${unrecognizedCerts.length} GCN(s) with invalid certificate format:`);
-      unrecognizedCerts.forEach(doc => {
-        const index = normalizedResults.indexOf(doc);
-        const reason = doc._invalidReason || 'invalid format';
+        console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
         
-        // Default to GCNC (old) for invalid formats
-        updatedResults[index] = {
-          ...doc,
-          short_code: 'GCNC',
-          reasoning: `${doc.reasoning || 'GCN'} - Invalid certificate format (${doc.certificate_number}), ${reason}, defaulting to GCNC`,
-          gcn_classification_note: `📌 Invalid format: ${reason} (${doc.certificate_number}) → GCNC (default)`
-        };
-        console.log(`  ✅ ${doc.certificate_number} → GCNC (${reason})`);
+        // Apply classification to both pages of the pair
+        [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+          const index = normalizedResults.indexOf(page);
+          normalizedResults[index] = {
+            ...page,
+            short_code: classification,
+            reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+            gcn_classification_note: `📌 ${note}`
+          };
+        });
       });
     }
     
-    // Handle GCN documents without certificate numbers
-    if (gcnWithoutCert.length > 0) {
-      console.log(`\n📄 Processing ${gcnWithoutCert.length} GCN(s) without certificate numbers:`);
-      gcnWithoutCert.forEach(doc => {
-        const index = normalizedResults.indexOf(doc);
-        // Default to GCNM (assume newer format if no cert number)
+    console.log('✅ GCN post-processing complete (date-based)');
+    return normalizedResults;
+    } catch (error) {
+      console.error('❌ Error in GCN post-processing:', error);
+      console.error('Stack trace:', error.stack);
+      // Return original results if processing fails
+      return results;
+    }
+  };
+  
+  // Helper function to parse issue date for comparison
+  const parseIssueDate = (issueDate, confidence) => {
+    if (!issueDate) return null;
+    
+    try {
+      let comparable = 0;
+      let parts;
+      
+      if (confidence === 'full') {
+        // DD/MM/YYYY
+        parts = issueDate.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10);
+          const year = parseInt(parts[2], 10);
+          comparable = year * 10000 + month * 100 + day;
+        }
+      } else if (confidence === 'partial') {
+        // MM/YYYY
+        parts = issueDate.split('/');
+        if (parts.length === 2) {
+          const month = parseInt(parts[0], 10);
+          const year = parseInt(parts[1], 10);
+          comparable = year * 10000 + month * 100 + 1; // Assume day 1
+        }
+      } else if (confidence === 'year_only') {
+        // YYYY
+        const year = parseInt(issueDate, 10);
+        comparable = year * 10000 + 1 * 100 + 1; // Assume Jan 1
+      }
+      
+      return { comparable, original: issueDate };
+    } catch (e) {
+      console.error(`❌ Error parsing date: ${issueDate}`, e);
+      return null;
+    }
+  };
+
+  // OLD FUNCTION END - Removed old logic below
+  const __OLD_POST_PROCESS_FUNCTION_REFERENCE = () => {
+    /*
+    // This is the old logic that was commented out above
+    // It used certificate_number for classification
+    // Now we use issue_date instead
+    // Kept here for reference only
+    
+        updatedResults[index] = {
+          ...doc,
+          short_code: 'GCNM',
+          reasoning: `${doc.reasoning || 'GCN'} - No certificate number, defaulting to GCNM`,
+          gcn_classification_note: '📌 No certificate number → GCNM (default)'
+        };
+        console.log(`  ✅ ${doc.fileName} → GCNM (no certificate number)`);
+      });
+    }
+    
+    console.log('✅ GCN post-processing complete');
+    return updatedResults;
+    } catch (error) {
+      console.error('❌ Error in GCN post-processing:', error);
+      console.error('Stack trace:', error.stack);
+      // Return original results if processing fails
+      return results;
+    }
+  };
+  */
+  // Removing this commented section to keep code clean
+  /*
+  ==========================
+  OLD LOGIC ENDS HERE
+  ==========================
+  */
+  };
         updatedResults[index] = {
           ...doc,
           short_code: 'GCNM',

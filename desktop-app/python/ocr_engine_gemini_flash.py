@@ -1631,9 +1631,15 @@ def parse_gemini_response(response_text):
                         print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
                         short_code = 'UNKNOWN'
                 
-                # Extract issue_date and issue_date_confidence if present (for GCN)
+                # Extract color, issue_date and issue_date_confidence if present (for GCN)
+                color = result.get('color', None)
                 issue_date = result.get('issue_date', None)
                 issue_date_confidence = result.get('issue_date_confidence', None)
+                
+                if color and isinstance(color, str):
+                    color = color.strip().lower()
+                    if color in ['null', 'none', 'n/a', '']:
+                        color = None
                 
                 if issue_date and isinstance(issue_date, str):
                     issue_date = issue_date.strip()
@@ -1652,6 +1658,13 @@ def parse_gemini_response(response_text):
                     "title_position": result.get('title_position', 'unknown'),
                     "method": "gemini_flash_ai"
                 }
+                
+                # Add color if available (for GCN classification)
+                if color:
+                    response_dict["color"] = color
+                    print(f"🎨 Color detected: {color}", file=sys.stderr)
+                else:
+                    response_dict["color"] = None
                 
                 # Add issue_date and issue_date_confidence if available
                 if issue_date:

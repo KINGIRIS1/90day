@@ -564,27 +564,9 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 📋 VÍ DỤ RESPONSE FORMAT:
 
-✅ Example 1 - GCN Document (màu đỏ/cam - cũ):
-{
-  "short_code": "GCN",
-  "confidence": 0.95,
-  "title_position": "top",
-  "color": "red",
-  "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021",
-  "issue_date": "27/10/2021",
-  "issue_date_confidence": "full"
-}
-
-✅ Example 2 - GCN Document (màu hồng - mới):
-{
-  "short_code": "GCN",
-  "confidence": 0.95,
-  "title_position": "top",
-  "color": "pink",
-  "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025",
-  "issue_date": "14/04/2025",
-  "issue_date_confidence": "full"
-}
+✅ GCN Examples:
+{"short_code": "GCN", "color": "red", "issue_date": "27/10/2021", "issue_date_confidence": "full", "confidence": 0.95, "title_position": "top"}
+{"short_code": "GCN", "color": "pink", "issue_date": "14/04/2025", "issue_date_confidence": "full", "confidence": 0.95, "title_position": "top"}
 
 ❌ TUYỆT ĐỐI KHÔNG LÀM NHƯ VẦY (SAI):
 {

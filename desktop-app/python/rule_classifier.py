@@ -50,6 +50,7 @@ EXACT_TITLE_MAPPING = {
     "ĐƠN XIN (ĐỀ NGHỊ) GIA HẠN SỬ DỤNG ĐẤT": "DGH",
     "ĐƠN XIN (ĐỀ NGHỊ) GIAO ĐẤT, CHO THUÊ ĐẤT": "DXGD",
     "ĐƠN XIN (ĐỀ NGHỊ) TÁCH THỬA ĐẤT, HỢP THỬA ĐẤT": "DXTHT",
+    "ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT": "DXTHT",
     "ĐƠN XIN CẤP ĐỔI GIẤY CHỨNG NHẬN": "DXCD",
     "ĐƠN XIN ĐIỀU CHỈNH THỜI HẠN SỬ DỤNG ĐẤT CỦA DỰ ÁN ĐẦU TƯ": "DDCTH",
     "ĐƠN XIN XÁC NHẬN LẠI THỜI HẠN SỬ DỤNG ĐẤT NÔNG NGHIỆP": "DXNTH",

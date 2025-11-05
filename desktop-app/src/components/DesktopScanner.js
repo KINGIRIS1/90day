@@ -1271,9 +1271,33 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                             }}
                           />
                         </div>
-                        {r.previewUrl && (
-                          <button onClick={() => setSelectedPreview(r.previewUrl)} className="mt-2 w-full text-xs text-blue-600 hover:underline">Phóng to ảnh</button>
-                        )}
+                        
+                        {/* Action Buttons */}
+                        <div className="mt-2 flex gap-2">
+                          {r.previewUrl && (
+                            <button
+                              onClick={() => setSelectedPreview(r.previewUrl)}
+                              className="flex-1 text-xs text-blue-600 hover:bg-blue-50 py-1 px-2 rounded border border-blue-200"
+                            >
+                              🔍 Phóng to
+                            </button>
+                          )}
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Xóa file "${r.fileName}"?`)) {
+                                setChildTabs(prev => prev.map((ct, j) => {
+                                  if (j !== childTabs.findIndex(x => x.path === t.path)) return ct;
+                                  const newRes = [...(ct.results || [])];
+                                  newRes.splice(idx, 1);
+                                  return { ...ct, results: newRes };
+                                }));
+                              }
+                            }}
+                            className="flex-1 text-xs text-red-600 hover:bg-red-50 py-1 px-2 rounded border border-red-200"
+                          >
+                            🗑️ Xóa
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

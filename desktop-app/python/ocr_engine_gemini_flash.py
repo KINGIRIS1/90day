@@ -1170,8 +1170,9 @@ DI CHÚC → DICHUC
 🚨 GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT (BẤT KỲ VARIANT) → GCN 🚨
   ❌ KHÔNG BAO GIỜ trả về "GCNM" hoặc "GCNC" ❌
   ✅ CHỈ trả về "GCN" (generic)
-  ⚠️ BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
-  ⚠️ Ví dụ issue_date: "01/01/2012", "02/2012", "2012" (linh hoạt nếu mờ)
+  ⚠️ BẮT BUỘC: Tìm NGÀY CẤP (có thể viết tay)
+  ⚠️ Ví dụ issue_date: "25/8/2010", "14/04/2025", "02/2012" (linh hoạt nếu mờ)
+  ⚠️ Nếu thấy "Ngày XX tháng YY năm ZZZZ" → chuyển thành "XX/YY/ZZZZ"
   ⚠️ Frontend xử lý batch để phân loại cũ/mới dựa trên ngày cấp
 GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT

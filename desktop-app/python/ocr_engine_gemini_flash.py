@@ -632,23 +632,57 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 📋 VÍ DỤ RESPONSE FORMAT:
 
-✅ GCN Examples:
-{"short_code": "GCN", "color": "red", "issue_date": "27/10/2021", "issue_date_confidence": "full", "confidence": 0.95, "title_position": "top"}
-{"short_code": "GCN", "color": "pink", "issue_date": "14/04/2025", "issue_date_confidence": "full", "confidence": 0.95, "title_position": "top"}
-
-❌ TUYỆT ĐỐI KHÔNG LÀM NHƯ VẦY (SAI):
+✅ Example 1 - GCN Document (màu đỏ/cam - cũ):
 {
-  "short_code": "GCNM",  // ❌ SAI! Phải là "GCN"
+  "short_code": "GCN",
   "confidence": 0.95,
   "title_position": "top",
-  "reasoning": "Giấy chứng nhận...",
-  "issue_date": "01/01/2012"
+  "color": "red",
+  "reasoning": "Giấy chứng nhận màu đỏ/cam (cũ), ngày cấp 27/10/2021",
+  "issue_date": "27/10/2021",
+  "issue_date_confidence": "full"
 }
 
-✅ Other Examples:
-{"short_code": "HDCN", "confidence": 0.92, "title_position": "top"}
-{"short_code": "HDUQ", "confidence": 0.98, "title_position": "top"}
-{"short_code": "UNKNOWN", "confidence": 0.3, "title_position": "middle"}"""
+✅ Example 2 - GCN Document (màu hồng - mới):
+{
+  "short_code": "GCN",
+  "confidence": 0.95,
+  "title_position": "top",
+  "color": "pink",
+  "reasoning": "Giấy chứng nhận màu hồng (mới), ngày cấp 14/04/2025",
+  "issue_date": "14/04/2025",
+  "issue_date_confidence": "full"
+}
+
+✅ Example 3 - HDCN Document:
+{
+  "short_code": "HDCN",
+  "confidence": 0.92,
+  "title_position": "top",
+  "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
+  "issue_date": null,
+  "issue_date_confidence": null
+}
+
+✅ Example 4 - HDUQ Document (HỢP ĐỒNG ỦY QUYỀN):
+{
+  "short_code": "HDUQ",
+  "confidence": 0.98,
+  "title_position": "top",
+  "reasoning": "Hợp đồng ủy quyền - tiêu đề lớn ở top",
+  "issue_date": null,
+  "issue_date_confidence": null
+}
+
+✅ Example 5 - Unknown Document:
+{
+  "short_code": "UNKNOWN",
+  "confidence": 0.3,
+  "title_position": "middle",
+  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
+  "issue_date": null,
+  "issue_date_confidence": null
+}"""
 
 
 def get_classification_prompt():

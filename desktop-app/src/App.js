@@ -146,7 +146,7 @@ function App() {
               <img src="/brand-icon.png" alt="90dayChonThanh" className="w-8 h-8 rounded-lg object-cover" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">90dayChonThanh</h1>
-                <p className="text-xs text-gray-500">Desktop App - Offline First</p>
+                <p className="text-xs text-gray-500">Desktop App</p>
               </div>
             </div>
             {/* Tab Navigation */}

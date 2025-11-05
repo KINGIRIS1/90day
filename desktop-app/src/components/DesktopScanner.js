@@ -514,8 +514,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   };
 
   // Progressive file processing (vừa quét vừa hiện)
-
-  // Progressive file processing (vừa quét vừa hiện)
   const handleProcessFiles = async (useCloudBoost = false, isResume = false) => {
     let filesToProcess = selectedFiles;
     if (!filesToProcess || filesToProcess.length === 0) {

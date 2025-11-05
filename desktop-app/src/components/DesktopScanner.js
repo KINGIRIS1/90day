@@ -407,67 +407,95 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       };
     });
     
-    // So sánh ngày cấp giữa các pairs
-    console.log('\n📊 Comparing issue dates between pairs...');
+    // Classification logic: Priority 1 = Color, Priority 2 = Date
+    console.log('\n📊 Classifying GCN pairs...');
     
-    if (pairsWithDates.length === 1) {
-      // Chỉ có 1 pair → default GCNM
-      console.log('📄 Only 1 pair → Default GCNM');
-      const pair = pairsWithDates[0];
-      const classification = 'GCNM';
-      const note = 'Only one GCN pair in batch → GCNM (default)';
+    // Step 1: Classify by color (highest priority)
+    const pairsWithColor = pairsWithData.filter(p => p.color && (p.color === 'red' || p.color === 'orange' || p.color === 'pink'));
+    const pairsWithoutColor = pairsWithData.filter(p => !p.color || (p.color !== 'red' && p.color !== 'orange' && p.color !== 'pink'));
+    
+    console.log(`  🎨 ${pairsWithColor.length} pair(s) with color detected`);
+    console.log(`  ⚪ ${pairsWithoutColor.length} pair(s) without color → will use date`);
+    
+    // Classify pairs with color
+    pairsWithColor.forEach(pair => {
+      const classification = (pair.color === 'red' || pair.color === 'orange') ? 'GCNC' : 'GCNM';
+      const colorName = (pair.color === 'red' || pair.color === 'orange') ? 'đỏ/cam (cũ)' : 'hồng (mới)';
+      const note = `Màu ${colorName} → ${classification}`;
       
-      // Apply to both pages
+      console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
+      
       [pair.page1, pair.page2].filter(Boolean).forEach(page => {
         const index = normalizedResults.indexOf(page);
         normalizedResults[index] = {
           ...page,
           short_code: classification,
           reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-          gcn_classification_note: `📌 ${note}`
+          gcn_classification_note: `📌 ${note} (phân loại theo màu)`
         };
       });
-    } else {
-      // Multiple pairs → compare dates
-      // Sort by date (oldest first)
-      const sortedPairs = [...pairsWithDates].sort((a, b) => {
-        if (!a.parsedDate && !b.parsedDate) return 0;
-        if (!a.parsedDate) return 1; // No date goes to end
-        if (!b.parsedDate) return -1;
-        return a.parsedDate.comparable - b.parsedDate.comparable;
-      });
+    });
+    
+    // Step 2: Classify remaining pairs by date
+    if (pairsWithoutColor.length > 0) {
+      console.log('\n📅 Classifying remaining pairs by date...');
       
-      console.log('\n📊 Sorted pairs by date:');
-      sortedPairs.forEach((pair, idx) => {
-        const dateStr = pair.issueDate || 'null';
-        const confidence = pair.issueDateConfidence || 'N/A';
-        console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr} (${confidence})`);
-      });
-      
-      // Classify: oldest = GCNC, others = GCNM
-      sortedPairs.forEach((pair, idx) => {
-        const isOldest = (idx === 0 && pair.parsedDate !== null);
-        const classification = isOldest ? 'GCNC' : 'GCNM';
+      if (pairsWithoutColor.length === 1) {
+        // Only 1 pair without color → default GCNM
+        console.log('📄 Only 1 pair without color → Default GCNM');
+        const pair = pairsWithoutColor[0];
+        const classification = 'GCNM';
         const dateStr = pair.issueDate || 'không có ngày cấp';
-        const note = isOldest 
-          ? `Ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
-          : pair.parsedDate 
-            ? `Ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
-            : `Không có ngày cấp → GCNM (mặc định)`;
+        const note = `Không detect màu, chỉ 1 GCN → GCNM (mặc định)`;
         
-        console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
-        
-        // Apply classification to both pages of the pair
         [pair.page1, pair.page2].filter(Boolean).forEach(page => {
           const index = normalizedResults.indexOf(page);
           normalizedResults[index] = {
             ...page,
             short_code: classification,
             reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-            gcn_classification_note: `📌 ${note}`
+            gcn_classification_note: `📌 ${note} (ngày cấp: ${dateStr})`
           };
         });
-      });
+      } else {
+        // Multiple pairs → sort by date
+        const sortedPairs = [...pairsWithoutColor].sort((a, b) => {
+          if (!a.parsedDate && !b.parsedDate) return 0;
+          if (!a.parsedDate) return 1;
+          if (!b.parsedDate) return -1;
+          return a.parsedDate.comparable - b.parsedDate.comparable;
+        });
+        
+        console.log('\n📊 Sorted pairs by date:');
+        sortedPairs.forEach((pair, idx) => {
+          const dateStr = pair.issueDate || 'null';
+          console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr}`);
+        });
+        
+        // Classify: oldest = GCNC, others = GCNM
+        sortedPairs.forEach((pair, idx) => {
+          const isOldest = (idx === 0 && pair.parsedDate !== null);
+          const classification = isOldest ? 'GCNC' : 'GCNM';
+          const dateStr = pair.issueDate || 'không có ngày cấp';
+          const note = isOldest 
+            ? `Không detect màu, ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
+            : pair.parsedDate 
+              ? `Không detect màu, ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
+              : `Không detect màu, không có ngày cấp → GCNM (mặc định)`;
+          
+          console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
+          
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: classification,
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note} (phân loại theo ngày)`
+            };
+          });
+        });
+      }
     }
     
     console.log('✅ GCN post-processing complete (date-based)');

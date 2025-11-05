@@ -1130,9 +1130,9 @@ DI CHÚC → DICHUC
 🚨 GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT (BẤT KỲ VARIANT) → GCN 🚨
   ❌ KHÔNG BAO GIỜ trả về "GCNM" hoặc "GCNC" ❌
   ✅ CHỈ trả về "GCN" (generic)
-  ⚠️ BẮT BUỘC: Tìm số chứng nhận ở góc dưới (format: [2 chữ][6 số])
-  ⚠️ Ví dụ certificate_number: "DE 334187", "DP 947330", "AB 123456"
-  ⚠️ Frontend xử lý batch để phân loại cũ/mới
+  ⚠️ BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
+  ⚠️ Ví dụ issue_date: "01/01/2012", "02/2012", "2012" (linh hoạt nếu mờ)
+  ⚠️ Frontend xử lý batch để phân loại cũ/mới dựa trên ngày cấp
 GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
 GIẤY SANG NHƯỢNG ĐẤT → GSND

@@ -1572,9 +1572,11 @@ TRẢ VỀ JSON (BẮT BUỘC):
 - LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, issue_date, issue_date_confidence
 
 📋 ISSUE_DATE (BẮT BUỘC CHO GCN):
-- ⚠️ Nếu phân loại "GCN" → BẮT BUỘC tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
-- Format: DD/MM/YYYY (e.g., "01/01/2012") hoặc MM/YYYY hoặc YYYY nếu mờ
-- Trả về trong fields: "issue_date": "01/01/2012", "issue_date_confidence": "full"
+- ⚠️ Nếu phân loại "GCN" → BẮT BUỘC tìm NGÀY CẤP (có thể viết tay)
+- Format output: LUÔN LUÔN trả về "DD/MM/YYYY" (e.g., "25/8/2010", "14/04/2025")
+- Nếu thấy "Ngày XX tháng YY năm ZZZZ" → chuyển thành "XX/YY/ZZZZ"
+- Nếu mờ → MM/YYYY hoặc YYYY
+- Trả về trong fields: "issue_date": "25/8/2010", "issue_date_confidence": "full"
 - Nếu KHÔNG phải GCN → "issue_date": null, "issue_date_confidence": null
 
 VÍ DỤ CHO GCN (Trang 2 - có ngày cấp):

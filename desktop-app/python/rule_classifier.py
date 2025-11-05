@@ -74,6 +74,7 @@ EXACT_TITLE_MAPPING = {
     "HOÁ ĐƠN GIÁ TRỊ GIA TĂNG": "hoadon",
     "HOÀN THÀNH CÔNG TÁC BỒI THƯỜNG HỖ TRỢ": "HTBTH",
     "HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT": "HDCQ",
+    "HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT": "HDCQ",
     "HỢP ĐỒNG MUA BÁN TÀI SẢN BÁN ĐẤU GIÁ": "HDBDG",
     "HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT": "HDTHC",
     "HỢP ĐỒNG THI CÔNG": "HDTCO",

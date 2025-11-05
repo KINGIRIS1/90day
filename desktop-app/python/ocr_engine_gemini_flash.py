@@ -1611,12 +1611,19 @@ def parse_gemini_response(response_text):
                         print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
                         short_code = 'UNKNOWN'
                 
-                # Extract certificate_number if present (for GCN)
-                certificate_number = result.get('certificate_number', None)
-                if certificate_number and isinstance(certificate_number, str):
-                    certificate_number = certificate_number.strip()
-                    if certificate_number.lower() in ['null', 'none', 'n/a', '']:
-                        certificate_number = None
+                # Extract issue_date and issue_date_confidence if present (for GCN)
+                issue_date = result.get('issue_date', None)
+                issue_date_confidence = result.get('issue_date_confidence', None)
+                
+                if issue_date and isinstance(issue_date, str):
+                    issue_date = issue_date.strip()
+                    if issue_date.lower() in ['null', 'none', 'n/a', '']:
+                        issue_date = None
+                
+                if issue_date_confidence and isinstance(issue_date_confidence, str):
+                    issue_date_confidence = issue_date_confidence.strip()
+                    if issue_date_confidence.lower() in ['null', 'none', 'n/a', '']:
+                        issue_date_confidence = None
                 
                 response_dict = {
                     "short_code": short_code,
@@ -1626,10 +1633,14 @@ def parse_gemini_response(response_text):
                     "method": "gemini_flash_ai"
                 }
                 
-                # Add certificate_number if available
-                if certificate_number:
-                    response_dict["certificate_number"] = certificate_number
-                    print(f"📋 Certificate number extracted: {certificate_number}", file=sys.stderr)
+                # Add issue_date and issue_date_confidence if available
+                if issue_date:
+                    response_dict["issue_date"] = issue_date
+                    response_dict["issue_date_confidence"] = issue_date_confidence or "unknown"
+                    print(f"📅 Issue date extracted: {issue_date} ({issue_date_confidence or 'unknown'})", file=sys.stderr)
+                else:
+                    response_dict["issue_date"] = None
+                    response_dict["issue_date_confidence"] = None
                 
                 return response_dict
         

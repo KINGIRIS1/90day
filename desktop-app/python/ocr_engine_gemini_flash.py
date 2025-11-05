@@ -883,13 +883,21 @@ NỘI DUNG THỎA THUẬN PHÂN CHIA
    → BẮT BUỘC: Tìm NGÀY CẤP (thường ở trang 2, có thể viết tay)
 
 📋 TÌM NGÀY CẤP (ISSUE DATE):
-   • Vị trí: Thường ở trang 2, gần cuối trang, có thể viết tay
-   • Text gần: "Ngày cấp", "Cấp ngày", hoặc ô có handwriting date
-   • Format:
-     - Đầy đủ: DD/MM/YYYY (ví dụ: "01/01/2012", "15/03/2013")
-     - Nếu mờ: MM/YYYY (ví dụ: "02/2012", "04/2013")
-     - Nếu rất mờ: YYYY (ví dụ: "2012", "2013")
-   • Lý do: Frontend sẽ so sánh ngày cấp giữa các GCN:
+   • Vị trí: 
+     - A3 (2 trang lớn): Thường ở trang 2, gần cuối trang
+     - A4 (1 trang nhỏ): Thường ở trang 1, bottom
+   • Text gần: "Ngày cấp", "Cấp ngày", "Ngày...tháng...năm", "TM. UBND"
+   • Các format có thể gặp:
+     - Format 1: "DD/MM/YYYY" (ví dụ: "01/01/2012", "15/03/2013", "14/04/2025")
+     - Format 2: "Ngày DD tháng MM năm YYYY" (ví dụ: "Ngày 25 tháng 8 năm 2010")
+       → PHẢI chuyển thành "DD/MM/YYYY" (ví dụ: "25/8/2010" hoặc "25/08/2010")
+     - Format 3: "DD.MM.YYYY" hoặc "DD-MM-YYYY"
+     - Nếu mờ: MM/YYYY hoặc YYYY
+   • ⚠️ QUAN TRỌNG: Nếu thấy format "Ngày XX tháng YY năm ZZZZ":
+     - ĐỌC các số XX, YY, ZZZZ (có thể viết tay)
+     - CHUYỂN thành "XX/YY/ZZZZ"
+     - Ví dụ: "Ngày 25 tháng 8 năm 2010" → "25/8/2010"
+   • Lý do: Frontend sẽ so sánh ngày cấp:
      - Ngày nhỏ hơn = GCNC (cũ)
      - Ngày lớn hơn = GCNM (mới)
    

@@ -577,35 +577,10 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "issue_date": "01/01/2012"
 }
 
-✅ Example 3 - HDCN Document:
-{
-  "short_code": "HDCN",
-  "confidence": 0.92,
-  "title_position": "top",
-  "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất",
-  "issue_date": null,
-  "issue_date_confidence": null
-}
-
-✅ Example 4 - HDUQ Document (HỢP ĐỒNG ỦY QUYỀN):
-{
-  "short_code": "HDUQ",
-  "confidence": 0.98,
-  "title_position": "top",
-  "reasoning": "Hợp đồng ủy quyền - tiêu đề lớn ở top",
-  "issue_date": null,
-  "issue_date_confidence": null
-}
-
-✅ Example 5 - Unknown Document:
-{
-  "short_code": "UNKNOWN",
-  "confidence": 0.3,
-  "title_position": "middle",
-  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
-  "issue_date": null,
-  "issue_date_confidence": null
-}"""
+✅ Other Examples:
+{"short_code": "HDCN", "confidence": 0.92, "title_position": "top"}
+{"short_code": "HDUQ", "confidence": 0.98, "title_position": "top"}
+{"short_code": "UNKNOWN", "confidence": 0.3, "title_position": "middle"}"""
 
 
 def get_classification_prompt():

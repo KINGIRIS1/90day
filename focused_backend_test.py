@@ -12,7 +12,7 @@ from PIL import Image
 import base64
 
 class FocusedDocumentScannerTester:
-    def __init__(self, base_url="https://vndoc-ocr.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://landoc-vision.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.test_results = {}
         

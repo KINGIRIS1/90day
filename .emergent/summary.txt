@@ -1,102 +1,84 @@
 <analysis>
-The AI engineer's work primarily revolved around enhancing a desktop OCR application for Vietnamese land documents. A significant portion involved refining the complex classification of Giấy chứng nhận (GCN) documents, transitioning from certificate number-based logic to issue date and color-based classification. This included extensive prompt engineering in  to extract  and , and sophisticated client-side JavaScript logic in  for pairing multi-page documents and applying conditional classification rules (prioritizing color, then date, then specific sequential rules).
+The AI engineer's work spanned enhancing an OCR application, primarily focusing on document classification and installer creation. Initially, the task was to create a one-click installer, which led to the generation of multiple build scripts (, ) and documentation. This process faced immediate issues: a missing  in  and a hanging Yarn installation during the build, both successfully resolved.
 
-Beyond GCN, the engineer addressed several classification inaccuracies, such as fixing HỢP ĐỒNG ỦY QUYỀN (HDUQ) misidentification and improving sequential page classification for documents like PCT and TBT by adding specific rules in . UI/UX improvements included adding an exit confirmation dialog, moving the request delay setting to , removing per-page cost displays, updating the application title, adding developer information, and implementing file deletion and folder rescan functionalities in the . The final task involves providing instructions for building a one-click installer.
+Simultaneously, the engineer addressed several critical document classification inaccuracies reported by the user, including mapping HDTG to HDCQ, BVDS to HSKT, and refining DDKBD to DXTHT, and DDK to PCTSVC. These fixes involved updating , , and  prompts. UI improvements like updating the rescan warning message were also implemented.
+
+A config error during scanning was traced to a missing API key, which the user resolved. The engineer engaged in detailed prompt engineering discussions, including comparing a user-provided prompt with the existing one, and later a HYBRID prompt attempt, eventually discarding the hybrid due to real-world inaccuracies. The conversation concluded with a new directive: prioritize Flash Lite optimization, and a question about why HDCQ was correctly classified.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, focusing on accurate classification, renaming, and batch processing. It uses Gemini Flash AI for OCR. Key requirements addressed and developed in this trajectory include:
-
-*   **GCN Classification Refinement**: Initially, classifying Giấy chứng nhận (GCN) into GCNC (old) or GCNM (new) based on certificate numbers. This evolved to a more robust, user-driven requirement:
-    *   **Date-Based GCN Classification**: Classify GCNs as GCNC or GCNM primarily using Ngày cấp (issue date), with older dates as GCNC and newer as GCNM.
-    *   **Color-Based GCN Classification**: Incorporate document color (red/orange for GCNC, pink for GCNM) as the highest priority classification rule for GCNs.
-    *   **Mixed Logic**: If colors are the same, use date comparison.
-    *   **Multi-Page GCN Handling**: Support 2-page A3 and A4 GCN documents where the issue date might be on page 2 (A3) or page 1 (A4), with page 1 renaming based on page 2's data.
-    *   **Handwriting Recognition**: Improve Ngày cấp extraction, especially for handwritten dates in various formats.
-    *   **Specific GCN Misclassification Fixes**: Address issues like GCN page 2 (with maps) being misclassified as HSKT.
-*   **Sequential Document Naming**: Improve logic for continuation pages (e.g., page 2 of PCT misclassified as DDKBD or TBT misclassified as PCT) where primary titles are ambiguous.
-*   **Classification Accuracy Fixes**:
-    *   Correctly classify HỢP ĐỒNG ỦY QUYỀN (HDUQ), preventing Gemini from returning HDQUYEN or UNKNOWN.
-    *   Fix specific issues like PCT page 2 misclassified as DDKBD due to Gemini misinterpreting title position.
-*   **Performance & Cost Optimization**: Optimize Gemini prompts to reduce token usage while maintaining accuracy.
-*   **UI/UX Enhancements**:
-    *   Move Delay giữa các request (request delay to avoid rate limits) setting from  into  for user control.
-    *   Remove per-page cost display.
-    *   Update application title by removing Offline First.
-    *   Add developer information to the settings page.
-    *   Add Xóa file (delete file) buttons for individual scanned files.
-    *   Add Quét lại thư mục này (rescan this folder) button for folder scan results.
-*   **Installer Guidance**: Provide instructions for building a one-click NSIS installer.
+The application is a desktop OCR scanner for Vietnamese land documents, aiming for accurate classification, renaming, and batch processing using Gemini Flash AI.
+**Key requirements addressed:**
+*   **One-click installer:** Develop an automated build process for a single-executable installer.
+*   **Document Classification:**
+    *   Correctly classify HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT (HDTG) as HDCQ.
+    *   Map Bản vẽ đồ đạc/bản đồ địa chính (BVDS) to HSKT.
+    *   Ensure ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT is classified as DXTHT (not DDKBD).
+    *   Classify VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG (DDK) as PCTSVC.
+*   **Performance:** Optimize Gemini prompts for cost (Flash Lite) and accuracy.
+*   **UI/UX:** Modify the rescan folder warning message.
+*   **Rate Limit Management:** Provide guidance on Delay giữa các request for multiple machines.
 </product_requirements>
 
 <key_technical_concepts>
-- **Electron**: Desktop application framework.
-- **React**: Frontend UI development.
-- **Python**: Backend for OCR and AI processing.
-- **Gemini Flash API**: Google's multimodal AI for document OCR and classification, with token-based pricing and handwriting recognition.
-- **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification, structured JSON output (, ), and handling varied date formats.
-- **IPC (Inter-Process Communication)**: Electron's mechanism for  and configuration management.
-- **Client-side Post-processing**: JavaScript logic in  for complex batch-level classification (GCN pairing, color/date comparison, sequential rules).
+- **Electron**: Desktop app framework.
+- **React**: Frontend UI.
+- **Python**: Backend for OCR and AI.
+- **Gemini Flash API**: Google's AI for document OCR/classification (Flash & Flash Lite).
+- **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification and structured JSON output.
+- **NSIS**: Nullsoft Scriptable Install System for Windows installers.
+- **Client-side Post-processing**: JavaScript logic in  for classification rules.
 </key_technical_concepts>
 
 <code_architecture>
-The application is structured into , , and  directories.
+The application has a , , and  structure.
 
 
 
 -   ****:
-    -   **Summary**: Electron's main process, window management, IPC, Python execution. Manages the core Electron app.
-    -   **Changes**: Not explicitly modified in the provided trajectory, but  (compiled) implies changes related to exit confirmation dialog were present.
+    -   **Summary**: Defines project metadata, dependencies, and build scripts for the Electron app.
+    -   **Changes**: Removed  from the  configuration to fix a build error.
 -   ****:
-    -   **Summary**: Compiled version of .
-    -   **Changes**: Synchronized with  modifications to include the exit confirmation dialog (as per initial analysis, not explicitly in trajectory).
--   ****:
-    -   **Summary**: Python script for Gemini Flash AI OCR and classification. Contains the prompts for Gemini.
+    -   **Summary**: Core Python script for Gemini OCR and classification. Contains prompts for Gemini Flash and Flash Lite models.
     -   **Changes**:
-        -   **Prompt Refinement**: Iteratively updated  and  to:
-            -   Explicitly extract  and  in JSON format.
-            -   Add detailed instructions and examples for handling handwritten dates and various date formats (e.g., Ngày DD tháng MM năm YYYY).
-            -   Remove references to  as a primary extraction target.
-            -   Add specific examples for  to prevent misclassification as HDQUYEN.
-            -   Optimized prompts by removing duplicate warning sections and temporarily reducing GCN examples (later restored).
+        -   Prompt updated to include HDTG as an example for HDCQ.
+        -   Prompt updated to include BVDS as an example for HSKT.
+        -   Prompt updated to include DXTHT in NHÓM 3 and distinguish it from DDKBD.
+        -   Prompt updated to include VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG as an example for PCTSVC.
 -   ****:
-    -   **Summary**: Orchestrates document processing and OCR engine calls, and structures the output.
-    -   **Changes**: Modified the JSON output to explicitly include the , , and  extracted by , ensuring they are passed to the frontend.
+    -   **Summary**: Orchestrates document processing, calls OCR engine, and structures output.
+    -   **Changes**: Added  mapping:  to  and  to .
 -   ****:
     -   **Summary**: Defines document classification rules and valid codes.
-    -   **Changes**: Verified that GCN and HDUQ were already present in , no explicit code changes needed in this trajectory.
--   ****:
-    -   **Summary**: The main React component for the desktop application.
-    -   **Changes**: Removed Offline First from the application title displayed in the UI.
--   ****:
-    -   **Summary**: Handles document scanning, displays results, and contains complex post-processing logic.
     -   **Changes**:
-        -   **GCN Post-processing (Date & Color-based)**: Replaced  logic entirely. The new function:
-            -   Pairs two-page GCN documents (e.g., page 1 and page 2).
-            -   Prioritizes  for GCNM/GCNC classification.
-            -   If colors are identical within a pair, falls back to  comparison (older date = GCNC, newer = GCNM).
-            -   Handles mixed-page GCNs (A3, A4) and applies renaming based on page 2 (for A3) or page 1 (for A4) date.
-        -   **Sequential Naming Logic**: Enhanced sequential logic (Rules 3, 4) to apply more flexibly when current document confidence is low OR  is not top.
-        -   **Specific Classification Rules**: Added new sequential rules:
-            -   **Rule 5 (GCN-HSKT)**: Prevents GCN page 2 (with maps) from being misclassified as HSKT.
-            -   **Rule 6 (PCT-DDKBD)**: Prevents PCT continuation pages from being misclassified as DDKBD when Gemini incorrectly identifies a middle title as top.
-        -   **Request Delay Integration**: Modified to load  from application configuration (managed in ) and removed the local UI slider.
-        -   **UI Modifications**: Removed cost/token display per file. Added Xóa file (delete file) buttons for individual scanned documents. Added Quét lại thư mục này (rescan this folder) buttons for scanned folders.
-        -   **Bug Fix**: Corrected a JavaScript syntax error by removing a remnant of old, unused code.
+        -   Added  to  for HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT.
+        -   Added  to  for ĐỒ ĐẠC CHÍNH LÝ BẢN ĐỒ ĐỊA CHÍNH.
+        -   Added variants for  in  to better capture ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT.
+        -   Added  to  for VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG.
 -   ****:
-    -   **Summary**: Provides user-configurable settings for the application.
-    -   **Changes**: Added a new  component to allow users to configure the delay between requests, and integrated it into the UI. Added a Thông tin nhà phát triển (Developer Information) section.
--   **New Markdown Files**:
-    -   : Documented the initial date-based GCN classification logic.
-    -   : Documented the enhanced color and date-based GCN classification.
-    -   : Provides detailed instructions for building the one-click installer.
--   **New Test Script**:
-    -   : Python script created to test the  extraction from .
+    -   **Summary**: Handles scanning, displays results, and contains post-processing logic.
+    -   **Changes**: Modified the rescan folder warning message from Phát hiện lỗi nhiều file? Quét lại thư mục này để sửa to Nếu bạn phát hiện nhiều file bị lỗi. Hãy sử dụng tính năng quét lại thư mục này để sửa.
+-   ****:
+    -   **Summary**: Documentation for building the installer.
+    -   **Changes**: Updated to include instructions for newly created build scripts.
+-   **New Build Scripts and Docs**:
+    -   : Main batch script for one-click installer.
+    -   : PowerShell script for installer.
+    -   : Simplified batch script for faster rebuilds.
+    -   : README for build scripts.
+    -   : Script to test the installer.
+    -   : Quick start guide.
+    -   : Index of build scripts.
+    -   : Build-specific README.
+    -   : Summary of build process.
+    -   : A new file representing a hybrid prompt attempt, later discarded.
+    -   : Summary for the hybrid engine.
+    -   : Test script for the hybrid engine.
 </code_architecture>
 
 <pending_tasks>
--   Implement full logic for the all-in-one installer using  (currently, only documentation and guidance have been provided).
--   Fine-tune remaining document types in  and  (beyond the specific ones fixed).
+-   Implement full logic for the all-in-one installer (beyond documentation).
+-   Fine-tune remaining document types in  and .
 -   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
 -   Migrate or pin React/Webpack versions.
 -   Test the backend with 5-10 real images to validate Hybrid OCR.
@@ -111,11 +93,11 @@ The application is structured into , , and  directories.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer completed a series of UI/UX updates and prepared documentation. The application title 90dayChonThanh Desktop App - Offline First was updated to remove Offline First in . Developer information (Người viết phần mềm: Nguyen Thin Trung - Email: nguyenthintrung.ceo@gmail.com) was added to the  component. The display of estimated costs per page was removed from , and new functionalities for managing scanned files were implemented: a Xóa file (delete file) button for individual results and a Quét lại thư mục này (rescan this folder) button for folder scan results. The  for folder scanning was confirmed to be active and loading from a configurable setting now present in .
+Immediately before this summary request, the AI engineer had addressed several document classification issues and provided cost calculations. The user reported that a previously introduced HYBRID prompt version showed many errors in real-world testing. The AI engineer analyzed the current app's  and realized the existing Flash Lite prompt was significantly more optimized than the proposed hybrid, recommending against deploying the hybrid.
 
-The user's most recent explicit request was to provide guidance on building a one-click installer. In response, the AI engineer successfully created a detailed Vietnamese documentation file: . The AI engineer's final action in the trajectory was preparing to create a build script to facilitate the installer creation process.
+The user then discarded the hybrid and set a new directive: all future optimizations should prioritize the **Flash Lite** version. Only content explicitly requested for *both* Flash versions should be added to the full Flash version; otherwise, it's for Flash Lite only. The user provided a scan log for a document titled HỢP ĐỒNG CHUYỂN NHƯỢNG which was correctly classified as HDCQ using Flash Lite and asked for an explanation as to why it was correctly classified. The AI engineer was about to analyze the image to explain the classification.
 </current_work>
 
 <optional_next_step>
-Create a build script to automate the one-click installer generation process based on the user's request.
+Analyze the provided HỢP ĐỒNG CHUYỂN NHƯỢNG image to explain its classification as HDCQ by the Flash Lite model.
 </optional_next_step>

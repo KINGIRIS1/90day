@@ -175,6 +175,70 @@ ipcMain.handle('select-files', async () => {
   return result.filePaths;
 });
 
+// Batch scanning - select CSV/Excel file
+ipcMain.handle('select-file', async (event, options) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    title: options?.title || 'Select File',
+    filters: options?.filters || []
+  });
+  return {
+    success: !result.canceled,
+    canceled: result.canceled,
+    filePath: result.canceled ? null : result.filePaths[0]
+  };
+});
+
+// Batch scanning - analyze CSV/Excel file
+ipcMain.handle('analyze-batch-file', async (event, csvFilePath) => {
+  const pyInfo = discoverPython();
+  if (!pyInfo.ok) {
+    return { success: false, error: 'Python not found' };
+  }
+  
+  const batchScriptPath = isDev 
+    ? path.join(__dirname, '../python/batch_scanner.py')
+    : getPythonScriptPath('batch_scanner.py');
+  
+  return new Promise((resolve) => {
+    const child = spawn(pyInfo.executable, [batchScriptPath, csvFilePath], {
+      env: buildPythonEnv({}, pyInfo, path.dirname(batchScriptPath))
+    });
+    
+    let stdout = '';
+    let stderr = '';
+    
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+    
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+    
+    child.on('close', (code) => {
+      if (code === 0) {
+        try {
+          const result = JSON.parse(stdout);
+          resolve(result);
+        } catch (e) {
+          resolve({ success: false, error: `Failed to parse JSON: ${e.message}` });
+        }
+      } else {
+        resolve({ success: false, error: stderr || `Process exited with code ${code}` });
+      }
+    });
+    
+    // Timeout after 30 seconds
+    setTimeout(() => {
+      try {
+        child.kill();
+      } catch {}
+      resolve({ success: false, error: 'Analysis timeout' });
+    }, 30000);
+  });
+});
+
 ipcMain.handle('list-files-in-folder', async (event, folderPath) => {
   try {
     const entries = fs.readdirSync(folderPath, { withFileTypes: true });

@@ -440,8 +440,13 @@ const BatchScanner = () => {
 
         {/* Progress */}
         {processing && (
-          <div className="mb-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-            <h3 className="text-lg font-semibold mb-2">⏳ Tiến độ</h3>
+          <div className={`mb-6 p-4 rounded-lg border ${isPaused ? 'bg-orange-50 border-orange-200' : 'bg-yellow-50 border-yellow-200'}`}>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold">{isPaused ? '⏸️ Đã tạm dừng' : '⏳ Tiến độ'}</h3>
+              {isPaused && (
+                <span className="text-sm text-orange-600 font-medium">Nhấn "Tiếp tục" để chạy lại</span>
+              )}
+            </div>
             <div className="mb-2">
               <div className="flex justify-between text-sm mb-1">
                 <span>Đã xử lý: {progress.current} / {progress.total} ảnh</span>
@@ -449,7 +454,7 @@ const BatchScanner = () => {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-green-600 h-2 rounded-full transition-all"
+                  className={`h-2 rounded-full transition-all ${isPaused ? 'bg-orange-600' : 'bg-green-600'}`}
                   style={{ width: `${(progress.current / progress.total) * 100}%` }}
                 />
               </div>

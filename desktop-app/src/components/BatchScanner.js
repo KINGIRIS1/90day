@@ -42,24 +42,33 @@ const BatchScanner = () => {
     }
 
     try {
-      const result = await api.selectFile({
-        title: 'Chọn file CSV hoặc Excel',
-        filters: [
-          { name: 'CSV Files', extensions: ['csv'] },
-          { name: 'Excel Files', extensions: ['xlsx', 'xls'] },
-          { name: 'All Files', extensions: ['*'] }
-        ]
-      });
-
-      if (result.success && result.filePath) {
-        setCsvFile(result.filePath);
-        addLog(`✅ Đã chọn file: ${result.filePath}`, 'success');
-        
-        // Analyze batch
-        await analyzeBatch(result.filePath);
-      } else if (result.canceled) {
-        addLog('⚠️ Đã hủy chọn file', 'warning');
-      }
+      // Use native file input as fallback
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.csv,.xlsx,.xls';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // In Electron, we need the file path, not the File object
+          // We'll use a workaround by reading the file path from input
+          const filePath = file.path || file.name;
+          setCsvFile(filePath);
+          addLog(`✅ Đã chọn file: ${filePath}`, 'success');
+          
+          // For now, show a message that user needs to provide full path
+          if (!file.path) {
+            addLog('⚠️ Vui lòng nhập đường dẫn đầy đủ của file CSV/Excel', 'warning');
+            const userPath = prompt('Nhập đường dẫn đầy đủ của file CSV/Excel:');
+            if (userPath) {
+              setCsvFile(userPath);
+              await analyzeBatch(userPath);
+            }
+          } else {
+            await analyzeBatch(file.path);
+          }
+        }
+      };
+      input.click();
     } catch (error) {
       addLog(`❌ Lỗi chọn file: ${error.message}`, 'error');
     }

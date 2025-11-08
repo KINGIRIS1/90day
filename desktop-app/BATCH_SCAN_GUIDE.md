@@ -97,6 +97,26 @@ Có 3 chế độ:
 2. Theo dõi tiến độ trên progress bar
 3. Xem log để biết chi tiết quá trình xử lý
 
+### Điều khiển trong quá trình quét
+
+Khi đang quét, bạn có thể:
+
+**⏸️ Tạm dừng (Pause):**
+- Click nút "⏸️ Tạm dừng" để dừng tạm thời
+- Progress bar chuyển sang màu cam
+- File đang xử lý sẽ hoàn thành trước khi dừng
+- Tiến độ được giữ nguyên
+
+**▶️ Tiếp tục (Resume):**
+- Click nút "▶️ Tiếp tục" để chạy lại
+- Quá trình tiếp tục từ file tiếp theo
+- Progress bar chuyển về màu xanh
+
+**⏹️ Dừng (Stop):**
+- Click nút "⏹️ Dừng" để dừng hoàn toàn
+- Tất cả file đã xử lý vẫn được giữ lại
+- Có thể bắt đầu lại từ đầu nếu muốn
+
 ## 📊 Hiểu kết quả
 
 ### Log Messages

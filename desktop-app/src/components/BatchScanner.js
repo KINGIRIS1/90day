@@ -122,6 +122,21 @@ const BatchScanner = () => {
     }
   };
 
+  const handlePauseResume = () => {
+    setIsPaused(!isPaused);
+    if (isPaused) {
+      addLog('▶️ Tiếp tục quét...', 'info');
+    } else {
+      addLog('⏸️ Đã tạm dừng', 'warning');
+    }
+  };
+
+  const handleStop = () => {
+    setProcessing(false);
+    setIsPaused(false);
+    addLog('⏹️ Đã dừng quét batch', 'warning');
+  };
+
   const handleStartBatchScan = async () => {
     if (!batchAnalysis || batchAnalysis.valid_folders === 0) {
       addLog('❌ Không có thư mục hợp lệ để quét', 'error');
@@ -137,6 +152,7 @@ const BatchScanner = () => {
     if (!api) return;
 
     setProcessing(true);
+    setIsPaused(false);
     setResults([]);
     setProgress({ current: 0, total: batchAnalysis.total_images, currentFolder: '' });
     addLog('🚀 Bắt đầu quét batch...', 'info');
@@ -146,6 +162,8 @@ const BatchScanner = () => {
       let currentImageCount = 0;
 
       for (const folder of batchAnalysis.folders) {
+        if (!processing) break; // Stop if processing was set to false
+        
         if (!folder.valid || folder.image_count === 0) {
           continue;
         }
@@ -155,6 +173,14 @@ const BatchScanner = () => {
 
         // Process images in this folder
         for (let i = 0; i < folder.images.length; i++) {
+          // Check if paused
+          while (isPaused && processing) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+          
+          // Check if stopped
+          if (!processing) break;
+          
           const imagePath = folder.images[i];
           currentImageCount++;
           

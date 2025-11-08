@@ -239,6 +239,10 @@ const BatchScanner = () => {
     setLogs([]);
   };
 
+  const getFileName = (fullPath) => {
+    return fullPath.split(/[/\\]/).pop();
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm p-6">

@@ -409,13 +409,32 @@ const BatchScanner = () => {
         {batchAnalysis && batchAnalysis.valid_folders > 0 && (
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">Bước 3: Bắt đầu quét</h3>
-            <button
-              onClick={handleStartBatchScan}
-              disabled={processing || (outputMode === 'copy_to_folder' && !outputFolder)}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-            >
-              {processing ? '⏳ Đang xử lý...' : '🚀 Bắt đầu quét batch'}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleStartBatchScan}
+                disabled={processing || (outputMode === 'copy_to_folder' && !outputFolder)}
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              >
+                {processing ? '⏳ Đang xử lý...' : '🚀 Bắt đầu quét batch'}
+              </button>
+              
+              {processing && (
+                <>
+                  <button
+                    onClick={handlePauseResume}
+                    className="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium"
+                  >
+                    {isPaused ? '▶️ Tiếp tục' : '⏸️ Tạm dừng'}
+                  </button>
+                  <button
+                    onClick={handleStop}
+                    className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                  >
+                    ⏹️ Dừng
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
 

@@ -48,6 +48,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteApiKey: (provider) => ipcRenderer.invoke('delete-api-key', provider),
   testApiKey: (data) => ipcRenderer.invoke('test-api-key', data),
   
+  // Batch scanning from CSV/Excel
+  analyzeBatchFile: (csvFilePath) => ipcRenderer.invoke('analyze-batch-file', csvFilePath),
+  
   // Platform info
   platform: process.platform,
   isElectron: true

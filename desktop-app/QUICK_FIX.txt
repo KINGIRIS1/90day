@@ -1,0 +1,44 @@
+========================================
+  QUICK FIX - Copy 3 Files từ Server
+========================================
+
+Bạn cần copy 3 files từ server sang Windows:
+
+1. /app/desktop-app/electron/preload.js
+   → Copy to: desktop-app\electron\preload.js
+
+2. /app/desktop-app/electron/main.js
+   → Copy to: desktop-app\electron\main.js
+
+3. /app/desktop-app/src/App.js
+   → Copy to: desktop-app\src\App.js
+
+========================================
+CÁCH COPY:
+========================================
+
+Option 1: FileZilla/WinSCP
+- Connect to server
+- Download 3 files trên (overwrite)
+
+Option 2: Command line (PowerShell)
+cd C:\your-path\desktop-app
+scp user@server:/app/desktop-app/electron/preload.js electron\
+scp user@server:/app/desktop-app/electron/main.js electron\
+scp user@server:/app/desktop-app/src/App.js src\
+
+========================================
+SAU KHI COPY:
+========================================
+
+1. Run: check-files.bat
+   → Phải thấy: ✅ All files are correct!
+
+2. Run: fix-api-error.bat
+   → Chờ 2-3 phút
+
+3. App sẽ tự động mở!
+
+========================================
+
+Xem chi tiết: MANUAL_FIX_GUIDE.md

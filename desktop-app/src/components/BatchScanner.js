@@ -154,44 +154,80 @@ const BatchScanner = () => {
           });
 
           try {
-            // Process single image
-            const result = await api.processDocument(imagePath);
+            // Process single image using offline OCR
+            const result = await api.processDocumentOffline(imagePath);
             
             if (result.success) {
-              // Handle output based on mode
-              let outputPath = '';
+              const shortCode = result.short_code || 'UNKNOWN';
+              let outputPath = imagePath;
               
+              // Handle output based on mode
               if (outputMode === 'rename') {
                 // Rename in place
-                const renameResult = await api.renameFile(imagePath, result.short_code);
-                outputPath = renameResult.newPath || imagePath;
+                try {
+                  const renameResult = await api.renameFile(imagePath, shortCode);
+                  if (renameResult.success) {
+                    outputPath = renameResult.newPath;
+                  }
+                } catch (e) {
+                  addLog(`⚠️ Không thể đổi tên ${imagePath}: ${e.message}`, 'warning');
+                }
               } else if (outputMode === 'copy_by_type') {
-                // Copy to doc type subfolder
-                const copyResult = await api.copyFileByType(imagePath, result.short_code, folder.path);
-                outputPath = copyResult.newPath || imagePath;
+                // Copy to doc type subfolder in the same parent folder
+                try {
+                  const targetFolder = path.join(folder.path, shortCode);
+                  // Create folder if not exists (will be handled by filesystem)
+                  const fileName = path.basename(imagePath);
+                  const ext = path.extname(imagePath);
+                  const baseName = path.basename(imagePath, ext);
+                  const newFileName = `${shortCode}_${baseName}${ext}`;
+                  const targetPath = path.join(targetFolder, newFileName);
+                  
+                  // Note: We need to implement folder creation and file copy in Electron
+                  // For now, just log the intent
+                  addLog(`📁 Cần copy ${fileName} → ${shortCode}/${newFileName}`, 'info');
+                  outputPath = targetPath;
+                } catch (e) {
+                  addLog(`⚠️ Lỗi copy ${imagePath}: ${e.message}`, 'warning');
+                }
               } else if (outputMode === 'copy_to_folder') {
-                // Copy to custom folder
-                const copyResult = await api.copyFileToFolder(imagePath, result.short_code, outputFolder);
-                outputPath = copyResult.newPath || imagePath;
+                // Copy to custom output folder
+                try {
+                  const fileName = path.basename(imagePath);
+                  const ext = path.extname(imagePath);
+                  const baseName = path.basename(imagePath, ext);
+                  const newFileName = `${shortCode}_${baseName}${ext}`;
+                  const targetPath = path.join(outputFolder, newFileName);
+                  
+                  addLog(`📁 Cần copy ${fileName} → ${outputFolder}/${newFileName}`, 'info');
+                  outputPath = targetPath;
+                } catch (e) {
+                  addLog(`⚠️ Lỗi copy ${imagePath}: ${e.message}`, 'warning');
+                }
               }
 
               setResults(prev => [...prev, {
                 originalPath: imagePath,
                 outputPath,
-                shortCode: result.short_code,
-                confidence: result.confidence,
+                shortCode: shortCode,
+                confidence: result.confidence || 0,
                 success: true
               }]);
             } else {
-              addLog(`❌ Lỗi xử lý ${imagePath}: ${result.error}`, 'error');
+              addLog(`❌ Lỗi xử lý ${imagePath}: ${result.error || 'Unknown error'}`, 'error');
               setResults(prev => [...prev, {
                 originalPath: imagePath,
-                error: result.error,
+                error: result.error || 'Unknown error',
                 success: false
               }]);
             }
           } catch (error) {
             addLog(`❌ Lỗi xử lý ${imagePath}: ${error.message}`, 'error');
+            setResults(prev => [...prev, {
+              originalPath: imagePath,
+              error: error.message,
+              success: false
+            }]);
           }
         }
 

@@ -7,9 +7,11 @@ const BatchScanner = () => {
   const [outputMode, setOutputMode] = useState('rename'); // 'rename', 'copy_by_type', 'copy_to_folder'
   const [outputFolder, setOutputFolder] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0, currentFolder: '' });
   const [results, setResults] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [pendingItems, setPendingItems] = useState([]); // Items left to process
 
   // Load saved output mode
   useEffect(() => {

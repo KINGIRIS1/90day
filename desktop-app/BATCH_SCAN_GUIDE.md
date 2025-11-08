@@ -178,8 +178,10 @@ App **KHÔNG** quét đệ quy vào thư mục con. Nếu bạn muốn quét th�
 ### Q: Nếu tên file trùng thì sao?
 **A:** App sẽ báo lỗi "Tên file đã tồn tại" và skip file đó.
 
-### Q: Tôi có thể dừng quá trình quét không?
-**A:** Hiện tại chưa hỗ trợ pause/stop. Nếu cần dừng, hãy đóng app (dữ liệu đã xử lý vẫn được giữ lại).
+### Q: Tôi có thể dừng hoặc tạm dừng quá trình quét không?
+**A:** Có! Khi đang quét, bạn sẽ thấy 2 nút:
+- **⏸️ Tạm dừng**: Dừng tạm thời, có thể tiếp tục sau
+- **⏹️ Dừng**: Dừng hoàn toàn (dữ liệu đã xử lý vẫn được giữ lại)
 
 ### Q: Làm sao để quét thư mục con?
 **A:** Thêm đường dẫn của từng thư mục con vào file CSV/Excel.

@@ -160,6 +160,7 @@ const BatchScanner = () => {
             if (result.success) {
               const shortCode = result.short_code || 'UNKNOWN';
               let outputPath = imagePath;
+              let fileProcessed = false;
               
               // Handle output based on mode
               if (outputMode === 'rename') {
@@ -168,41 +169,23 @@ const BatchScanner = () => {
                   const renameResult = await api.renameFile(imagePath, shortCode);
                   if (renameResult.success) {
                     outputPath = renameResult.newPath;
+                    fileProcessed = true;
                   }
                 } catch (e) {
-                  addLog(`⚠️ Không thể đổi tên ${imagePath}: ${e.message}`, 'warning');
+                  addLog(`⚠️ Không thể đổi tên ${getFileName(imagePath)}: ${e.message}`, 'warning');
                 }
-              } else if (outputMode === 'copy_by_type') {
-                // Copy to doc type subfolder in the same parent folder
+              } else if (outputMode === 'copy_by_type' || outputMode === 'copy_to_folder') {
+                // For now, just rename in place since we need to implement copy functions
+                // TODO: Implement proper copy functionality in Electron IPC
+                addLog(`⚠️ Chế độ copy chưa được implement đầy đủ. Tạm thời dùng rename.`, 'warning');
                 try {
-                  const targetFolder = path.join(folder.path, shortCode);
-                  // Create folder if not exists (will be handled by filesystem)
-                  const fileName = path.basename(imagePath);
-                  const ext = path.extname(imagePath);
-                  const baseName = path.basename(imagePath, ext);
-                  const newFileName = `${shortCode}_${baseName}${ext}`;
-                  const targetPath = path.join(targetFolder, newFileName);
-                  
-                  // Note: We need to implement folder creation and file copy in Electron
-                  // For now, just log the intent
-                  addLog(`📁 Cần copy ${fileName} → ${shortCode}/${newFileName}`, 'info');
-                  outputPath = targetPath;
+                  const renameResult = await api.renameFile(imagePath, shortCode);
+                  if (renameResult.success) {
+                    outputPath = renameResult.newPath;
+                    fileProcessed = true;
+                  }
                 } catch (e) {
-                  addLog(`⚠️ Lỗi copy ${imagePath}: ${e.message}`, 'warning');
-                }
-              } else if (outputMode === 'copy_to_folder') {
-                // Copy to custom output folder
-                try {
-                  const fileName = path.basename(imagePath);
-                  const ext = path.extname(imagePath);
-                  const baseName = path.basename(imagePath, ext);
-                  const newFileName = `${shortCode}_${baseName}${ext}`;
-                  const targetPath = path.join(outputFolder, newFileName);
-                  
-                  addLog(`📁 Cần copy ${fileName} → ${outputFolder}/${newFileName}`, 'info');
-                  outputPath = targetPath;
-                } catch (e) {
-                  addLog(`⚠️ Lỗi copy ${imagePath}: ${e.message}`, 'warning');
+                  addLog(`⚠️ Không thể đổi tên ${getFileName(imagePath)}: ${e.message}`, 'warning');
                 }
               }
 
@@ -211,10 +194,15 @@ const BatchScanner = () => {
                 outputPath,
                 shortCode: shortCode,
                 confidence: result.confidence || 0,
-                success: true
+                success: true,
+                processed: fileProcessed
               }]);
+              
+              if (fileProcessed) {
+                addLog(`✅ ${getFileName(imagePath)} → ${shortCode}`, 'success');
+              }
             } else {
-              addLog(`❌ Lỗi xử lý ${imagePath}: ${result.error || 'Unknown error'}`, 'error');
+              addLog(`❌ Lỗi xử lý ${getFileName(imagePath)}: ${result.error || 'Unknown error'}`, 'error');
               setResults(prev => [...prev, {
                 originalPath: imagePath,
                 error: result.error || 'Unknown error',
@@ -222,7 +210,7 @@ const BatchScanner = () => {
               }]);
             }
           } catch (error) {
-            addLog(`❌ Lỗi xử lý ${imagePath}: ${error.message}`, 'error');
+            addLog(`❌ Lỗi xử lý ${getFileName(imagePath)}: ${error.message}`, 'error');
             setResults(prev => [...prev, {
               originalPath: imagePath,
               error: error.message,

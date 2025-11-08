@@ -46,9 +46,13 @@ Tính năng mới cho phép quét hàng loạt nhiều thư mục từ file CSV 
   - Copy file giữa các thư mục
   - Rename file đã copy
 
-### 2. Pause/Resume
-- **Hiện trạng**: Không có nút pause/stop
-- **Cần làm**: Thêm state management cho pause/resume
+### 2. Pause/Resume ✅ ĐÃ HOÀN THÀNH
+- **Hiện trạng**: ✅ Đã có nút Pause/Resume/Stop
+- **Tính năng**:
+  - ⏸️ Tạm dừng: Dừng quá trình xử lý, giữ nguyên tiến độ
+  - ▶️ Tiếp tục: Chạy lại từ vị trí đã dừng
+  - ⏹️ Dừng: Dừng hoàn toàn quá trình
+  - UI thay đổi màu khi paused (orange)
 
 ### 3. Error recovery
 - **Hiện trạng**: Skip thư mục lỗi, tiếp tục

@@ -780,7 +780,7 @@ function CloudSettings() {
       )}
 
       {/* Image Resize Settings - Only for Gemini engines */}
-      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-lite') && (
+      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') && (
         <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <span>💰</span> Tối ưu hóa chi phí Gemini

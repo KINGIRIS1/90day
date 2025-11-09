@@ -263,7 +263,7 @@ ipcMain.handle('scan-single-folder', async (event, folderPath, ocrEngineType) =>
       let cloudApiKey = null;
       if (ocrEngineType === 'google') {
         cloudApiKey = store.get('cloudOCR.google.apiKey', '');
-      } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+      } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
         cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       }
 

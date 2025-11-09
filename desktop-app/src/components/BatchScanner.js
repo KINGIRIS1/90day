@@ -38,7 +38,8 @@ function BatchScanner() {
       if (filePath) {
         setTxtFilePath(filePath);
         // Reset results when new file is selected
-        setResults(null);
+        setScanResults(null);
+        setFileResults([]);
         setErrors([]);
         setSkippedFolders([]);
       }

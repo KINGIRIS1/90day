@@ -535,7 +535,16 @@ function BatchScanner() {
       {/* Folder Tabs */}
       {folderTabs.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">📂 Thư mục đã quét ({folderTabs.length})</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">📂 Thư mục đã quét ({folderTabs.length})</h2>
+            <button
+              onClick={() => handleMerge(true)}
+              disabled={mergeInProgress}
+              className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
+            >
+              {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp tất cả thư mục'}
+            </button>
+          </div>
           
           {/* Tabs */}
           <div className="flex items-center gap-2 overflow-auto mb-4">

@@ -817,9 +817,9 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
       const scriptPath = path.join(pythonDir, 'batch_processor.py');
       
       // Build args
-      const args = [scriptPath, mode, cloudApiKey, ...imagePaths];
+      const args = [scriptPath, mode, ocrEngine, cloudApiKey, ...imagePaths];
       
-      console.log(`🐍 Calling Python batch processor: mode=${mode}`);
+      console.log(`🐍 Calling Python batch processor: mode=${mode}, engine=${ocrEngine}`);
       
       // Discover Python executable
       const pyInfo = discoverPython();

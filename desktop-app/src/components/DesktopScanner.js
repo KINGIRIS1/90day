@@ -967,6 +967,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     stopRef.current = false;
     setIsFolderPaused(false);
     
+    // Initialize timer (only for new scan, not resume)
+    if (!isResume) {
+      const scanStartTime = Date.now();
+      setTimers({
+        scanStartTime: scanStartTime,
+        scanEndTime: null,
+        scanElapsedSeconds: 0,
+        fileTimings: [],
+        folderTimings: []
+      });
+      setElapsedTime(0);
+      console.log('⏱️ Folder scan timer started:', new Date(scanStartTime).toLocaleTimeString());
+    }
+    
     let tabsToScan = isResume ? remainingTabs : childTabs.filter(t => t.status !== 'done');
     
     for (const tab of tabsToScan) {
@@ -977,7 +991,44 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         setIsFolderPaused(true);
         return;
       }
+      
+      const folderStartTime = Date.now();
+      console.log(`⏱️ Folder timer started: ${tab.name}`);
+      
       await scanChildFolder(tab.path);
+      
+      const folderEndTime = Date.now();
+      const folderDurationMs = folderEndTime - folderStartTime;
+      console.log(`✅ Folder "${tab.name}" completed in ${(folderDurationMs / 1000).toFixed(2)}s`);
+      
+      // Save folder timing
+      setTimers(prev => ({
+        ...prev,
+        folderTimings: [...prev.folderTimings, {
+          folderName: tab.name,
+          folderPath: tab.path,
+          startTime: folderStartTime,
+          endTime: folderEndTime,
+          durationMs: folderDurationMs,
+          fileCount: tab.count || 0
+        }]
+      }));
+    }
+    
+    // End timer
+    if (!isResume && timers.scanStartTime) {
+      const scanEndTime = Date.now();
+      const scanElapsedMs = scanEndTime - timers.scanStartTime;
+      const scanElapsedSeconds = Math.floor(scanElapsedMs / 1000);
+      
+      console.log(`⏱️ Folder scan timer ended: ${new Date(scanEndTime).toLocaleTimeString()}`);
+      console.log(`⏱️ Total folder scan time: ${scanElapsedSeconds}s (${(scanElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+      
+      setTimers(prev => ({
+        ...prev,
+        scanEndTime: scanEndTime,
+        scanElapsedSeconds: scanElapsedSeconds
+      }));
     }
     
     setRemainingTabs([]);

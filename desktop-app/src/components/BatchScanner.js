@@ -284,10 +284,20 @@ function BatchScanner() {
   const gridColsClass = density === 'high' ? 'grid-cols-5' : density === 'medium' ? 'grid-cols-4' : 'grid-cols-3';
 
   // Handle merge PDFs (show modal)
-  const handleMerge = () => {
-    if (fileResults.length === 0) {
-      alert('Không có file nào để gộp PDF!');
-      return;
+  const handleMerge = (mergeAll = false) => {
+    if (mergeAll) {
+      // Check if there are any files across all folders
+      const totalFiles = folderTabs.reduce((sum, tab) => sum + tab.files.length, 0);
+      if (totalFiles === 0) {
+        alert('Không có file nào để gộp PDF!');
+        return;
+      }
+    } else {
+      // Check current folder
+      if (fileResults.length === 0) {
+        alert('Không có file nào trong thư mục hiện tại để gộp PDF!');
+        return;
+      }
     }
     setShowMergeModal(true);
   };

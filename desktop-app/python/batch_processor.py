@@ -400,29 +400,23 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         print(f"   Has title: {last_known_type.get('has_title', False)}", file=sys.stderr)
     
     all_results = []
-    processed_files = set()  # Track processed files to detect missing ones
+    processed_files = set()
     batch_num = 0
     current_idx = 0
+    current_last_known = last_known_type  # Start with provided lastKnown
     
     while current_idx < len(image_paths):
         batch_num += 1
         
-        # Calculate batch range with overlap
-        batch_start = max(0, current_idx - overlap) if batch_num > 1 else current_idx
+        # Calculate batch range WITHOUT overlap
+        batch_start = current_idx
         batch_end = min(len(image_paths), current_idx + batch_size)
         batch_paths = image_paths[batch_start:batch_end]
         
-        # Track which files are NEW in this batch (not overlap)
-        new_file_start_idx = current_idx - batch_start
-        
         print(f"\n📦 Batch {batch_num}: Files {batch_start}-{batch_end-1} ({len(batch_paths)} images)", file=sys.stderr)
-        if batch_num > 1:
-            print(f"   ↩️ Overlap: {overlap} files from previous batch (for context)", file=sys.stderr)
-            print(f"   🆕 New files: {batch_end - current_idx} (starting from index {new_file_start_idx})", file=sys.stderr)
         
         for i, path in enumerate(batch_paths):
-            marker = "🆕" if i >= new_file_start_idx else "↩️"
-            print(f"   [{i}] {marker} {os.path.basename(path)}", file=sys.stderr)
+            print(f"   [{i}] {os.path.basename(path)}", file=sys.stderr)
         
         # Encode all images in batch
         print(f"🖼️ Encoding {len(batch_paths)} images...", file=sys.stderr)

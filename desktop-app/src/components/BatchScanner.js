@@ -7,7 +7,12 @@ function BatchScanner() {
   const [outputOption, setOutputOption] = useState('same_folder');
   const [mergeSuffix, setMergeSuffix] = useState('_merged');
   const [outputFolder, setOutputFolder] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // New workflow states
+  const [isLoadingFolders, setIsLoadingFolders] = useState(false);
+  const [discoveredFolders, setDiscoveredFolders] = useState([]); // [{path, name, imageCount, valid, selected}]
+  const [isScanning, setIsScanning] = useState(false);
+  const [shouldStop, setShouldStop] = useState(false);
   const [progress, setProgress] = useState({ 
     currentFolder: '',
     currentFile: '',

@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   processDocumentOffline: (filePath) => ipcRenderer.invoke('process-document-offline', filePath),
   
   // Batch scan processing
+  validateBatchFolders: (txtPath) => ipcRenderer.invoke('validate-batch-folders', txtPath),
+  scanSingleFolder: (folderPath, ocrEngine) => ipcRenderer.invoke('scan-single-folder', folderPath, ocrEngine),
   processBatchScan: (txtPath, outputOption, mergeSuffix, outputFolder) => ipcRenderer.invoke('process-batch-scan', txtPath, outputOption, mergeSuffix, outputFolder),
   onBatchScanProgress: (callback) => ipcRenderer.on('batch-scan-progress', (event, data) => callback(data)),
   

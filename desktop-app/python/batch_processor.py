@@ -196,11 +196,26 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
                     if len(parts) > 0 and 'text' in parts[0]:
                         response_text = parts[0]['text']
                         
-                        # Extract JSON from response
-                        import re
+                        print(f"📄 Raw response preview: {response_text[:200]}...", file=sys.stderr)
+                        
+                        # Extract JSON from response - try multiple patterns
                         json_match = re.search(r'\{[\s\S]*"documents"[\s\S]*\}', response_text)
-                        if json_match:
-                            batch_result = json.loads(json_match.group(0))
+                        if not json_match:
+                            # Try finding JSON with triple backticks
+                            json_match = re.search(r'```json\s*(\{[\s\S]*?\})\s*```', response_text)
+                            if json_match:
+                                response_text = json_match.group(1)
+                            else:
+                                # Try finding any JSON object
+                                json_match = re.search(r'(\{[\s\S]*\})', response_text)
+                                if json_match:
+                                    response_text = json_match.group(1)
+                        else:
+                            response_text = json_match.group(0)
+                        
+                        if response_text:
+                            try:
+                                batch_result = json.loads(response_text)
                             
                             print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
                             for doc in batch_result.get('documents', []):

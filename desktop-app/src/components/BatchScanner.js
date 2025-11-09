@@ -230,8 +230,11 @@ function BatchScanner() {
         
         setProgress(prev => ({
           ...prev,
-          processedFolders: i + 1,
-          currentFolder: folder.path
+          processedFolders: i,
+          totalFolders: selectedFolders.length,
+          currentFolder: folder.path,
+          processedFiles: 0,
+          totalFiles: folder.imageCount
         }));
 
         // Update folder tab status to 'scanning'
@@ -250,23 +253,95 @@ function BatchScanner() {
           }
         });
 
-        try {
-          // Scan this folder
-          const folderResult = await window.electronAPI.scanSingleFolder(folder.path, ocrEngine);
-          
-          if (folderResult.success) {
-            allResults.push(...(folderResult.results || []));
-            processedFolderPaths.push(folder.path);
+        // Set active folder to show files as they're scanned
+        setActiveFolder(folder.path);
 
+        try {
+          // Get image files in folder
+          const imageFiles = await window.electronAPI.listFilesInFolder(folder.path);
+          const validImages = imageFiles.filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+          
+          console.log(`Found ${validImages.length} images in ${folder.name}`);
+          
+          // Scan each file and display immediately
+          const folderResults = [];
+          for (let j = 0; j < validImages.length; j++) {
+            if (shouldStop) break;
+
+            const imagePath = validImages[j];
+            const fileName = imagePath.split(/[/\\]/).pop();
+            
+            setProgress(prev => ({
+              ...prev,
+              processedFiles: j + 1,
+              currentFile: fileName
+            }));
+
+            try {
+              console.log(`  [${j + 1}/${validImages.length}] Processing: ${fileName}`);
+              
+              // Scan single file
+              const fileResult = await window.electronAPI.processDocumentOffline(imagePath);
+              
+              if (fileResult.success) {
+                // Load preview
+                let previewUrl = null;
+                try {
+                  previewUrl = await window.electronAPI.readImageDataUrl(imagePath);
+                } catch (err) {
+                  console.warn('Failed to load preview:', err);
+                }
+
+                const fileWithPreview = {
+                  filePath: imagePath,
+                  fileName: fileName,
+                  short_code: fileResult.short_code || 'UNKNOWN',
+                  doc_type: fileResult.doc_type || 'Unknown',
+                  confidence: fileResult.confidence || 0,
+                  folder: folder.path,
+                  previewUrl: previewUrl,
+                  success: true,
+                  method: fileResult.method || 'offline_ocr'
+                };
+
+                folderResults.push(fileWithPreview);
+                allResults.push({
+                  original_path: imagePath,
+                  short_code: fileResult.short_code || 'UNKNOWN',
+                  doc_type: fileResult.doc_type || 'Unknown',
+                  confidence: fileResult.confidence || 0,
+                  folder: folder.path
+                });
+
+                // Add to fileResults and folder tab immediately (realtime display)
+                setFileResults(prev => [...prev, fileWithPreview]);
+                setFolderTabs(prev => prev.map(t => 
+                  t.path === folder.path ? { ...t, files: [...t.files, fileWithPreview] } : t
+                ));
+
+                console.log(`  ✅ ${fileResult.short_code} - ${Math.round(fileResult.confidence * 100)}%`);
+              } else {
+                allErrors.push({
+                  file: imagePath,
+                  error: fileResult.error || 'Unknown error'
+                });
+              }
+            } catch (err) {
+              console.error(`  ❌ Error processing ${fileName}:`, err);
+              allErrors.push({
+                file: imagePath,
+                error: err.message
+              });
+            }
+          }
+
+          if (!shouldStop && folderResults.length > 0) {
+            processedFolderPaths.push(folder.path);
+            
             // Update folder tab to 'done'
             setFolderTabs(prev => prev.map(t => 
-              t.path === folder.path ? { ...t, status: 'done' } : t
+              t.path === folder.path ? { ...t, status: 'done', count: folderResults.length } : t
             ));
-          } else {
-            allErrors.push({
-              folder: folder.path,
-              error: folderResult.error || 'Unknown error'
-            });
           }
         } catch (err) {
           console.error(`Error scanning ${folder.path}:`, err);

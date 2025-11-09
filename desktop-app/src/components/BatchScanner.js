@@ -861,10 +861,18 @@ function BatchScanner() {
         };
         
         console.log('Merge options:', mergeOptions);
-        const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);
-        const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
-        totalMerged += (merged || []).length;
-        totalSuccess += okCount;
+        console.log('Items to merge:', items.length, 'files');
+        
+        try {
+          const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);
+          console.log('Merge result:', merged);
+          const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+          totalMerged += (merged || []).length;
+          totalSuccess += okCount;
+        } catch (mergeErr) {
+          console.error('❌ Merge failed for folder:', folder, mergeErr);
+          alert(`❌ Lỗi merge folder ${folder}:\n${mergeErr.message}`);
+        }
       }
 
       alert(`✅ Gộp PDF hoàn tất!\n\nThành công: ${totalSuccess}/${totalMerged} file PDF`);

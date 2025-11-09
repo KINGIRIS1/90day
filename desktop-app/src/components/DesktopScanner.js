@@ -56,6 +56,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   // Rate limit control - delay between requests (ms)
   const [requestDelay, setRequestDelay] = useState(1200); // Default 1.2s, loaded from config
   const [postProcessingStatus, setPostProcessingStatus] = useState(null); // Show post-processing notification
+  
+  // Timer states
+  const [timers, setTimers] = useState({
+    scanStartTime: null,
+    scanEndTime: null,
+    scanElapsedSeconds: 0,
+    fileTimings: [], // [{fileName, startTime, endTime, durationMs, engineType}]
+    folderTimings: [], // [{folderName, startTime, endTime, durationMs, fileCount}]
+  });
+  const [elapsedTime, setElapsedTime] = useState(0); // Live elapsed time in seconds
+  const timerIntervalRef = useRef(null);
 
   // Load config (guard electron)
   useEffect(() => {

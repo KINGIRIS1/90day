@@ -446,6 +446,39 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
         for missing_file in sorted(missing_files):
             print(f"   ❌ {os.path.basename(missing_file)}", file=sys.stderr)
         print(f"   Possible causes: AI didn't return page indices, JSON parsing error", file=sys.stderr)
+        print(f"\n🔄 FALLBACK: Processing {len(missing_files)} missing files individually...", file=sys.stderr)
+        
+        # Fallback: Process missing files with single-file tier1 scan
+        for missing_file in sorted(missing_files):
+            try:
+                print(f"   🔄 Processing {os.path.basename(missing_file)}...", file=sys.stderr)
+                result = quick_scan_tier1(missing_file, api_key)
+                all_results.append({
+                    'file_path': missing_file,
+                    'file_name': os.path.basename(missing_file),
+                    'short_code': result.get('short_code', 'UNKNOWN'),
+                    'confidence': result.get('confidence', 0.5),
+                    'reasoning': result.get('reasoning', 'Fallback single-file scan'),
+                    'metadata': result.get('metadata', {}),
+                    'method': 'batch_fallback',
+                    'batch_num': 'fallback'
+                })
+                print(f"      ✅ {result.get('short_code', 'UNKNOWN')} ({result.get('confidence', 0):.0%})", file=sys.stderr)
+            except Exception as e:
+                print(f"      ❌ Error: {e}", file=sys.stderr)
+                # Add as UNKNOWN if fallback also fails
+                all_results.append({
+                    'file_path': missing_file,
+                    'file_name': os.path.basename(missing_file),
+                    'short_code': 'UNKNOWN',
+                    'confidence': 0.0,
+                    'reasoning': f'Fallback failed: {str(e)}',
+                    'metadata': {},
+                    'method': 'batch_fallback_failed',
+                    'batch_num': 'fallback'
+                })
+        
+        print(f"✅ Fallback complete: {len(all_results)} total results (original + fallback)", file=sys.stderr)
     else:
         print(f"✅ All {len(all_input_files)} input files were successfully processed", file=sys.stderr)
     

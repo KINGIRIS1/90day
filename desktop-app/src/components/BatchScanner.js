@@ -610,14 +610,14 @@ function BatchScanner() {
           </div>
         </div>
 
-        {/* Start Button */}
+        {/* Load Folders Button */}
         <div className="pt-4 border-t">
           <button
-            onClick={handleStartScan}
-            disabled={isProcessing || !txtFilePath}
-            className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            onClick={handleLoadFolders}
+            disabled={isLoadingFolders || !txtFilePath}
+            className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            {isProcessing ? '⏳ Đang xử lý...' : '🚀 Bắt đầu quét'}
+            {isLoadingFolders ? '⏳ Đang tìm thư mục...' : '🔍 Tìm kiếm thư mục'}
           </button>
         </div>
       </div>

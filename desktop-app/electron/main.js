@@ -652,22 +652,37 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
       if (options.autoSave) {
         const childFolder = path.dirname(filePaths[0]);
         let targetDir;
+        
+        console.log(`📂 Merge processing for ${shortCode}:`);
+        console.log(`   childFolder: ${childFolder}`);
+        console.log(`   mergeMode: ${options.mergeMode}`);
+        console.log(`   customOutputFolder: ${options.customOutputFolder || 'null'}`);
+        
         if (options.mergeMode === 'new') {
           const parentOfChild = path.dirname(childFolder);
           const childBaseName = path.basename(childFolder);
           const newFolderName = childBaseName + (options.mergeSuffix || '_merged');
           targetDir = path.join(parentOfChild, newFolderName);
           if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+          console.log(`   ✅ Mode 'new': targetDir = ${targetDir}`);
         } else if (options.mergeMode === 'custom' && options.customOutputFolder) {
           // Custom folder mode: Create subfolder named after source folder
           const childBaseName = path.basename(childFolder);
           targetDir = path.join(options.customOutputFolder, childBaseName);
-          if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+          console.log(`   📁 Creating custom folder: ${targetDir}`);
+          if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+            console.log(`   ✅ Created: ${targetDir}`);
+          } else {
+            console.log(`   ✅ Already exists: ${targetDir}`);
+          }
         } else {
           // Default: Same folder (root mode)
           targetDir = childFolder;
+          console.log(`   ✅ Mode 'root': targetDir = ${targetDir}`);
         }
         outputPath = path.join(targetDir, `${shortCode}.pdf`);
+        console.log(`   🎯 Final output path: ${outputPath}`);
         let count = 1;
         while (fs.existsSync(outputPath)) { outputPath = path.join(targetDir, `${shortCode}(${count}).pdf`); count += 1; }
         fs.writeFileSync(outputPath, Buffer.from(pdfBytes));

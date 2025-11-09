@@ -879,8 +879,8 @@ function CloudSettings() {
             {/* Info Box */}
             <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
               <p className="text-sm text-yellow-800">
-                <strong>💡 Lưu ý:</strong> Batch mode chỉ áp dụng cho <strong>Batch Scan</strong> (quét nhiều thư mục). 
-                Single file scan vẫn dùng chế độ tuần tự.
+                <strong>💡 Lưu ý:</strong> Batch mode áp dụng cho <strong>Folder Scan</strong> (quét nhiều files trong folder) và <strong>Batch Scan</strong> (quét nhiều thư mục). 
+                Single file scan (1 file) vẫn dùng chế độ tuần tự.
               </p>
             </div>
           </div>

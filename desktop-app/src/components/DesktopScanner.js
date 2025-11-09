@@ -1154,14 +1154,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                 Đang xử lý... ({progress.current}/{selectedFiles.length})
               </span>
             </div>
-            <button 
-              onClick={() => { 
-                stopRef.current = true; 
-              }} 
-              className="px-4 py-2 text-sm rounded-xl bg-orange-600 text-white hover:bg-orange-700 transition-all shadow-sm hover:shadow-md font-medium"
-            >
-              ⏸️ Tạm dừng
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Live Timer */}
+              {timers.scanStartTime && (
+                <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200">
+                  <span className="text-lg">⏱️</span>
+                  <div className="text-right">
+                    <div className="text-xs text-orange-600 font-medium">Thời gian</div>
+                    <div className="text-sm font-bold text-orange-900">
+                      {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <button 
+                onClick={() => { 
+                  stopRef.current = true; 
+                }} 
+                className="px-4 py-2 text-sm rounded-xl bg-orange-600 text-white hover:bg-orange-700 transition-all shadow-sm hover:shadow-md font-medium"
+              >
+                ⏸️ Tạm dừng
+              </button>
+            </div>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out relative" style={{ width: `${(progress.current / selectedFiles.length) * 100}%` }}>

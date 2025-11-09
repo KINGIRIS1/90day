@@ -125,8 +125,6 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
     print(f"🔄 BATCH MODE 1: Fixed Batch Size ({batch_size} images per batch)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
-    import requests
-    
     all_results = []
     total_batches = (len(image_paths) + batch_size - 1) // batch_size
     

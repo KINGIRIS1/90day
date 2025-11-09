@@ -62,6 +62,36 @@ TRANG TIẾP NỐI (Continuation - Trang 2, 3, 4...):
 - Cùng format/màu sắc với trang trước
 - Nội dung liên tục (điều khoản, chữ ký, bảng biểu)
 
+🚨 QUAN TRỌNG - NHẬN DIỆN CONTINUATION PAGES:
+Các dấu hiệu sau = CONTINUATION (trang tiếp theo, KHÔNG phải document mới):
+1. Section headers với số: "II.", "III.", "IV.", "V.", "ĐIỀU 2", "ĐIỀU 3", "PHẦN II", "MỤC III"
+2. Bảng biểu với số phân cấp: "4.1", "4.2", "4.2.1", "4.2.2", "(1.1)", "(2.1.3)"
+3. Text body tiếp nối: "...tiếp theo...", "...như sau:", danh sách bullet points
+4. Chữ ký/con dấu ở cuối trang
+5. Không có header chính thức (quốc huy, cơ quan ban hành)
+
+VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
+✅ "III. TÍNH THUẾ CỦA CƠ QUAN THUẾ" + bảng 4.1, 4.2
+   → Section header với số La Mã
+   → Bảng biểu phân cấp
+   → Đây là continuation của document trước (có thể là TBT, HDCQ, etc.)
+   → KHÔNG classify thành UNKNOWN
+   → GOM VÀO document có trang trước đó
+
+✅ "ĐIỀU 2: NỘI DUNG THỎA THUẬN PHÂN CHIA"
+   → Section header
+   → Continuation của TTHGD hoặc PCTSVC
+   → GOM VÀO document trước
+
+✅ Trang chỉ có bảng biểu (không có title)
+   → Continuation
+   → GOM VÀO document trước
+
+❌ SAI - Classify continuation thành UNKNOWN:
+Trang có "III. TÍNH THUẾ" + bảng
+→ AI classify: UNKNOWN ❌
+→ ĐÚNG: Phải gom vào document trước (TBT hoặc HDCQ) ✅
+
 RANH GIỚI GIỮA CÁC TÀI LIỆU:
 - Thay đổi rõ rệt: màu giấy (hồng → trắng), format khác
 - Xuất hiện tiêu đề chính mới ở TOP

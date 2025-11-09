@@ -903,49 +903,99 @@ function BatchScanner() {
         </div>
       )}
 
-      {/* Folder Tabs - Only show after scanning */}
-      {folderTabs.length > 0 && !isScanning && (
+      {/* Folder Tabs - Show during and after scanning */}
+      {folderTabs.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
+          {/* Header with Stop/Merge All buttons */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">📂 Thư mục đã quét ({folderTabs.length})</h2>
-            <button
-              onClick={() => handleMerge(true)}
-              disabled={mergeInProgress || isScanning}
-              className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
-            >
-              {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp tất cả thư mục'}
-            </button>
+            <h2 className="text-lg font-semibold text-gray-900">📂 Thư mục ({folderTabs.length})</h2>
+            <div className="flex gap-2">
+              {isScanning && (
+                <button
+                  onClick={handleStopScan}
+                  className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                >
+                  ⏹️ Dừng quét
+                </button>
+              )}
+              {!isScanning && folderTabs.some(t => t.files.length > 0) && (
+                <button
+                  onClick={() => handleMerge(true)}
+                  disabled={mergeInProgress}
+                  className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
+                >
+                  {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp tất cả'}
+                </button>
+              )}
+            </div>
           </div>
-          
-          {/* Tabs */}
-          <div className="flex items-center gap-2 overflow-auto mb-4">
-            {folderTabs.map((tab) => (
-              <button 
-                key={tab.path} 
-                onClick={() => {
-                  setActiveFolder(tab.path);
-                  setFileResults(tab.files);
-                }}
-                title={`${tab.name} (${tab.count} files)`}
-                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] ${
-                  activeFolder === tab.path 
-                    ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' 
-                    : 'bg-white hover:bg-gray-50 border-gray-300'
-                }`}
-              >
-                <span className="truncate flex-1">{tab.name} ({tab.count})</span>
-                {tab.status === 'scanning' ? (
-                  <span className="animate-spin flex-shrink-0">⚙️</span>
-                ) : tab.status === 'done' ? (
-                  <span className="text-green-600 flex-shrink-0">✓</span>
-                ) : (
-                  <span className="text-gray-400 flex-shrink-0">○</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+
+          {/* Tab list */}
+          {folderTabs.map((tab) => (
+            <div key={tab.path} className="mb-4 border rounded-xl p-4 bg-gray-50">
+              {/* Tab header */}
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={() => setActiveFolder(activeFolder === tab.path ? null : tab.path)}
+                  className="flex items-center gap-2 flex-1"
+                >
+                  <span className={`transform transition-transform ${activeFolder === tab.path ? 'rotate-90' : ''}`}>▶</span>
+                  <span className="font-medium text-gray-900">{tab.name}</span>
+                  <span className="text-xs text-gray-600">({tab.files.length} files)</span>
+                  {tab.status === 'scanning' && <span className="animate-spin">⚙️</span>}
+                  {tab.status === 'done' && <span className="text-green-600">✓</span>}
+                </button>
+
+                {/* Action buttons for this tab */}
+                <div className="flex gap-2">
+                  {tab.files.length > 0 && !isScanning && (
+                    <button
+                      onClick={() => {
+                        setActiveFolder(tab.path);
+                        handleMerge(false);
+                      }}
+                      className="px-3 py-2 text-xs rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-sm font-medium"
+                    >
+                      📚 Gộp thư mục này
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress bar when scanning */}
+              {tab.status === 'scanning' && (
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-blue-700">Đang quét... {tab.files.length}/{tab.count}</span>
+                    <span className="text-blue-600">{Math.round((tab.files.length / tab.count) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-blue-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      style={{ width: `${(tab.files.length / tab.count) * 100}%` }}
+                    ></div>
+                  </div>
+                  {progress.currentFile && (
+                    <div className="text-xs text-blue-600 mt-1">➜ {progress.currentFile}</div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab content - files grid */}
+              {activeFolder === tab.path && tab.files.length > 0 && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-gray-600">Files trong thư mục</span>
+                    <select 
+                      value={density} 
+                      onChange={(e) => setDensity(e.target.value)} 
+                      className="text-xs border rounded px-2 py-1"
+                    >
+                      <option value="high">Mật độ cao (5)</option>
+                      <option value="medium">Trung bình (4)</option>
+                      <option value="low">Thấp (3)</option>
+                    </select>
+                  </div>
 
       {/* File Results Grid - Show files of active folder only */}
       {activeFolder && folderTabs.length > 0 && (

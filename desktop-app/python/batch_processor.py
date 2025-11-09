@@ -291,6 +291,32 @@ OUTPUT JSON:
   ]
 }
 
+🚨 CỰC KỲ QUAN TRỌNG - BẮT BUỘC RETURN TẤT CẢ PAGES:
+- Bạn PHẢI assign MỌI page vào 1 document
+- Nếu page không rõ ràng → assign vào document "UNKNOWN"
+- KHÔNG BAO GIỜ bỏ qua bất kỳ page nào
+- Ví dụ: Nếu có 20 pages → "pages" arrays phải cover hết 0-19
+
+VÍ DỤ ĐÚNG (20 pages):
+{
+  "documents": [
+    {"type": "HDCQ", "pages": [0,1,2,3,4], ...},      // 5 pages
+    {"type": "GCN", "pages": [5,6,7,8], ...},         // 4 pages
+    {"type": "DDKBD", "pages": [9,10,11], ...},       // 3 pages
+    {"type": "UNKNOWN", "pages": [12,13,14,15,16,17,18,19], ...}  // 8 unclear pages
+  ]
+}
+→ Total pages: 5+4+3+8 = 20 ✅ (ALL pages covered)
+
+VÍ DỤ SAI:
+{
+  "documents": [
+    {"type": "HDCQ", "pages": [0,1,2,3,4], ...},
+    {"type": "GCN", "pages": [5,6,7,8], ...}
+  ]
+}
+→ Total pages: 5+4 = 9 ❌ (Missing pages 9-19!)
+
 Lưu ý:
 - pages dùng 0-indexed (trang đầu tiên = 0)
 - Nếu không chắc chắn, đánh dấu confidence thấp

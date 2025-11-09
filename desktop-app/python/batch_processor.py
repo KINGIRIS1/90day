@@ -429,10 +429,18 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
                                     print(f"   📄 {doc_type}: {len(pages)} pages, confidence {confidence:.0%}", file=sys.stderr)
                                 
                                 # Map results back to original file paths
+                                # ONLY process NEW files (skip overlap files)
                                 for doc in batch_result.get('documents', []):
                                     for page_idx in doc.get('pages', []):
-                                        if page_idx < len(batch_paths):
+                                        # Check if this is a NEW file (not overlap)
+                                        if page_idx >= new_file_start_idx and page_idx < len(batch_paths):
                                             file_path = batch_paths[page_idx]
+                                            
+                                            # Skip if already processed (from previous batch)
+                                            if file_path in processed_files:
+                                                print(f"   ⏭️ Skipping duplicate: {os.path.basename(file_path)}", file=sys.stderr)
+                                                continue
+                                            
                                             processed_files.add(file_path)  # Track this file
                                             all_results.append({
                                                 'file_path': file_path,

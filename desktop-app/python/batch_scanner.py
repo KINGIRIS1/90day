@@ -389,6 +389,7 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
     print(f"📊 Skipped folders: {len(skipped_folders)}")
     print(f"📊 Total files: {total_files}")
     print(f"📊 Processed files: {processed_files}")
+    print(f"📊 Merged PDFs: {len(merged_pdfs)}")
     print(f"📊 Errors: {len(errors)}")
     
     return {
@@ -398,10 +399,12 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
         "skipped_folders_count": len(skipped_folders),
         "total_files": total_files,
         "processed_files": processed_files,
+        "merged_pdfs_count": len(merged_pdfs),
         "error_count": len(errors),
         "skipped_folders": skipped_folders,
         "errors": errors,
-        "results": results
+        "results": results,
+        "merged_pdfs": merged_pdfs
     }
 
 

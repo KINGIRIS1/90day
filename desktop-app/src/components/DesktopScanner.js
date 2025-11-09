@@ -59,6 +59,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   
   // Batch processing mode
   const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
+  const [activeBatchMode, setActiveBatchMode] = useState(null); // Track active batch mode during scan
   
   // Timer states
   const [timers, setTimers] = useState({

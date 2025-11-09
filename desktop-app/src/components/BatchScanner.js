@@ -47,6 +47,28 @@ function BatchScanner() {
   const [elapsedTime, setElapsedTime] = useState(0); // Live elapsed time in seconds
   const timerIntervalRef = useRef(null);
 
+  // Live timer effect - update elapsed time every second
+  useEffect(() => {
+    if (isScanning && timers.batchStartTime) {
+      timerIntervalRef.current = setInterval(() => {
+        const now = Date.now();
+        const elapsedMs = now - timers.batchStartTime;
+        setElapsedTime(Math.floor(elapsedMs / 1000)); // Convert to seconds
+      }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [isScanning, timers.batchStartTime]);
+  
   // Load OCR engine from config on mount
   useEffect(() => {
     const loadConfig = async () => {

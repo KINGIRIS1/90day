@@ -363,12 +363,41 @@ function BatchScanner() {
           }
 
           if (!stopRef.current && folderResults.length > 0) {
-            processedFolderPaths.push(folder.path);
+            // Post-process GCN documents (date-based classification)
+            const processedFolderResults = postProcessGCNBatch(folderResults);
             
-            // Update folder tab to 'done'
-            setFolderTabs(prev => prev.map(t => 
-              t.path === folder.path ? { ...t, status: 'done', count: folderResults.length } : t
-            ));
+            // Update allResults with post-processed results
+            const startIndex = allResults.length - folderResults.length;
+            for (let i = 0; i < processedFolderResults.length; i++) {
+              allResults[startIndex + i] = {
+                original_path: processedFolderResults[i].filePath,
+                short_code: processedFolderResults[i].short_code,
+                doc_type: processedFolderResults[i].doc_type,
+                confidence: processedFolderResults[i].confidence,
+                folder: processedFolderResults[i].folder
+              };
+            }
+            
+            // Update folder tabs with post-processed results
+            setFolderTabs(prev => prev.map(t => {
+              if (t.path === folder.path) {
+                return { 
+                  ...t, 
+                  status: 'done', 
+                  count: processedFolderResults.length,
+                  files: processedFolderResults 
+                };
+              }
+              return t;
+            }));
+            
+            // Update fileResults with post-processed results
+            setFileResults(prev => {
+              const otherFolders = prev.filter(f => f.folder !== folder.path);
+              return [...otherFolders, ...processedFolderResults];
+            });
+            
+            processedFolderPaths.push(folder.path);
           }
         } catch (err) {
           console.error(`Error scanning ${folder.path}:`, err);

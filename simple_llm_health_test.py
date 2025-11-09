@@ -13,7 +13,7 @@ def test_llm_health():
     
     try:
         # Use the URL from frontend .env
-        url = "https://landoc-scanner-1.preview.emergentagent.com/api/llm/health"
+        url = "https://batch-scanner-ocr.preview.emergentagent.com/api/llm/health"
         print(f"Calling: {url}")
         
         response = requests.get(url, timeout=30)

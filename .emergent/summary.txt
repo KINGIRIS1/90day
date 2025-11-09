@@ -1,135 +1,82 @@
 <analysis>
-The AI engineer's work primarily revolved around implementing the Batch Scan from List feature, which proved to be a complex and iterative process. Initially, the feature faced significant issues with Electron's IPC and caching mechanisms, leading to a complete reversion of the first attempt. The engineer then re-planned and rebuilt the feature in five distinct stages, focusing on Python backend logic, Electron IPC, and React UI.
-
-Despite successfully implementing the core batch scanning functionality, including PDF merging and basic progress tracking, the development was characterized by a continuous feedback loop with the user to refine UI/UX and address numerous bugs. Key challenges included:
-1.  **IPC and Subprocess Communication:** Resolving I/O operation on closed file by switching  to a subprocess call.
-2.  **UI/UX Alignment:** Iteratively adjusting the  component to match the  in terms of progress display, folder tabs, merge options, and image previews, often requiring significant refactoring.
-3.  **State Management:** Debugging issues related to asynchronous state updates, particularly for sequential naming logic ().
-
-The trajectory ends with the AI identifying the root cause of the persistent UNKNOWN naming issue (due to  not updating synchronously) and outlining a plan to fix it. Several UI/UX refinements requested by the user are still outstanding, indicating the feature is not yet fully stable or complete.
+The previous AI engineer's work centered on the Batch Scan from List feature, an iterative process marked by continuous debugging and refinement. Initial challenges included Electron IPC, caching, and React state management, particularly for sequential naming and PDF merging. Much effort went into fixing persistent merge issues (custom folder output) and improving document classification accuracy by meticulously refining Gemini Flash Lite prompts. This involved distinguishing similar document types, strengthening GCN identification rules, addressing Flash Lite's limitations with text case distinction, and ensuring prompt stability. The trajectory concluded with a detailed analysis and strong recommendation for a user-proposed Two-Tier OCR approach, balancing cost and accuracy by using Flash Lite for easy cases and Flash Full for complex ones. The user approved implementing this as an optional setting.
 </analysis>
 
 <product_requirements>
-The application's core purpose is to be a desktop OCR scanner for Vietnamese land documents.
-**General Requirements:**
-*   **One-click installer:** Automated build process for a single-executable installer.
-*   **Document Classification:** Accurate classification of Vietnamese land document types (e.g., HDTG as HDCQ, BVDS as HSKT, DXTHT, DDK as PCTSVC).
-*   **Performance:** Optimized Gemini prompts for cost (Flash Lite) and accuracy.
-*   **UI/UX:** Customizable rescan folder warning message.
-*   **Rate Limit Management:** Guidance for Delay giữa các request.
-
-**Batch Scan from List Feature Requirements (Primary focus of trajectory):**
-*   **Input:** Read a TXT file where each line is a path to a folder (not sub-folders).
-*   **Processing:** Scan only image files (JPG, JPEG, PNG) within specified folders; skip non-existent folders or those without image files; no sub-folder scanning.
-*   **Output Options (3 types):**
-    1.  Rename files in place.
-    2.  Copy files by document type to a new sub-folder within the original folder, with a user-defined suffix.
-    3.  Copy all new PDF files (created from merging images) to a user-selected custom folder, organizing them into sub-folders named after the original source folders.
-*   **PDF Merging:** Merge images of the same type within a folder into a single PDF, similar to the Desktop Scan functionality.
-*   **UI/UX:**
-    *   A Batch Scan tab in the application.
-    *   Progress bar and detailed error logging for scanning.
-    *   A clearer 2-step flow: 1) Load folders from TXT (display discovered folders with file counts), then 2) Start Scan.
-    *   A Stop button to halt the scanning process.
-    *   Display scan results (files and their classifications) dynamically in a grid view with image previews.
-    *   Horizontal folder tabs, similar to Desktop Scan, each showing its respective files and including a Merge button.
-    *   A Merge All Tabs button.
-    *   Zoom functionality for scanned images.
-    *   Accurate display of OCR engine used (Cloud/Offline).
-*   **Naming Convention:** Implement sequential naming for UNKNOWN classified documents, reverting to the  from a previous document in the sequence.
+The application is a desktop OCR scanner for Vietnamese land documents.
+**General Requirements:** One-click installer, accurate document classification (e.g., HDTG as HDCQ, BVDS as HSKT, DXTHT, DDK as PCTSVC), optimized Gemini prompts (cost/accuracy), customizable UI/UX, and rate limit management.
+**Batch Scan from List Feature (Primary Focus):**
+*   **Input:** Read folder paths from a TXT file, scan only image files (JPG, JPEG, PNG); skip non-existent folders or those without images; no sub-folder scanning.
+*   **Output Options:** Rename files in place; copy files by document type to a new sub-folder with a user-defined suffix; copy merged PDF files to a user-selected custom folder, organized by source folder names.
+*   **Processing:** Merge images of the same type within a folder into a single PDF.
+*   **UI/UX:** Batch Scan tab, 2-step flow (load then scan), progress bar/error logging, stop button, dynamic display of results (grid view with image previews), horizontal folder tabs with Merge button, Merge All Tabs button, image zoom, accurate OCR engine display (Cloud/Offline).
+*   **Naming:** Sequential naming for UNKNOWN classified documents, reverting to the .
+*   **Recent Refinements:** GCN date-based classification, robust GCN hard rules (national emblem), improved distinction for document types (HDCQ/HDUQ, PXNKQDD/PKTHS), and stable Gemini responses.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Electron**: Framework for building desktop applications.
--   **React**: JavaScript library for building the frontend UI.
--   **Python**: Used for backend OCR processing and AI classification.
--   **Gemini Flash API**: Google's AI models (Flash & Flash Lite) for document OCR/classification.
--   **IPC (Inter-Process Communication)**: Electron's method for communication between main and renderer processes.
--   **Subprocess Module**: Python's way to run external commands/scripts (used to call  from ).
--   **PyPDF**: Python library for PDF creation and manipulation.
--   **Prompt Engineering**: Refining LLM inputs for better accuracy.
+-   **React**: JavaScript library for the frontend UI.
+-   **Python**: Backend for OCR processing and AI classification.
+-   **Gemini Flash API**: Google's AI models (Flash & Flash Lite) for OCR/classification, prompt engineering, .
+-   **IPC (Inter-Process Communication)**: Electron's method for communication.
+-   **Subprocess Module**: Python's way to run external scripts.
+-   **PyPDF**: Python library for PDF creation.
+-   **Image Processing**: Resizing, cropping images.
+-   **Cascade Classifiers**: Two-tier OCR strategy for efficiency.
 </key_technical_concepts>
 
 <code_architecture>
-The application features a tripartite structure: , , and . The recent development work primarily focuses on the  for the Batch Scan feature.
+The application has , , and  structures, with recent work focused on .
 
-
-
--   ** (NEW)**
-    -   **Summary**: The core Python script for handling batch scanning logic. It reads folder paths from a TXT file, scans images within them, orchestrates calls to  (as a subprocess), emits progress, and manages PDF merging based on user-selected output options.
-    -   **Changes**: Initially created with basic processing, then heavily refactored to:
-        *   Call  as a subprocess to avoid UTF-8 I/O conflicts.
-        *   Implement PDF merging logic () and output options (rename, copy by type, copy to custom folder).
-        *   Add robust error handling and progress emission ().
-        *   Support comment lines in input TXT files.
-        *   Introduce a  mode for initial folder validation.
--   ** (MODIFIED)**
-    -   **Summary**: Electron's main process, responsible for creating the browser window and handling IPC communications between the renderer process (React app) and Node.js/Python backend.
+-   ****: Electron's main process, handles IPC.
+    -   **Changes**: Fixed  to use  for  merge. Added extensive  statements and  for file writing/folder creation to debug merge issues.
+-   ****: Exposes Node.js APIs to renderer.
+    -   **Changes**: Added  to  to verify IPC communication for merge.
+-   ****: React component for Batch Scan UI.
     -   **Changes**:
-        *   Added IPC handlers:  (to open file dialog),  (initially, then updated/re-purposed),  (to check input paths),  (for iterative scanning), and  (to relay Python progress to renderer).
-        *   Fixed  to correctly return an array.
-        *   Increased timeout for  to 5 minutes.
--   ** (MODIFIED)**
-    -   **Summary**: Safely exposes specific Node.js APIs to the renderer process, respecting .
-    -   **Changes**: Exposed new APIs for the Batch Scan feature: , , , , and an  listener.
--   ** (NEW)**
-    -   **Summary**: The main React component for the Batch Scan feature. It provides the UI for selecting the input TXT file, viewing discovered folders, starting/stopping scans, choosing output options, displaying realtime progress, and showing scanned results with image previews, per-folder tabs, and merge functionalities.
-    -   **Changes**: Created from scratch, then extensively refactored multiple times to:
-        *   Implement a 2-step UI flow (Load folders, then Scan).
-        *   Integrate with new IPC APIs for file selection, folder validation, and scanning.
-        *   Display realtime progress (folder and file level) via event listeners.
-        *   Manage state for discovered folders, scan results, progress, and UI elements.
-        *   Implement horizontal folder tabs (mimicking ) to display results per folder.
-        *   Add buttons for Merge This Folder and Merge All Tabs.
-        *   Add an image zoom modal and fix method badges ( vs. ).
-        *   Implement  logic for UNKNOWN classifications and manage .
-        *   Fix numerous UI state-related bugs ( renamed to ,  to ).
-        *   Refactor the merge modal to correctly handle output options (rename, copy by type, custom folder).
-        *   Implement a  using  for reliable scan stopping.
--   ** (MODIFIED)**
-    -   **Summary**: The main React application component, handling routing and global layout.
-    -   **Changes**: Added a new navigation tab for 📋 Quét danh sách (Batch Scan) and its corresponding rendering logic.
--   ** (MODIFIED)**
-    -   **Summary**: Lists Python dependencies for the desktop application.
-    -   **Changes**: Added  to enable PDF merging functionality.
--   ** (NEW)**
-    -   **Summary**: Documentation for using the new Batch Scan feature.
--   ** (NEW)**
-    -   **Summary**: A temporary document instructing the user on how to force a reload to clear potential Electron cache issues during debugging.
+        -   Fixed sequential naming by changing  (state) to a local variable  for synchronous updates.
+        -   Integrated  and  (copied from ) after folder scans.
+        -   Ensured , ,  are copied to  for GCN post-processing.
+        -   Refactored GCN pairing logic to group files by  before pairing, correcting date-based naming.
+        -   Added  around  for robustness.
+-   ****: Python script for Gemini OCR/classification, containing prompt definitions.
+    -   **Changes**:
+        -   Clarified HDCQ/HDUQ distinction in prompt with details and examples.
+        -   Added  (, ) to Gemini API payload for stability.
+        -   Strengthened GCN hard rules (national emblem, specific lines) in the prompt.
+        -   Refined title position rules, blacklisting problematic patterns (e.g., Người lập văn bản cam kết...) instead of relying on unreliable uppercase detection.
+        -   Strengthened title position rules for continuation pages (middle titles) with examples.
+        -   Added distinguishing details and examples for PXNKQDD vs PKTHS.
+        -   Modified  to 1500 and  to 2100 for image resizing.
+-   ****: Source for  and  functions, which were then copied to .
+-   **New Documentation/Test Files**: Various  and  files were created to document fixes, provide debug instructions, or add temporary tests.
 </code_architecture>
 
 <pending_tasks>
 -   Implement full logic for the all-in-one installer.
 -   Fine-tune remaining document types in  and .
--   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+-   Monitor OpenAI quota/plan for Emergent LLM Key.
 -   Migrate or pin React/Webpack versions.
 -   Update icon for macOS (.icns).
 -   Implement license/activation key feature.
 -   Implement Parallel Local Processing for batch scanning.
--   Handle deep path length issues in the application.
--   Address the slow startup of the app.
--   Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
--   Implement a code patch for robust cache pathing and single-instance lock in .
--   Fix sequential naming logic in  (using local variable for ).
--   Ensure the stop button is fully functional and responsive across all stages of scanning.
--   Verify that merge options, particularly custom folder, are working correctly in the Batch Scan feature.
--   Further refine the display of scanned files according to user feedback (tabbed display, zoom, naming).
+-   Handle deep path length issues.
+-   Address slow app startup.
+-   Add configurable single price rates in Cloud Settings.
+-   Implement code patch for robust cache pathing and single-instance lock in .
+-   Ensure the stop button is fully functional.
+-   Implement the proposed Two-Tier OCR classification as an optional setting.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was deep into debugging the Batch Scan from List feature. The user reported multiple persistent issues: the stop button not working, the folder tabs not displaying correctly (horizontally), the merge functionality (especially to a custom folder) not behaving as expected, and the sequential naming rule still defaulting to UNKNOWN for many files.
+Immediately prior to this summary, the AI engineer was deep into a discussion with the user about optimizing the OCR classification for both cost-efficiency and accuracy. The user proposed a Two-Tier classification strategy:
+1.  **Tier 1 (Fast & Cheap):** Utilize Gemini Flash Lite to scan only the top portion of an image (e.g., 60%) using a simplified prompt for documents that are typically easy to classify (e.g., clear contracts or application forms).
+2.  **Tier 2 (Thorough & Expensive):** For more complex documents (like GCNs requiring date extraction) or cases where Tier 1 provides low confidence, escalate to using the full Gemini Flash model on the entire image with the comprehensive set of 98 classification rules.
 
-The AI engineer's most recent action was to analyze console logs for the sequential naming issue. It identified that  in  was always receiving . The root cause was determined to be the asynchronous nature of  when attempting to update state in a rapid loop, causing the next iteration to read an outdated or  value.
-
-The current state of the Batch Scan feature is:
-*   The overall UI has been significantly refactored to align with  for progress, folder tabs, image previews, and merge options, but some aspects are still problematic.
-*   The core scanning and PDF merging logic are in place.
-*   Realtime progress reporting (folder and file level) is implemented.
-*   An image zoom feature and correct OCR engine badge display are added.
-*   The  mechanism using  has been integrated for the stop button, but its full effectiveness needs re-verification.
-*   The  for sequential naming is not functioning as intended due to a state update race condition.
+The AI engineer provided a detailed analysis comparing this Two-Tier approach against the existing Flash Lite-only method and a Flash Full-only method, evaluating accuracy, processing speed, and API costs, including an estimation of manual correction labor costs. The analysis concluded that the Two-Tier (60% crop) approach offered the best balance, significantly boosting overall accuracy (from ~82% to ~92%) at a comparable API cost to Flash Lite-only, leading to substantial savings when factoring in reduced manual error correction. The user accepted this recommendation and requested its implementation as an optional feature in the settings to ensure backward compatibility and prevent disruption to current functionality.
 </current_work>
 
 <optional_next_step>
-Fix the sequential naming logic in  by using a local variable for  during file iteration to ensure synchronous updates.
+Implement the Two-Tier OCR classification as an optional setting in the CloudSettings UI.
 </optional_next_step>

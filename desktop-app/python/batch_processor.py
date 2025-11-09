@@ -419,6 +419,16 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
             
             print(f"📊 Response status: {response.status_code}", file=sys.stderr)
             
+            # Debug: Check finish reason and safety
+            if 'candidates' in result_data and len(result_data['candidates']) > 0:
+                candidate = result_data['candidates'][0]
+                finish_reason = candidate.get('finishReason', 'UNKNOWN')
+                print(f"🔍 Finish reason: {finish_reason}", file=sys.stderr)
+                
+                if finish_reason == 'MAX_TOKENS':
+                    print(f"⚠️ WARNING: Response truncated due to MAX_TOKENS!", file=sys.stderr)
+                    print(f"   Some pages may be missing from response", file=sys.stderr)
+            
             # Parse response
             if 'candidates' in result_data and len(result_data['candidates']) > 0:
                 candidate = result_data['candidates'][0]

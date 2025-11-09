@@ -462,6 +462,9 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
             print(f"❌ Batch {batch_num} error: {e}", file=sys.stderr)
             import traceback
             traceback.print_exc(file=sys.stderr)
+        
+        # Move to next batch (increment by batch_size, not batch_end)
+        current_idx += batch_size
     
     print(f"\n{'='*80}", file=sys.stderr)
     print(f"✅ BATCH MODE 1 COMPLETE: {len(all_results)} files processed", file=sys.stderr)

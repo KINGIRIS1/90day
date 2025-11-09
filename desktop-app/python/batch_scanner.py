@@ -413,13 +413,14 @@ if __name__ == "__main__":
         if len(sys.argv) < 3:
             error_result = {
                 "success": False,
-                "error": "Invalid arguments. Usage: batch_scanner.py <txt_path> <ocr_engine> [api_key] [output_option] [output_folder]",
+                "error": "Invalid arguments. Usage: batch_scanner.py <txt_path> <ocr_engine> [api_key] [output_option] [merge_suffix] [output_folder]",
                 "total_folders": 0,
                 "total_files": 0,
                 "processed_files": 0,
                 "skipped_folders": [],
                 "errors": [],
-                "results": []
+                "results": [],
+                "merged_pdfs": []
             }
             print(json.dumps(error_result, ensure_ascii=False))
             sys.exit(1)

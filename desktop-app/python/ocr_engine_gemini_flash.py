@@ -59,7 +59,7 @@ def resize_image_smart(img, max_width=2000, max_height=2800):
     }
 
 
-def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, model_type='gemini-flash', enable_resize=True, max_width=2000, max_height=2800):
+def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, model_type='gemini-flash', enable_resize=True, max_width=1500, max_height=2100):
     """
     Classify Vietnamese land document using Gemini Flash 2.0 AI with position awareness
     

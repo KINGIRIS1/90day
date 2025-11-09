@@ -622,6 +622,9 @@ TBT = Thông báo thuế
   • Title: "THÔNG BÁO THUẾ" hoặc "THÔNG BÁO NỘP TIỀN"
   • Về thuế trước bạ, TNCN, tiền sử dụng đất, nộp tiền
   • Keywords: "thuế", "nộp tiền", "nghĩa vụ tài chính", "trước bạ"
+  ⚠️ Đặc điểm: Nhiều trang với bảng biểu tính thuế (4.1, 4.2, III. TÍNH THUẾ...)
+  ⚠️ Continuation pages: Có section headers (III., IV.) và bảng biểu
+  ⚠️ Phải gom TẤT CẢ pages có bảng tính thuế vào cùng TBT document
 TBMG = Thông báo mất giấy
 TBCKCG = Thông báo công khai cấp giấy
 TBCKMG = Thông báo công khai mất giấy

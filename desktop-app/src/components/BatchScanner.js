@@ -522,11 +522,46 @@ function BatchScanner() {
         </div>
       )}
 
+      {/* Folder Tabs */}
+      {folderTabs.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">📂 Thư mục đã quét ({folderTabs.length})</h2>
+          
+          {/* Tabs */}
+          <div className="flex items-center gap-2 overflow-auto mb-4">
+            {folderTabs.map((tab) => (
+              <button 
+                key={tab.path} 
+                onClick={() => {
+                  setActiveFolder(tab.path);
+                  setFileResults(tab.files);
+                }}
+                title={`${tab.name} (${tab.count} files)`}
+                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] ${
+                  activeFolder === tab.path 
+                    ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' 
+                    : 'bg-white hover:bg-gray-50 border-gray-300'
+                }`}
+              >
+                <span className="truncate flex-1">{tab.name} ({tab.count})</span>
+                {tab.status === 'scanning' ? (
+                  <span className="animate-spin flex-shrink-0">⚙️</span>
+                ) : tab.status === 'done' ? (
+                  <span className="text-green-600 flex-shrink-0">✓</span>
+                ) : (
+                  <span className="text-gray-400 flex-shrink-0">○</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* File Results Grid (like DesktopScanner) */}
       {fileResults.length > 0 && !isProcessing && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">📁 Files đã quét ({fileResults.length})</h2>
+            <h2 className="text-lg font-semibold text-gray-900">📁 Files trong thư mục ({fileResults.length})</h2>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600">Mật độ:</label>

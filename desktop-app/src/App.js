@@ -275,6 +275,13 @@ function App() {
           ) : null;
         })}
 
+        {/* Batch Scan tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('batch') && (
+          <div style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
+            <BatchScanner />
+          </div>
+        )}
+
         {/* Rules tab - rendered after first visit, just hidden when not active */}
         {visitedTabs.has('rules') && (
           <div style={{ display: activeTab === 'rules' ? 'block' : 'none' }}>

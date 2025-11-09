@@ -858,7 +858,7 @@ function BatchScanner() {
             <h2 className="text-lg font-semibold text-gray-900">📂 Thư mục đã quét ({folderTabs.length})</h2>
             <button
               onClick={() => handleMerge(true)}
-              disabled={mergeInProgress}
+              disabled={mergeInProgress || isScanning}
               className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
             >
               {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp tất cả thư mục'}

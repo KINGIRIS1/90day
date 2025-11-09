@@ -217,30 +217,33 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
                             try:
                                 batch_result = json.loads(response_text)
                             
-                            print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
-                            for doc in batch_result.get('documents', []):
-                                doc_type = doc.get('type', 'UNKNOWN')
-                                pages = doc.get('pages', [])
-                                confidence = doc.get('confidence', 0)
-                                print(f"   📄 {doc_type}: {len(pages)} pages, confidence {confidence:.0%}", file=sys.stderr)
-                            
-                            # Map results back to original file paths
-                            for doc in batch_result.get('documents', []):
-                                for page_idx in doc.get('pages', []):
-                                    if page_idx < len(batch_paths):
-                                        file_path = batch_paths[page_idx]
-                                        all_results.append({
-                                            'file_path': file_path,
-                                            'file_name': os.path.basename(file_path),
-                                            'short_code': doc.get('type', 'UNKNOWN'),
-                                            'confidence': doc.get('confidence', 0.5),
-                                            'reasoning': doc.get('reasoning', ''),
-                                            'metadata': doc.get('metadata', {}),
-                                            'method': 'batch_fixed',
-                                            'batch_num': batch_num
-                                        })
+                                print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
+                                for doc in batch_result.get('documents', []):
+                                    doc_type = doc.get('type', 'UNKNOWN')
+                                    pages = doc.get('pages', [])
+                                    confidence = doc.get('confidence', 0)
+                                    print(f"   📄 {doc_type}: {len(pages)} pages, confidence {confidence:.0%}", file=sys.stderr)
+                                
+                                # Map results back to original file paths
+                                for doc in batch_result.get('documents', []):
+                                    for page_idx in doc.get('pages', []):
+                                        if page_idx < len(batch_paths):
+                                            file_path = batch_paths[page_idx]
+                                            all_results.append({
+                                                'file_path': file_path,
+                                                'file_name': os.path.basename(file_path),
+                                                'short_code': doc.get('type', 'UNKNOWN'),
+                                                'confidence': doc.get('confidence', 0.5),
+                                                'reasoning': doc.get('reasoning', ''),
+                                                'metadata': doc.get('metadata', {}),
+                                                'method': 'batch_fixed',
+                                                'batch_num': batch_num
+                                            })
+                            except json.JSONDecodeError as je:
+                                print(f"⚠️ JSON decode error in batch {batch_num}: {je}", file=sys.stderr)
+                                print(f"   Response text: {response_text[:500]}...", file=sys.stderr)
                         else:
-                            print(f"⚠️ No valid JSON in response", file=sys.stderr)
+                            print(f"⚠️ No valid JSON in response for batch {batch_num}", file=sys.stderr)
             
         except Exception as e:
             print(f"❌ Batch {batch_num} error: {e}", file=sys.stderr)

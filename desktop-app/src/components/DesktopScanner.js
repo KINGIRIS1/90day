@@ -116,6 +116,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         console.log(`⏱️ Loaded request delay: ${savedDelay}ms`);
       }
       
+      // Load batch mode from config
+      const savedBatchMode = await api.getConfig('batchMode');
+      if (savedBatchMode) {
+        setBatchMode(savedBatchMode);
+        console.log(`📦 Loaded batch mode: ${savedBatchMode}`);
+      }
+      
       console.log('🔍 Current OCR Engine:', engine);
     };
     try { loadConfig(); } catch {}

@@ -34,6 +34,7 @@ function BatchScanner() {
   const [folderTabs, setFolderTabs] = useState([]); // [{path, name, count, status, files: []}]
   const [activeFolder, setActiveFolder] = useState(null);
   const [isMergeAll, setIsMergeAll] = useState(false); // Track if merging all folders
+  const [lastKnownType, setLastKnownType] = useState(null); // For sequential naming (UNKNOWN fallback)
 
   // Load OCR engine from config on mount
   useEffect(() => {

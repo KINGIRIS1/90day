@@ -278,20 +278,31 @@ def get_classification_prompt_lite():
 🔍 1. VỊ TRÍ TIÊU ĐỀ (TOP 30%):
 ✅ CHỈ PHÂN LOẠI NẾU ĐẦY ĐỦ TẤT CẢ CÁC ĐIỀU KIỆN:
 - Text LỚN NHẤT, căn giữa
-- 🔒 **BẮT BUỘC: PHẢI LÀ CHỮ IN HOA TOÀN BỘ** (không phải chữ thường, không phải Chữ Hoa Đầu Dòng)
 - NẰM ĐỘC LẬP (không có text khác cùng dòng)
 - VD đúng: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "PHIẾU THẨM TRA", "GIẤY CHỨNG NHẬN"
-- VD sai: "theo Giấy chứng nhận số..." (có "theo" + số)
-- VD sai: "Người lập văn bản cam kết" (chữ thường/chữ hoa đầu dòng)
 
-❌ TUYỆT ĐỐI BỎ QUA NẾU:
+❌ TUYỆT ĐỐI BỎ QUA NẾU (BLACKLIST - QUAN TRỌNG):
 - Text ở giữa/cuối trang (MIDDLE/BOTTOM)
-- Có từ: "căn cứ", "theo", "kèm theo", "số..."
+- Có từ: "căn cứ", "theo", "kèm theo", "số...", "ngày...", "về việc"
 - NẰM CHUNG với text khác trên cùng dòng
-- **Chữ thường hoặc Chữ Hoa Đầu Dòng** (ví dụ: "Người lập văn bản", "Phiếu đánh giá", "Giấy xác nhận")
 - Nằm trong câu văn
 
-⚠️ QUAN TRỌNG: Nếu title KHÔNG phải CHỮ IN HOA toàn bộ → UNKNOWN (không classify)
+🚨 BLACKLIST - KHÔNG BAO GIỜ LÀ TITLE CHÍNH (REJECT NGAY):
+Nếu text BẮT ĐẦU bằng các từ sau → KHÔNG PHẢI title → Trả về UNKNOWN:
+- "Người..." (ví dụ: "Người lập văn bản", "Người đại diện")
+- "Phiếu..." khi viết chữ hoa đầu (ví dụ: "Phiếu đánh giá", "Phiếu xác nhận")
+- "Giấy..." khi viết chữ hoa đầu (ví dụ: "Giấy xác nhận", "Giấy ủy quyền")
+- "Biên..." (ví dụ: "Biên bản họp")
+- "Đơn..." (ví dụ: "Đơn xin phép")
+- "Văn bản..." (ví dụ: "Văn bản cam kết")
+- "Bản..." (ví dụ: "Bản kê khai")
+
+⚠️ LƯU Ý: CHỈ ACCEPT nếu text TOÀN BỘ là IN HOA:
+- ✅ "PHIẾU THẨM TRA" (toàn bộ in hoa)
+- ❌ "Phiếu thẩm tra" (chữ hoa đầu dòng)
+- ✅ "GIẤY CHỨNG NHẬN" (toàn bộ in hoa)
+- ❌ "Giấy chứng nhận" (chữ hoa đầu dòng)
+- ❌ "Người lập văn bản cam kết" (chữ hoa đầu dòng)
 
 👁️ 2. VISUAL INDICATORS (QUAN TRỌNG):
 ✅ QUỐC HUY (National Emblem):

@@ -345,21 +345,23 @@ def encode_image_base64(image_path, max_width=1500, max_height=2100):
 
 
 
-def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=5, overlap=3):
+def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=5, last_known_type=None):
     """
-    Phương án 1: Fixed Batch Size với OVERLAP
+    Phương án 1: Fixed Batch Size với SEQUENTIAL METADATA
     
     Args:
         image_paths: List of file paths
         api_key: Google API key
         engine_type: 'gemini-flash', 'gemini-flash-lite', or 'gemini-flash-hybrid'
         batch_size: Files per batch
-        overlap: Overlap files between batches
+        last_known_type: Metadata từ file cuối batch trước {short_code, confidence, has_title}
     
-    Engine types:
-        - gemini-flash: Use Flash Full prompt + model
-        - gemini-flash-lite: Use Flash Lite prompt + model  
-        - gemini-flash-hybrid: Use Two-tier (Lite → Full if needed)
+    Strategy:
+        - Batch 1: Process files 0-4, return lastKnown từ file 4
+        - Batch 2: Process files 5-9 WITH lastKnown từ file 4
+          * File 5 có title → Bỏ qua lastKnown, dùng title mới
+          * File 5 không có title → Áp dụng sequential từ lastKnown
+        - No overlap needed → 0% overhead!
     """
     
     # Determine model and prompt based on engine type
@@ -367,26 +369,35 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         model_name = 'gemini-2.5-flash-lite'
         prompt_getter = get_multi_image_prompt_lite
         print(f"\n{'='*80}", file=sys.stderr)
-        print(f"⚡ BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash LITE", file=sys.stderr)
+        print(f"⚡ BATCH MODE: Fixed ({batch_size} files, NO overlap) + Flash LITE", file=sys.stderr)
         print(f"   Model: {model_name}", file=sys.stderr)
         print("   Prompt: Lite (simplified, 60% crop rules)", file=sys.stderr)
+        print("   Metadata: Sequential naming from previous batch", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     elif engine_type == 'gemini-flash-hybrid':
         model_name = 'gemini-2.5-flash-lite'  # Start with Lite for hybrid
         prompt_getter = get_multi_image_prompt_lite
         print(f"\n{'='*80}", file=sys.stderr)
-        print(f"🔄 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + HYBRID", file=sys.stderr)
+        print(f"🔄 BATCH MODE: Fixed ({batch_size} files, NO overlap) + HYBRID", file=sys.stderr)
         print("   Strategy: Two-tier (Lite → Full if low confidence)", file=sys.stderr)
         print(f"   Model (Tier 1): {model_name}", file=sys.stderr)
+        print("   Metadata: Sequential naming from previous batch", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     else:  # gemini-flash (default)
         model_name = 'gemini-2.5-flash'
         prompt_getter = get_multi_image_prompt_full
         print(f"\n{'='*80}", file=sys.stderr)
-        print(f"🤖 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash FULL", file=sys.stderr)
+        print(f"🤖 BATCH MODE: Fixed ({batch_size} files, NO overlap) + Flash FULL", file=sys.stderr)
         print(f"   Model: {model_name}", file=sys.stderr)
         print("   Prompt: Full (complete 98-rule classification)", file=sys.stderr)
+        print("   Metadata: Sequential naming from previous batch", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
+    
+    if last_known_type:
+        print(f"\n📌 Received lastKnown from previous batch:", file=sys.stderr)
+        print(f"   Type: {last_known_type.get('short_code')}", file=sys.stderr)
+        print(f"   Confidence: {last_known_type.get('confidence', 0):.0%}", file=sys.stderr)
+        print(f"   Has title: {last_known_type.get('has_title', False)}", file=sys.stderr)
     
     all_results = []
     processed_files = set()  # Track processed files to detect missing ones

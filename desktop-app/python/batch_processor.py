@@ -597,7 +597,7 @@ def group_by_document(quick_results, file_paths):
     return groups
 
 
-def batch_classify_smart(image_paths, api_key):
+def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash'):
     """
     Phương án 2: Smart Batching - TRUE AI-POWERED với OVERLAP
     Gửi nhiều files (10-20) với overlap để AI có full context
@@ -631,8 +631,8 @@ def batch_classify_smart(image_paths, api_key):
     
     print("   AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
     
-    # Use fixed batch with smart size + overlap
-    return batch_classify_fixed(image_paths, api_key, batch_size=batch_size, overlap=overlap)
+    # Use fixed batch with smart size + overlap + engine type
+    return batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=batch_size, overlap=overlap)
 
 
 # CLI interface for testing

@@ -7,6 +7,9 @@ Pillow>=10.0.0
 # HTTP requests for Cloud OCR
 requests>=2.31.0
 
+# PDF merging for batch scanner
+pypdf>=3.0.0
+
 # VietOCR - Optional Vietnamese OCR Engine (Transformer-based)
 # Chỉ cài nếu cần độ chính xác cao hơn cho tiếng Việt (90-95%)
 # Uncomment dòng dưới để cài:

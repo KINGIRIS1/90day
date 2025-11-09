@@ -397,10 +397,29 @@ function BatchScanner() {
                   // GCN fields for post-processing
                   color: fileResult.color || null,
                   issue_date: fileResult.issue_date || null,
-                  issue_date_confidence: fileResult.issue_date_confidence || null
+                  issue_date_confidence: fileResult.issue_date_confidence || null,
+                  // Timing data
+                  startTime: fileStartTime,
+                  endTime: fileEndTime,
+                  durationMs: fileDurationMs,
+                  durationSeconds: (fileDurationMs / 1000).toFixed(2)
                 };
 
                 folderResults.push(fileWithPreview);
+                
+                // Save file timing
+                setTimers(prev => ({
+                  ...prev,
+                  fileTimings: [...prev.fileTimings, {
+                    fileName: fileName,
+                    folderName: folder.name,
+                    startTime: fileStartTime,
+                    endTime: fileEndTime,
+                    durationMs: fileDurationMs,
+                    engineType: ocrEngine,
+                    method: fileResult.method || 'offline_ocr'
+                  }]
+                }));
                 allResults.push({
                   original_path: imagePath,
                   short_code: fileResult.short_code || 'UNKNOWN',

@@ -674,10 +674,15 @@ function BatchScanner() {
       {showMergeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">📚 Gộp PDF</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              📚 {isMergeAll ? 'Gộp PDF tất cả thư mục' : 'Gộp PDF thư mục hiện tại'}
+            </h3>
             
             <p className="text-sm text-gray-600 mb-4">
-              Chọn cách lưu file PDF sau khi gộp:
+              {isMergeAll 
+                ? `Gộp PDF cho ${folderTabs.length} thư mục. Chọn cách lưu file PDF:`
+                : 'Chọn cách lưu file PDF sau khi gộp:'
+              }
             </p>
 
             <div className="space-y-3">

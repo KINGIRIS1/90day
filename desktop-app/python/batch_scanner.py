@@ -37,13 +37,18 @@ except ImportError as e:
 def read_txt_file(txt_path: str) -> list:
     """
     Read TXT file and return list of folder paths (one per line)
+    Ignores comment lines starting with #
     """
     try:
         with open(txt_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
         
-        # Clean up lines: strip whitespace, remove empty lines
-        folders = [line.strip() for line in lines if line.strip()]
+        # Clean up lines: strip whitespace, remove empty lines and comments
+        folders = []
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                folders.append(line)
         return folders
     except Exception as e:
         print(f"❌ Error reading TXT file: {e}")

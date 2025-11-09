@@ -116,6 +116,32 @@ RANH GIỚI GIỮA CÁC TÀI LIỆU:
 
 """
 
+    unknown_rules = f"""
+
+⚠️ QUAN TRỌNG - KHI NÀO TRẢ VỀ "UNKNOWN":
+CHỈ trả về "UNKNOWN" khi:
+1. Trang thực sự không có tiêu đề VÀ không match continuation patterns
+2. Title không thuộc 98 loại VÀ không phải continuation
+3. Trang hoàn toàn trống hoặc không đọc được
+
+❌ KHÔNG trả về "UNKNOWN" cho:
+- Trang có section headers (III., ĐIỀU 2) → Continuation, gom vào doc trước
+- Trang có bảng biểu structured → Continuation, gom vào doc trước
+- Trang có text liên tục với trang trước → Continuation, gom vào doc trước
+
+🎯 NGUYÊN TẮC: Khi nghi ngờ → Gom vào document trước (safer than creating new UNKNOWN doc)
+
+VÍ DỤ:
+Page 0: "THÔNG BÁO THUẾ" → TBT
+Page 1: "ĐIỀU 1: ..." → TBT continuation
+Page 2: "III. TÍNH THUẾ" + bảng → TBT continuation (KHÔNG phải UNKNOWN)
+
+Result: {{"type": "TBT", "pages": [0, 1, 2], ...}} ✅
+
+---
+
+"""
+
     output_format = f"""
 
 ---

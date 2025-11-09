@@ -1010,7 +1010,7 @@ function BatchScanner() {
       )}
 
       {/* Scan Statistics Summary */}
-      {scanResults && !isProcessing && (
+      {scanResults && !isScanning && (
         <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Thống kê tổng quan</h3>
 

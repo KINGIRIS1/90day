@@ -116,7 +116,7 @@ RANH GIỚI GIỮA CÁC TÀI LIỆU:
 
 """
 
-    unknown_rules = f"""
+    unknown_rules = """
 
 ⚠️ QUAN TRỌNG - KHI NÀO TRẢ VỀ "UNKNOWN":
 CHỈ trả về "UNKNOWN" khi:

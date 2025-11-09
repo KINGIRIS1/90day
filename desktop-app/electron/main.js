@@ -186,6 +186,74 @@ ipcMain.handle('select-txt-file', async () => {
   return result.canceled ? null : (result.filePaths[0] || null);
 });
 
+ipcMain.handle('validate-batch-folders', async (event, txtPath) => {
+  try {
+    console.log('Validating folders from:', txtPath);
+    
+    // Read TXT file
+    const content = fs.readFileSync(txtPath, 'utf-8');
+    const lines = content.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+    
+    console.log(`Found ${lines.length} folder paths`);
+    
+    // Validate each folder
+    const folders = [];
+    for (const folderPath of lines) {
+      try {
+        const stats = fs.statSync(folderPath);
+        if (!stats.isDirectory()) {
+          folders.push({
+            path: folderPath,
+            name: path.basename(folderPath),
+            imageCount: 0,
+            valid: false,
+            selected: false,
+            error: 'Không phải thư mục'
+          });
+          continue;
+        }
+        
+        // Count image files
+        const files = fs.readdirSync(folderPath);
+        const imageExtensions = ['.jpg', '.jpeg', '.png'];
+        const imageFiles = files.filter(f => {
+          const ext = path.extname(f).toLowerCase();
+          return imageExtensions.includes(ext);
+        });
+        
+        folders.push({
+          path: folderPath,
+          name: path.basename(folderPath),
+          imageCount: imageFiles.length,
+          valid: imageFiles.length > 0,
+          selected: imageFiles.length > 0, // Auto-select valid folders
+          error: imageFiles.length === 0 ? 'Không có ảnh' : null
+        });
+      } catch (err) {
+        folders.push({
+          path: folderPath,
+          name: path.basename(folderPath),
+          imageCount: 0,
+          valid: false,
+          selected: false,
+          error: 'Không tồn tại hoặc không truy cập được'
+        });
+      }
+    }
+    
+    return {
+      success: true,
+      folders: folders
+    };
+  } catch (err) {
+    console.error('Validate folders error:', err);
+    return {
+      success: false,
+      error: err.message
+    };
+  }
+});
+
 ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeSuffix, outputFolder) => {
   return new Promise(async (resolve, reject) => {
     const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));

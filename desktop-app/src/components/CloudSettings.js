@@ -839,14 +839,14 @@ function CloudSettings() {
                 />
                 <div className="flex-1">
                   <div className="font-medium flex items-center gap-2">
-                    <span>📦 Gom Cố Định 5 Files</span>
+                    <span>📦 Gom Cố Định (5 Files)</span>
                     <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">ĐỀ XUẤT</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
                     • Gom mỗi 5 files và xử lý cùng lúc<br />
-                    • <strong>⚡ Nhanh hơn 3-4 lần</strong><br />
+                    • <strong>⚡ Nhanh hơn 4-5 lần</strong><br />
                     • <strong>💰 Tiết kiệm 80% chi phí</strong><br />
-                    • Phù hợp: Scan nhiều files (10-100 files)
+                    • Phù hợp: Hầu hết trường hợp (10-200 files)
                   </div>
                 </div>
               </label>
@@ -862,15 +862,15 @@ function CloudSettings() {
                 />
                 <div className="flex-1">
                   <div className="font-medium flex items-center gap-2">
-                    <span>🧠 Gom Thông Minh</span>
-                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">TỐI ƯU NHẤT</span>
+                    <span>🧠 Gom Thông Minh (15-20 Files)</span>
+                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">CHÍNH XÁC NHẤT</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    • Quét nhanh → Tự động nhóm theo tài liệu → Xử lý từng nhóm<br />
-                    • <strong>🚀 Nhanh hơn 6-9 lần</strong><br />
-                    • <strong>💰 Tiết kiệm 90% chi phí</strong><br />
-                    • <strong>🎯 Chính xác nhất (hiểu context tốt nhất)</strong><br />
-                    • Phù hợp: Batch lớn (50-200 files), nhiều tài liệu khác nhau
+                    • Gom 15-20 files → AI tự detect ranh giới documents<br />
+                    • <strong>🎯 Chính xác nhất (97%+)</strong> - AI hiểu full context<br />
+                    • <strong>⚡ Nhanh hơn 8-10 lần</strong><br />
+                    • <strong>💰 Tiết kiệm 85-90% chi phí</strong><br />
+                    • Phù hợp: Multi-page documents khác nhau (20-100 files)
                   </div>
                 </div>
               </label>

@@ -162,6 +162,18 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "Implemented BYOK (Bring Your Own Key) feature for Cloud OCR. Users can add their own API keys for Google Cloud Vision and Azure Computer Vision. Features: API key storage (encrypted), test functionality, usage guides. New tab '☁️ Cloud OCR' added to App.js routing."
+  
+  - task: "Batch Scan from List"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/desktop-app/src/components/BatchScanner.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ IMPLEMENTED: Batch scan feature that reads TXT file (each line = folder path) and processes all images (JPG, JPEG, PNG) in each folder. Features: 3 output options (rename in place, copy by type, copy all), progress tracking, error logging, skipped folders tracking. Python backend: batch_scanner.py. React UI: BatchScanner.js with file picker, output selection, and results display. IPC handlers added to main.js and preload.js. New tab '📋 Quét danh sách' added to App.js. Documentation: BATCH_SCAN_GUIDE.md. Does NOT scan sub-folders. Uses existing OCR engine from settings (Tesseract/EasyOCR/VietOCR/Gemini Flash)."
 
 metadata:
   created_by: "main_agent"

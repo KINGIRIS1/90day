@@ -454,8 +454,192 @@ function BatchScanner() {
         </div>
       )}
 
-      {/* Results Summary */}
-      {results && !isProcessing && (
+      {/* File Results Grid (like DesktopScanner) */}
+      {fileResults.length > 0 && !isProcessing && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">📁 Files đã quét ({fileResults.length})</h2>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600">Mật độ:</label>
+                <select 
+                  value={density} 
+                  onChange={(e) => setDensity(e.target.value)} 
+                  className="text-sm border rounded px-3 py-1.5"
+                >
+                  <option value="high">Cao (5)</option>
+                  <option value="medium">TB (4)</option>
+                  <option value="low">Thấp (3)</option>
+                </select>
+              </div>
+              <button
+                onClick={handleMerge}
+                disabled={mergeInProgress}
+                className="px-5 py-2.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
+              >
+                {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp PDF'}
+              </button>
+            </div>
+          </div>
+
+          <div className={`grid gap-4 ${gridColsClass}`}>
+            {fileResults.map((result, idx) => (
+              <div key={idx} className="p-3 border rounded-lg bg-white hover:shadow-md transition-shadow">
+                {/* Preview Image */}
+                <div className="mb-3">
+                  {result.previewUrl ? (
+                    <img 
+                      src={result.previewUrl} 
+                      alt={result.fileName} 
+                      className="w-full h-40 object-contain border rounded bg-gray-50"
+                    />
+                  ) : (
+                    <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
+                      Không có preview
+                    </div>
+                  )}
+                </div>
+
+                {/* File Info */}
+                <div className="text-sm font-medium truncate" title={result.fileName}>
+                  {result.fileName}
+                </div>
+                <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                  {getMethodBadge(result.method)}
+                  <span className="ml-auto font-semibold">{formatConfidence(result.confidence)}%</span>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span>
+                </div>
+
+                {/* Inline Editor */}
+                <div className="mt-2 p-2 bg-gray-50 border rounded">
+                  <InlineShortCodeEditor 
+                    value={result.short_code} 
+                    onChange={(newCode) => {
+                      setFileResults(prev => prev.map((r, i) => 
+                        i === idx ? { ...r, short_code: newCode } : r
+                      ));
+                    }} 
+                  />
+                </div>
+
+                {/* Folder Info */}
+                <div className="mt-2 text-xs text-gray-500 truncate" title={result.folder}>
+                  📂 {getFileName(result.folder)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Merge Modal */}
+      {showMergeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">📚 Gộp PDF</h3>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              Chọn cách lưu file PDF sau khi gộp:
+            </p>
+
+            <div className="space-y-3">
+              {/* Option 1: Same Folder */}
+              <label className="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="mergeOutput"
+                  value="same_folder"
+                  checked={outputOption === 'same_folder'}
+                  onChange={(e) => setOutputOption(e.target.value)}
+                  className="mt-1"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Gộp vào thư mục gốc</div>
+                  <div className="text-sm text-gray-600">PDF sẽ được lưu trực tiếp vào thư mục gốc của mỗi folder</div>
+                </div>
+              </label>
+
+              {/* Option 2: New Folder */}
+              <label className="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="mergeOutput"
+                  value="new_folder"
+                  checked={outputOption === 'new_folder'}
+                  onChange={(e) => setOutputOption(e.target.value)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Tạo thư mục mới</div>
+                  <div className="text-sm text-gray-600 mb-2">Tên thư mục = Thư mục gốc + ký tự tùy chọn</div>
+                  {outputOption === 'new_folder' && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-sm text-gray-700">Ký tự thêm vào:</span>
+                      <input
+                        type="text"
+                        value={mergeSuffix}
+                        onChange={(e) => setMergeSuffix(e.target.value)}
+                        placeholder="_merged"
+                        className="flex-1 px-3 py-1.5 text-sm border rounded"
+                      />
+                    </div>
+                  )}
+                </div>
+              </label>
+
+              {/* Option 3: Custom Folder */}
+              <label className="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="mergeOutput"
+                  value="custom_folder"
+                  checked={outputOption === 'custom_folder'}
+                  onChange={(e) => setOutputOption(e.target.value)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Lưu vào thư mục chỉ định</div>
+                  <div className="text-sm text-gray-600 mb-2">Chọn thư mục để lưu tất cả PDF</div>
+                  {outputOption === 'custom_folder' && (
+                    <button
+                      onClick={handleSelectOutputFolder}
+                      className="mt-2 px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      📁 Chọn thư mục
+                    </button>
+                  )}
+                  {outputOption === 'custom_folder' && outputFolder && (
+                    <div className="mt-2 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                      ✅ {getFileName(outputFolder)}
+                    </div>
+                  )}
+                </div>
+              </label>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={() => setShowMergeModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={executeMerge}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Bắt đầu gộp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Scan Statistics Summary */}
+      {scanResults && !isProcessing && (
         <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Kết quả</h3>
 

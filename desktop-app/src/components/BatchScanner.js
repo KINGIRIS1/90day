@@ -1011,13 +1011,39 @@ function BatchScanner() {
                       )}
                     </div>
 
-                {/* Folder Info */}
-                <div className="mt-2 text-xs text-gray-500 truncate" title={result.folder}>
-                  📂 {getFileName(result.folder)}
-                </div>
+                    {/* Folder Info */}
+                    <div className="mt-2 text-xs text-gray-500 truncate" title={result.folder}>
+                      📂 {getFileName(result.folder)}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )
+        ))}
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {selectedPreview && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedPreview(null)}
+        >
+          <div className="max-w-6xl max-h-full">
+            <img 
+              src={selectedPreview} 
+              alt="Preview" 
+              className="max-w-full max-h-screen object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
+          <button
+            onClick={() => setSelectedPreview(null)}
+            className="absolute top-4 right-4 px-4 py-2 bg-white rounded-lg shadow-lg hover:bg-gray-100"
+          >
+            ✕ Đóng
+          </button>
         </div>
       )}
 

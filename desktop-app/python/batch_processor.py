@@ -83,7 +83,7 @@ VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
    Page 5 (index 5): "ĐIỀU 1: ..." → TBT continuation
    Page 6 (index 6): "III. TÍNH THUẾ" + bảng 4.1 → TBT continuation ✅ (KHÔNG phải UNKNOWN)
    
-   Result: {"type": "TBT", "pages": [4, 5, 6], ...}
+   Result: {{"type": "TBT", "pages": [4, 5, 6], ...}}
 
 ✅ "ĐIỀU 2: NỘI DUNG THỎA THUẬN PHÂN CHIA"
    → Section header

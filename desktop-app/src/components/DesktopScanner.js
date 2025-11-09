@@ -1245,6 +1245,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
                 <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
                 <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">{getMethodBadge(result.method)}<span className="ml-auto font-semibold">{formatConfidence(result.confidence)}%</span></div>
                 <div className="mt-2 text-xs text-gray-600">Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
+                {/* Timing Info */}
+                {result.durationSeconds && (
+                  <div className="mt-1 text-xs text-orange-600 flex items-center gap-1">
+                    <span>⏱️</span>
+                    <span className="font-medium">{result.durationSeconds}s</span>
+                  </div>
+                )}
                 <div className="mt-2 p-2 bg-gray-50 border rounded"><InlineShortCodeEditor value={result.short_code} onChange={(newCode) => { setResults(prev => prev.map((r, i) => i === idx ? { ...r, short_code: newCode } : r)); }} /></div>
                 
                 {/* Action Buttons */}

@@ -436,6 +436,19 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
     
     print(f"\n{'='*80}", file=sys.stderr)
     print(f"✅ BATCH MODE 1 COMPLETE: {len(all_results)} files processed", file=sys.stderr)
+    
+    # Detect missing files
+    all_input_files = set(image_paths)
+    missing_files = all_input_files - processed_files
+    
+    if missing_files:
+        print(f"⚠️ WARNING: {len(missing_files)} files were NOT processed by AI:", file=sys.stderr)
+        for missing_file in sorted(missing_files):
+            print(f"   ❌ {os.path.basename(missing_file)}", file=sys.stderr)
+        print(f"   Possible causes: AI didn't return page indices, JSON parsing error", file=sys.stderr)
+    else:
+        print(f"✅ All {len(all_input_files)} input files were successfully processed", file=sys.stderr)
+    
     print(f"{'='*80}", file=sys.stderr)
     
     return all_results

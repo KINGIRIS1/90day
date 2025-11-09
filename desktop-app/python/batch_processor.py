@@ -11,6 +11,8 @@ import sys
 import os
 import json
 import base64
+import re
+import requests
 from PIL import Image
 import io
 

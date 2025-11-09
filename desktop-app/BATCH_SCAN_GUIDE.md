@@ -88,7 +88,7 @@ C:\Documents\HoSo003
 
 ## 📊 Ví dụ thực tế
 
-### Ví dụ 1: Batch scan 3 thư mục với "Đổi tên tại chỗ"
+### Ví dụ 1: Lưu trong thư mục gốc (Same Folder)
 
 **Input (folders.txt):**
 ```
@@ -100,15 +100,15 @@ C:\Scan\HoSo003
 **Kết quả:**
 ```
 C:\Scan\HoSo001\
-  - HDCQ_image001.jpg (từ image001.jpg)
-  - GCNM_image002.jpg (từ image002.jpg)
+  - HDCQ.pdf (gộp 3 ảnh HDCQ)
+  - GCNM.pdf (gộp 2 ảnh GCNM)
 
 C:\Scan\HoSo002\
-  - DKTC_doc001.jpg (từ doc001.jpg)
-  - HDCQ_doc002.jpg (từ doc002.jpg)
+  - DKTC.pdf (gộp 4 ảnh DKTC)
+  - HDCQ.pdf (gộp 1 ảnh HDCQ)
 ```
 
-### Ví dụ 2: Copy theo loại tài liệu
+### Ví dụ 2: Lưu trong thư mục mới có suffix
 
 **Input (folders.txt):**
 ```
@@ -116,18 +116,36 @@ C:\Scan\Batch2024-01
 C:\Scan\Batch2024-02
 ```
 
-**Output folder:** `D:\Organized`
+**Suffix:** `_merged`
 
 **Kết quả:**
 ```
-D:\Organized\
-  ├── HDCQ\
-  │   ├── image001.jpg
-  │   └── doc002.jpg
-  ├── GCNM\
-  │   └── image002.jpg
-  └── DKTC\
-      └── doc001.jpg
+C:\Scan\Batch2024-01_merged\
+  ├── HDCQ.pdf (gộp 5 ảnh)
+  └── GCNM.pdf (gộp 3 ảnh)
+
+C:\Scan\Batch2024-02_merged\
+  └── DKTC.pdf (gộp 2 ảnh)
+```
+
+### Ví dụ 3: Lưu trong thư mục chỉ định
+
+**Input (folders.txt):**
+```
+C:\Scan\Batch2024-01
+C:\Scan\Batch2024-02
+```
+
+**Output folder:** `D:\Results`
+
+**Kết quả:**
+```
+D:\Results\
+  ├── Batch2024-01\
+  │   ├── HDCQ.pdf
+  │   └── GCNM.pdf
+  └── Batch2024-02\
+      └── DKTC.pdf
 ```
 
 ## 🔍 Xử lý lỗi

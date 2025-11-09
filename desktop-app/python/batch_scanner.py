@@ -20,7 +20,18 @@ os.environ['FLAGS_use_mkldnn'] = '0'
 sys.path.insert(0, os.path.dirname(__file__))
 
 # Import process_document function
-from process_document import process_document
+try:
+    from process_document import process_document
+except ImportError as e:
+    # If import fails, create a dummy function that returns error
+    def process_document(file_path, ocr_engine, api_key=None, endpoint=None):
+        return {
+            "success": False,
+            "error": f"Failed to import process_document: {str(e)}",
+            "short_code": "UNKNOWN",
+            "doc_type": "Unknown",
+            "confidence": 0
+        }
 
 
 def read_txt_file(txt_path: str) -> list:

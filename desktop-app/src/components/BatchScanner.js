@@ -535,6 +535,196 @@ function BatchScanner() {
     return result;
   };
 
+  // Parse issue date from GCN for comparison
+  const parseIssueDate = (issueDate, confidence) => {
+    if (!issueDate) return null;
+    
+    try {
+      let comparable = 0;
+      let parts;
+      
+      if (confidence === 'full') {
+        // DD/MM/YYYY
+        parts = issueDate.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10);
+          const year = parseInt(parts[2], 10);
+          comparable = year * 10000 + month * 100 + day;
+        }
+      } else if (confidence === 'partial') {
+        // MM/YYYY
+        parts = issueDate.split('/');
+        if (parts.length === 2) {
+          const month = parseInt(parts[0], 10);
+          const year = parseInt(parts[1], 10);
+          comparable = year * 10000 + month * 100 + 1; // Assume day 1
+        }
+      } else if (confidence === 'year_only') {
+        // YYYY
+        const year = parseInt(issueDate, 10);
+        comparable = year * 10000 + 1 * 100 + 1; // Assume Jan 1
+      }
+      
+      return { comparable, original: issueDate };
+    } catch (e) {
+      console.error(`❌ Error parsing date: ${issueDate}`, e);
+      return null;
+    }
+  };
+
+  // Post-process GCN batch (DATE-BASED classification)
+  const postProcessGCNBatch = (folderResults) => {
+    try {
+      console.log('🔄 Post-processing GCN batch (DATE-BASED classification)...');
+      
+      // Step 1: Normalize GCNM/GCNC → GCN
+      const normalizedResults = folderResults.map(r => {
+        if (r.short_code === 'GCNM' || r.short_code === 'GCNC') {
+          console.log(`🔄 Converting ${r.short_code} → GCN for file: ${r.fileName}`);
+          return { ...r, short_code: 'GCN', original_short_code: r.short_code };
+        }
+        return r;
+      });
+      
+      // Step 2: Find all GCN documents
+      const allGcnDocs = normalizedResults.filter(r => r.short_code === 'GCN');
+      
+      if (allGcnDocs.length === 0) {
+        console.log('✅ No GCN documents found');
+        return normalizedResults;
+      }
+      
+      console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
+      
+      // Step 3: Pair documents (trang 1 + trang 2)
+      const pairs = [];
+      for (let i = 0; i < allGcnDocs.length; i += 2) {
+        const page1 = allGcnDocs[i];
+        const page2 = allGcnDocs[i + 1];
+        
+        if (page1 && page2) {
+          pairs.push({ page1, page2, pairIndex: i / 2 });
+        } else if (page1) {
+          pairs.push({ page1, page2: null, pairIndex: i / 2 });
+        }
+      }
+      
+      // Step 4: Extract color and dates
+      const pairsWithData = pairs.map(pair => {
+        const color = pair.page1?.color || pair.page2?.color || null;
+        const issueDate = pair.page1?.issue_date || pair.page2?.issue_date || null;
+        const issueDateConfidence = pair.page1?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+        
+        return {
+          ...pair,
+          color,
+          issueDate,
+          issueDateConfidence,
+          parsedDate: parseIssueDate(issueDate, issueDateConfidence)
+        };
+      });
+      
+      // Step 5: Check if mixed colors (red vs pink)
+      const colors = pairsWithData.map(p => p.color).filter(Boolean);
+      const uniqueColors = [...new Set(colors)];
+      const hasMixedColors = uniqueColors.length > 1;
+      const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
+      
+      console.log(`  🎨 Unique colors: ${uniqueColors.join(', ') || 'none'}`);
+      
+      // Step 6: Classify by color if mixed
+      if (hasMixedColors && hasRedAndPink) {
+        console.log(`  🎨 Mixed colors → Classify by color`);
+        
+        pairsWithData.forEach(pair => {
+          const classification = (pair.color === 'red' || pair.color === 'orange') ? 'GCNC' : 'GCNM';
+          const note = `Màu ${pair.color} → ${classification}`;
+          
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: classification,
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note}`
+            };
+          });
+        });
+        
+        return normalizedResults;
+      }
+      
+      // Step 7: Classify by date (oldest = GCNC, newer = GCNM)
+      const pairsWithDates = pairsWithData.filter(p => p.parsedDate);
+      
+      if (pairsWithDates.length === 0) {
+        console.log('  ⚠️ No dates found → Default all to GCNM');
+        pairsWithData.forEach(pair => {
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: 'GCNM',
+              reasoning: `${page.reasoning || 'GCN'} - Không tìm thấy ngày → GCNM (mặc định)`,
+              gcn_classification_note: '📌 Không có ngày cấp → GCNM (mặc định)'
+            };
+          });
+        });
+        return normalizedResults;
+      }
+      
+      // Sort by date
+      pairsWithDates.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+      
+      console.log('  📊 Sorted by date:');
+      pairsWithDates.forEach((pair, idx) => {
+        console.log(`    ${idx + 1}. ${pair.issueDate} (${pair.issueDateConfidence})`);
+      });
+      
+      // Oldest = GCNC, rest = GCNM
+      pairsWithDates.forEach((pair, idx) => {
+        const classification = idx === 0 ? 'GCNC' : 'GCNM';
+        const note = `Ngày cấp ${pair.issueDate} → ${classification} ${idx === 0 ? '(cũ nhất)' : ''}`;
+        
+        console.log(`  ✅ ${note}`);
+        
+        [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+          const index = normalizedResults.indexOf(page);
+          normalizedResults[index] = {
+            ...page,
+            short_code: classification,
+            reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+            gcn_classification_note: `📌 ${note}`
+          };
+        });
+      });
+      
+      // Handle pairs without dates (default GCNM)
+      const pairsWithoutDates = pairsWithData.filter(p => !p.parsedDate);
+      pairsWithoutDates.forEach(pair => {
+        [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+          const index = normalizedResults.indexOf(page);
+          if (normalizedResults[index].short_code === 'GCN') {
+            normalizedResults[index] = {
+              ...page,
+              short_code: 'GCNM',
+              reasoning: `${page.reasoning || 'GCN'} - Không tìm thấy ngày → GCNM`,
+              gcn_classification_note: '📌 Không có ngày → GCNM (mặc định)'
+            };
+          }
+        });
+      });
+      
+      console.log('✅ GCN post-processing complete');
+      return normalizedResults;
+      
+    } catch (err) {
+      console.error('❌ GCN post-processing error:', err);
+      return folderResults; // Return original if error
+    }
+  };
+
   // Get method badge - check OCR engine type
   const getMethodBadge = (method) => {
     // Check if using cloud OCR engines

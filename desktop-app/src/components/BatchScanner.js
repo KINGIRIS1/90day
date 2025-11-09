@@ -35,6 +35,50 @@ function BatchScanner() {
       }
     };
     loadConfig();
+
+    // Listen for progress updates
+    const handleProgress = (data) => {
+      const logText = String(data);
+      
+      // Parse folder progress: "📂 [1/3] Processing: C:\Folder1"
+      const folderMatch = logText.match(/📂\s*\[(\d+)\/(\d+)\]\s*Processing:\s*(.+)/);
+      if (folderMatch) {
+        setProgress(prev => ({
+          ...prev,
+          processedFolders: parseInt(folderMatch[1]),
+          totalFolders: parseInt(folderMatch[2]),
+          currentFolder: folderMatch[3].trim()
+        }));
+      }
+
+      // Parse file progress: "   [1/10] Processing: image001.jpg"
+      const fileMatch = logText.match(/\s*\[(\d+)\/(\d+)\]\s*Processing:\s*(.+)/);
+      if (fileMatch) {
+        setProgress(prev => ({
+          ...prev,
+          processedFiles: parseInt(fileMatch[1]),
+          totalFiles: parseInt(fileMatch[2]),
+          currentFile: fileMatch[3].trim()
+        }));
+      }
+
+      // Parse found files: "🖼️  Found 10 image file(s)"
+      const foundMatch = logText.match(/Found\s+(\d+)\s+image/);
+      if (foundMatch) {
+        setProgress(prev => ({
+          ...prev,
+          totalFiles: parseInt(foundMatch[1])
+        }));
+      }
+    };
+
+    if (window.electronAPI && window.electronAPI.onBatchScanProgress) {
+      window.electronAPI.onBatchScanProgress(handleProgress);
+    }
+
+    return () => {
+      // Cleanup listener if needed
+    };
   }, []);
 
   // Handle TXT file selection

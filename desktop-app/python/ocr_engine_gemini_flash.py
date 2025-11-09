@@ -653,6 +653,10 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 - Trang là form "ĐƠN ĐĂNG KÝ" nhưng classify thành GCNM
   → ❌ SAI! Phải là DDKBD (form khác certificate)
 
+- Trang có title "HỢP ĐỒNG ỦY QUYỀN" nhưng classify thành HDCQ
+  → ❌ SAI! Title rõ ràng là "ỦY QUYỀN" → Phải là HDUQ (KHÔNG phải HDCQ)
+  → 🚨 LƯU Ý: Đọc kỹ title, "ỦY QUYỀN" khác hoàn toàn với "CHUYỂN NHƯỢNG"
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!
 
 📋 VÍ DỤ RESPONSE FORMAT:

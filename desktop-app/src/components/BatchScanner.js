@@ -332,6 +332,7 @@ function BatchScanner() {
 
             const imagePath = validImages[j];
             const fileName = imagePath.split(/[/\\]/).pop();
+            const fileStartTime = Date.now();
             
             setProgress(prev => ({
               ...prev,
@@ -341,9 +342,14 @@ function BatchScanner() {
 
             try {
               console.log(`  [${j + 1}/${validImages.length}] Processing: ${fileName}`);
+              console.log(`  ⏱️ File timer started: ${new Date(fileStartTime).toLocaleTimeString()}`);
               
               // Scan single file
               let fileResult = await window.electronAPI.processDocumentOffline(imagePath);
+              const fileEndTime = Date.now();
+              const fileDurationMs = fileEndTime - fileStartTime;
+              
+              console.log(`  ✅ File completed in ${(fileDurationMs / 1000).toFixed(2)}s`);
               
               // Debug: Log GCN fields if present
               if (fileResult.short_code === 'GCN' || fileResult.short_code === 'GCNM' || fileResult.short_code === 'GCNC') {

@@ -409,7 +409,50 @@ function BatchScanner() {
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             <span className="font-medium text-blue-900">Đang xử lý batch scan...</span>
           </div>
-          <p className="text-sm text-blue-700">
+
+          {/* Folder Progress */}
+          {progress.totalFolders > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm mb-1">
+                <span className="text-blue-800 font-medium">📂 Thư mục: {progress.processedFolders}/{progress.totalFolders}</span>
+                <span className="text-blue-600">{Math.round((progress.processedFolders / progress.totalFolders) * 100)}%</span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(progress.processedFolders / progress.totalFolders) * 100}%` }}
+                ></div>
+              </div>
+              {progress.currentFolder && (
+                <div className="text-xs text-blue-700 mt-2 truncate" title={progress.currentFolder}>
+                  ➜ {progress.currentFolder}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* File Progress */}
+          {progress.totalFiles > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm mb-1">
+                <span className="text-blue-800 font-medium">🖼️ Files trong thư mục: {progress.processedFiles}/{progress.totalFiles}</span>
+                <span className="text-blue-600">{Math.round((progress.processedFiles / progress.totalFiles) * 100)}%</span>
+              </div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(progress.processedFiles / progress.totalFiles) * 100}%` }}
+                ></div>
+              </div>
+              {progress.currentFile && (
+                <div className="text-xs text-blue-700 mt-2">
+                  ➜ {progress.currentFile}
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="text-sm text-blue-700 mt-4">
             Vui lòng đợi. Quá trình này có thể mất vài phút tùy thuộc vào số lượng file.
           </p>
         </div>

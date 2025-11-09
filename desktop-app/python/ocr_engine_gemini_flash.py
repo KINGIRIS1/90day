@@ -275,17 +275,27 @@ def get_classification_prompt_lite():
 
 📋 QUY TẮC PHÂN LOẠI (QUAN TRỌNG):
 
-🔍 1. VỊ TRÍ TIÊU ĐỀ (TOP 30%):
+🔍 1. VỊ TRÍ TIÊU ĐỀ (STRICT TOP 20% ONLY!):
 ✅ CHỈ PHÂN LOẠI NẾU ĐẦY ĐỦ TẤT CẢ CÁC ĐIỀU KIỆN:
 - Text LỚN NHẤT, căn giữa
+- 🔒 **BẮT BUỘC: NẰM Ở TOP 20% CỦA TRANG** (NOT middle, NOT 30-40%)
 - NẰM ĐỘC LẬP (không có text khác cùng dòng)
 - VD đúng: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "PHIẾU THẨM TRA", "GIẤY CHỨNG NHẬN"
 
 ❌ TUYỆT ĐỐI BỎ QUA NẾU (BLACKLIST - QUAN TRỌNG):
-- Text ở giữa/cuối trang (MIDDLE/BOTTOM)
+- Text ở giữa/cuối trang (MIDDLE/BOTTOM) - NGAY CẢ NẾU text lớn!
+- Text có SECTION NUMBER (I., II., III., IV., 1., 2., 3.) → Đây là section heading, KHÔNG phải title chính
 - Có từ: "căn cứ", "theo", "kèm theo", "số...", "ngày...", "về việc"
 - NẰM CHUNG với text khác trên cùng dòng
 - Nằm trong câu văn
+
+🚨 SECTION HEADERS - KHÔNG BAO GIỜ LÀ TITLE CHÍNH (REJECT):
+Nếu text có SECTION NUMBER ở đầu → KHÔNG PHẢI title chính → Trả về UNKNOWN:
+- "I. ...", "II. ...", "III. ...", "IV. ...", "V. ..."
+- "1. ...", "2. ...", "3. ...", "4. ..."
+- "1.1 ...", "2.1 ...", "3.1 ..."
+- VD SAI: "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG..." → KHÔNG phải title (là section header!)
+- VD SAI: "I. THÔNG TIN CHUNG" → KHÔNG phải title (là section header!)
 
 🚨 BLACKLIST - KHÔNG BAO GIỜ LÀ TITLE CHÍNH (REJECT NGAY):
 Nếu text BẮT ĐẦU bằng các từ sau → KHÔNG PHẢI title → Trả về UNKNOWN:
@@ -297,12 +307,10 @@ Nếu text BẮT ĐẦU bằng các từ sau → KHÔNG PHẢI title → Trả v
 - "Văn bản..." (ví dụ: "Văn bản cam kết")
 - "Bản..." (ví dụ: "Bản kê khai")
 
-⚠️ LƯU Ý: CHỈ ACCEPT nếu text TOÀN BỘ là IN HOA:
-- ✅ "PHIẾU THẨM TRA" (toàn bộ in hoa)
-- ❌ "Phiếu thẩm tra" (chữ hoa đầu dòng)
-- ✅ "GIẤY CHỨNG NHẬN" (toàn bộ in hoa)
-- ❌ "Giấy chứng nhận" (chữ hoa đầu dòng)
-- ❌ "Người lập văn bản cam kết" (chữ hoa đầu dòng)
+⚠️ QUAN TRỌNG - POSITION VERIFICATION:
+- Nếu có text LỚN nhưng ở giữa trang (30-60% từ top) → KHÔNG phải title → UNKNOWN
+- Nếu có text LỚN có section number (I., II., III.) → KHÔNG phải title → UNKNOWN
+- CHỈ ACCEPT text ở TOP 20% CỦA TRANG (0-20% from top)
 
 👁️ 2. VISUAL INDICATORS (QUAN TRỌNG):
 ✅ QUỐC HUY (National Emblem):

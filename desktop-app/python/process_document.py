@@ -86,8 +86,53 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
     Process a document using OCR + Rules with font height detection
     """
     try:
+        # Handle Gemini Flash Hybrid (Two-Tier AI classification)
+        if ocr_engine_type == 'gemini-flash-hybrid':
+            if not cloud_api_key:
+                return {
+                    "success": False,
+                    "error": "Google API key is required for Gemini Flash Hybrid",
+                    "method": "config_error"
+                }
+
+            print(f"🔄 Using Gemini Flash HYBRID (Two-Tier) classification", file=sys.stderr)
+
+            from ocr_engine_gemini_flash_hybrid import classify_document_gemini_flash_hybrid
+            from rule_classifier import classify_document_name_from_code
+            import time
+
+            # Get resize settings from environment (set by Electron)
+            enable_resize = os.environ.get('ENABLE_RESIZE', 'true').lower() == 'true'
+            max_width = int(os.environ.get('MAX_WIDTH', '1500'))
+            max_height = int(os.environ.get('MAX_HEIGHT', '2100'))
+            
+            # Get confidence threshold from environment (default: 0.80)
+            confidence_threshold = float(os.environ.get('HYBRID_CONFIDENCE_THRESHOLD', '0.80'))
+
+            print(f"📸 Two-Tier strategy:", file=sys.stderr)
+            print(f"   ├─ Tier 1: Flash Lite (60% crop) for easy documents", file=sys.stderr)
+            print(f"   ├─ Tier 2: Flash Full (100% image) if confidence < {confidence_threshold:.0%} or complex doc", file=sys.stderr)
+            print(f"   └─ Smart resize: max {max_width}x{max_height}px", file=sys.stderr)
+            
+            start_time = time.time()
+
+            # Call hybrid engine
+            result = classify_document_gemini_flash_hybrid(
+                image_path=file_path, 
+                api_key=cloud_api_key, 
+                confidence_threshold=confidence_threshold,
+                complex_doc_types=['GCN', 'GCNM', 'GCNC'],
+                enable_resize=enable_resize,
+                max_width=max_width,
+                max_height=max_height
+            )
+
+            scan_time = time.time() - start_time
+            tier_used = result.get('tier_used', 'unknown')
+            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, tier: {tier_used}, time: {scan_time:.1f}s)", file=sys.stderr)
+
         # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
-        if ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:
+        elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:
             if not cloud_api_key:
                 return {
                     "success": False,

@@ -1217,6 +1217,52 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       )}
 
       {/* Results Grid - File Scan */}
+      {/* Performance Stats - File Scan */}
+      {activeTab === 'files' && results.length > 0 && timers.fileTimings && timers.fileTimings.length > 0 && (
+        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-xl shadow-sm p-4">
+          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <span className="text-xl">⏱️</span>
+            <span>Thống kê hiệu năng - {currentOcrEngine === 'gemini-flash-hybrid' ? '🔄 Gemini Hybrid' : currentOcrEngine === 'gemini-flash' ? '🤖 Gemini Flash' : currentOcrEngine === 'gemini-flash-lite' ? '⚡ Gemini Flash Lite' : currentOcrEngine}</span>
+          </h3>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-white p-3 rounded border border-orange-200">
+              <div className="text-xs text-gray-600 mb-1">Tổng thời gian</div>
+              <div className="text-lg font-bold text-orange-600">
+                {Math.floor(timers.scanElapsedSeconds / 60)}:{String(timers.scanElapsedSeconds % 60).padStart(2, '0')}
+              </div>
+            </div>
+            
+            <div className="bg-white p-3 rounded border border-orange-200">
+              <div className="text-xs text-gray-600 mb-1">TB mỗi file</div>
+              <div className="text-lg font-bold text-blue-600">
+                {timers.fileTimings.length > 0 
+                  ? (timers.fileTimings.reduce((sum, f) => sum + f.durationMs, 0) / timers.fileTimings.length / 1000).toFixed(2) 
+                  : '0.00'}s
+              </div>
+            </div>
+            
+            <div className="bg-white p-3 rounded border border-orange-200">
+              <div className="text-xs text-gray-600 mb-1">Nhanh nhất</div>
+              <div className="text-lg font-bold text-green-600">
+                {timers.fileTimings.length > 0 
+                  ? (Math.min(...timers.fileTimings.map(f => f.durationMs)) / 1000).toFixed(2) 
+                  : '0.00'}s
+              </div>
+            </div>
+            
+            <div className="bg-white p-3 rounded border border-orange-200">
+              <div className="text-xs text-gray-600 mb-1">Chậm nhất</div>
+              <div className="text-lg font-bold text-red-600">
+                {timers.fileTimings.length > 0 
+                  ? (Math.max(...timers.fileTimings.map(f => f.durationMs)) / 1000).toFixed(2) 
+                  : '0.00'}s
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {activeTab === 'files' && results.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
           <div className="flex items-center justify-between mb-3">

@@ -222,9 +222,20 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         
         print(f"📊 Tokens: input={usage_info['input_tokens']}, output={usage_info['output_tokens']}", file=sys.stderr)
         
-        # Extract text from response
+        # Check for safety ratings or finish reason (why output=0)
         if 'candidates' in result_data and len(result_data['candidates']) > 0:
             candidate = result_data['candidates'][0]
+            
+            # Check finish reason
+            finish_reason = candidate.get('finishReason', 'UNKNOWN')
+            if finish_reason != 'STOP':
+                print(f"⚠️ Gemini finish reason: {finish_reason}", file=sys.stderr)
+                
+                # Check safety ratings
+                if 'safetyRatings' in candidate:
+                    print(f"🛡️ Safety ratings: {candidate['safetyRatings']}", file=sys.stderr)
+            
+            # Extract text from response
             if 'content' in candidate and 'parts' in candidate['content']:
                 parts = candidate['content']['parts']
                 if len(parts) > 0 and 'text' in parts[0]:
@@ -237,12 +248,31 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                     classification['usage'] = usage_info
                     classification['resize_info'] = resize_info
                     return classification
+                else:
+                    print(f"⚠️ No text in response parts. Candidate: {candidate}", file=sys.stderr)
+            else:
+                print(f"⚠️ No content in candidate. Full candidate: {candidate}", file=sys.stderr)
+        else:
+            print(f"⚠️ No candidates in response. Full response: {result_data}", file=sys.stderr)
         
-        # No valid response
+        # No valid response - construct detailed error message
+        error_reason = "Could not parse Gemini response"
+        if 'candidates' in result_data and len(result_data['candidates']) > 0:
+            candidate = result_data['candidates'][0]
+            finish_reason = candidate.get('finishReason', 'UNKNOWN')
+            if finish_reason == 'SAFETY':
+                error_reason = "Response blocked by safety filters"
+            elif finish_reason == 'MAX_TOKENS':
+                error_reason = "Response exceeded max tokens"
+            elif finish_reason == 'RECITATION':
+                error_reason = "Response blocked due to recitation"
+            else:
+                error_reason = f"Response incomplete (finish reason: {finish_reason})"
+        
         return {
             "short_code": "UNKNOWN",
             "confidence": 0.3,
-            "reasoning": "Could not parse Gemini response",
+            "reasoning": error_reason,
             "usage": usage_info,
             "resize_info": resize_info
         }

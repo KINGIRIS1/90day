@@ -719,6 +719,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     setProcessing(true);
     setIsPaused(false);
     
+    // Initialize timer (only for new scan, not resume)
+    if (!isResume) {
+      const scanStartTime = Date.now();
+      setTimers({
+        scanStartTime: scanStartTime,
+        scanEndTime: null,
+        scanElapsedSeconds: 0,
+        fileTimings: [],
+        folderTimings: []
+      });
+      setElapsedTime(0);
+      console.log('⏱️ File scan timer started:', new Date(scanStartTime).toLocaleTimeString());
+    }
+    
     if (!isResume) {
       setResults([]);
       setComparisons([]);

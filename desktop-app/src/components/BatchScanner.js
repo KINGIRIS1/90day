@@ -641,34 +641,38 @@ function BatchScanner() {
       {/* Scan Statistics Summary */}
       {scanResults && !isProcessing && (
         <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Kết quả</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Thống kê tổng quan</h3>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{results.total_folders}</div>
+              <div className="text-2xl font-bold text-blue-600">{scanResults.total_folders}</div>
               <div className="text-sm text-gray-600">Tổng thư mục</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{results.valid_folders}</div>
+              <div className="text-2xl font-bold text-green-600">{scanResults.valid_folders}</div>
               <div className="text-sm text-gray-600">Thư mục hợp lệ</div>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{results.processed_files}/{results.total_files}</div>
+              <div className="text-2xl font-bold text-purple-600">{scanResults.processed_files}/{scanResults.total_files}</div>
               <div className="text-sm text-gray-600">Files xử lý</div>
             </div>
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-indigo-600">{results.merged_pdfs_count || 0}</div>
-              <div className="text-sm text-gray-600">PDFs đã tạo</div>
-            </div>
             <div className="bg-red-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{results.error_count}</div>
+              <div className="text-2xl font-bold text-red-600">{scanResults.error_count}</div>
               <div className="text-sm text-gray-600">Lỗi</div>
             </div>
           </div>
 
-          {/* Merged PDFs List */}
-          {results.merged_pdfs && results.merged_pdfs.length > 0 && (
+          {/* Note about merging */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-blue-900">
+              <span className="text-xl">💡</span>
+              <span className="font-medium">Gộp PDF từ các file đã quét bằng nút "📚 Gộp PDF" ở trên</span>
+            </div>
+          </div>
+
+          {/* Merged PDFs List - Remove this section as merging is now manual */}
+          {scanResults.merged_pdfs && scanResults.merged_pdfs.length > 0 && (
             <div className="mt-6">
               <h4 className="font-semibold text-gray-900 mb-3">📚 PDFs đã tạo ({results.merged_pdfs.length})</h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">

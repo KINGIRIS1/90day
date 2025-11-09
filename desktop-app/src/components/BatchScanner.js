@@ -488,9 +488,14 @@ function BatchScanner() {
     return Math.round(conf * 100);
   };
 
-  // Get method badge
+  // Get method badge - check OCR engine type
   const getMethodBadge = (method) => {
-    if (method === 'cloud_boost') return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">☁️ Cloud</span>;
+    // Check if using cloud OCR engines
+    const isCloudEngine = ocrEngine.includes('gemini') || ocrEngine.includes('google') || ocrEngine.includes('azure');
+    
+    if (method === 'cloud_boost' || isCloudEngine) {
+      return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">☁️ Cloud</span>;
+    }
     return <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">💻 Offline</span>;
   };
 

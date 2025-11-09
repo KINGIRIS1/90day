@@ -427,10 +427,11 @@ if __name__ == "__main__":
         txt_path = sys.argv[1]
         ocr_engine = sys.argv[2]
         api_key = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "none" else None
-        output_option = sys.argv[4] if len(sys.argv) > 4 else "rename_in_place"
-        output_folder = sys.argv[5] if len(sys.argv) > 5 else None
+        output_option = sys.argv[4] if len(sys.argv) > 4 else "same_folder"
+        merge_suffix = sys.argv[5] if len(sys.argv) > 5 else "_merged"
+        output_folder = sys.argv[6] if len(sys.argv) > 6 else None
         
-        result = process_batch_scan(txt_path, ocr_engine, api_key, output_option, output_folder)
+        result = process_batch_scan(txt_path, ocr_engine, api_key, output_option, merge_suffix, output_folder)
         
         # Print JSON result to stdout
         print(json.dumps(result, ensure_ascii=False))

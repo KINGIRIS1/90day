@@ -263,7 +263,7 @@ ipcMain.handle('scan-single-folder', async (event, folderPath, ocrEngineType) =>
       let cloudApiKey = null;
       if (ocrEngineType === 'google') {
         cloudApiKey = store.get('cloudOCR.google.apiKey', '');
-      } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+      } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
         cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       }
 
@@ -360,10 +360,10 @@ ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeS
         resolve({ success: false, error: 'Google Cloud Vision API key not configured. Please add it in Cloud OCR settings.' });
         return;
       }
-    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
       cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       if (!cloudApiKey) {
-        resolve({ success: false, error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.' });
+        resolve({ success: false, error: 'Google API key not configured for Gemini. Please add it in Cloud OCR settings.' });
         return;
       }
     }
@@ -547,10 +547,10 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         resolve({ success: false, error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.', method: 'config_error' });
         return;
       }
-    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
       cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       if (!cloudApiKey) {
-        resolve({ success: false, error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.', method: 'config_error' });
+        resolve({ success: false, error: 'Google API key not configured for Gemini. Please add it in Cloud OCR settings.', method: 'config_error' });
         return;
       }
     }
@@ -625,8 +625,18 @@ ipcMain.handle('choose-save-path', async (event, defaultName) => {
 });
 
 ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
+  console.log('='.repeat(80));
+  console.log('🚀 MERGE HANDLER CALLED IN MAIN.JS');
+  console.log('📦 Items count:', items.length);
+  console.log('⚙️ Options:', JSON.stringify(options, null, 2));
+  console.log('='.repeat(80));
+  
   const { PDFDocument } = require('pdf-lib');
   const groups = items.reduce((acc, it) => { const key = it.short_code || 'UNKNOWN'; if (!acc[key]) acc[key] = []; acc[key].push(it.filePath); return acc; }, {});
+  
+  console.log('📊 Groups created:', Object.keys(groups).join(', '));
+  console.log('📊 Group details:', Object.entries(groups).map(([k, v]) => `${k}: ${v.length} files`).join(', '));
+  
   const results = [];
   for (const [shortCode, filePaths] of Object.entries(groups)) {
     try {
@@ -650,22 +660,81 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
       const pdfBytes = await outPdf.save();
       let outputPath;
       if (options.autoSave) {
-        const childFolder = path.dirname(filePaths[0]);
+        // Use parentFolder from options if provided, otherwise get from filePath
+        const childFolder = options.parentFolder || path.dirname(filePaths[0]);
         let targetDir;
+        
+        console.log(`📂 Merge processing for ${shortCode}:`);
+        console.log(`   childFolder: ${childFolder}`);
+        console.log(`   parentFolder (from options): ${options.parentFolder || 'null'}`);
+        console.log(`   mergeMode: ${options.mergeMode}`);
+        console.log(`   customOutputFolder: ${options.customOutputFolder || 'null'}`);
+        console.log(`   Files to merge: ${filePaths.length}`);
+        
         if (options.mergeMode === 'new') {
           const parentOfChild = path.dirname(childFolder);
           const childBaseName = path.basename(childFolder);
           const newFolderName = childBaseName + (options.mergeSuffix || '_merged');
           targetDir = path.join(parentOfChild, newFolderName);
           if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+          console.log(`   ✅ Mode 'new': targetDir = ${targetDir}`);
+        } else if (options.mergeMode === 'custom' && options.customOutputFolder) {
+          // Custom folder mode: Create subfolder named after source folder
+          const childBaseName = path.basename(childFolder);
+          targetDir = path.join(options.customOutputFolder, childBaseName);
+          console.log(`   📁 Attempting to create custom folder:`);
+          console.log(`      customOutputFolder: ${options.customOutputFolder}`);
+          console.log(`      childBaseName: ${childBaseName}`);
+          console.log(`      targetDir: ${targetDir}`);
+          
+          try {
+            // First check if customOutputFolder exists
+            if (!fs.existsSync(options.customOutputFolder)) {
+              console.error(`   ❌ Custom output folder does not exist: ${options.customOutputFolder}`);
+              throw new Error(`Custom output folder does not exist: ${options.customOutputFolder}`);
+            }
+            
+            // Check if we have write permission
+            try {
+              fs.accessSync(options.customOutputFolder, fs.constants.W_OK);
+              console.log(`   ✅ Write permission OK for: ${options.customOutputFolder}`);
+            } catch (permErr) {
+              console.error(`   ❌ No write permission for: ${options.customOutputFolder}`);
+              throw new Error(`No write permission for custom folder: ${options.customOutputFolder}`);
+            }
+            
+            // Now try to create subfolder
+            if (!fs.existsSync(targetDir)) {
+              console.log(`   📁 Creating subfolder: ${targetDir}`);
+              fs.mkdirSync(targetDir, { recursive: true });
+              console.log(`   ✅ Subfolder created successfully: ${targetDir}`);
+            } else {
+              console.log(`   ✅ Subfolder already exists: ${targetDir}`);
+            }
+          } catch (mkdirErr) {
+            console.error(`   ❌ Failed to create directory:`, mkdirErr);
+            console.error(`      Error code: ${mkdirErr.code}`);
+            console.error(`      Error message: ${mkdirErr.message}`);
+            throw new Error(`Cannot create output directory: ${targetDir} - ${mkdirErr.message}`);
+          }
         } else {
+          // Default: Same folder (root mode)
           targetDir = childFolder;
+          console.log(`   ✅ Mode 'root': targetDir = ${targetDir}`);
         }
         outputPath = path.join(targetDir, `${shortCode}.pdf`);
+        console.log(`   🎯 Final output path: ${outputPath}`);
         let count = 1;
         while (fs.existsSync(outputPath)) { outputPath = path.join(targetDir, `${shortCode}(${count}).pdf`); count += 1; }
-        fs.writeFileSync(outputPath, Buffer.from(pdfBytes));
-        results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true, autoSaved: true });
+        
+        try {
+          fs.writeFileSync(outputPath, Buffer.from(pdfBytes));
+          console.log(`   ✅ PDF written successfully: ${outputPath}`);
+          results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true, autoSaved: true });
+        } catch (writeErr) {
+          console.error(`   ❌ Failed to write PDF: ${writeErr.message}`);
+          throw new Error(`Cannot write PDF to: ${outputPath} - ${writeErr.message}`);
+        }
       } else {
         const savePath = await dialog.showSaveDialog(mainWindow, { defaultPath: `${shortCode}.pdf`, filters: [{ name: 'PDF', extensions: ['pdf'] }] });
         if (!savePath.canceled && savePath.filePath) {
@@ -677,10 +746,17 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         }
       }
     } catch (err) {
-      console.error('Merge error for', shortCode, err);
+      console.error('❌ Merge error for', shortCode, ':', err.message);
+      console.error('   Stack:', err.stack);
       results.push({ short_code: shortCode, error: err.message, success: false });
     }
   }
+  
+  console.log('='.repeat(80));
+  console.log('✅ MERGE HANDLER COMPLETED');
+  console.log('📊 Results:', results.map(r => `${r.short_code}: ${r.success ? '✅' : '❌'}`).join(', '));
+  console.log('='.repeat(80));
+  
   return results;
 });
 

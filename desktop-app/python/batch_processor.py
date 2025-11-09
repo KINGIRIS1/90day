@@ -509,7 +509,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
             continue
         
         # Build multi-image payload
-        parts = [{"text": get_multi_image_prompt()}]
+        parts = [{"text": get_multi_image_prompt_full(len(batch_paths))}]
         for img_data in encoded_images:
             parts.append({
                 "inline_data": {

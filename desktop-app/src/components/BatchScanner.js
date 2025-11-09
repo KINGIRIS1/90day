@@ -918,7 +918,7 @@ function BatchScanner() {
               </div>
               <button
                 onClick={handleMerge}
-                disabled={mergeInProgress}
+                disabled={mergeInProgress || isScanning}
                 className="px-5 py-2.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
               >
                 {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp PDF'}

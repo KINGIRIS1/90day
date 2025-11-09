@@ -858,11 +858,15 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
             resolve({ success: true, results: results });
           } catch (e) {
             console.error('Failed to parse batch results:', e);
+            console.error('Stdout:', stdoutData);
+            console.error('Stderr:', stderrData);
             resolve({ success: false, error: 'Failed to parse results', results: [] });
           }
         } else {
           console.error(`Batch process failed with code ${code}`);
-          resolve({ success: false, error: `Process exited with code ${code}`, results: [] });
+          console.error('Stderr output:', stderrData);
+          console.error('Stdout output:', stdoutData);
+          resolve({ success: false, error: `Process exited with code ${code}. Error: ${stderrData}`, results: [] });
         }
       });
       

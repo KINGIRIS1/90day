@@ -705,6 +705,18 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   → ❌ SAI! Title rõ ràng là "ỦY QUYỀN" → Phải là HDUQ (KHÔNG phải HDCQ)
   → 🚨 LƯU Ý: Đọc kỹ title, "ỦY QUYỀN" khác hoàn toàn với "CHUYỂN NHƯỢNG"
 
+- Trang có title "Người lập văn bản cam kết về tài sản" ở top, chữ lớn
+  → ❌ SAI! "Người lập..." là chữ hoa đầu dòng, không phải IN HOA toàn bộ
+  → Phải là {short_code: "UNKNOWN", reasoning: "Title không phải in hoa toàn bộ"}
+
+- Trang có "PHIẾU THẨM TRA" nhưng classify thành GCN
+  → ❌ SAI! Không có quốc huy, không có 3 dòng đặc trưng của GCN
+  → Phải là PKTHS (KHÔNG phải GCN)
+
+- Trang có "Giấy xác nhận" (chữ hoa đầu dòng) ở top
+  → ❌ SAI! Phải là {short_code: "UNKNOWN"} vì không phải in hoa toàn bộ
+  → Nếu là "GIẤY XÁC NHẬN" (toàn bộ in hoa) → GXN
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!
 
 📋 VÍ DỤ RESPONSE FORMAT:

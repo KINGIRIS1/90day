@@ -223,8 +223,9 @@ ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeS
       args.push('none');
     }
     
-    // Add output option and folder
+    // Add output option, merge suffix, and folder
     args.push(outputOption);
+    args.push(mergeSuffix || '_merged');
     if (outputFolder) {
       args.push(outputFolder);
     }

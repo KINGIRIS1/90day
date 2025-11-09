@@ -258,8 +258,8 @@ function BatchScanner() {
         // Set active folder to show files as they're scanned
         setActiveFolder(folder.path);
         
-        // Reset lastKnownType for new folder
-        setLastKnownType(null);
+        // Use local variable for lastKnownType in loop (not state!)
+        let currentLastKnown = null;
 
         try {
           // Get image files in folder

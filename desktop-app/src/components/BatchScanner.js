@@ -1084,12 +1084,11 @@ function BatchScanner() {
                       📂 {getFileName(result.folder)}
                     </div>
                   </div>
-                  ))}
-                  </div>
-                </div>
-              )}
+                );
+                })}
+              </div>
             </div>
-          ))}
+          )}
         </div>
       )}
 

@@ -102,10 +102,45 @@ function BatchScanner() {
       console.log('✅ Batch scan result:', result);
 
       if (result.success) {
-        setResults(result);
+        setScanResults(result);
         setSkippedFolders(result.skipped_folders || []);
         setErrors(result.errors || []);
-        alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- PDFs đã tạo: ${result.merged_pdfs_count || 0}\n- Lỗi: ${result.error_count}`);
+        
+        // Create file results with preview for display
+        const fileResultsWithPreview = await Promise.all(
+          (result.results || []).map(async (item) => {
+            try {
+              const previewUrl = await window.electronAPI.readImageDataUrl(item.original_path);
+              return {
+                filePath: item.original_path,
+                fileName: item.original_path.split(/[/\\]/).pop(),
+                short_code: item.short_code,
+                doc_type: item.doc_type,
+                confidence: item.confidence,
+                folder: item.folder,
+                previewUrl: previewUrl,
+                success: true,
+                method: 'offline_ocr'
+              };
+            } catch (err) {
+              return {
+                filePath: item.original_path,
+                fileName: item.original_path.split(/[/\\]/).pop(),
+                short_code: item.short_code,
+                doc_type: item.doc_type,
+                confidence: item.confidence,
+                folder: item.folder,
+                previewUrl: null,
+                success: true,
+                method: 'offline_ocr'
+              };
+            }
+          })
+        );
+        
+        setFileResults(fileResultsWithPreview);
+        
+        alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- Lỗi: ${result.error_count}\n\n💡 Bạn có thể xem kết quả chi tiết và gộp PDF bên dưới.`);
       } else {
         alert(`❌ Lỗi: ${result.error}`);
       }

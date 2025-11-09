@@ -45,45 +45,173 @@ def encode_image_base64(image_path, max_width=1500, max_height=2100):
 
 
 def get_multi_image_prompt():
-    """Get prompt for multi-image batch analysis"""
+    """Get prompt for multi-image batch analysis with full 98 document types"""
     return """Bạn đang phân tích nhiều trang scan tài liệu đất đai Việt Nam (có thể thuộc 1 hoặc nhiều tài liệu khác nhau).
 
 NHIỆM VỤ:
 1. Xác định có BAO NHIÊU tài liệu khác nhau trong các trang này
 2. Nhóm các trang theo tài liệu
-3. Phân loại loại tài liệu của từng nhóm
+3. Phân loại loại tài liệu của từng nhóm theo DANH SÁCH 98 LOẠI bên dưới
 4. Trích xuất metadata (ngày cấp cho GCN, màu sắc, v.v.)
 
-DẤU HIỆU NHẬN BIẾT:
+DẤU HIỆU NHẬN BIẾT TRANG MỚI vs TRANG TIẾP NỐI:
 
-Trang 1 của tài liệu:
-- Có TIÊU ĐỀ CHÍNH ở đầu trang (20% đầu)
-- Rõ ràng, đầy đủ (ví dụ: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT")
+TRANG 1 CỦA TÀI LIỆU (New Document):
+- Có TIÊU ĐỀ CHÍNH ở TOP 30% (đầu trang)
+- Cỡ chữ LỚN, IN HOA, căn giữa
+- Ví dụ: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
 - Có quốc huy (đối với GCN)
-- Khác biệt rõ ràng về format/màu sắc với trang trước
+- Khác biệt rõ về format/màu sắc so với trang trước
 
-Trang tiếp nối (trang 2, 3, 4...):
+TRANG TIẾP NỐI (Continuation - Trang 2, 3, 4...):
 - KHÔNG có tiêu đề chính ở đầu
-- Có section headers (II., III., IV., "Điều 2", "Phần II", "Mục III")
+- Chỉ có section headers: "II.", "III.", "ĐIỀU 2", "PHẦN II", "MỤC III"
 - Cùng format/màu sắc với trang trước
-- Nội dung liên tục (điều khoản, sơ đồ, bảng biểu)
+- Nội dung liên tục (điều khoản, sơ đồ, bảng biểu, chữ ký)
 
-Ranh giới giữa các tài liệu:
-- Thay đổi rõ rệt về màu giấy (hồng → trắng, đỏ → hồng)
-- Xuất hiện tiêu đề chính mới
-- Thay đổi hoàn toàn về định dạng
+RANH GIỚI GIỮA CÁC TÀI LIỆU:
+- Thay đổi rõ rệt: màu giấy (hồng → trắng), format (có quốc huy → không có)
+- Xuất hiện tiêu đề chính mới ở TOP
+- Thay đổi hoàn toàn về layout
 
-CÁC LOẠI TÀI LIỆU CHÍNH (98 loại):
-- GCN, GCNM, GCNC: Giấy chứng nhận (có quốc huy, 3 dòng tiêu đề)
-- HDCQ: Hợp đồng chuyển nhượng, tặng cho
-- DDKBD: Đơn đăng ký biến động
-- HSKT: Hồ sơ kỹ thuật
-- (và 94 loại khác...)
+⚠️ DANH SÁCH 98 LOẠI TÀI LIỆU (CHỈ DÙNG MÃ TRONG DANH SÁCH NÀY):
 
-QUAN TRỌNG - ĐỐI VỚI GCN:
-- Tìm NGÀY CẤP (có thể ở trang 1 HOẶC trang 2)
-- Xác định MÀU (đỏ/cam = cũ, hồng = mới)
-- Ngày cấp thường ở bottom, gần chữ ký/con dấu
+📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
+BMT = Bản mô tả ranh giới
+HSKT = Bản vẽ (trích lục, đo tách)
+BVHC = Bản vẽ hoàn công
+BVN = Bản vẽ nhà
+SDTT = Sơ đồ dự kiến tách thửa
+
+📋 NHÓM 2: BẢNG KÊ / DANH SÁCH (4 loại)
+BKKDT = Bảng kê khai diện tích
+DSCG = Bảng liệt kê danh sách thửa đất
+DS15 = Danh sách chủ sử dụng (Mẫu 15)
+DSCK = Danh sách công khai hồ sơ cấp giấy
+
+📋 NHÓM 3: BIÊN BẢN (10 loại)
+BBBDG = Biên bản bán đấu giá
+BBGD = Biên bản bàn giao đất
+BBHDDK = Biên bản hội đồng đăng ký đất đai
+BBNT = Biên bản nghiệm thu công trình
+BBKTSS = Biên bản kiểm tra sai sót
+BBKTHT = Biên bản kiểm tra hiện trạng
+BBKTDC = Biên bản kết thúc công khai di chúc
+KTCKCG = Biên bản kết thúc thông báo cấp GCN
+KTCKMG = Biên bản kết thúc thông báo mất GCN
+BLTT = Biên lai thu thuế
+
+📋 NHÓM 4: GIẤY TỜ CÁ NHÂN (4 loại)
+CCCD = Căn cước công dân
+GKS = Giấy khai sinh
+GKH = Giấy kết hôn
+DICHUC = Di chúc
+
+📋 NHÓM 5: GIẤY CHỨNG NHẬN (9 loại)
+🚨 GCN = Giấy chứng nhận quyền sử dụng đất (❌ KHÔNG bao giờ trả về GCNM/GCNC)
+  ⚠️ BẮT BUỘC tìm NGÀY CẤP (có thể viết tay, format: DD/MM/YYYY hoặc MM/YYYY hoặc YYYY)
+  ⚠️ Nếu thấy "Ngày XX tháng YY năm ZZZZ" → chuyển thành "XX/YY/ZZZZ"
+GXNNVTC = Giấy xác nhận nộp vào ngân sách
+GNT = Giấy nộp tiền
+GSND = Giấy sang nhượng đất
+GTLQ = Giấy tờ liên quan (giấy tiếp nhận, biên nhận hồ sơ, phiếu kiểm soát)
+GUQ = Giấy ủy quyền
+GXNDKLD = Giấy xác nhận đăng ký lần đầu
+GPXD = Giấy phép xây dựng
+
+📋 NHÓM 6: HỢP ĐỒNG (7 loại)
+HDCQ = Hợp đồng chuyển nhượng, tặng cho
+HDUQ = Hợp đồng ủy quyền
+HDTHC = Hợp đồng thế chấp
+HDTD = Hợp đồng thuê đất
+HDTCO = Hợp đồng thi công
+HDBDG = Hợp đồng mua bán đấu giá
+hoadon = Hóa đơn giá trị gia tăng
+
+📋 NHÓM 7: ĐƠN (15 loại)
+DDKBD = Đơn đăng ký biến động (có "BIẾN ĐỘNG")
+DDK = Đơn đăng ký (không có "BIẾN ĐỘNG")
+DCK = Đơn cam kết, giấy cam kết
+CHTGD = Đơn chuyển hình thức giao đất
+DCQDGD = Đơn điều chỉnh quyết định giao đất
+DMG = Đơn miễn giảm lệ phí
+DMD = Đơn đa mục đích
+DXN = Đơn xác nhận
+DXCMD = Đơn xin chuyển mục đích
+DGH = Đơn xin gia hạn
+DXGD = Đơn xin giao đất
+DXTHT = Đơn xin tách/hợp thửa
+DXCD = Đơn xin cấp đổi GCN
+DDCTH = Đơn điều chỉnh thời hạn dự án
+DXNTH = Đơn xác nhận thời hạn nông nghiệp
+
+📋 NHÓM 8: QUYẾT ĐỊNH (15 loại)
+QDGTD = Quyết định giao đất/cho thuê
+QDCMD = Quyết định chuyển mục đích
+QDTH = Quyết định thu hồi đất
+QDGH = Quyết định gia hạn
+QDTT = Quyết định tách/hợp thửa
+QDCHTGD = Quyết định chuyển hình thức giao đất
+QDDCGD = Quyết định điều chỉnh QĐ giao đất
+QDDCTH = Quyết định điều chỉnh thời hạn dự án
+QDHG = Quyết định hủy GCN
+QDPDBT = Quyết định phê duyệt bồi thường
+QDDCQH = Quyết định điều chỉnh quy hoạch
+QDPDDG = Quyết định phê quyết đơn giá
+QDTHA = Quyết định thi hành án
+QDHTSD = Quyết định hình thức sử dụng đất
+QDXP = Quyết định xử phạt
+
+📋 NHÓM 9: PHIẾU (8 loại)
+PCT = Phiếu chuyển thông tin nghĩa vụ tài chính
+PKTHS = Phiếu kiểm tra hồ sơ (KIỂM TRA, không phải KIỂM SOÁT)
+PLYKDC = Phiếu lấy ý kiến khu dân cư
+PXNKQDD = Phiếu xác nhận kết quả đo đạc
+DKTC = Phiếu yêu cầu đăng ký biện pháp bảo đảm
+DKTD = Phiếu yêu cầu thay đổi biện pháp bảo đảm
+DKXTC = Phiếu yêu cầu xóa đăng ký biện pháp bảo đảm
+QR = Quét mã QR
+
+📋 NHÓM 10: THÔNG BÁO (8 loại)
+TBT = Thông báo thuế
+TBMG = Thông báo về việc mất GCN
+TBCKCG = Thông báo công khai kết quả cấp GCN
+TBCKMG = Thông báo niêm yết mất GCN
+HTNVTC = Thông báo hoàn thành nghĩa vụ tài chính
+TBCNBD = Thông báo cập nhật biến động
+CKDC = Thông báo công bố di chúc
+HTBTH = Hoàn thành bồi thường hỗ trợ
+
+📋 NHÓM 11: TỜ KHAI / TỜ TRÌNH (3 loại)
+TKT = Tờ khai thuế
+TTr = Tờ trình về giao đất (chữ "r" thường)
+TTCG = Tờ trình về đăng ký đất đai (UBND xã)
+
+📋 NHÓM 12: VĂN BẢN (10 loại)
+CKTSR = Văn bản cam kết tài sản riêng
+VBCTCMD = Văn bản chấp thuận chuyển mục đích
+VBDNCT = Văn bản đề nghị chấp thuận nhận chuyển nhượng
+PDPASDD = Văn bản đề nghị thẩm định phương án
+VBTK = Văn bản thỏa thuận phân chia DI SẢN THỪA KẾ
+TTHGD = Văn bản thỏa thuận HỘ GIA ĐÌNH (không phải vợ chồng)
+CDLK = Văn bản chấm dứt quyền hạn chế liền kề
+HCLK = Văn bản xác lập quyền hạn chế liền kề
+VBTC = Văn bản từ chối nhận di sản
+PCTSVC = Văn bản phân chia tài sản VỢ CHỒNG (không phải hộ gia đình)
+
+⚠️ QUAN TRỌNG - QUY TẮC PHÂN LOẠI:
+- CHỈ phân loại dựa vào TIÊU ĐỀ CHÍNH ở TOP 30%
+- BỎ QUA section headers (ĐIỀU 2, PHẦN II, ...)
+- BỎ QUA mentions trong body text
+- ❌ TUYỆT ĐỐI không trả về GCNM hoặc GCNC, chỉ trả về GCN
+- Nếu không khớp 98 loại → trả về "UNKNOWN"
+
+🚨 ĐẶC BIỆT VỚI GCN:
+- Luôn trả về "GCN" (không phải GCNM/GCNC)
+- BẮT BUỘC tìm NGÀY CẤP (issue_date) ở mọi trang
+- Format ngày: DD/MM/YYYY (hoặc MM/YYYY, YYYY nếu mờ)
+- Vị trí: Thường ở trang 2, bottom, gần chữ ký/con dấu
+- Nếu không tìm thấy → issue_date: null, issue_date_confidence: "not_found"
 
 OUTPUT JSON:
 {

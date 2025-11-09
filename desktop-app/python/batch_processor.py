@@ -653,7 +653,11 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
     
     print(f"{'='*80}", file=sys.stderr)
     
-    return all_results
+    # Return results AND lastKnown for next batch
+    return {
+        'results': all_results,
+        'last_known_type': current_last_known
+    }
 
 
 def quick_scan_tier1(image_path, api_key):

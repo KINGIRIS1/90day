@@ -95,26 +95,57 @@ def classify_document_gemini_flash_hybrid(
             print(f"   📋 GCN Special: Will scan 100% full image to extract issue_date", file=sys.stderr)
         
         # Reason 3: ERROR or UNKNOWN with very low confidence
-        # IMPORTANT: Don't skip for potential GCN pages (date might be on page 2)
+        # Check if this is a continuation page (section headers, no main title)
         elif tier1_code in ['ERROR', 'UNKNOWN'] and tier1_confidence < 0.5:
-            needs_tier2 = True
-            escalation_reason = f"Uncertain classification ({tier1_code} with {tier1_confidence:.2%} confidence)"
-            
-            # Check if this might be GCN continuation (for logging only)
-            is_likely_gcn_continuation = any(keyword in tier1_reasoning.lower() for keyword in [
+            # Strong continuation indicators (common across all multi-page documents)
+            continuation_keywords = [
                 'section header',
+                'not in the top',
+                'middle of the page',
                 'thửa đất',
                 'sơ đồ thửa đất',
                 'ii.',
                 'iii.',
-                'iv.'
-            ])
+                'iv.',
+                'v.',
+                'phần ii',
+                'phần iii',
+                'mục ii',
+                'mục iii',
+                'điều khoản',
+                'điều kiện',
+                'bên a',
+                'bên b',
+                'ký hiệu',
+                'ghi chú'
+            ]
             
-            if is_likely_gcn_continuation:
-                print(f"\n⚠️ ESCALATION TRIGGER: {escalation_reason}", file=sys.stderr)
-                print(f"   💡 Detected GCN continuation indicators - still escalating to check for issue_date", file=sys.stderr)
-                print(f"   📋 GCN date can be on page 2 (new A4 format)", file=sys.stderr)
+            is_likely_continuation = any(keyword in tier1_reasoning.lower() for keyword in continuation_keywords)
+            
+            if is_likely_continuation:
+                # This is likely a continuation page (page 2+) of ANY document type
+                print(f"\n💡 DETECTED CONTINUATION PAGE - SKIP TIER 2 FOR SPEED", file=sys.stderr)
+                print(f"   ├─ Indicators: {[k for k in continuation_keywords if k in tier1_reasoning.lower()]}", file=sys.stderr)
+                print(f"   ├─ This is likely page 2+ (no main title at top)", file=sys.stderr)
+                print(f"   ├─ Sequential naming will classify this based on previous page", file=sys.stderr)
+                print(f"   └─ Time saved: ~12s per page ⚡", file=sys.stderr)
+                
+                # Return UNKNOWN, let sequential naming fix it
+                tier1_result['tier_used'] = 'tier1_only_continuation_detected'
+                tier1_result['tier1_confidence'] = tier1_confidence
+                tier1_result['escalation_reason'] = 'Continuation page - no escalation for speed optimization'
+                tier1_result['cost_estimate'] = 'low'
+                tier1_result['is_continuation'] = True
+                
+                print(f"\n✅ TIER 1 ACCEPTED - Continuation page optimization", file=sys.stderr)
+                print(f"   └─ Cost: ~$0.08/1K (Tier 1 only)", file=sys.stderr)
+                print("=" * 80, file=sys.stderr)
+                
+                return tier1_result
             else:
+                # Not a continuation - genuine UNKNOWN that needs Tier 2
+                needs_tier2 = True
+                escalation_reason = f"Uncertain classification ({tier1_code} with {tier1_confidence:.2%} confidence) - not a continuation page"
                 print(f"\n⚠️ ESCALATION TRIGGER: {escalation_reason}", file=sys.stderr)
         
         # If Tier 1 is good enough, return immediately

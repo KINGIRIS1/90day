@@ -35,6 +35,17 @@ function BatchScanner() {
   const [activeFolder, setActiveFolder] = useState(null);
   const [isMergeAll, setIsMergeAll] = useState(false); // Track if merging all folders
   const [lastKnownType, setLastKnownType] = useState(null); // For sequential naming (UNKNOWN fallback)
+  
+  // Timer states
+  const [timers, setTimers] = useState({
+    batchStartTime: null,
+    batchEndTime: null,
+    batchElapsedSeconds: 0,
+    fileTimings: [], // [{fileName, startTime, endTime, durationMs, engineType}]
+    folderTimings: [], // [{folderName, startTime, endTime, durationMs, fileCount}]
+  });
+  const [elapsedTime, setElapsedTime] = useState(0); // Live elapsed time in seconds
+  const timerIntervalRef = useRef(null);
 
   // Load OCR engine from config on mount
   useEffect(() => {

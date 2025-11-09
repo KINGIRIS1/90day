@@ -682,17 +682,40 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
           // Custom folder mode: Create subfolder named after source folder
           const childBaseName = path.basename(childFolder);
           targetDir = path.join(options.customOutputFolder, childBaseName);
-          console.log(`   📁 Creating custom folder: ${targetDir}`);
+          console.log(`   📁 Attempting to create custom folder:`);
+          console.log(`      customOutputFolder: ${options.customOutputFolder}`);
+          console.log(`      childBaseName: ${childBaseName}`);
+          console.log(`      targetDir: ${targetDir}`);
+          
           try {
+            // First check if customOutputFolder exists
+            if (!fs.existsSync(options.customOutputFolder)) {
+              console.error(`   ❌ Custom output folder does not exist: ${options.customOutputFolder}`);
+              throw new Error(`Custom output folder does not exist: ${options.customOutputFolder}`);
+            }
+            
+            // Check if we have write permission
+            try {
+              fs.accessSync(options.customOutputFolder, fs.constants.W_OK);
+              console.log(`   ✅ Write permission OK for: ${options.customOutputFolder}`);
+            } catch (permErr) {
+              console.error(`   ❌ No write permission for: ${options.customOutputFolder}`);
+              throw new Error(`No write permission for custom folder: ${options.customOutputFolder}`);
+            }
+            
+            // Now try to create subfolder
             if (!fs.existsSync(targetDir)) {
+              console.log(`   📁 Creating subfolder: ${targetDir}`);
               fs.mkdirSync(targetDir, { recursive: true });
-              console.log(`   ✅ Created: ${targetDir}`);
+              console.log(`   ✅ Subfolder created successfully: ${targetDir}`);
             } else {
-              console.log(`   ✅ Already exists: ${targetDir}`);
+              console.log(`   ✅ Subfolder already exists: ${targetDir}`);
             }
           } catch (mkdirErr) {
-            console.error(`   ❌ Failed to create directory: ${mkdirErr.message}`);
-            throw new Error(`Cannot create output directory: ${targetDir}`);
+            console.error(`   ❌ Failed to create directory:`, mkdirErr);
+            console.error(`      Error code: ${mkdirErr.code}`);
+            console.error(`      Error message: ${mkdirErr.message}`);
+            throw new Error(`Cannot create output directory: ${targetDir} - ${mkdirErr.message}`);
           }
         } else {
           // Default: Same folder (root mode)

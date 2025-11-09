@@ -8,8 +8,14 @@ function BatchScanner() {
   const [mergeSuffix, setMergeSuffix] = useState('_merged');
   const [outputFolder, setOutputFolder] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0 });
-  const [currentFolder, setCurrentFolder] = useState('');
+  const [progress, setProgress] = useState({ 
+    currentFolder: '',
+    currentFile: '',
+    processedFiles: 0,
+    totalFiles: 0,
+    processedFolders: 0,
+    totalFolders: 0
+  });
   const [scanResults, setScanResults] = useState(null); // Scan statistics
   const [fileResults, setFileResults] = useState([]); // Individual file results with preview
   const [errors, setErrors] = useState([]);

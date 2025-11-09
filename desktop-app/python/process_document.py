@@ -132,6 +132,85 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, tier: {tier_used}, time: {scan_time:.1f}s)", file=sys.stderr)
             
             method_used = "gemini_hybrid_two_tier"
+            
+            # Check for errors
+            if result.get("short_code") == "ERROR":
+                return {
+                    "success": False,
+                    "error": result.get("reasoning", "Gemini Hybrid error"),
+                    "method": "gemini_hybrid_failed"
+                }
+            
+            # Common processing for all Gemini modes (hybrid + flash + lite)
+            from rule_classifier import classify_document_name_from_code, EXACT_TITLE_MAPPING, DOCUMENT_RULES
+            
+            short_code = result.get("short_code", "UNKNOWN")
+            
+            # ✅ CODE ALIAS MAPPING: Map alternate codes to standard codes
+            CODE_ALIASES = {
+                "HDTG": "HDCQ",  # Hợp đồng tặng cho → Hợp đồng chuyển nhượng, tặng cho
+                "BVDS": "HSKT",  # Bản vẽ đo sơ / Bản đồ địa chính → Hồ sơ kỹ thuật
+            }
+            
+            # Apply alias mapping if needed
+            if short_code in CODE_ALIASES:
+                original_code = short_code
+                short_code = CODE_ALIASES[short_code]
+                result["short_code"] = short_code
+                print(f"🔄 Mapped code '{original_code}' → '{short_code}'", file=sys.stderr)
+            
+            # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
+            # Get all valid codes from rule_classifier
+            VALID_CODES = set(EXACT_TITLE_MAPPING.values())
+            VALID_CODES.update(DOCUMENT_RULES.keys())
+            
+            # If Gemini returns invalid code, force to UNKNOWN
+            if short_code not in VALID_CODES and short_code != "UNKNOWN":
+                print(f"⚠️ Gemini Hybrid returned INVALID code '{short_code}' (not in 98 valid codes). Forcing to UNKNOWN.", file=sys.stderr)
+                print(f"   Original reasoning: {result.get('reasoning', 'N/A')}", file=sys.stderr)
+                result["short_code"] = "UNKNOWN"
+                result["confidence"] = 0.1
+                result["reasoning"] = f"AI returned invalid code '{short_code}' (not in system). Original: {result.get('reasoning', '')}"
+                short_code = "UNKNOWN"
+            
+            doc_name = classify_document_name_from_code(short_code)
+
+            # Extract color, issue_date and issue_date_confidence for GCN documents
+            color = result.get("color", None)
+            issue_date = result.get("issue_date", None)
+            issue_date_confidence = result.get("issue_date_confidence", None)
+            
+            # Tier-specific metadata for hybrid mode
+            tier1_confidence = result.get('tier1_confidence', 0)
+            tier2_confidence = result.get('tier2_confidence', None)
+            escalation_reason = result.get('escalation_reason', 'none')
+            
+            return {
+                "success": True,
+                "type": short_code,
+                "doc_type": doc_name,
+                "short_code": short_code,
+                "confidence": result.get("confidence", 0.5),
+                "matched_keywords": [result.get("reasoning", "Hybrid AI classification")],
+                "title_boost_applied": True if short_code != "UNKNOWN" else False,
+                "title_extracted_via_pattern": True if short_code != "UNKNOWN" else False,
+                "reasoning": result.get("reasoning", ""),
+                "color": color,
+                "issue_date": issue_date,
+                "issue_date_confidence": issue_date_confidence,
+                "method": method_used,
+                "accuracy_estimate": f"{int(result.get('confidence', 0.5) * 100)}%",
+                "recommend_cloud_boost": False,
+                "avg_font_height": 0,
+                # Hybrid-specific stats
+                "tier_used": tier_used,
+                "tier1_confidence": tier1_confidence,
+                "tier2_confidence": tier2_confidence,
+                "escalation_reason": escalation_reason,
+                "cost_estimate": result.get('cost_estimate', 'medium'),
+                "usage": {},  # Hybrid mode doesn't expose token counts directly
+                "estimated_cost_usd": 0  # Could be calculated based on tier_used
+            }
 
         # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
         elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:

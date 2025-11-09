@@ -322,13 +322,22 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   
   • 🔒 QUY TẮC CỨNG (HARD RULE) - PHẢI CÓ ÍT NHẤT MỘT TRONG HAI:
     1. **QUỐC HUY** ở top center (national emblem với ngôi sao, búa liềm)
-    2. **CÁC DÒNG ĐẶC TRƯNG** ở top (PHẢI có đủ cả 3):
-       - "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
-       - "Độc lập - Tự do - Hạnh phúc"
-       - "Giấy chứng nhận quyền sử dụng đất..."
+       - Phải thấy rõ quốc huy hoặc chỗ trống hình tròn/oval dành cho quốc huy
+       - VD: Có hình tròn ở top center + "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM" bên trên
     
-    ⚠️ NẾU KHÔNG CÓ quốc huy HOẶC không có 3 dòng trên → KHÔNG PHẢI GCN!
-    → Có thể là: DDKBD (form), BVDS (notice), hoặc loại khác
+    2. **CÁC DÒNG ĐẶC TRƯNG** ở top (PHẢI có đủ cả 3 dòng theo thứ tự):
+       - Dòng 1: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
+       - Dòng 2: "Độc lập - Tự do - Hạnh phúc" (có thể có gạch chân/underline)
+       - Dòng 3: "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." (title chính)
+    
+    ⚠️ NẾU THIẾU BẤT KỲ YẾU TỐ NÀO → TUYỆT ĐỐI KHÔNG PHẢI GCN!
+    
+    ❌ VÍ DỤ KHÔNG PHẢI GCN (DÙ CÓ TITLE TƯƠNG TỰ):
+    - "PHIẾU THẨM TRA" → Không có quốc huy, không có 3 dòng → PKTHS
+    - "PHIẾU ĐÁNH GIÁ TÀI SẢN" → Không có quốc huy → GTK
+    - "Giấy xác nhận quyền sử dụng đất" → Chữ thường + không có quốc huy → GXN
+    - Form có blank fields + title "Đơn đăng ký..." → DDKBD
+    - Notice có "VĂN PHÒNG ĐĂNG KÝ ĐẤT ĐAI" nhưng không có quốc huy → BVDS/PKTHS
     
   • ❌ KHÔNG PHẢI GCN nếu chỉ có:
     - Title "giấy chứng nhận" nhưng không có quốc huy/3 dòng → Có thể là copy/scan không rõ

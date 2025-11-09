@@ -90,8 +90,9 @@ def classify_document_gemini_flash_hybrid(
         # Reason 2: Complex document type (e.g., GCN requires date extraction)
         elif tier1_code in complex_doc_types:
             needs_tier2 = True
-            escalation_reason = f"Complex document type ({tier1_code} requires detailed analysis)"
+            escalation_reason = f"Complex document type ({tier1_code} requires date extraction from full image)"
             print(f"\n⚠️ ESCALATION TRIGGER: {escalation_reason}", file=sys.stderr)
+            print(f"   📋 GCN Special: Will scan 100% full image to extract issue_date", file=sys.stderr)
         
         # Reason 3: ERROR or UNKNOWN with very low confidence
         elif tier1_code in ['ERROR', 'UNKNOWN'] and tier1_confidence < 0.5:

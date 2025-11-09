@@ -448,7 +448,8 @@ if __name__ == "__main__":
             "processed_files": 0,
             "skipped_folders": [],
             "errors": [{"file": "N/A", "error": str(e)}],
-            "results": []
+            "results": [],
+            "merged_pdfs": []
         }
         print(json.dumps(error_result, ensure_ascii=False))
         sys.exit(1)

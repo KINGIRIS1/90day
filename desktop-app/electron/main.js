@@ -186,7 +186,7 @@ ipcMain.handle('select-txt-file', async () => {
   return result.canceled ? null : (result.filePaths[0] || null);
 });
 
-ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, outputFolder) => {
+ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeSuffix, outputFolder) => {
   return new Promise(async (resolve, reject) => {
     const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
 

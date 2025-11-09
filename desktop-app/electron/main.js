@@ -723,10 +723,17 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         }
       }
     } catch (err) {
-      console.error('Merge error for', shortCode, err);
+      console.error('❌ Merge error for', shortCode, ':', err.message);
+      console.error('   Stack:', err.stack);
       results.push({ short_code: shortCode, error: err.message, success: false });
     }
   }
+  
+  console.log('='.repeat(80));
+  console.log('✅ MERGE HANDLER COMPLETED');
+  console.log('📊 Results:', results.map(r => `${r.short_code}: ${r.success ? '✅' : '❌'}`).join(', '));
+  console.log('='.repeat(80));
+  
   return results;
 });
 

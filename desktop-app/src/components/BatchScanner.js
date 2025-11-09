@@ -997,60 +997,8 @@ function BatchScanner() {
                     </select>
                   </div>
 
-      {/* File Results Grid - Show files of active folder only */}
-      {activeFolder && folderTabs.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          {folderTabs.map((tab) => (
-            activeFolder === tab.path && (
-              <div key={tab.path}>
-                {/* Scanning indicator */}
-                {tab.status === 'scanning' && (
-                  <div className="mb-4 p-3 bg-blue-50 rounded-xl border border-blue-200">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className="animate-spin text-xl">⚙️</div>
-                      <span className="text-sm text-blue-900 font-medium">
-                        Đang quét thư mục "{tab.name}"... ({tab.files.length}/{tab.count})
-                      </span>
-                    </div>
-                    <div className="w-full bg-blue-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${(tab.files.length / tab.count) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    📁 {tab.name} - {tab.files.length} files
-                  </h2>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Mật độ:</label>
-                <select 
-                  value={density} 
-                  onChange={(e) => setDensity(e.target.value)} 
-                  className="text-sm border rounded px-3 py-1.5"
-                >
-                  <option value="high">Cao (5)</option>
-                  <option value="medium">TB (4)</option>
-                  <option value="low">Thấp (3)</option>
-                </select>
-              </div>
-              <button
-                onClick={handleMerge}
-                disabled={mergeInProgress || isScanning}
-                className="px-5 py-2.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 transition-all shadow-sm font-medium"
-              >
-                {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp PDF'}
-              </button>
-            </div>
-          </div>
-
-                {/* Grid */}
-                <div className={`grid gap-4 ${gridColsClass}`}>
+                  {/* Grid */}
+                  <div className={`grid gap-4 ${gridColsClass}`}>
                   {tab.files.map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white hover:shadow-md transition-shadow">
                 {/* Preview Image */}

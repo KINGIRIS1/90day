@@ -300,6 +300,7 @@ function BatchScanner() {
         return;
       }
     }
+    setIsMergeAll(mergeAll);
     setShowMergeModal(true);
   };
 

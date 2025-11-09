@@ -147,8 +147,9 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
         txt_path: Path to TXT file containing folder paths
         ocr_engine: OCR engine type (tesseract, easyocr, vietocr, gemini-flash, etc.)
         api_key: API key for cloud OCR (if needed)
-        output_option: "rename_in_place", "copy_by_type", or "copy_all"
-        output_folder: Output folder path (required for copy_by_type and copy_all)
+        output_option: "same_folder" (save in source folder), "new_folder" (save in folder_suffix), or "custom_folder" (save in output_folder organized by folder name)
+        merge_suffix: Suffix for new_folder mode (default: "_merged")
+        output_folder: Output folder path (required for custom_folder)
     
     Returns:
         JSON object with results, errors, and statistics

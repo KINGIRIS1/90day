@@ -254,6 +254,99 @@ ipcMain.handle('validate-batch-folders', async (event, txtPath) => {
   }
 });
 
+ipcMain.handle('scan-single-folder', async (event, folderPath, ocrEngineType) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log(`Scanning single folder: ${folderPath}`);
+      
+      // Get API key
+      let cloudApiKey = null;
+      if (ocrEngineType === 'google') {
+        cloudApiKey = store.get('cloudOCR.google.apiKey', '');
+      } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+        cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
+      }
+
+      // Get image files
+      const imageExtensions = ['.jpg', '.jpeg', '.png'];
+      const files = fs.readdirSync(folderPath);
+      const imageFiles = files
+        .filter(f => imageExtensions.includes(path.extname(f).toLowerCase()))
+        .map(f => path.join(folderPath, f));
+
+      if (imageFiles.length === 0) {
+        resolve({
+          success: false,
+          error: 'No image files found',
+          results: []
+        });
+        return;
+      }
+
+      const pyInfo = discoverPython();
+      if (!pyInfo.ok) {
+        reject(new Error('Python 3.10–3.12 not found'));
+        return;
+      }
+
+      const scriptPath = isDev ? path.join(__dirname, '../python/process_document.py') : getPythonScriptPath('process_document.py');
+      const pythonScriptDir = path.dirname(scriptPath);
+      
+      // Process each image
+      const results = [];
+      for (const imagePath of imageFiles) {
+        const args = [scriptPath, imagePath, ocrEngineType];
+        if (cloudApiKey) args.push(cloudApiKey);
+
+        const child = spawn(pyInfo.executable, args, {
+          cwd: pythonScriptDir,
+          env: buildPythonEnv({ 
+            GOOGLE_API_KEY: cloudApiKey || process.env.GOOGLE_API_KEY || ''
+          }, pyInfo, pythonScriptDir)
+        });
+
+        let result = '';
+        let errorLogs = '';
+        child.stdout.setEncoding('utf8');
+        child.stderr.setEncoding('utf8');
+        child.stdout.on('data', (d) => { result += d; });
+        child.stderr.on('data', (d) => { errorLogs += d; });
+
+        await new Promise((res) => {
+          child.on('close', (code) => {
+            if (code === 0) {
+              try {
+                const lines = result.trim().split('\n');
+                const jsonLine = lines[lines.length - 1];
+                const jsonResult = JSON.parse(jsonLine);
+                results.push({
+                  original_path: imagePath,
+                  short_code: jsonResult.short_code || 'UNKNOWN',
+                  doc_type: jsonResult.doc_type || 'Unknown',
+                  confidence: jsonResult.confidence || 0,
+                  folder: folderPath,
+                  success: jsonResult.success || false
+                });
+              } catch (e) {
+                console.error('Parse error:', e);
+              }
+            }
+            res();
+          });
+        });
+      }
+
+      resolve({
+        success: true,
+        results: results
+      });
+    } catch (err) {
+      console.error('Scan single folder error:', err);
+      reject(err);
+    }
+  });
+});
+
 ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeSuffix, outputFolder) => {
   return new Promise(async (resolve, reject) => {
     const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));

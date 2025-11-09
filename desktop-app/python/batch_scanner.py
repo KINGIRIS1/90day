@@ -305,18 +305,44 @@ def copy_file_to_output(file_path: str, short_code: str, output_folder: str) -> 
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python batch_scanner.py <txt_path> <ocr_engine> [api_key] [output_option] [output_folder]", file=sys.stderr)
-        print("Example: python batch_scanner.py folders.txt tesseract none rename_in_place", file=sys.stderr)
+    try:
+        if len(sys.argv) < 3:
+            error_result = {
+                "success": False,
+                "error": "Invalid arguments. Usage: batch_scanner.py <txt_path> <ocr_engine> [api_key] [output_option] [output_folder]",
+                "total_folders": 0,
+                "total_files": 0,
+                "processed_files": 0,
+                "skipped_folders": [],
+                "errors": [],
+                "results": []
+            }
+            print(json.dumps(error_result, ensure_ascii=False))
+            sys.exit(1)
+        
+        txt_path = sys.argv[1]
+        ocr_engine = sys.argv[2]
+        api_key = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "none" else None
+        output_option = sys.argv[4] if len(sys.argv) > 4 else "rename_in_place"
+        output_folder = sys.argv[5] if len(sys.argv) > 5 else None
+        
+        result = process_batch_scan(txt_path, ocr_engine, api_key, output_option, output_folder)
+        
+        # Print JSON result to stdout
+        print(json.dumps(result, ensure_ascii=False))
+        sys.exit(0)
+        
+    except Exception as e:
+        # Catch any unhandled exceptions and return JSON error
+        error_result = {
+            "success": False,
+            "error": f"Unhandled exception: {str(e)}",
+            "total_folders": 0,
+            "total_files": 0,
+            "processed_files": 0,
+            "skipped_folders": [],
+            "errors": [{"file": "N/A", "error": str(e)}],
+            "results": []
+        }
+        print(json.dumps(error_result, ensure_ascii=False))
         sys.exit(1)
-    
-    txt_path = sys.argv[1]
-    ocr_engine = sys.argv[2]
-    api_key = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3] != "none" else None
-    output_option = sys.argv[4] if len(sys.argv) > 4 else "rename_in_place"
-    output_folder = sys.argv[5] if len(sys.argv) > 5 else None
-    
-    result = process_batch_scan(txt_path, ocr_engine, api_key, output_option, output_folder)
-    
-    # Print JSON result to stdout
-    print(json.dumps(result, ensure_ascii=False))

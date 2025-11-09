@@ -77,6 +77,13 @@ VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
    → Đây là continuation của document trước (có thể là TBT, HDCQ, etc.)
    → KHÔNG classify thành UNKNOWN
    → GOM VÀO document có trang trước đó
+   
+   VÍ DỤ CỤ THỂ:
+   Page 4 (index 4): "THÔNG BÁO THUẾ" (title) → TBT
+   Page 5 (index 5): "ĐIỀU 1: ..." → TBT continuation
+   Page 6 (index 6): "III. TÍNH THUẾ" + bảng 4.1 → TBT continuation ✅ (KHÔNG phải UNKNOWN)
+   
+   Result: {"type": "TBT", "pages": [4, 5, 6], ...}
 
 ✅ "ĐIỀU 2: NỘI DUNG THỎA THUẬN PHÂN CHIA"
    → Section header
@@ -87,10 +94,18 @@ VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
    → Continuation
    → GOM VÀO document trước
 
+✅ Trang có "1.1 Trường hợp...", "1.2 Trường hợp..." (numbered list)
+   → Continuation với structured content
+   → GOM VÀO document trước
+
 ❌ SAI - Classify continuation thành UNKNOWN:
-Trang có "III. TÍNH THUẾ" + bảng
-→ AI classify: UNKNOWN ❌
-→ ĐÚNG: Phải gom vào document trước (TBT hoặc HDCQ) ✅
+Page 5: "THÔNG BÁO THUẾ" (title)
+Page 6: "III. TÍNH THUẾ" + bảng
+→ AI classify:
+  {"type": "TBT", "pages": [5]},
+  {"type": "UNKNOWN", "pages": [6]}  ❌ SAI!
+→ ĐÚNG:
+  {"type": "TBT", "pages": [5, 6]}  ✅
 
 RANH GIỚI GIỮA CÁC TÀI LIỆU:
 - Thay đổi rõ rệt: màu giấy (hồng → trắng), format khác

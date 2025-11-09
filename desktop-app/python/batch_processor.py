@@ -647,7 +647,7 @@ if __name__ == "__main__":
     print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode", file=sys.stderr)
     
     if mode == 'fixed':
-        results = batch_classify_fixed(image_paths, api_key, batch_size=5)
+        results = batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=2)
     elif mode == 'smart':
         results = batch_classify_smart(image_paths, api_key)
     else:

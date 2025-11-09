@@ -33,6 +33,7 @@ function CloudSettings() {
         'google': 'google',
         'azure': 'azure',
         'gemini-flash': 'gemini-flash',
+        'gemini-flash-hybrid': 'gemini-flash-hybrid',
         'gemini-flash-lite': 'gemini-flash-lite'
       };
       

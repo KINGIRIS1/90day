@@ -272,7 +272,11 @@ function BatchScanner() {
           // Scan each file and display immediately
           const folderResults = [];
           for (let j = 0; j < validImages.length; j++) {
-            if (shouldStop) break;
+            // Check shouldStop at start of each iteration
+            if (shouldStop) {
+              console.log('⏹️ Stopping at file:', j + 1);
+              break;
+            }
 
             const imagePath = validImages[j];
             const fileName = imagePath.split(/[/\\]/).pop();

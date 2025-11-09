@@ -596,8 +596,8 @@ def group_by_document(quick_results, file_paths):
 
 def batch_classify_smart(image_paths, api_key):
     """
-    Phương án 2: Smart Batching - TRUE AI-POWERED
-    Gửi nhiều files (10-20) để AI tự detect document boundaries
+    Phương án 2: Smart Batching - TRUE AI-POWERED với OVERLAP
+    Gửi nhiều files (10-20) với overlap để AI có full context
     """
     print(f"\n{'='*80}", file=sys.stderr)
     print(f"🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
@@ -605,26 +605,31 @@ def batch_classify_smart(image_paths, api_key):
     
     total_files = len(image_paths)
     
-    # Smart batch size strategy
+    # Smart batch size strategy với overlap
     if total_files <= 20:
-        # Small batch: Send all at once
+        # Small batch: Send all at once, no overlap needed
         batch_size = total_files
+        overlap = 0
         print(f"📊 Strategy: Send ALL {total_files} files in 1 batch", file=sys.stderr)
     elif total_files <= 60:
-        # Medium batch: 15-20 files per batch
+        # Medium batch: 20 files per batch, 5 files overlap
         batch_size = 20
-        print(f"📊 Strategy: Send {batch_size} files per batch", file=sys.stderr)
+        overlap = 5
+        print(f"📊 Strategy: Send {batch_size} files per batch với {overlap} files overlap", file=sys.stderr)
     else:
-        # Large batch: 15 files per batch (more batches but still smart)
+        # Large batch: 15 files per batch, 4 files overlap
         batch_size = 15
-        print(f"📊 Strategy: Send {batch_size} files per batch (large dataset)", file=sys.stderr)
+        overlap = 4
+        print(f"📊 Strategy: Send {batch_size} files per batch với {overlap} files overlap (large dataset)", file=sys.stderr)
     
-    print(f"   Why? AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
-    print(f"   Fixed Batch (5 files) may cut documents in half ❌", file=sys.stderr)
-    print(f"   Smart Batch ({batch_size} files) sees full documents ✅", file=sys.stderr)
+    if overlap > 0:
+        print(f"   ↩️ Overlap purpose: Batch sau thấy {overlap} files cuối của batch trước", file=sys.stderr)
+        print(f"   Why? File 16 không có title → cần thấy file 14-15 để biết nó thuộc document nào", file=sys.stderr)
     
-    # Use fixed batch with smart size
-    return batch_classify_fixed(image_paths, api_key, batch_size=batch_size)
+    print(f"   AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
+    
+    # Use fixed batch with smart size + overlap
+    return batch_classify_fixed(image_paths, api_key, batch_size=batch_size, overlap=overlap)
 
 
 # CLI interface for testing

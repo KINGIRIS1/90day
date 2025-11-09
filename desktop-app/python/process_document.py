@@ -130,6 +130,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             scan_time = time.time() - start_time
             tier_used = result.get('tier_used', 'unknown')
             print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, tier: {tier_used}, time: {scan_time:.1f}s)", file=sys.stderr)
+            
+            method_used = "gemini_hybrid_two_tier"
 
         # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
         elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:

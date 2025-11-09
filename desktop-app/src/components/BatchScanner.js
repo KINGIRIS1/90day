@@ -544,7 +544,19 @@ function BatchScanner() {
         results: allResults
       };
 
+      // End batch timer
+      const batchEndTime = Date.now();
+      const batchElapsedMs = batchEndTime - batchStartTime;
+      const batchElapsedSeconds = Math.floor(batchElapsedMs / 1000);
+      
       console.log('✅ Batch scan complete:', result);
+      console.log(`⏱️ Total batch time: ${batchElapsedSeconds}s (${(batchElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+      
+      setTimers(prev => ({
+        ...prev,
+        batchEndTime: batchEndTime,
+        batchElapsedSeconds: batchElapsedSeconds
+      }));
 
       if (result.success) {
         setScanResults(result);

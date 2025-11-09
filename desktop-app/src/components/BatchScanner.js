@@ -641,18 +641,56 @@ function BatchScanner() {
       
       console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
       
-      // Step 3: Pair documents (trang 1 + trang 2)
-      const pairs = [];
-      for (let i = 0; i < allGcnDocs.length; i += 2) {
-        const page1 = allGcnDocs[i];
-        const page2 = allGcnDocs[i + 1];
-        
-        if (page1 && page2) {
-          pairs.push({ page1, page2, pairIndex: i / 2 });
-        } else if (page1) {
-          pairs.push({ page1, page2: null, pairIndex: i / 2 });
+      // Step 3: Group by color first, then pair within same color
+      console.log(`  🎨 Grouping GCN documents by color...`);
+      
+      const colorGroups = {
+        red: [],
+        pink: [],
+        unknown: []
+      };
+      
+      allGcnDocs.forEach(doc => {
+        if (doc.color === 'red' || doc.color === 'orange') {
+          colorGroups.red.push(doc);
+        } else if (doc.color === 'pink') {
+          colorGroups.pink.push(doc);
+        } else {
+          colorGroups.unknown.push(doc);
         }
-      }
+      });
+      
+      console.log(`  📊 Color groups: Red=${colorGroups.red.length}, Pink=${colorGroups.pink.length}, Unknown=${colorGroups.unknown.length}`);
+      
+      // Step 4: Pair within each color group
+      const pairs = [];
+      let pairIndex = 0;
+      
+      ['red', 'pink', 'unknown'].forEach(colorKey => {
+        const group = colorGroups[colorKey];
+        for (let i = 0; i < group.length; i += 2) {
+          const page1 = group[i];
+          const page2 = group[i + 1];
+          
+          if (page1 && page2) {
+            pairs.push({ 
+              page1, 
+              page2, 
+              pairIndex: pairIndex++,
+              colorGroup: colorKey 
+            });
+            console.log(`    ➡️ Pair ${pairIndex}: [${page1.fileName}] + [${page2.fileName}] (${colorKey})`);
+          } else if (page1) {
+            pairs.push({ 
+              page1, 
+              page2: null, 
+              pairIndex: pairIndex++,
+              colorGroup: colorKey 
+            });
+            console.log(`    ➡️ Pair ${pairIndex}: [${page1.fileName}] (single, ${colorKey})`);
+          }
+        }
+      });
       
       // Step 4: Extract color and dates
       const pairsWithData = pairs.map(pair => {

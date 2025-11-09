@@ -300,7 +300,7 @@ function BatchScanner() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Kết quả</h3>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{results.total_folders}</div>
               <div className="text-sm text-gray-600">Tổng thư mục</div>
@@ -313,11 +313,33 @@ function BatchScanner() {
               <div className="text-2xl font-bold text-purple-600">{results.processed_files}/{results.total_files}</div>
               <div className="text-sm text-gray-600">Files xử lý</div>
             </div>
+            <div className="bg-indigo-50 p-4 rounded-lg">
+              <div className="text-2xl font-bold text-indigo-600">{results.merged_pdfs_count || 0}</div>
+              <div className="text-sm text-gray-600">PDFs đã tạo</div>
+            </div>
             <div className="bg-red-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{results.error_count}</div>
               <div className="text-sm text-gray-600">Lỗi</div>
             </div>
           </div>
+
+          {/* Merged PDFs List */}
+          {results.merged_pdfs && results.merged_pdfs.length > 0 && (
+            <div className="mt-6">
+              <h4 className="font-semibold text-gray-900 mb-3">📚 PDFs đã tạo ({results.merged_pdfs.length})</h4>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {results.merged_pdfs.map((item, idx) => (
+                  <div key={idx} className="bg-indigo-50 border border-indigo-200 rounded p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-gray-900">{item.short_code}.pdf</div>
+                      <div className="text-xs text-indigo-700">{item.count} ảnh</div>
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">{item.path}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Skipped Folders */}
           {skippedFolders.length > 0 && (

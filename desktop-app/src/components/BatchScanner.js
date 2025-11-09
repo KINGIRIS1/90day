@@ -84,11 +84,13 @@ function BatchScanner() {
       console.log('📄 TXT file:', txtFilePath);
       console.log('🔧 OCR Engine:', ocrEngine);
       console.log('📤 Output Option:', outputOption);
+      console.log('📝 Merge Suffix:', mergeSuffix);
       console.log('📁 Output Folder:', outputFolder);
 
       const result = await window.electronAPI.processBatchScan(
         txtFilePath,
         outputOption,
+        mergeSuffix,
         outputFolder
       );
 

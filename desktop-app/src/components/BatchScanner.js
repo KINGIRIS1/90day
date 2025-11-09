@@ -274,7 +274,9 @@ function BatchScanner() {
         }
 
         const folder = selectedFolders[i];
+        const folderStartTime = Date.now();
         console.log(`\n📂 [${i + 1}/${selectedFolders.length}] Scanning: ${folder.path}`);
+        console.log(`⏱️ Folder timer started: ${new Date(folderStartTime).toLocaleTimeString()}`);
         
         setProgress(prev => ({
           ...prev,

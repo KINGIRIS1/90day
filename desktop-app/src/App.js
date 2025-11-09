@@ -185,6 +185,14 @@ function App() {
                 </div>
               ))}
               <button
+                onClick={() => setActiveTab('batch')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'batch' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                📋 Quét danh sách
+              </button>
+              <button
                 onClick={() => setActiveTab('rules')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'rules' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'

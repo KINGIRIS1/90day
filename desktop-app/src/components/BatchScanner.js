@@ -576,8 +576,11 @@ function BatchScanner() {
           allFilesToMerge = allFilesToMerge.concat(tab.files);
         });
       } else {
-        // Merge only current folder
-        allFilesToMerge = fileResults;
+        // Merge only current active folder
+        const currentTab = folderTabs.find(t => t.path === activeFolder);
+        if (currentTab) {
+          allFilesToMerge = currentTab.files;
+        }
       }
 
       const payload = allFilesToMerge

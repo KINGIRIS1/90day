@@ -465,9 +465,11 @@ DXTHT = Đơn xin (đề nghị) tách thửa đất, hợp thửa đất
   • Keywords: "tách thửa", "hợp thửa", "tách", "hợp"
   • ⚠️ Ưu tiên DXTHT nếu có từ "tách" hoặc "hợp" trong title
 DCK = Đơn cam kết, Giấy cam kết
-  • Title: "GIẤY CAM KẾT" hoặc "ĐƠN CAM KẾT"
+  • Title: "GIẤY CAM KẾT" hoặc "ĐƠN CAM KẾT" (PHẢI TOÀN BỘ IN HOA)
   • Variants: "GIẤY CAM KẾT\n(V/v chọn thửa đất...)", "ĐƠN CAM KẾT"
   • Keywords: "cam kết", "xin cam kết"
+  • ❌ REJECT: "Người lập văn bản cam kết" (không phải title chính, chỉ là mô tả người lập)
+  • ❌ REJECT: "Giấy cam kết" (chữ hoa đầu dòng, không phải in hoa toàn bộ)
 DXGCN = Đơn xin cấp giấy chứng nhận
 DXCMG = Đơn xin cấp lại giấy chứng nhận mất
 DXCHS = Đơn xin cấp lại giấy chứng nhận hỏng/sai

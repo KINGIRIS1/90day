@@ -833,6 +833,64 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     stopRef.current = false;
 
+    // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED
+    const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(currentOcrEngine);
+    const shouldUseBatch = (
+      !isResume && // Not resuming
+      isGeminiEngine && // Gemini engine
+      (batchMode === 'fixed' || batchMode === 'smart') && // Batch mode enabled
+      filesToProcess.length >= 3 // At least 3 files (batch makes sense)
+    );
+    
+    if (shouldUseBatch) {
+      console.log(`\n${'='*80}`);
+      console.log(`🚀 BATCH MODE DETECTED: Using batch processing for ${filesToProcess.length} files`);
+      console.log(`   Mode: ${batchMode}`);
+      console.log(`   Engine: ${currentOcrEngine}`);
+      console.log(`${'='*80}\n`);
+      
+      setProgress({ current: 0, total: filesToProcess.length });
+      
+      // Use batch processing
+      const batchResults = await handleProcessFilesBatch(filesToProcess, batchMode);
+      
+      if (batchResults && batchResults.length > 0) {
+        console.log(`✅ Batch processing returned ${batchResults.length} results`);
+        
+        // Post-process GCN documents
+        const finalResults = postProcessGCNBatch(batchResults);
+        
+        // Update results
+        setResults(finalResults);
+        setProgress({ current: finalResults.length, total: filesToProcess.length });
+        
+        // End timer
+        if (timers.scanStartTime) {
+          const scanEndTime = Date.now();
+          const scanElapsedMs = scanEndTime - timers.scanStartTime;
+          const scanElapsedSeconds = Math.floor(scanElapsedMs / 1000);
+          
+          console.log(`⏱️ Batch scan timer ended: ${new Date(scanEndTime).toLocaleTimeString()}`);
+          console.log(`⏱️ Total scan time: ${scanElapsedSeconds}s (${(scanElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+          console.log(`⚡ Average: ${(scanElapsedMs / filesToProcess.length / 1000).toFixed(2)}s per file`);
+          
+          setTimers(prev => ({
+            ...prev,
+            scanEndTime: scanEndTime,
+            scanElapsedSeconds: scanElapsedSeconds,
+            fileTimings: []
+          }));
+        }
+        
+        setProcessing(false);
+        return;
+      } else {
+        console.warn('⚠️ Batch processing failed or returned no results, falling back to sequential processing');
+        // Fall through to sequential processing
+      }
+    }
+
+    // SEQUENTIAL PROCESSING (Original logic)
     const newResults = isResume ? [...results] : [];
     let currentLastKnown = null;
 

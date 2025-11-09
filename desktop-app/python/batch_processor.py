@@ -462,24 +462,35 @@ def group_by_document(quick_results, file_paths):
 
 def batch_classify_smart(image_paths, api_key):
     """
-    Phương án 2: Smart Batching - IMPROVED
-    Gửi TẤT CẢ files trong 1 batch lớn, để Gemini tự nhóm documents
+    Phương án 2: Smart Batching - TRUE AI-POWERED
+    Gửi nhiều files (10-20) để AI tự detect document boundaries
     """
     print(f"\n{'='*80}", file=sys.stderr)
-    print(f"🧠 BATCH MODE 2: Smart Batching (AI-Powered Grouping)", file=sys.stderr)
+    print(f"🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
-    # Check batch size - if too large, use fixed batches
-    if len(image_paths) > 30:
-        print(f"⚠️ Too many files ({len(image_paths)}), using Fixed Batch mode (5 files) instead", file=sys.stderr)
-        return batch_classify_fixed(image_paths, api_key, batch_size=5)
+    total_files = len(image_paths)
     
-    # Smart batching: Send all files in ONE batch
-    print(f"\n📊 Smart Batching: Sending {len(image_paths)} files in 1 batch", file=sys.stderr)
-    print(f"   Let AI detect document boundaries and group pages automatically", file=sys.stderr)
+    # Smart batch size strategy
+    if total_files <= 20:
+        # Small batch: Send all at once
+        batch_size = total_files
+        print(f"📊 Strategy: Send ALL {total_files} files in 1 batch", file=sys.stderr)
+    elif total_files <= 60:
+        # Medium batch: 15-20 files per batch
+        batch_size = 20
+        print(f"📊 Strategy: Send {batch_size} files per batch", file=sys.stderr)
+    else:
+        # Large batch: 15 files per batch (more batches but still smart)
+        batch_size = 15
+        print(f"📊 Strategy: Send {batch_size} files per batch (large dataset)", file=sys.stderr)
     
-    # Use fixed batch with size = all files
-    return batch_classify_fixed(image_paths, api_key, batch_size=len(image_paths))
+    print(f"   Why? AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
+    print(f"   Fixed Batch (5 files) may cut documents in half ❌", file=sys.stderr)
+    print(f"   Smart Batch ({batch_size} files) sees full documents ✅", file=sys.stderr)
+    
+    # Use fixed batch with smart size
+    return batch_classify_fixed(image_paths, api_key, batch_size=batch_size)
 
 
 # CLI interface for testing

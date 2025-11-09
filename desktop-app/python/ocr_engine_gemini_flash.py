@@ -725,6 +725,14 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   → ❌ SAI! Phải là {short_code: "UNKNOWN"} vì không phải in hoa toàn bộ
   → Nếu là "GIẤY XÁC NHẬN" (toàn bộ in hoa) → GXN
 
+- Trang có "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG..." ở giữa trang (middle), chữ lớn
+  → ❌ SAI! Có section number "III." → Đây là section header, KHÔNG phải title chính
+  → Phải là {short_code: "UNKNOWN", reasoning: "Section header ở middle, not title"}
+  
+- Trang có "I. THÔNG TIN CHUNG" ở 30% từ top
+  → ❌ SAI! (1) Có section number "I.", (2) Không ở top 20%
+  → Phải là {short_code: "UNKNOWN"}
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!
 
 📋 VÍ DỤ RESPONSE FORMAT:

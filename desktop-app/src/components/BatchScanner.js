@@ -243,6 +243,19 @@ function BatchScanner() {
     setSkippedFolders([]);
     setFolderTabs([]);
     setActiveFolder(null);
+    
+    // Initialize timer
+    const batchStartTime = Date.now();
+    setTimers({
+      batchStartTime: batchStartTime,
+      batchEndTime: null,
+      batchElapsedSeconds: 0,
+      fileTimings: [],
+      folderTimings: []
+    });
+    setElapsedTime(0);
+    
+    console.log('⏱️ Batch timer started:', new Date(batchStartTime).toLocaleTimeString());
 
     try {
       console.log('🚀 Starting batch scan...');

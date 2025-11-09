@@ -493,6 +493,27 @@ function BatchScanner() {
     return Math.round(conf * 100);
   };
 
+  // Apply sequential naming logic (UNKNOWN fallback)
+  const applySequentialNaming = (result, lastType) => {
+    if (result.success && lastType) {
+      // Rule: UNKNOWN → always use lastKnown
+      if (result.short_code === 'UNKNOWN') {
+        console.log(`🔄 Sequential: UNKNOWN → ${lastType.short_code}`);
+        return {
+          ...result,
+          doc_type: lastType.doc_type,
+          short_code: lastType.short_code,
+          confidence: Math.max(0.75, lastType.confidence * 0.95),
+          original_confidence: result.confidence,
+          original_short_code: result.short_code,
+          applied_sequential_logic: true,
+          note: `📄 Trang tiếp theo của ${lastType.short_code} (không nhận dạng được)`
+        };
+      }
+    }
+    return result;
+  };
+
   // Get method badge - check OCR engine type
   const getMethodBadge = (method) => {
     // Check if using cloud OCR engines

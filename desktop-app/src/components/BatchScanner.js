@@ -671,12 +671,8 @@ function BatchScanner() {
             </div>
           </div>
 
-          {/* Merged PDFs List - Remove this section as merging is now manual */}
-          {scanResults.merged_pdfs && scanResults.merged_pdfs.length > 0 && (
-            <div className="mt-6">
-              <h4 className="font-semibold text-gray-900 mb-3">📚 PDFs đã tạo ({results.merged_pdfs.length})</h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {results.merged_pdfs.map((item, idx) => (
+          {/* Skipped folders and errors only */}
+          {skippedFolders.length > 0 && (
                   <div key={idx} className="bg-indigo-50 border border-indigo-200 rounded p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div className="font-medium text-gray-900">{item.short_code}.pdf</div>

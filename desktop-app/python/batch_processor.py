@@ -269,14 +269,14 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         print(f"\n{'='*80}", file=sys.stderr)
         print(f"⚡ BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash LITE", file=sys.stderr)
         print(f"   Model: {model_name}", file=sys.stderr)
-        print(f"   Prompt: Lite (simplified, 60% crop rules)", file=sys.stderr)
+        print("   Prompt: Lite (simplified, 60% crop rules)", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     elif engine_type == 'gemini-flash-hybrid':
         model_name = 'gemini-2.5-flash-lite'  # Start with Lite for hybrid
         prompt_getter = get_multi_image_prompt_lite
         print(f"\n{'='*80}", file=sys.stderr)
         print(f"🔄 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + HYBRID", file=sys.stderr)
-        print(f"   Strategy: Two-tier (Lite → Full if low confidence)", file=sys.stderr)
+        print("   Strategy: Two-tier (Lite → Full if low confidence)", file=sys.stderr)
         print(f"   Model (Tier 1): {model_name}", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     else:  # gemini-flash (default)
@@ -285,7 +285,7 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         print(f"\n{'='*80}", file=sys.stderr)
         print(f"🤖 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash FULL", file=sys.stderr)
         print(f"   Model: {model_name}", file=sys.stderr)
-        print(f"   Prompt: Full (complete 98-rule classification)", file=sys.stderr)
+        print("   Prompt: Full (complete 98-rule classification)", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     
     all_results = []

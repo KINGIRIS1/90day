@@ -1201,3 +1201,100 @@ agent_communication:
       - User test với file: "20240504-01700003.jpg"
       - Verify classification: Should be HDCQ, not DKTC
       - Monitor console logs: Should see "HỢP ĐỒNG CHUYỂN NHƯỢNG..." extracted
+
+  - agent: "main"
+    message: |
+      ✅ BATCH PROCESSING IMPLEMENTATION - PHASE 1 COMPLETE
+      
+      🎯 USER REQUEST:
+      - Implement Multi-Image Batch Analysis cho multi-page documents
+      - 2 modes: Fixed Batch Size (5 files) và Smart Batching (dynamic grouping)
+      - Áp dụng cho TẤT CẢ scan types: File Scan, Folder Scan, Batch Scan
+      - Mục tiêu: Giảm thời gian 3-9 lần, tiết kiệm 80-90% chi phí, tăng độ chính xác
+      
+      📦 IMPLEMENTATION COMPLETE:
+      
+      **1. Python Batch Processor** (/app/desktop-app/python/batch_processor.py):
+      - ✅ Fixed Batch Mode: Gom mỗi 5 files, gửi cùng lúc lên Gemini
+      - ✅ Smart Batch Mode: Quick scan → Group by document → Process by group
+      - ✅ Multi-image prompt: AI nhận diện document boundaries và phân loại context-aware
+      - ✅ GCN metadata extraction: issue_date, color từ nhiều trang
+      - ✅ Error handling: JSON parsing, API failures, fallback logic
+      - ✅ Imports fixed: Added `requests` and `re` to imports
+      
+      **2. Electron IPC** (/app/desktop-app/electron/main.js):
+      - ✅ Handler 'batch-process-documents' đã có sẵn (line 798-869)
+      - ✅ Spawn Python batch processor với correct args
+      - ✅ Parse JSON output from Python
+      - ✅ Return results to renderer
+      
+      **3. Preload Bridge** (/app/desktop-app/electron/preload.js):
+      - ✅ Added batchProcessDocuments() method
+      - ✅ Synced to public/preload.js
+      
+      **4. Cloud Settings UI** (/app/desktop-app/src/components/CloudSettings.js):
+      - ✅ Batch mode options UI already exists
+      - ✅ Updated to show for ALL Gemini engines (not just hybrid)
+      - ✅ 3 modes: Sequential (default), Fixed (5 files), Smart (intelligent grouping)
+      - ✅ Info box updated: Applies to Folder Scan & Batch Scan
+      - ✅ Load/save batchMode config
+      
+      **5. Desktop Scanner Integration** (/app/desktop-app/src/components/DesktopScanner.js):
+      - ✅ Added batchMode state (line 60)
+      - ✅ Load batchMode from config (line 115-119)
+      - ✅ New function: handleProcessFilesBatch() (line 712-785)
+      - ✅ Integrated into handleProcessFiles() (line 835-892)
+      - ✅ Smart detection logic:
+          * Check if Gemini engine
+          * Check if batch mode enabled (fixed or smart)
+          * Check if >= 3 files
+          * Check if not resume mode
+      - ✅ Automatic fallback to sequential if batch fails
+      - ✅ Post-process GCN batch after completion
+      - ✅ Timer tracking for batch scans
+      
+      🎯 HOW IT WORKS:
+      
+      **User Flow:**
+      1. Settings → Cloud OCR → Select Gemini engine
+      2. Choose batch mode: Sequential / Fixed (5 files) / Smart
+      3. Scan folder với nhiều files (≥ 3 files)
+      4. App automatically uses batch processing
+      5. Results hiển thị như bình thường
+      
+      **Fixed Batch Mode:**
+      - Gom mỗi 5 files vào 1 batch
+      - Gửi tất cả 5 images trong 1 API call
+      - AI nhìn thấy cả 5 images cùng lúc → hiểu context
+      - 5x faster, 80% cheaper
+      
+      **Smart Batch Mode:**
+      - Step 1: Quick scan tất cả (Flash Lite)
+      - Step 2: Detect document boundaries (confidence + reasoning)
+      - Step 3: Group files theo document
+      - Step 4: Send từng document group together
+      - Best accuracy (entire document analyzed together)
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/python/batch_processor.py (fixed imports, JSON parsing)
+      - ✅ /app/desktop-app/electron/preload.js (added batchProcessDocuments)
+      - ✅ /app/desktop-app/public/preload.js (synced)
+      - ✅ /app/desktop-app/src/components/CloudSettings.js (batch mode for all Gemini)
+      - ✅ /app/desktop-app/src/components/DesktopScanner.js (batch integration)
+      - ✅ /app/test_result.md (updated with implementation details)
+      
+      🧪 TESTING NEEDED:
+      - ⏳ Test Fixed Batch mode với 5-10 files
+      - ⏳ Test Smart Batch mode với mixed document types
+      - ⏳ Verify performance: Time saved, cost saved
+      - ⏳ Verify accuracy: Continuation pages correctly classified
+      - ⏳ Test GCN batch: issue_date extraction and GCNC/GCNM classification
+      - ⏳ Test fallback: If batch fails → sequential still works
+      
+      📌 NEXT STEPS:
+      1. Integrate batch processing vào BatchScanner.js
+      2. Test với real documents
+      3. Monitor performance improvements
+      
+      🎯 STATUS: ✅ Phase 1 Complete (DesktopScanner) | ⏳ Phase 2 Pending (BatchScanner)
+

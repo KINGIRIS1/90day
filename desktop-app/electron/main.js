@@ -360,10 +360,10 @@ ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, mergeS
         resolve({ success: false, error: 'Google Cloud Vision API key not configured. Please add it in Cloud OCR settings.' });
         return;
       }
-    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
       cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       if (!cloudApiKey) {
-        resolve({ success: false, error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.' });
+        resolve({ success: false, error: 'Google API key not configured for Gemini. Please add it in Cloud OCR settings.' });
         return;
       }
     }

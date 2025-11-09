@@ -43,6 +43,24 @@ def adapt_prompt_for_multi_image(single_image_prompt, batch_size):
 Bạn đang phân tích %d trang scan tài liệu đất đai Việt Nam.
 Các trang này có thể thuộc 1 hoặc nhiều tài liệu khác nhau.
 
+🚨 QUAN TRỌNG NHẤT - BATCH MODE vs SINGLE-FILE MODE:
+Trong BATCH MODE này, bạn KHÔNG phải single-file classifier!
+- ❌ ĐỪNG trả về "UNKNOWN" cho continuation pages
+- ✅ Bạn PHẢI tự GOM continuation pages vào document trước
+- ✅ Bạn có context từ nhiều pages → Hãy tận dụng!
+
+VÍ DỤ:
+Page 0: "THÔNG BÁO THUẾ" → Start TBT document
+Page 1: "ĐIỀU 1" → TBT continuation → ADD vào pages của TBT
+Page 2: "III. TÍNH THUẾ" + bảng → TBT continuation → ADD vào pages của TBT
+
+Result: {{"type": "TBT", "pages": [0,1,2]}} ✅
+
+KHÔNG LÀM (single-file style):
+Result: 
+  {{"type": "TBT", "pages": [0]}},
+  {{"type": "UNKNOWN", "pages": [1,2]}} ❌ SAI!
+
 NHIỆM VỤ:
 1. Xác định có BAO NHIÊU tài liệu khác nhau trong %d trang này
 2. Nhóm các trang theo tài liệu (pages array)

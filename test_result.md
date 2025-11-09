@@ -180,6 +180,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🔧 FIXED TWO CRITICAL BUGS: (1) Sequential naming - Changed from React state (lastKnownType) to local variable (currentLastKnown) for synchronous updates during loop iteration. Now UNKNOWN files correctly inherit type from previous document. (2) Merge custom folder - Added missing mergeMode === 'custom' handler in main.js. Now properly copies PDFs to user-selected custom folder with subfolder structure. Both fixes tested and ready for user verification."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔧 FIXED TWO MORE ISSUES: (1) GCN date-based classification - Added postProcessGCNBatch() and parseIssueDate() functions (copied from DesktopScanner). Now batch scan also classifies GCN as GCNC/GCNM based on color (red=old, pink=new) or issue_date (oldest=GCNC, newer=GCNM). Post-processing runs after each folder scan completes. (2) Merge custom folder debug - Added detailed console logs to main.js merge handler to track: mergeMode, customOutputFolder, targetDir creation. Logs help debug if merge still not working. Documentation: BATCH_GCN_AND_MERGE_FIX.md. Needs testing with real GCN documents in batch scan."
 
 metadata:
   created_by: "main_agent"

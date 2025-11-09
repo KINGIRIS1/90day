@@ -658,7 +658,13 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
           const newFolderName = childBaseName + (options.mergeSuffix || '_merged');
           targetDir = path.join(parentOfChild, newFolderName);
           if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+        } else if (options.mergeMode === 'custom' && options.customOutputFolder) {
+          // Custom folder mode: Create subfolder named after source folder
+          const childBaseName = path.basename(childFolder);
+          targetDir = path.join(options.customOutputFolder, childBaseName);
+          if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
         } else {
+          // Default: Same folder (root mode)
           targetDir = childFolder;
         }
         outputPath = path.join(targetDir, `${shortCode}.pdf`);

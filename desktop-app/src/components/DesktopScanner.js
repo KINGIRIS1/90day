@@ -710,8 +710,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   // Batch processing using Python batch_processor.py
   const handleProcessFilesBatch = async (filesToProcess, mode) => {
+    const modeNames = {
+      'fixed': '📦 Gom Cố Định 5 Files',
+      'smart': '🧠 Gom Thông Minh'
+    };
+    
     console.log(`\n${'='*80}`);
-    console.log(`🚀 BATCH PROCESSING START: mode=${mode}, files=${filesToProcess.length}`);
+    console.log(`🚀 BATCH PROCESSING START`);
+    console.log(`   Mode: ${modeNames[mode] || mode}`);
+    console.log(`   Files: ${filesToProcess.length}`);
+    console.log(`   Engine: ${currentOcrEngine}`);
     console.log(`${'='*80}`);
     
     if (!window.electronAPI) {

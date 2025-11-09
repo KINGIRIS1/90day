@@ -899,7 +899,10 @@ function BatchScanner() {
       {fileResults.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">📁 Files trong thư mục ({fileResults.length})</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              📁 Files trong thư mục ({fileResults.length})
+              {isScanning && <span className="ml-2 text-sm text-blue-600 animate-pulse">⚙️ Đang quét...</span>}
+            </h2>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-600">Mật độ:</label>

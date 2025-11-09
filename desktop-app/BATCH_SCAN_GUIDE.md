@@ -22,32 +22,36 @@ E:\Scan\ThangĐÈN
 
 ## 🔧 Các chế độ Output
 
-### 1️⃣ Đổi tên tại chỗ (Rename in Place)
-- File được đổi tên **ngay trong thư mục gốc**
-- Format: `SHORT_CODE_filename.jpg`
-- Ví dụ: `image001.jpg` → `HDCQ_image001.jpg`
+### 1️⃣ Lưu trong thư mục gốc (Same Folder)
+- **Merge ảnh cùng loại** thành 1 file PDF
+- Lưu PDF **ngay trong thư mục gốc**
+- Ví dụ: `C:\Scan\Folder1\` → `C:\Scan\Folder1\HDCQ.pdf`, `C:\Scan\Folder1\GCNM.pdf`
 
 **Khi nào dùng:**
-- Bạn muốn giữ file ở vị trí hiện tại
-- Chỉ cần thêm prefix phân loại
+- Bạn muốn giữ PDF ở vị trí hiện tại
+- Không muốn tạo thêm thư mục
 
-### 2️⃣ Copy theo loại tài liệu (Copy by Type)
-- Copy file vào thư mục đích
-- Tự động **tạo subfolder cho mỗi loại** tài liệu
-- Cấu trúc: `OutputFolder/HDCQ/`, `OutputFolder/GCNM/`, ...
-
-**Khi nào dùng:**
-- Bạn muốn **tổ chức lại** toàn bộ hồ sơ theo loại
-- Cần tách riêng từng loại tài liệu
-
-### 3️⃣ Copy tất cả vào 1 thư mục (Copy All)
-- Copy tất cả file vào **1 thư mục duy nhất**
-- File được đổi tên với prefix: `SHORT_CODE_filename.jpg`
-- Không tạo subfolder
+### 2️⃣ Lưu trong thư mục mới có suffix (New Folder)
+- **Merge ảnh cùng loại** thành 1 file PDF
+- Tạo thư mục mới **bên cạnh thư mục gốc** với suffix tùy chọn
+- Ví dụ: `C:\Scan\Folder1\` → `C:\Scan\Folder1_merged\HDCQ.pdf`, `C:\Scan\Folder1_merged\GCNM.pdf`
 
 **Khi nào dùng:**
-- Bạn muốn tập trung tất cả file đã scan vào 1 nơi
-- Cần backup/archive đơn giản
+- Bạn muốn **tổ chức riêng** file PDF
+- Giữ nguyên thư mục gốc (không thay đổi)
+- Tùy chọn suffix: `_merged`, `_output`, `_pdf`, etc.
+
+### 3️⃣ Lưu trong thư mục chỉ định (Custom Folder)
+- **Merge ảnh cùng loại** thành 1 file PDF
+- Lưu trong **thư mục chỉ định**, tổ chức theo tên thư mục gốc
+- Ví dụ: Output = `D:\Results\`
+  - `C:\Scan\Folder1\` → `D:\Results\Folder1\HDCQ.pdf`, `D:\Results\Folder1\GCNM.pdf`
+  - `C:\Scan\Folder2\` → `D:\Results\Folder2\HDCQ.pdf`, `D:\Results\Folder2\GCNM.pdf`
+
+**Khi nào dùng:**
+- Bạn muốn **tập trung** tất cả kết quả vào 1 nơi
+- Tổ chức theo cấu trúc rõ ràng
+- Backup/archive toàn bộ batch
 
 ## 📝 Hướng dẫn từng bước
 

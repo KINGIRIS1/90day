@@ -1349,9 +1349,21 @@ function BatchScanner() {
       {/* Scanning Status - REMOVED, show in tabs instead */}
       {false && isScanning && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="font-medium text-blue-900">Đang xử lý batch scan...</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="font-medium text-blue-900">Đang xử lý batch scan...</span>
+            </div>
+            {/* Live Timer */}
+            <div className="flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-lg">
+              <span className="text-2xl">⏱️</span>
+              <div className="text-right">
+                <div className="text-xs text-blue-600 font-medium">Thời gian đã quét</div>
+                <div className="text-lg font-bold text-blue-900">
+                  {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Folder Progress */}

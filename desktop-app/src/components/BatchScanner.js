@@ -192,14 +192,15 @@ function BatchScanner() {
       return;
     }
 
-    setIsProcessing(true);
+    setIsScanning(true);
+    setShouldStop(false);
     setProgress({ 
       currentFolder: '',
       currentFile: '',
       processedFiles: 0,
       totalFiles: 0,
       processedFolders: 0,
-      totalFolders: 0
+      totalFolders: selectedFolders.length
     });
     setScanResults(null);
     setFileResults([]);
@@ -210,16 +211,85 @@ function BatchScanner() {
 
     try {
       console.log('🚀 Starting batch scan...');
-      console.log('📄 TXT file:', txtFilePath);
+      console.log('📁 Selected folders:', selectedFolders.length);
       console.log('🔧 OCR Engine:', ocrEngine);
 
-      // Just scan files, don't merge yet (merge will be done manually via modal)
-      const result = await window.electronAPI.processBatchScan(
-        txtFilePath,
-        'scan_only', // Special mode: only scan, no merge
-        '_merged',
-        null
-      );
+      // Scan each folder one by one (allows stopping)
+      const allResults = [];
+      const allErrors = [];
+      const processedFolderPaths = [];
+
+      for (let i = 0; i < selectedFolders.length; i++) {
+        if (shouldStop) {
+          console.log('⏸️ Scan stopped by user');
+          break;
+        }
+
+        const folder = selectedFolders[i];
+        console.log(`\n📂 [${i + 1}/${selectedFolders.length}] Scanning: ${folder.path}`);
+        
+        setProgress(prev => ({
+          ...prev,
+          processedFolders: i + 1,
+          currentFolder: folder.path
+        }));
+
+        // Update folder tab status to 'scanning'
+        setFolderTabs(prev => {
+          const existing = prev.find(t => t.path === folder.path);
+          if (existing) {
+            return prev.map(t => t.path === folder.path ? { ...t, status: 'scanning' } : t);
+          } else {
+            return [...prev, {
+              path: folder.path,
+              name: folder.name,
+              count: folder.imageCount,
+              status: 'scanning',
+              files: []
+            }];
+          }
+        });
+
+        try {
+          // Scan this folder
+          const folderResult = await window.electronAPI.scanSingleFolder(folder.path, ocrEngine);
+          
+          if (folderResult.success) {
+            allResults.push(...(folderResult.results || []));
+            processedFolderPaths.push(folder.path);
+
+            // Update folder tab to 'done'
+            setFolderTabs(prev => prev.map(t => 
+              t.path === folder.path ? { ...t, status: 'done' } : t
+            ));
+          } else {
+            allErrors.push({
+              folder: folder.path,
+              error: folderResult.error || 'Unknown error'
+            });
+          }
+        } catch (err) {
+          console.error(`Error scanning ${folder.path}:`, err);
+          allErrors.push({
+            folder: folder.path,
+            error: err.message
+          });
+        }
+      }
+
+      // Aggregate results
+      const result = {
+        success: true,
+        total_folders: selectedFolders.length,
+        valid_folders: processedFolderPaths.length,
+        skipped_folders_count: allErrors.length,
+        total_files: allResults.length,
+        processed_files: allResults.length,
+        error_count: allErrors.length,
+        skipped_folders: allErrors,
+        errors: allErrors,
+        results: allResults
+      };
 
       console.log('✅ Batch scan result:', result);
 

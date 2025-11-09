@@ -292,9 +292,20 @@ function BatchScanner() {
               console.log(`  [${j + 1}/${validImages.length}] Processing: ${fileName}`);
               
               // Scan single file
-              const fileResult = await window.electronAPI.processDocumentOffline(imagePath);
+              let fileResult = await window.electronAPI.processDocumentOffline(imagePath);
+              
+              // Apply sequential naming if UNKNOWN
+              fileResult = applySequentialNaming(fileResult, lastKnownType);
               
               if (fileResult.success) {
+                // Update lastKnownType if not UNKNOWN
+                if (fileResult.short_code !== 'UNKNOWN') {
+                  setLastKnownType({
+                    short_code: fileResult.short_code,
+                    doc_type: fileResult.doc_type,
+                    confidence: fileResult.confidence
+                  });
+                }
                 // Load preview
                 let previewUrl = null;
                 try {

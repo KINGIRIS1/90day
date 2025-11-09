@@ -536,30 +536,59 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                                 else:
                                     print(f"   ✅ All {total_pages_in_batch} pages accounted for", file=sys.stderr)
                                 
-                                # Map results back to original file paths
-                                # ONLY process NEW files (skip overlap files)
+                                # Map results back to original file paths WITH sequential naming
+                                batch_results_with_sequential = []
+                                
                                 for doc in batch_result.get('documents', []):
+                                    doc_type = doc.get('type', 'UNKNOWN')
+                                    doc_confidence = doc.get('confidence', 0.5)
+                                    doc_reasoning = doc.get('reasoning', '')
+                                    doc_metadata = doc.get('metadata', {})
+                                    
                                     for page_idx in doc.get('pages', []):
-                                        # Check if this is a NEW file (not overlap)
-                                        if page_idx >= new_file_start_idx and page_idx < len(batch_paths):
+                                        if page_idx < len(batch_paths):
                                             file_path = batch_paths[page_idx]
+                                            file_name = os.path.basename(file_path)
                                             
-                                            # Skip if already processed (from previous batch)
-                                            if file_path in processed_files:
-                                                print(f"   ⏭️ Skipping duplicate: {os.path.basename(file_path)}", file=sys.stderr)
-                                                continue
+                                            # Determine if this file has title (high confidence, not UNKNOWN)
+                                            has_title = (doc_confidence >= 0.8 and doc_type != 'UNKNOWN')
                                             
-                                            processed_files.add(file_path)  # Track this file
-                                            all_results.append({
+                                            # Apply sequential naming logic
+                                            final_type = doc_type
+                                            final_confidence = doc_confidence
+                                            applied_sequential = False
+                                            
+                                            # If file is UNKNOWN or low confidence AND we have lastKnown
+                                            if (doc_type == 'UNKNOWN' or doc_confidence < 0.5) and current_last_known:
+                                                final_type = current_last_known['short_code']
+                                                final_confidence = current_last_known['confidence']
+                                                applied_sequential = True
+                                                print(f"   🔄 Sequential: {file_name} ({doc_type} {doc_confidence:.0%}) → {final_type}", file=sys.stderr)
+                                            
+                                            # Update lastKnown if this file has good classification
+                                            if doc_type != 'UNKNOWN' and doc_confidence >= 0.7 and has_title:
+                                                current_last_known = {
+                                                    'short_code': doc_type,
+                                                    'confidence': doc_confidence,
+                                                    'has_title': True
+                                                }
+                                                print(f"   📌 Updated lastKnown: {doc_type} ({doc_confidence:.0%})", file=sys.stderr)
+                                            
+                                            processed_files.add(file_path)
+                                            batch_results_with_sequential.append({
                                                 'file_path': file_path,
-                                                'file_name': os.path.basename(file_path),
-                                                'short_code': doc.get('type', 'UNKNOWN'),
-                                                'confidence': doc.get('confidence', 0.5),
-                                                'reasoning': doc.get('reasoning', ''),
-                                                'metadata': doc.get('metadata', {}),
+                                                'file_name': file_name,
+                                                'short_code': final_type,
+                                                'confidence': final_confidence,
+                                                'reasoning': doc_reasoning,
+                                                'metadata': doc_metadata,
                                                 'method': 'batch_fixed',
-                                                'batch_num': batch_num
+                                                'batch_num': batch_num,
+                                                'applied_sequential': applied_sequential,
+                                                'original_classification': doc_type if applied_sequential else None
                                             })
+                                
+                                all_results.extend(batch_results_with_sequential)
                             except json.JSONDecodeError as je:
                                 print(f"⚠️ JSON decode error in batch {batch_num}: {je}", file=sys.stderr)
                                 print(f"   Response text: {response_text[:500]}...", file=sys.stderr)

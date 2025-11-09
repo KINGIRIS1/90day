@@ -17,7 +17,7 @@ from PIL import Image
 
 class ReviewTester:
     def __init__(self):
-        self.base_url = "https://vietdoc-scanner-2.preview.emergentagent.com/api"
+        self.base_url = "https://landoc-scanner-1.preview.emergentagent.com/api"
         self.admin_token = None
         
     def test_llm_health(self):

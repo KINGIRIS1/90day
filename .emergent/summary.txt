@@ -1,88 +1,135 @@
 <analysis>
-The previous AI engineer's work focused on two main areas: refining the OCR document classification and implementing a Batch Scan from List feature. Initially, the engineer successfully addressed several classification inaccuracies by updating Python scripts and prompts. A one-click installer task led to new build scripts and documentation.
+The AI engineer's work primarily revolved around implementing the Batch Scan from List feature, which proved to be a complex and iterative process. Initially, the feature faced significant issues with Electron's IPC and caching mechanisms, leading to a complete reversion of the first attempt. The engineer then re-planned and rebuilt the feature in five distinct stages, focusing on Python backend logic, Electron IPC, and React UI.
 
-The significant challenge arose during the Batch Scan feature implementation. Despite multiple attempts to integrate new IPC handlers and expose APIs in Electron's  and , the app consistently failed to recognize the new APIs, often due to persistent caching, incorrect file paths, port conflicts, and  issues. This involved extensive debugging, clean-up, and rebuilding attempts across both Linux (server) and Windows (desktop app) environments. Ultimately, the feature implementation was fully reverted, and new, simplified approaches were proposed to the user, highlighting the deep-seated challenges encountered with Electron's IPC and build system in this context.
+Despite successfully implementing the core batch scanning functionality, including PDF merging and basic progress tracking, the development was characterized by a continuous feedback loop with the user to refine UI/UX and address numerous bugs. Key challenges included:
+1.  **IPC and Subprocess Communication:** Resolving I/O operation on closed file by switching  to a subprocess call.
+2.  **UI/UX Alignment:** Iteratively adjusting the  component to match the  in terms of progress display, folder tabs, merge options, and image previews, often requiring significant refactoring.
+3.  **State Management:** Debugging issues related to asynchronous state updates, particularly for sequential naming logic ().
+
+The trajectory ends with the AI identifying the root cause of the persistent UNKNOWN naming issue (due to  not updating synchronously) and outlining a plan to fix it. Several UI/UX refinements requested by the user are still outstanding, indicating the feature is not yet fully stable or complete.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, designed for accurate classification, renaming, and batch processing using Google's Gemini Flash AI.
-**Key requirements addressed/intended:**
-*   **One-click installer:** Develop an automated build process for a single-executable installer (partially implemented with scripts and docs).
-*   **Document Classification:** Correctly classify various Vietnamese land document types, including HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT (HDTG) as HDCQ, Bản vẽ đồ đạc/bản đồ địa chính (BVDS) as HSKT, ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT as DXTHT, and VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG (DDK) as PCTSVC.
-*   **Performance:** Optimize Gemini prompts for cost (Flash Lite) and accuracy.
-*   **UI/UX:** Modify the rescan folder warning message.
-*   **Rate Limit Management:** Provide guidance on Delay giữa các request.
-*   **Batch Scan from List:** Implement a feature to scan documents from a list of predefined folder paths provided via CSV/Excel, processing only image files (JPG, JPEG, PNG), without scanning sub-folders. The output should offer three options: rename in place, copy by document type, or copy all to a user-selected folder. Invalid paths should be skipped with logging.
+The application's core purpose is to be a desktop OCR scanner for Vietnamese land documents.
+**General Requirements:**
+*   **One-click installer:** Automated build process for a single-executable installer.
+*   **Document Classification:** Accurate classification of Vietnamese land document types (e.g., HDTG as HDCQ, BVDS as HSKT, DXTHT, DDK as PCTSVC).
+*   **Performance:** Optimized Gemini prompts for cost (Flash Lite) and accuracy.
+*   **UI/UX:** Customizable rescan folder warning message.
+*   **Rate Limit Management:** Guidance for Delay giữa các request.
+
+**Batch Scan from List Feature Requirements (Primary focus of trajectory):**
+*   **Input:** Read a TXT file where each line is a path to a folder (not sub-folders).
+*   **Processing:** Scan only image files (JPG, JPEG, PNG) within specified folders; skip non-existent folders or those without image files; no sub-folder scanning.
+*   **Output Options (3 types):**
+    1.  Rename files in place.
+    2.  Copy files by document type to a new sub-folder within the original folder, with a user-defined suffix.
+    3.  Copy all new PDF files (created from merging images) to a user-selected custom folder, organizing them into sub-folders named after the original source folders.
+*   **PDF Merging:** Merge images of the same type within a folder into a single PDF, similar to the Desktop Scan functionality.
+*   **UI/UX:**
+    *   A Batch Scan tab in the application.
+    *   Progress bar and detailed error logging for scanning.
+    *   A clearer 2-step flow: 1) Load folders from TXT (display discovered folders with file counts), then 2) Start Scan.
+    *   A Stop button to halt the scanning process.
+    *   Display scan results (files and their classifications) dynamically in a grid view with image previews.
+    *   Horizontal folder tabs, similar to Desktop Scan, each showing its respective files and including a Merge button.
+    *   A Merge All Tabs button.
+    *   Zoom functionality for scanned images.
+    *   Accurate display of OCR engine used (Cloud/Offline).
+*   **Naming Convention:** Implement sequential naming for UNKNOWN classified documents, reverting to the  from a previous document in the sequence.
 </product_requirements>
 
 <key_technical_concepts>
-- **Electron**: Desktop app framework.
-- **React**: Frontend UI.
-- **Python**: Backend for OCR and AI, batch processing.
-- **Gemini Flash API**: Google's AI for document OCR/classification (Flash & Flash Lite).
-- **Prompt Engineering**: LLM input refinement.
-- **NSIS**: Nullsoft Scriptable Install System for Windows installers.
-- **IPC (Inter-Process Communication)**: Electron's method for main/renderer process communication.
+-   **Electron**: Framework for building desktop applications.
+-   **React**: JavaScript library for building the frontend UI.
+-   **Python**: Used for backend OCR processing and AI classification.
+-   **Gemini Flash API**: Google's AI models (Flash & Flash Lite) for document OCR/classification.
+-   **IPC (Inter-Process Communication)**: Electron's method for communication between main and renderer processes.
+-   **Subprocess Module**: Python's way to run external commands/scripts (used to call  from ).
+-   **PyPDF**: Python library for PDF creation and manipulation.
+-   **Prompt Engineering**: Refining LLM inputs for better accuracy.
 </key_technical_concepts>
 
 <code_architecture>
-The application has a , , and  structure.
+The application features a tripartite structure: , , and . The recent development work primarily focuses on the  for the Batch Scan feature.
 
 
 
--   ****:
-    -   **Summary**: Defines project metadata, dependencies, and build scripts.
-    -   **Changes**: Initially removed , and  script modified for Linux compatibility. All batch scan related dependencies were removed upon reversion.
--   ****:
-    -   **Summary**: Core Python script for Gemini OCR and classification, containing prompts for Flash and Flash Lite.
-    -   **Changes**: Prompts updated for HDTG as HDCQ, BVDS as HSKT, DXTHT distinction, and VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG as PCTSVC. The AI also analyzed its rules for HDCQ classification and identified a rule violation related to title position.
--   ****:
-    -   **Summary**: Orchestrates document processing, calls OCR engine.
-    -   **Changes**: Added  mapping:  to  and  to .
--   ****:
-    -   **Summary**: Defines document classification rules.
-    -   **Changes**: Added , , ,  to  with specific titles/variants.
--   ****:
-    -   **Summary**: Handles scanning, displays results.
-    -   **Changes**: Modified rescan warning message.
--   ****:
-    -   **Summary**: Electron's main process, sets up browser window, handles IPC.
-    -   **Changes**: Initially added IPC handlers for batch scanning (e.g., , ), debug logging for preload path, then reverted to its original state.
--   ****:
-    -   **Summary**: Exposes Node.js APIs to the renderer process safely.
-    -   **Changes**: Initially added  and  to , then reverted to its original state.
--   ****:
-    -   **Summary**: Main React component, handles navigation and routing.
-    -   **Changes**: Initially added a new tab for Batch Scan and its rendering logic, then reverted.
--   ****: (, , , , , , , , )
-    -   **Summary**: New files generated to automate and document the one-click installer build process.
--   ****: (, , )
-    -   **Summary**: Files created for a hybrid prompt attempt, which was later discarded due to real-world inaccuracies.
--   ****: (, , , , , and many other temporary fix/debug/doc files)
-    -   **Summary**: A suite of new Python, React, and documentation files were created to implement the Batch Scan from List feature. These included a Python backend for file processing, a React component for the UI (with progress, pause/resume), and Electron IPC for communication. **All these files were subsequently deleted or reverted** due to persistent technical issues with Electron's caching and API loading mechanisms.
+-   ** (NEW)**
+    -   **Summary**: The core Python script for handling batch scanning logic. It reads folder paths from a TXT file, scans images within them, orchestrates calls to  (as a subprocess), emits progress, and manages PDF merging based on user-selected output options.
+    -   **Changes**: Initially created with basic processing, then heavily refactored to:
+        *   Call  as a subprocess to avoid UTF-8 I/O conflicts.
+        *   Implement PDF merging logic () and output options (rename, copy by type, copy to custom folder).
+        *   Add robust error handling and progress emission ().
+        *   Support comment lines in input TXT files.
+        *   Introduce a  mode for initial folder validation.
+-   ** (MODIFIED)**
+    -   **Summary**: Electron's main process, responsible for creating the browser window and handling IPC communications between the renderer process (React app) and Node.js/Python backend.
+    -   **Changes**:
+        *   Added IPC handlers:  (to open file dialog),  (initially, then updated/re-purposed),  (to check input paths),  (for iterative scanning), and  (to relay Python progress to renderer).
+        *   Fixed  to correctly return an array.
+        *   Increased timeout for  to 5 minutes.
+-   ** (MODIFIED)**
+    -   **Summary**: Safely exposes specific Node.js APIs to the renderer process, respecting .
+    -   **Changes**: Exposed new APIs for the Batch Scan feature: , , , , and an  listener.
+-   ** (NEW)**
+    -   **Summary**: The main React component for the Batch Scan feature. It provides the UI for selecting the input TXT file, viewing discovered folders, starting/stopping scans, choosing output options, displaying realtime progress, and showing scanned results with image previews, per-folder tabs, and merge functionalities.
+    -   **Changes**: Created from scratch, then extensively refactored multiple times to:
+        *   Implement a 2-step UI flow (Load folders, then Scan).
+        *   Integrate with new IPC APIs for file selection, folder validation, and scanning.
+        *   Display realtime progress (folder and file level) via event listeners.
+        *   Manage state for discovered folders, scan results, progress, and UI elements.
+        *   Implement horizontal folder tabs (mimicking ) to display results per folder.
+        *   Add buttons for Merge This Folder and Merge All Tabs.
+        *   Add an image zoom modal and fix method badges ( vs. ).
+        *   Implement  logic for UNKNOWN classifications and manage .
+        *   Fix numerous UI state-related bugs ( renamed to ,  to ).
+        *   Refactor the merge modal to correctly handle output options (rename, copy by type, custom folder).
+        *   Implement a  using  for reliable scan stopping.
+-   ** (MODIFIED)**
+    -   **Summary**: The main React application component, handling routing and global layout.
+    -   **Changes**: Added a new navigation tab for 📋 Quét danh sách (Batch Scan) and its corresponding rendering logic.
+-   ** (MODIFIED)**
+    -   **Summary**: Lists Python dependencies for the desktop application.
+    -   **Changes**: Added  to enable PDF merging functionality.
+-   ** (NEW)**
+    -   **Summary**: Documentation for using the new Batch Scan feature.
+-   ** (NEW)**
+    -   **Summary**: A temporary document instructing the user on how to force a reload to clear potential Electron cache issues during debugging.
 </code_architecture>
 
 <pending_tasks>
-- Implement full logic for the all-in-one installer.
-- Fine-tune remaining document types in  and .
-- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
-- Migrate or pin React/Webpack versions.
-- Update icon for macOS (.icns).
-- Implement license/activation key feature.
-- Implement Parallel Local Processing for batch scanning.
-- Handle deep path length issues in the application.
-- Implement Batch Scan from List feature (reverted and needs new approach).
-- Address the slow startup of the app.
-- Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
-- Implement a code patch for robust cache pathing and single-instance lock in .
+-   Implement full logic for the all-in-one installer.
+-   Fine-tune remaining document types in  and .
+-   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+-   Migrate or pin React/Webpack versions.
+-   Update icon for macOS (.icns).
+-   Implement license/activation key feature.
+-   Implement Parallel Local Processing for batch scanning.
+-   Handle deep path length issues in the application.
+-   Address the slow startup of the app.
+-   Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
+-   Implement a code patch for robust cache pathing and single-instance lock in .
+-   Fix sequential naming logic in  (using local variable for ).
+-   Ensure the stop button is fully functional and responsive across all stages of scanning.
+-   Verify that merge options, particularly custom folder, are working correctly in the Batch Scan feature.
+-   Further refine the display of scanned files according to user feedback (tabbed display, zoom, naming).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer had concluded an extensive and ultimately unsuccessful attempt to implement the Batch Scan from List feature. The initial implementation involved creating new Python scripts (), a React component (), and Electron IPC handlers (, ). However, the feature faced critical and persistent issues, primarily with Electron's  not correctly loading or exposing the new  API, leading to numerous debugging cycles focused on cache clearing, file path verification, build processes, port conflicts, and Electron's  security features. Despite many troubleshooting steps and workarounds, the issue persisted.
+Immediately before this summary request, the AI engineer was deep into debugging the Batch Scan from List feature. The user reported multiple persistent issues: the stop button not working, the folder tabs not displaying correctly (horizontally), the merge functionality (especially to a custom folder) not behaving as expected, and the sequential naming rule still defaulting to UNKNOWN for many files.
 
-Following the user's explicit request to xóa hết phần liên quan đến quét danh sách và làm lại từ đầu (delete everything related to batch scanning and start over), the AI engineer meticulously reverted all code changes and deleted all new files related to the Batch Scan from List feature. The codebase is now in a state prior to this feature's development. The AI engineer has just proposed three new approaches for reimplementing the Batch Scan from List feature, ranging from using only existing APIs to a CSV-based drag & drop solution without needing new IPC, and is awaiting the user's selection.
+The AI engineer's most recent action was to analyze console logs for the sequential naming issue. It identified that  in  was always receiving . The root cause was determined to be the asynchronous nature of  when attempting to update state in a rapid loop, causing the next iteration to read an outdated or  value.
+
+The current state of the Batch Scan feature is:
+*   The overall UI has been significantly refactored to align with  for progress, folder tabs, image previews, and merge options, but some aspects are still problematic.
+*   The core scanning and PDF merging logic are in place.
+*   Realtime progress reporting (folder and file level) is implemented.
+*   An image zoom feature and correct OCR engine badge display are added.
+*   The  mechanism using  has been integrated for the stop button, but its full effectiveness needs re-verification.
+*   The  for sequential naming is not functioning as intended due to a state update race condition.
 </current_work>
 
 <optional_next_step>
-Wait for the user to select one of the proposed new approaches for the Batch Scan from List feature.
+Fix the sequential naming logic in  by using a local variable for  during file iteration to ensure synchronous updates.
 </optional_next_step>

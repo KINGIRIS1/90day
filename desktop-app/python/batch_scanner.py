@@ -21,6 +21,57 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 import subprocess
 
+try:
+    from pypdf import PdfWriter, PdfReader
+    from PIL import Image
+    HAS_PDF = True
+except ImportError:
+    HAS_PDF = False
+    print("⚠️  Warning: pypdf or PIL not found. PDF merging disabled.")
+
+def merge_images_to_pdf(image_paths: list, output_path: str) -> bool:
+    """
+    Merge multiple images into a single PDF file
+    """
+    if not HAS_PDF:
+        print("❌ Cannot merge to PDF: pypdf or PIL not installed")
+        return False
+    
+    try:
+        pdf_writer = PdfWriter()
+        
+        for img_path in image_paths:
+            # Convert image to PDF page
+            img = Image.open(img_path)
+            
+            # Convert to RGB if necessary
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Save to temp PDF
+            temp_pdf = img_path + '.temp.pdf'
+            img.save(temp_pdf, 'PDF', resolution=100.0)
+            
+            # Add to writer
+            pdf_reader = PdfReader(temp_pdf)
+            for page in pdf_reader.pages:
+                pdf_writer.add_page(page)
+            
+            # Clean up temp
+            try:
+                os.remove(temp_pdf)
+            except:
+                pass
+        
+        # Write final PDF
+        with open(output_path, 'wb') as f:
+            pdf_writer.write(f)
+        
+        return True
+    except Exception as e:
+        print(f"❌ Failed to merge PDF: {e}")
+        return False
+
 def process_document(file_path: str, ocr_engine: str, api_key: str = None) -> dict:
     """
     Call process_document.py as subprocess to avoid stdio conflicts

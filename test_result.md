@@ -113,6 +113,18 @@ backend:
       - working: "needs_testing"
         agent: "main"
         comment: "🔧 FIXED HDCQ vs HDUQ DISTINCTION: User reported Gemini reading 'HỢP ĐỒNG ỦY QUYỀN' correctly but classifying as HDCQ (wrong). Updated prompt with: (1) Clear distinction between HDCQ (chuyển nhượng - transfer ownership) and HDUQ (ủy quyền - power of attorney), (2) Explicit examples for both types, (3) Strong warning about difference. Now Gemini should correctly classify 'HỢP ĐỒNG ỦY QUYỀN' as HDUQ. Expected accuracy improvement: 60% → 95% for HDUQ. Needs testing with real HDUQ documents."
+  
+  - task: "Two-Tier Hybrid OCR Classification"
+    implemented: true
+    working: "needs_testing"
+    file: "/app/desktop-app/python/ocr_engine_gemini_flash_hybrid.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ IMPLEMENTED Two-Tier Hybrid OCR as optional setting. Strategy: Tier 1 (Flash Lite 60% crop) for easy docs, escalate to Tier 2 (Flash Full 100% image) if confidence < 80% or complex doc (GCN). New engine: ocr_engine_gemini_flash_hybrid.py. Updated process_document.py to support 'gemini-flash-hybrid' engine type. Updated CloudSettings.js with new option '🔄 Gemini Hybrid (Two-Tier)' with badge '⭐ CÂN BẰNG TỐI ƯU'. Expected cost: ~$0.15/1K (50-70% cheaper than Flash Full for easy docs). Expected accuracy: 92-96% (balance cost/accuracy). Needs testing: Tier 1 acceptance, Tier 2 escalation, cost savings, console logs."
 
 frontend:
   - task: "Desktop App - Electron + React"

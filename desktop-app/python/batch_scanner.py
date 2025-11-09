@@ -19,15 +19,68 @@ os.environ['FLAGS_use_mkldnn'] = '0'
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Import process_document function
-try:
-    from process_document import process_document
-except ImportError as e:
-    # If import fails, create a dummy function that returns error
-    def process_document(file_path, ocr_engine, api_key=None, endpoint=None):
+import subprocess
+
+def process_document(file_path: str, ocr_engine: str, api_key: str = None) -> dict:
+    """
+    Call process_document.py as subprocess to avoid stdio conflicts
+    """
+    try:
+        script_dir = os.path.dirname(__file__)
+        script_path = os.path.join(script_dir, 'process_document.py')
+        
+        # Build command
+        cmd = [sys.executable, script_path, file_path, ocr_engine]
+        if api_key:
+            cmd.append(api_key)
+        
+        # Run subprocess
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            timeout=60,
+            cwd=script_dir
+        )
+        
+        if result.returncode == 0:
+            # Parse JSON from last line
+            lines = result.stdout.strip().split('\n')
+            for line in reversed(lines):
+                line = line.strip()
+                if line.startswith('{'):
+                    return json.loads(line)
+            
+            # No JSON found
+            return {
+                "success": False,
+                "error": "No JSON output from process_document.py",
+                "short_code": "UNKNOWN",
+                "doc_type": "Unknown",
+                "confidence": 0
+            }
+        else:
+            # Error
+            return {
+                "success": False,
+                "error": f"process_document.py failed: {result.stderr[:200]}",
+                "short_code": "UNKNOWN",
+                "doc_type": "Unknown",
+                "confidence": 0
+            }
+    except subprocess.TimeoutExpired:
         return {
             "success": False,
-            "error": f"Failed to import process_document: {str(e)}",
+            "error": "process_document.py timeout (60s)",
+            "short_code": "UNKNOWN",
+            "doc_type": "Unknown",
+            "confidence": 0
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Failed to call process_document.py: {str(e)}",
             "short_code": "UNKNOWN",
             "doc_type": "Unknown",
             "confidence": 0

@@ -1781,8 +1781,67 @@ function BatchScanner() {
             </div>
           </div>
 
+          {/* Performance Stats */}
+          {timers.fileTimings.length > 0 && (
+            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg p-4 mt-4">
+              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-xl">⏱️</span>
+                <span>Thống kê hiệu năng - {ocrEngine === 'gemini-flash-hybrid' ? '🔄 Gemini Hybrid' : ocrEngine === 'gemini-flash' ? '🤖 Gemini Flash' : ocrEngine === 'gemini-flash-lite' ? '⚡ Gemini Flash Lite' : ocrEngine}</span>
+              </h4>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-white p-3 rounded border border-orange-200">
+                  <div className="text-xs text-gray-600 mb-1">Tổng thời gian</div>
+                  <div className="text-lg font-bold text-orange-600">
+                    {Math.floor(timers.batchElapsedSeconds / 60)}:{String(timers.batchElapsedSeconds % 60).padStart(2, '0')}
+                  </div>
+                </div>
+                
+                <div className="bg-white p-3 rounded border border-orange-200">
+                  <div className="text-xs text-gray-600 mb-1">TB mỗi file</div>
+                  <div className="text-lg font-bold text-blue-600">
+                    {timers.fileTimings.length > 0 
+                      ? (timers.fileTimings.reduce((sum, f) => sum + f.durationMs, 0) / timers.fileTimings.length / 1000).toFixed(2) 
+                      : '0.00'}s
+                  </div>
+                </div>
+                
+                <div className="bg-white p-3 rounded border border-orange-200">
+                  <div className="text-xs text-gray-600 mb-1">Nhanh nhất</div>
+                  <div className="text-lg font-bold text-green-600">
+                    {timers.fileTimings.length > 0 
+                      ? (Math.min(...timers.fileTimings.map(f => f.durationMs)) / 1000).toFixed(2) 
+                      : '0.00'}s
+                  </div>
+                </div>
+                
+                <div className="bg-white p-3 rounded border border-orange-200">
+                  <div className="text-xs text-gray-600 mb-1">Chậm nhất</div>
+                  <div className="text-lg font-bold text-red-600">
+                    {timers.fileTimings.length > 0 
+                      ? (Math.max(...timers.fileTimings.map(f => f.durationMs)) / 1000).toFixed(2) 
+                      : '0.00'}s
+                  </div>
+                </div>
+              </div>
+              
+              {/* Speed Rating */}
+              {timers.fileTimings.length > 0 && (
+                <div className="mt-3 text-xs text-gray-700">
+                  📊 Tốc độ: {(() => {
+                    const avgTime = timers.fileTimings.reduce((sum, f) => sum + f.durationMs, 0) / timers.fileTimings.length / 1000;
+                    if (avgTime < 2) return '🚀 Rất nhanh (< 2s/file)';
+                    if (avgTime < 5) return '⚡ Nhanh (2-5s/file)';
+                    if (avgTime < 10) return '✅ Trung bình (5-10s/file)';
+                    return '🐢 Chậm (> 10s/file)';
+                  })()}
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Note about merging */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
             <div className="flex items-center gap-2 text-blue-900">
               <span className="text-xl">💡</span>
               <span className="font-medium">Gộp PDF từ các file đã quét bằng nút "📚 Gộp PDF" ở trên</span>

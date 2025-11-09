@@ -885,6 +885,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         }
         
         setProcessing(false);
+        setActiveBatchMode(null); // Reset batch mode indicator
         return;
       } else {
         console.warn('⚠️ Batch processing failed or returned no results, falling back to sequential processing');

@@ -46,7 +46,7 @@ def read_txt_file(txt_path: str) -> list:
         folders = [line.strip() for line in lines if line.strip()]
         return folders
     except Exception as e:
-        print(f"❌ Error reading TXT file: {e}", file=sys.stderr)
+        print(f"❌ Error reading TXT file: {e}")
         return []
 
 
@@ -116,7 +116,7 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
             "results": []
         }
     
-    print(f"📁 Found {len(folders)} folder(s) in TXT file", file=sys.stderr)
+    print(f"📁 Found {len(folders)} folder(s) in TXT file")
     
     # Validate output folder if needed
     if output_option in ["copy_by_type", "copy_all"]:
@@ -156,12 +156,12 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
     
     # Process each folder
     for idx, folder_path in enumerate(folders):
-        print(f"\n📂 [{idx + 1}/{len(folders)}] Processing: {folder_path}", file=sys.stderr)
+        print(f"\n📂 [{idx + 1}/{len(folders)}] Processing: {folder_path}")
         
         # Validate folder
         validation = validate_folder(folder_path)
         if not validation["valid"]:
-            print(f"⚠️  Skipped: {validation['error']}", file=sys.stderr)
+            print(f"⚠️  Skipped: {validation['error']}")
             skipped_folders.append({
                 "folder": folder_path,
                 "reason": validation["error"]
@@ -170,19 +170,19 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
         
         image_files = validation["image_files"]
         total_files += len(image_files)
-        print(f"🖼️  Found {len(image_files)} image file(s)", file=sys.stderr)
+        print(f"🖼️  Found {len(image_files)} image file(s)")
         
         # Process each image
         for file_idx, image_path in enumerate(image_files):
             try:
-                print(f"   [{file_idx + 1}/{len(image_files)}] Processing: {os.path.basename(image_path)}", file=sys.stderr)
+                print(f"   [{file_idx + 1}/{len(image_files)}] Processing: {os.path.basename(image_path)}")
                 
                 # Call process_document
                 result = process_document(image_path, ocr_engine, api_key)
                 
                 if not result.get("success", False):
                     error_msg = result.get("error", "Unknown error")
-                    print(f"   ❌ Error: {error_msg}", file=sys.stderr)
+                    print(f"   ❌ Error: {error_msg}")
                     errors.append({
                         "file": image_path,
                         "error": error_msg
@@ -194,7 +194,7 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                 doc_type = result.get("doc_type", "Unknown")
                 confidence = result.get("confidence", 0)
                 
-                print(f"   ✅ {short_code} ({doc_type}) - Confidence: {confidence:.0%}", file=sys.stderr)
+                print(f"   ✅ {short_code} ({doc_type}) - Confidence: {confidence:.0%}")
                 
                 # Handle output based on option
                 new_path = None
@@ -221,19 +221,19 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                 })
                 
             except Exception as e:
-                print(f"   ❌ Exception: {str(e)}", file=sys.stderr)
+                print(f"   ❌ Exception: {str(e)}")
                 errors.append({
                     "file": image_path,
                     "error": str(e)
                 })
     
     # Summary
-    print(f"\n✅ Batch scan complete!", file=sys.stderr)
-    print(f"📊 Total folders: {len(folders)}", file=sys.stderr)
-    print(f"📊 Skipped folders: {len(skipped_folders)}", file=sys.stderr)
-    print(f"📊 Total files: {total_files}", file=sys.stderr)
-    print(f"📊 Processed files: {processed_files}", file=sys.stderr)
-    print(f"📊 Errors: {len(errors)}", file=sys.stderr)
+    print(f"\n✅ Batch scan complete!")
+    print(f"📊 Total folders: {len(folders)}")
+    print(f"📊 Skipped folders: {len(skipped_folders)}")
+    print(f"📊 Total files: {total_files}")
+    print(f"📊 Processed files: {processed_files}")
+    print(f"📊 Errors: {len(errors)}")
     
     return {
         "success": True,

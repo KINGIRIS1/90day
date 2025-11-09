@@ -37,13 +37,14 @@ def adapt_prompt_for_multi_image(single_image_prompt, batch_size):
     5. Emphasize MUST return ALL pages
     """
     
-    multi_image_intro = f"""🎯 BATCH ANALYSIS - {batch_size} TRANG SCAN
+    # Use % formatting to avoid f-string issues with JSON examples
+    multi_image_intro = """🎯 BATCH ANALYSIS - %d TRANG SCAN
 
-Bạn đang phân tích {batch_size} trang scan tài liệu đất đai Việt Nam.
+Bạn đang phân tích %d trang scan tài liệu đất đai Việt Nam.
 Các trang này có thể thuộc 1 hoặc nhiều tài liệu khác nhau.
 
 NHIỆM VỤ:
-1. Xác định có BAO NHIÊU tài liệu khác nhau trong {batch_size} trang này
+1. Xác định có BAO NHIÊU tài liệu khác nhau trong %d trang này
 2. Nhóm các trang theo tài liệu (pages array)
 3. Phân loại loại tài liệu của từng nhóm
 4. Trích xuất metadata (ngày cấp cho GCN, màu sắc, v.v.)
@@ -51,7 +52,7 @@ NHIỆM VỤ:
 DẤU HIỆU NHẬN BIẾT:
 
 TRANG 1 CỦA TÀI LIỆU (New Document):
-- Có TIÊU ĐỀ CHÍNH ở TOP 30% (đầu trang)
+- Có TIÊU ĐỀ CHÍNH ở TOP 30%% (đầu trang)
 - Cỡ chữ LỚN, IN HOA, căn giữa
 - Có quốc huy (đối với GCN)
 - Khác biệt rõ về format/màu sắc so với trang trước
@@ -102,19 +103,19 @@ VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
 Page 5: "THÔNG BÁO THUẾ" (title)
 Page 6: "III. TÍNH THUẾ" + bảng
 → AI classify:
-  {"type": "TBT", "pages": [5]},
-  {"type": "UNKNOWN", "pages": [6]}  ❌ SAI!
+  {{"type": "TBT", "pages": [5]}},
+  {{"type": "UNKNOWN", "pages": [6]}}  ❌ SAI!
 → ĐÚNG:
-  {"type": "TBT", "pages": [5, 6]}  ✅
+  {{"type": "TBT", "pages": [5, 6]}}  ✅
 
 RANH GIỚI GIỮA CÁC TÀI LIỆU:
-- Thay đổi rõ rệt: màu giấy (hồng → trắng), format khác
+- Thay đổi rõ rệt: màu giấy (hồng → trắng), format (có quốc huy → không có)
 - Xuất hiện tiêu đề chính mới ở TOP
-- Layout hoàn toàn khác
+- Thay đổi hoàn toàn về layout
 
 ---
 
-"""
+""" % (batch_size, batch_size, batch_size)
 
     unknown_rules = """
 

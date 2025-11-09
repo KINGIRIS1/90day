@@ -110,6 +110,9 @@ backend:
       - working: "needs_testing"
         agent: "main"
         comment: "Updated Gemini prompts (both lite and full) to extract issue_date from GCN documents. Supports handwriting recognition with flexible formats: full (DD/MM/YYYY), partial (MM/YYYY), year_only (YYYY), not_found. Returns issue_date and issue_date_confidence in JSON response. Needs testing with real handwritten dates."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔧 FIXED HDCQ vs HDUQ DISTINCTION: User reported Gemini reading 'HỢP ĐỒNG ỦY QUYỀN' correctly but classifying as HDCQ (wrong). Updated prompt with: (1) Clear distinction between HDCQ (chuyển nhượng - transfer ownership) and HDUQ (ủy quyền - power of attorney), (2) Explicit examples for both types, (3) Strong warning about difference. Now Gemini should correctly classify 'HỢP ĐỒNG ỦY QUYỀN' as HDUQ. Expected accuracy improvement: 60% → 95% for HDUQ. Needs testing with real HDUQ documents."
 
 frontend:
   - task: "Desktop App - Electron + React"

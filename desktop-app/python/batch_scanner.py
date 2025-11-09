@@ -332,8 +332,8 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                     "error": str(e)
                 })
         
-        # Merge images to PDF by short_code
-        if folder_groups:
+        # Merge images to PDF by short_code (skip if scan_only mode)
+        if folder_groups and output_option != 'scan_only':
             print(f"\n📚 Merging images to PDF for folder: {os.path.basename(folder_path)}")
             
             # Determine output directory

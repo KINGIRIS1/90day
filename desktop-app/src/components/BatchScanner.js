@@ -983,17 +983,32 @@ function BatchScanner() {
                   Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span>
                 </div>
 
-                {/* Inline Editor */}
-                <div className="mt-2 p-2 bg-gray-50 border rounded">
-                  <InlineShortCodeEditor 
-                    value={result.short_code} 
-                    onChange={(newCode) => {
-                      setFileResults(prev => prev.map((r, i) => 
-                        i === idx ? { ...r, short_code: newCode } : r
-                      ));
-                    }} 
-                  />
-                </div>
+                    {/* Inline Editor */}
+                    <div className="mt-2 p-2 bg-gray-50 border rounded">
+                      <InlineShortCodeEditor 
+                        value={result.short_code} 
+                        onChange={(newCode) => {
+                          setFolderTabs(prev => prev.map(t => {
+                            if (t.path !== tab.path) return t;
+                            const newFiles = [...t.files];
+                            newFiles[idx] = { ...newFiles[idx], short_code: newCode };
+                            return { ...t, files: newFiles };
+                          }));
+                        }} 
+                      />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-2 flex gap-2">
+                      {result.previewUrl && (
+                        <button
+                          onClick={() => setSelectedPreview(result.previewUrl)}
+                          className="flex-1 text-xs text-blue-600 hover:bg-blue-50 py-1 px-2 rounded border border-blue-200"
+                        >
+                          🔍 Phóng to
+                        </button>
+                      )}
+                    </div>
 
                 {/* Folder Info */}
                 <div className="mt-2 text-xs text-gray-500 truncate" title={result.folder}>

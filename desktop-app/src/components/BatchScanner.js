@@ -10,9 +10,13 @@ function BatchScanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [currentFolder, setCurrentFolder] = useState('');
-  const [results, setResults] = useState(null);
+  const [scanResults, setScanResults] = useState(null); // Scan statistics
+  const [fileResults, setFileResults] = useState([]); // Individual file results with preview
   const [errors, setErrors] = useState([]);
   const [skippedFolders, setSkippedFolders] = useState([]);
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [mergeInProgress, setMergeInProgress] = useState(false);
+  const [density, setDensity] = useState('medium');
 
   // Load OCR engine from config on mount
   useEffect(() => {

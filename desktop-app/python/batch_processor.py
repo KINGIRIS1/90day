@@ -258,7 +258,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
         }
         
         # Call Gemini API
-        print(f"📡 Sending batch request to Gemini Flash...", file=sys.stderr)
+        print("📡 Sending batch request to Gemini Flash...", file=sys.stderr)
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
         
         try:
@@ -275,8 +275,8 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
                 print(f"🔍 Finish reason: {finish_reason}", file=sys.stderr)
                 
                 if finish_reason == 'MAX_TOKENS':
-                    print(f"⚠️ WARNING: Response truncated due to MAX_TOKENS!", file=sys.stderr)
-                    print(f"   Some pages may be missing from response", file=sys.stderr)
+                    print("⚠️ WARNING: Response truncated due to MAX_TOKENS!", file=sys.stderr)
+                    print("   Some pages may be missing from response", file=sys.stderr)
             
             # Parse response
             if 'candidates' in result_data and len(result_data['candidates']) > 0:
@@ -329,7 +329,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
                                 
                                 if missing_pages:
                                     print(f"   ⚠️ WARNING: AI didn't return {len(missing_pages)} pages: {sorted(missing_pages)}", file=sys.stderr)
-                                    print(f"      These files will be processed by fallback", file=sys.stderr)
+                                    print("      These files will be processed by fallback", file=sys.stderr)
                                 else:
                                     print(f"   ✅ All {total_pages_in_batch} pages accounted for", file=sys.stderr)
                                 
@@ -382,7 +382,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
         print(f"⚠️ WARNING: {len(missing_files)} files were NOT processed by AI:", file=sys.stderr)
         for missing_file in sorted(missing_files):
             print(f"   ❌ {os.path.basename(missing_file)}", file=sys.stderr)
-        print(f"   Possible causes: AI didn't return page indices, JSON parsing error", file=sys.stderr)
+        print("   Possible causes: AI didn't return page indices, JSON parsing error", file=sys.stderr)
         print(f"\n🔄 FALLBACK: Processing {len(missing_files)} missing files individually...", file=sys.stderr)
         
         # Fallback: Process missing files with single-file tier1 scan
@@ -449,7 +449,7 @@ def group_by_document(quick_results, file_paths):
     Nhóm files thành documents dựa trên quick scan results
     Returns: List of document groups [[0,1,2], [3,4], [5,6,7,8], ...]
     """
-    print(f"\n🧠 Analyzing document boundaries...", file=sys.stderr)
+    print("\n🧠 Analyzing document boundaries...", file=sys.stderr)
     
     groups = []
     current_group = [0]
@@ -505,7 +505,7 @@ def batch_classify_smart(image_paths, api_key):
     Gửi nhiều files (10-20) với overlap để AI có full context
     """
     print(f"\n{'='*80}", file=sys.stderr)
-    print(f"🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
+    print("🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
     total_files = len(image_paths)
@@ -529,9 +529,9 @@ def batch_classify_smart(image_paths, api_key):
     
     if overlap > 0:
         print(f"   ↩️ Overlap purpose: Batch sau thấy {overlap} files cuối của batch trước", file=sys.stderr)
-        print(f"   Why? File 16 không có title → cần thấy file 14-15 để biết nó thuộc document nào", file=sys.stderr)
+        print("   Why? File 16 không có title → cần thấy file 14-15 để biết nó thuộc document nào", file=sys.stderr)
     
-    print(f"   AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
+    print("   AI needs 10-20 files to detect document boundaries accurately", file=sys.stderr)
     
     # Use fixed batch with smart size + overlap
     return batch_classify_fixed(image_paths, api_key, batch_size=batch_size, overlap=overlap)

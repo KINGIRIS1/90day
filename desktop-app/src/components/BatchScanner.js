@@ -764,10 +764,10 @@ function BatchScanner() {
                 Hủy
               </button>
               <button
-                onClick={executeMerge}
+                onClick={() => executeMerge(isMergeAll)}
                 className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
               >
-                Bắt đầu gộp
+                {isMergeAll ? 'Gộp tất cả thư mục' : 'Gộp thư mục hiện tại'}
               </button>
             </div>
           </div>

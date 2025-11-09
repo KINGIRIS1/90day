@@ -895,8 +895,8 @@ function BatchScanner() {
         </div>
       )}
 
-      {/* File Results Grid (like DesktopScanner) */}
-      {fileResults.length > 0 && !isScanning && (
+      {/* File Results Grid (like DesktopScanner) - Show during and after scanning */}
+      {fileResults.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">📁 Files trong thư mục ({fileResults.length})</h2>

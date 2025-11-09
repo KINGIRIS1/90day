@@ -330,104 +330,20 @@ function BatchScanner() {
           </p>
         </div>
 
-        {/* Output Option Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            3️⃣ Chọn chế độ output
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-              <input
-                type="radio"
-                name="outputOption"
-                value="same_folder"
-                checked={outputOption === 'same_folder'}
-                onChange={(e) => setOutputOption(e.target.value)}
-                disabled={isProcessing}
-                className="text-blue-600"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Lưu trong thư mục gốc</div>
-                <div className="text-xs text-gray-500">Merge ảnh cùng loại thành PDF, lưu trong thư mục gốc (HDCQ.pdf, GCNM.pdf)</div>
+        {/* Note about merging */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💡</span>
+            <div>
+              <div className="font-semibold text-blue-900 mb-1">Về tính năng gộp PDF</div>
+              <div className="text-sm text-blue-800">
+                Sau khi quét, bạn sẽ thấy danh sách tất cả file đã quét. 
+                Sử dụng nút <strong>"📚 Gộp PDF"</strong> để merge các ảnh cùng loại thành file PDF 
+                và chọn nơi lưu (thư mục gốc, thư mục mới, hoặc thư mục tùy chọn).
               </div>
-            </label>
-
-            <label className="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-              <input
-                type="radio"
-                name="outputOption"
-                value="new_folder"
-                checked={outputOption === 'new_folder'}
-                onChange={(e) => setOutputOption(e.target.value)}
-                disabled={isProcessing}
-                className="text-blue-600"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Lưu trong thư mục mới (có suffix)</div>
-                <div className="text-xs text-gray-500">Tạo thư mục mới bên cạnh với suffix, merge PDF vào đó (Folder1_merged/HDCQ.pdf)</div>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-              <input
-                type="radio"
-                name="outputOption"
-                value="custom_folder"
-                checked={outputOption === 'custom_folder'}
-                onChange={(e) => setOutputOption(e.target.value)}
-                disabled={isProcessing}
-                className="text-blue-600"
-              />
-              <div>
-                <div className="font-medium text-gray-900">Lưu trong thư mục chỉ định</div>
-                <div className="text-xs text-gray-500">Merge PDF, lưu trong thư mục chỉ định, tổ chức theo tên thư mục gốc (Output/Folder1/HDCQ.pdf)</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Merge Suffix Input (only for new_folder mode) */}
-        {outputOption === 'new_folder' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              4️⃣ Nhập suffix cho thư mục mới
-            </label>
-            <input
-              type="text"
-              value={mergeSuffix}
-              onChange={(e) => setMergeSuffix(e.target.value)}
-              disabled={isProcessing}
-              placeholder="Ví dụ: _merged, _output, _pdf"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Ví dụ: Folder1 → Folder1{mergeSuffix}
-            </p>
-          </div>
-        )}
-
-        {/* Output Folder Selection (only for custom_folder mode) */}
-        {outputOption === 'custom_folder' && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              5️⃣ Chọn thư mục đích
-            </label>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleSelectOutputFolder}
-                disabled={isProcessing}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-              >
-                📁 Chọn thư mục đích
-              </button>
-              {outputFolder && (
-                <span className="text-sm text-gray-600" title={outputFolder}>
-                  ✅ {getFileName(outputFolder)}
-                </span>
-              )}
             </div>
           </div>
-        )}
+        </div>
 
         {/* Start Button */}
         <div className="pt-4 border-t">

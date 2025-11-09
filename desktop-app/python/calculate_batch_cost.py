@@ -119,12 +119,36 @@ def main():
     print(f"\n" + "=" * 80)
     print(f"📊 SUMMARY COMPARISON - 100 FILES")
     print(f"=" * 80)
+    
     print(f"\n{'Mode':<25} {'Batches':<10} {'Files Sent':<12} {'Overhead':<12} {'Cost':<12} {'vs Seq':<10}")
     print(f"{'-'*80}")
-    print(f"{'Sequential':<25} {'100':<10} {f'{total_files}':<12} {'0%':<12} {'$' + f'{seq_cost:.4f}':<11} {'baseline':<10}")
-    print(f"{'Fixed (5, overlap 2)':<25} {f'{fixed_result["num_batches"]}':<10} {f'{fixed_result["total_files_sent"]}':<12} {f'+{fixed_result["overhead_percent"]:.0f}%':<12} {'$' + f'{fixed_result["cost"]:.4f}':<11} {f'{((fixed_result["cost"] - seq_cost) / seq_cost * 100):+.0f}%':<10}")
-    print(f"{'Smart (15, overlap 4)':<25} {f'{smart_result["num_batches"]}':<10} {f'{smart_result["total_files_sent"]}':<12} {f'+{smart_result["overhead_percent"]:.0f}%':<12} {'$' + f'{smart_result["cost"]:.4f}':<11} {f'{((smart_result["cost"] - seq_cost) / seq_cost * 100):+.0f}%':<10}")
-    print(f"{'Smart (20, overlap 5)':<25} {f'{smart20_result["num_batches"]}':<10} {f'{smart20_result["total_files_sent"]}':<12} {f'+{smart20_result["overhead_percent"]:.0f}%':<12} {'$' + f'{smart20_result["cost"]:.4f}':<11} {f'{((smart20_result["cost"] - seq_cost) / seq_cost * 100):+.0f}%':<10}")
+    
+    # Sequential
+    print(f"Sequential               100        {total_files:<12} 0%           ${seq_cost:.4f}      baseline")
+    
+    # Fixed
+    fixed_batches = fixed_result['num_batches']
+    fixed_sent = fixed_result['total_files_sent']
+    fixed_overhead = fixed_result['overhead_percent']
+    fixed_cost = fixed_result['cost']
+    fixed_vs_seq = ((fixed_cost - seq_cost) / seq_cost * 100)
+    print(f"Fixed (5, overlap 2)     {fixed_batches:<10} {fixed_sent:<12} +{fixed_overhead:.0f}%          ${fixed_cost:.4f}      {fixed_vs_seq:+.0f}%")
+    
+    # Smart 15
+    smart_batches = smart_result['num_batches']
+    smart_sent = smart_result['total_files_sent']
+    smart_overhead = smart_result['overhead_percent']
+    smart_cost = smart_result['cost']
+    smart_vs_seq = ((smart_cost - seq_cost) / seq_cost * 100)
+    print(f"Smart (15, overlap 4)    {smart_batches:<10} {smart_sent:<12} +{smart_overhead:.0f}%          ${smart_cost:.4f}      {smart_vs_seq:+.0f}%")
+    
+    # Smart 20
+    smart20_batches = smart20_result['num_batches']
+    smart20_sent = smart20_result['total_files_sent']
+    smart20_overhead = smart20_result['overhead_percent']
+    smart20_cost = smart20_result['cost']
+    smart20_vs_seq = ((smart20_cost - seq_cost) / seq_cost * 100)
+    print(f"Smart (20, overlap 5)    {smart20_batches:<10} {smart20_sent:<12} +{smart20_overhead:.0f}%          ${smart20_cost:.4f}      {smart20_vs_seq:+.0f}%")
     
     # Time Comparison (estimated)
     print(f"\n" + "=" * 80)

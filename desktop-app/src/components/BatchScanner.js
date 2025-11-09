@@ -470,14 +470,14 @@ function BatchScanner() {
       alert(`❌ Lỗi xử lý: ${err.message}`);
     } finally {
       setIsScanning(false);
-      setShouldStop(false);
+      stopRef.current = false;
     }
   };
 
   // Stop scanning
   const handleStopScan = () => {
-    setShouldStop(true);
-    alert('⏸️ Đang dừng quét... Vui lòng đợi thư mục hiện tại hoàn tất.');
+    stopRef.current = true;
+    alert('⏸️ Đang dừng quét... Vui lòng đợi file hiện tại hoàn tất.');
   };
 
   // Toggle folder selection

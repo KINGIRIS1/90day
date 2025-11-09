@@ -759,9 +759,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
       
       const file = filesToProcess[i];
+      const fileStartTime = Date.now();
       setProgress({ current: i + 1, total: filesToProcess.length });
+      
+      console.log(`  ⏱️ File timer started: ${file.name}`);
 
       let result = await processOffline(file);
+      const fileEndTime = Date.now();
+      const fileDurationMs = fileEndTime - fileStartTime;
+      
+      console.log(`  ✅ File completed in ${(fileDurationMs / 1000).toFixed(2)}s`);
       
       // 🔧 ADD DELAY: Tránh vượt Rate Limit (60 requests/phút)
       // User configurable delay để tránh rate limit

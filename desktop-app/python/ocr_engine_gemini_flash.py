@@ -624,7 +624,13 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   → Reasoning: "Đơn form, có blank fields, keyword 'biến động'"
 
 - Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở top, chữ lớn
-  → {short_code: "HDCQ", title_position: "top", confidence: 0.9}
+  → {short_code: "HDCQ", title_position: "top", confidence: 0.95}
+  → Reasoning: "Hợp đồng chuyển nhượng đất, title rõ ràng"
+
+- Trang có "HỢP ĐỒNG ỦY QUYỀN" ở top, chữ lớn
+  → {short_code: "HDUQ", title_position: "top", confidence: 0.95}
+  → Reasoning: "Hợp đồng ủy quyền (KHÔNG phải chuyển nhượng), title rõ ràng"
+  → 🚨 QUAN TRỌNG: "ỦY QUYỀN" ≠ "CHUYỂN NHƯỢNG" → HDUQ (KHÔNG phải HDCQ)
 
 - Trang có QUỐC HUY rõ + nền cam + "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT"
   → {short_code: "GCNC", confidence: 0.95}

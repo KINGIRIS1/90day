@@ -593,13 +593,6 @@ function BatchScanner() {
         return;
       }
 
-      const mergeOptions = {
-        autoSave: true,
-        mergeMode: outputOption === 'same_folder' ? 'root' : 'new',
-        mergeSuffix: mergeSuffix,
-        parentFolder: null // Will be handled per folder
-      };
-
       // Group files by folder
       const folderGroups = {};
       payload.forEach(item => {
@@ -616,8 +609,16 @@ function BatchScanner() {
 
       // Merge each folder separately
       for (const [folder, items] of Object.entries(folderGroups)) {
-        const folderMergeOptions = { ...mergeOptions, parentFolder: folder };
-        const merged = await window.electronAPI.mergeByShortCode(items, folderMergeOptions);
+        const mergeOptions = {
+          autoSave: true,
+          mergeMode: outputOption === 'same_folder' ? 'root' : (outputOption === 'new_folder' ? 'new' : 'custom'),
+          mergeSuffix: mergeSuffix || '_merged',
+          parentFolder: folder,
+          customOutputFolder: outputOption === 'custom_folder' ? outputFolder : null
+        };
+        
+        console.log('Merge options:', mergeOptions);
+        const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);
         const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
         totalMerged += (merged || []).length;
         totalSuccess += okCount;

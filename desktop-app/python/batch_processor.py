@@ -638,21 +638,23 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash'):
 # CLI interface for testing
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("Usage: python batch_processor.py <mode> <api_key> <image1> <image2> ...", file=sys.stderr)
+        print("Usage: python batch_processor.py <mode> <engine_type> <api_key> <image1> <image2> ...", file=sys.stderr)
         print("Modes: fixed, smart", file=sys.stderr)
-        print("Example: python batch_processor.py fixed AIza... img1.jpg img2.jpg img3.jpg", file=sys.stderr)
+        print("Engine types: gemini-flash, gemini-flash-lite, gemini-flash-hybrid", file=sys.stderr)
+        print("Example: python batch_processor.py smart gemini-flash-hybrid AIza... img1.jpg img2.jpg img3.jpg", file=sys.stderr)
         sys.exit(1)
     
     mode = sys.argv[1]
-    api_key = sys.argv[2]
-    image_paths = sys.argv[3:]
+    engine_type = sys.argv[2]
+    api_key = sys.argv[3]
+    image_paths = sys.argv[4:]
     
-    print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode", file=sys.stderr)
+    print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode with '{engine_type}'", file=sys.stderr)
     
     if mode == 'fixed':
-        results = batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=2)
+        results = batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=5, overlap=2)
     elif mode == 'smart':
-        results = batch_classify_smart(image_paths, api_key)
+        results = batch_classify_smart(image_paths, api_key, engine_type=engine_type)
     else:
         print(f"❌ Unknown mode: {mode}", file=sys.stderr)
         sys.exit(1)

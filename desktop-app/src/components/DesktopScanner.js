@@ -68,6 +68,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [elapsedTime, setElapsedTime] = useState(0); // Live elapsed time in seconds
   const timerIntervalRef = useRef(null);
 
+  // Live timer effect - update elapsed time every second
+  useEffect(() => {
+    if (processing && timers.scanStartTime) {
+      timerIntervalRef.current = setInterval(() => {
+        const now = Date.now();
+        const elapsedMs = now - timers.scanStartTime;
+        setElapsedTime(Math.floor(elapsedMs / 1000)); // Convert to seconds
+      }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [processing, timers.scanStartTime]);
+  
   // Load config (guard electron)
   useEffect(() => {
     const loadConfig = async () => {

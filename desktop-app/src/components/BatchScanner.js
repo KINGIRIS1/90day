@@ -159,6 +159,126 @@ function BatchScanner() {
     return parts[parts.length - 1];
   };
 
+  // Format confidence percentage
+  const formatConfidence = (conf) => {
+    if (typeof conf !== 'number') return 0;
+    return Math.round(conf * 100);
+  };
+
+  // Get method badge
+  const getMethodBadge = (method) => {
+    if (method === 'cloud_boost') return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">☁️ Cloud</span>;
+    return <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">💻 Offline</span>;
+  };
+
+  // Grid columns based on density
+  const gridColsClass = density === 'high' ? 'grid-cols-5' : density === 'medium' ? 'grid-cols-4' : 'grid-cols-3';
+
+  // Handle merge PDFs (show modal)
+  const handleMerge = () => {
+    if (fileResults.length === 0) {
+      alert('Không có file nào để gộp PDF!');
+      return;
+    }
+    setShowMergeModal(true);
+  };
+
+  // Execute merge with selected options
+  const executeMerge = async () => {
+    setShowMergeModal(false);
+    setMergeInProgress(true);
+
+    try {
+      const payload = fileResults
+        .filter(r => r.success && r.short_code)
+        .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+
+      if (payload.length === 0) {
+        alert('Không có trang hợp lệ để gộp.');
+        setMergeInProgress(false);
+        return;
+      }
+
+      const mergeOptions = {
+        autoSave: true,
+        mergeMode: outputOption === 'same_folder' ? 'root' : 'new',
+        mergeSuffix: mergeSuffix,
+        parentFolder: null // Will be handled per folder
+      };
+
+      // Group files by folder
+      const folderGroups = {};
+      payload.forEach(item => {
+        const result = fileResults.find(r => r.filePath === item.filePath);
+        const folder = result?.folder || '';
+        if (!folderGroups[folder]) {
+          folderGroups[folder] = [];
+        }
+        folderGroups[folder].push(item);
+      });
+
+      let totalMerged = 0;
+      let totalSuccess = 0;
+
+      // Merge each folder separately
+      for (const [folder, items] of Object.entries(folderGroups)) {
+        const folderMergeOptions = { ...mergeOptions, parentFolder: folder };
+        const merged = await window.electronAPI.mergeByShortCode(items, folderMergeOptions);
+        const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+        totalMerged += (merged || []).length;
+        totalSuccess += okCount;
+      }
+
+      alert(`✅ Gộp PDF hoàn tất!\n\nThành công: ${totalSuccess}/${totalMerged} file PDF`);
+    } catch (err) {
+      console.error('Merge error:', err);
+      alert(`❌ Lỗi khi gộp PDF: ${err.message}`);
+    } finally {
+      setMergeInProgress(false);
+    }
+  };
+
+  // Inline short code editor component
+  const InlineShortCodeEditor = ({ value, onChange }) => {
+    const [editing, setEditing] = useState(false);
+    const [tempValue, setTempValue] = useState(value);
+
+    if (!editing) {
+      return (
+        <button
+          onClick={() => { setEditing(true); setTempValue(value); }}
+          className="text-xs text-blue-600 hover:underline"
+        >
+          ✏️ Sửa: {value}
+        </button>
+      );
+    }
+
+    return (
+      <div className="flex gap-1">
+        <input
+          type="text"
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value.toUpperCase())}
+          className="flex-1 text-xs px-1 py-0.5 border rounded"
+          autoFocus
+        />
+        <button
+          onClick={() => { onChange(tempValue); setEditing(false); }}
+          className="text-xs px-2 bg-green-600 text-white rounded hover:bg-green-700"
+        >
+          ✓
+        </button>
+        <button
+          onClick={() => setEditing(false)}
+          className="text-xs px-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          ✕
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}

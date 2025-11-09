@@ -16,8 +16,13 @@ import requests
 from PIL import Image
 import io
 
-# Import existing engines
-from ocr_engine_gemini_flash import resize_image_smart, parse_gemini_response
+# Import existing engines and prompts
+from ocr_engine_gemini_flash import (
+    resize_image_smart, 
+    parse_gemini_response,
+    get_classification_prompt,
+    get_classification_prompt_lite
+)
 
 
 def encode_image_base64(image_path, max_width=1500, max_height=2100):

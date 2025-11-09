@@ -369,8 +369,29 @@ function BatchScanner() {
       console.error('Batch scan error:', err);
       alert(`❌ Lỗi xử lý: ${err.message}`);
     } finally {
-      setIsProcessing(false);
+      setIsScanning(false);
+      setShouldStop(false);
     }
+  };
+
+  // Stop scanning
+  const handleStopScan = () => {
+    setShouldStop(true);
+    alert('⏸️ Đang dừng quét... Vui lòng đợi thư mục hiện tại hoàn tất.');
+  };
+
+  // Toggle folder selection
+  const toggleFolderSelection = (folderPath) => {
+    setDiscoveredFolders(prev => prev.map(f => 
+      f.path === folderPath ? { ...f, selected: !f.selected } : f
+    ));
+  };
+
+  // Select/Deselect all
+  const selectAllFolders = (select = true) => {
+    setDiscoveredFolders(prev => prev.map(f => 
+      f.valid ? { ...f, selected: select } : f
+    ));
   };
 
   // Get filename from path

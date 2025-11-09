@@ -650,13 +650,16 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
       const pdfBytes = await outPdf.save();
       let outputPath;
       if (options.autoSave) {
-        const childFolder = path.dirname(filePaths[0]);
+        // Use parentFolder from options if provided, otherwise get from filePath
+        const childFolder = options.parentFolder || path.dirname(filePaths[0]);
         let targetDir;
         
         console.log(`📂 Merge processing for ${shortCode}:`);
         console.log(`   childFolder: ${childFolder}`);
+        console.log(`   parentFolder (from options): ${options.parentFolder || 'null'}`);
         console.log(`   mergeMode: ${options.mergeMode}`);
         console.log(`   customOutputFolder: ${options.customOutputFolder || 'null'}`);
+        console.log(`   Files to merge: ${filePaths.length}`);
         
         if (options.mergeMode === 'new') {
           const parentOfChild = path.dirname(childFolder);
@@ -670,11 +673,16 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
           const childBaseName = path.basename(childFolder);
           targetDir = path.join(options.customOutputFolder, childBaseName);
           console.log(`   📁 Creating custom folder: ${targetDir}`);
-          if (!fs.existsSync(targetDir)) {
-            fs.mkdirSync(targetDir, { recursive: true });
-            console.log(`   ✅ Created: ${targetDir}`);
-          } else {
-            console.log(`   ✅ Already exists: ${targetDir}`);
+          try {
+            if (!fs.existsSync(targetDir)) {
+              fs.mkdirSync(targetDir, { recursive: true });
+              console.log(`   ✅ Created: ${targetDir}`);
+            } else {
+              console.log(`   ✅ Already exists: ${targetDir}`);
+            }
+          } catch (mkdirErr) {
+            console.error(`   ❌ Failed to create directory: ${mkdirErr.message}`);
+            throw new Error(`Cannot create output directory: ${targetDir}`);
           }
         } else {
           // Default: Same folder (root mode)

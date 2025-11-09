@@ -556,6 +556,11 @@ PKTHS = Phiếu kiểm tra hồ sơ
   • KHÔNG phải "Phiếu kiểm soát" (→ GTLQ)
 PLYKDC = Phiếu lấy ý kiến dân cư
 PXNKQDD = Phiếu xác nhận kết quả đo đạc
+  • Title: "PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC HIỆN TRẠNG THỬA ĐẤT"
+  • PHẢI CÓ quốc huy + 3 dòng ("CỘNG HÒA...", "Độc lập...", title)
+  • Nội dung: Thông tin đo đạc đất (tọa độ, diện tích, bản vẽ thửa đất)
+  • Keywords: "đo đạc", "thửa đất", "tọa độ", "diện tích", "bản vẽ"
+  • ⚠️ PHÂN BIỆT với PKTHS: PXNKQDD có quốc huy + nội dung về đo đạc/tọa độ, PKTHS KHÔNG có quốc huy
 PCT = Phiếu chuyển thông tin để xác định nghĩa vụ tài chính
   • Title: "PHIẾU CHUYỂN THÔNG TIN ĐỂ XÁC ĐỊNH NGHĨA VỤ TÀI CHÍNH"
   • Từ Văn phòng đăng ký đất đai gửi Cơ quan thuế

@@ -819,6 +819,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         filePath: file.path,
         previewUrl,
         isPdf: /\.pdf$/i.test(file.name),
+        // Timing data
+        startTime: fileStartTime,
+        endTime: fileEndTime,
+        durationMs: fileDurationMs,
+        durationSeconds: (fileDurationMs / 1000).toFixed(2),
         ...processedResult
       });
       setResults([...newResults]);

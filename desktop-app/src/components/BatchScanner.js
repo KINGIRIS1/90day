@@ -328,7 +328,11 @@ function BatchScanner() {
                   folder: folder.path,
                   previewUrl: previewUrl,
                   success: true,
-                  method: fileResult.method || 'offline_ocr'
+                  method: fileResult.method || 'offline_ocr',
+                  // GCN fields for post-processing
+                  color: fileResult.color || null,
+                  issue_date: fileResult.issue_date || null,
+                  issue_date_confidence: fileResult.issue_date_confidence || null
                 };
 
                 folderResults.push(fileWithPreview);

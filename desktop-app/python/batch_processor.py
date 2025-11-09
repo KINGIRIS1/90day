@@ -132,12 +132,31 @@ CHỈ trả về "UNKNOWN" khi:
 
 🎯 NGUYÊN TẮC: Khi nghi ngờ → Gom vào document trước (safer than creating new UNKNOWN doc)
 
-VÍ DỤ:
-Page 0: "THÔNG BÁO THUẾ" → TBT
-Page 1: "ĐIỀU 1: ..." → TBT continuation
-Page 2: "III. TÍNH THUẾ" + bảng → TBT continuation (KHÔNG phải UNKNOWN)
+⚠️ ĐẶC BIỆT - GOM CONTINUATION THAY VÌ TRẢ VỀ UNKNOWN:
+NẾU trang không có title NHƯNG có dấu hiệu continuation:
+- Section headers: "II.", "III.", "ĐIỀU X"
+- Bảng biểu: tables với numbers
+- Text body: tiếp tục content
+
+→ KHÔNG tạo document UNKNOWN riêng
+→ GOM VÀO document trước đó
+→ Extend "pages" array của document trước
+
+VÍ DỤ ĐÚNG:
+Page 0: "THÔNG BÁO THUẾ" (title) → TBT
+Page 1: "ĐIỀU 1: ..." (section) → TBT continuation
+Page 2: "III. TÍNH THUẾ" + bảng (section + table) → TBT continuation
 
 Result: {{"type": "TBT", "pages": [0, 1, 2], ...}} ✅
+
+KHÔNG LÀM:
+  {{"type": "TBT", "pages": [0, 1]}},
+  {{"type": "UNKNOWN", "pages": [2]}}  ❌
+
+CHỈ TRẢ VỀ "UNKNOWN" KHI:
+- Trang hoàn toàn lạ (không có title, không có continuation patterns)
+- Title thực sự không thuộc 98 loại (VD: "BẢN GIẢI TRÌNH", "VĂN BẢN YÊU CẦU")
+- Trang trống, scan lỗi, không đọc được
 
 ---
 

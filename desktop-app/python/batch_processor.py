@@ -329,7 +329,7 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
             continue
         
         # Build multi-image payload
-        parts = [{"text": get_multi_image_prompt_full(len(batch_paths))}]
+        parts = [{"text": prompt_getter(len(batch_paths))}]
         for img_data in encoded_images:
             parts.append({
                 "inline_data": {
@@ -356,8 +356,8 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         }
         
         # Call Gemini API
-        print("📡 Sending batch request to Gemini Flash...", file=sys.stderr)
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
+        print(f"📡 Sending batch request to {model_name}...", file=sys.stderr)
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
         try:
             response = requests.post(api_url, json=payload, timeout=120)

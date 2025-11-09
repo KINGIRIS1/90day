@@ -222,7 +222,7 @@ function BatchScanner() {
       const processedFolderPaths = [];
 
       for (let i = 0; i < selectedFolders.length; i++) {
-        if (shouldStop) {
+        if (stopRef.current) {
           console.log('⏸️ Scan stopped by user');
           break;
         }

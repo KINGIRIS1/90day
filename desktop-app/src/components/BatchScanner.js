@@ -360,7 +360,7 @@ function BatchScanner() {
             }
           }
 
-          if (!shouldStop && folderResults.length > 0) {
+          if (!stopRef.current && folderResults.length > 0) {
             processedFolderPaths.push(folder.path);
             
             // Update folder tab to 'done'

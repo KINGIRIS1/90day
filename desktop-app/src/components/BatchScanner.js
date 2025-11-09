@@ -4,7 +4,8 @@ function BatchScanner() {
   // State
   const [txtFilePath, setTxtFilePath] = useState(null);
   const [ocrEngine, setOcrEngine] = useState('tesseract');
-  const [outputOption, setOutputOption] = useState('rename_in_place');
+  const [outputOption, setOutputOption] = useState('same_folder');
+  const [mergeSuffix, setMergeSuffix] = useState('_merged');
   const [outputFolder, setOutputFolder] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });

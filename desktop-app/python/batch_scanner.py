@@ -229,11 +229,11 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
     print(f"📁 Found {len(folders)} folder(s) in TXT file")
     
     # Validate output folder if needed
-    if output_option in ["copy_by_type", "copy_all"]:
+    if output_option == "custom_folder":
         if not output_folder:
             return {
                 "success": False,
-                "error": f"Output folder is required for {output_option} mode",
+                "error": f"Output folder is required for custom_folder mode",
                 "total_folders": len(folders),
                 "total_files": 0,
                 "processed_files": 0,

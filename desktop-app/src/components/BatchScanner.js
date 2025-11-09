@@ -671,20 +671,6 @@ function BatchScanner() {
             </div>
           </div>
 
-          {/* Skipped folders and errors only */}
-          {skippedFolders.length > 0 && (
-                  <div key={idx} className="bg-indigo-50 border border-indigo-200 rounded p-3 text-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-gray-900">{item.short_code}.pdf</div>
-                      <div className="text-xs text-indigo-700">{item.count} ảnh</div>
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1">{item.path}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Skipped Folders */}
           {skippedFolders.length > 0 && (
             <div className="mt-6">

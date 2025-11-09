@@ -761,9 +761,18 @@ function BatchScanner() {
             </div>
           )}
 
-          <p className="text-sm text-blue-700 mt-4">
-            Vui lòng đợi. Quá trình này có thể mất vài phút tùy thuộc vào số lượng file.
-          </p>
+          <div className="mt-6 flex items-center justify-between">
+            <p className="text-sm text-blue-700">
+              Vui lòng đợi. Quá trình này có thể mất vài phút tùy thuộc vào số lượng file.
+            </p>
+            <button
+              onClick={handleStopScan}
+              disabled={shouldStop}
+              className="px-5 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-300 transition-colors font-medium"
+            >
+              {shouldStop ? '⏸️ Đang dừng...' : '⏹️ Dừng quét'}
+            </button>
+          </div>
         </div>
       )}
 

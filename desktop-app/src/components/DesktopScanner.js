@@ -57,6 +57,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [requestDelay, setRequestDelay] = useState(1200); // Default 1.2s, loaded from config
   const [postProcessingStatus, setPostProcessingStatus] = useState(null); // Show post-processing notification
   
+  // Batch processing mode
+  const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
+  
   // Timer states
   const [timers, setTimers] = useState({
     scanStartTime: null,

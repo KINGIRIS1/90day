@@ -509,6 +509,11 @@ function BatchScanner() {
 
   // Apply sequential naming logic (UNKNOWN fallback)
   const applySequentialNaming = (result, lastType) => {
+    console.log('🔍 applySequentialNaming:', { 
+      short_code: result.short_code, 
+      lastType: lastType ? lastType.short_code : 'null' 
+    });
+    
     if (result.success && lastType) {
       // Rule: UNKNOWN → always use lastKnown
       if (result.short_code === 'UNKNOWN') {

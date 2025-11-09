@@ -258,8 +258,13 @@ function BatchScanner() {
 
         try {
           // Get image files in folder
-          const imageFiles = await window.electronAPI.listFilesInFolder(folder.path);
-          const validImages = imageFiles.filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+          const imageFilesResult = await window.electronAPI.listFilesInFolder(folder.path);
+          
+          if (!imageFilesResult.success) {
+            throw new Error(imageFilesResult.error || 'Failed to list files');
+          }
+          
+          const validImages = imageFilesResult.files.filter(f => /\.(jpg|jpeg|png)$/i.test(f));
           
           console.log(`Found ${validImages.length} images in ${folder.name}`);
           

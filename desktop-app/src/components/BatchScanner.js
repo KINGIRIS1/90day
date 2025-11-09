@@ -952,8 +952,9 @@ function BatchScanner() {
             </div>
           </div>
 
-          <div className={`grid gap-4 ${gridColsClass}`}>
-            {fileResults.map((result, idx) => (
+                {/* Grid */}
+                <div className={`grid gap-4 ${gridColsClass}`}>
+                  {tab.files.map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white hover:shadow-md transition-shadow">
                 {/* Preview Image */}
                 <div className="mb-3">

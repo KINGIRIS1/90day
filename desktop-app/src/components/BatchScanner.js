@@ -564,6 +564,8 @@ function BatchScanner() {
 
   // Execute merge with selected options
   const executeMerge = async (mergeAll = false) => {
+    console.log('🚀 executeMerge called:', { mergeAll, outputOption, mergeSuffix, outputFolder });
+    
     setShowMergeModal(false);
     setMergeInProgress(true);
 

@@ -303,12 +303,24 @@ function BatchScanner() {
   };
 
   // Execute merge with selected options
-  const executeMerge = async () => {
+  const executeMerge = async (mergeAll = false) => {
     setShowMergeModal(false);
     setMergeInProgress(true);
 
     try {
-      const payload = fileResults
+      // Determine which files to merge
+      let allFilesToMerge = [];
+      if (mergeAll) {
+        // Merge all files from all folders
+        folderTabs.forEach(tab => {
+          allFilesToMerge = allFilesToMerge.concat(tab.files);
+        });
+      } else {
+        // Merge only current folder
+        allFilesToMerge = fileResults;
+      }
+
+      const payload = allFilesToMerge
         .filter(r => r.success && r.short_code)
         .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
 
@@ -328,7 +340,7 @@ function BatchScanner() {
       // Group files by folder
       const folderGroups = {};
       payload.forEach(item => {
-        const result = fileResults.find(r => r.filePath === item.filePath);
+        const result = allFilesToMerge.find(r => r.filePath === item.filePath);
         const folder = result?.folder || '';
         if (!folderGroups[folder]) {
           folderGroups[folder] = [];

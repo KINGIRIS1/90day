@@ -794,6 +794,80 @@ ipcMain.handle('process-document-cloud', async (event, filePath) => {
   });
 });
 
+// Batch Process Handler
+ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrEngine }) => {
+  return new Promise((resolve) => {
+    try {
+      console.log(`\n📦 Batch Process: mode=${mode}, images=${imagePaths.length}, engine=${ocrEngine}`);
+      
+      // Get API key for cloud engines
+      let cloudApiKey = null;
+      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') {
+        cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'Google API key not configured', results: [] });
+          return;
+        }
+      }
+      
+      // Determine Python script path
+      const pythonDir = isDev 
+        ? path.join(__dirname, '../python')
+        : path.join(process.resourcesPath, 'python');
+      const scriptPath = path.join(pythonDir, 'batch_processor.py');
+      
+      // Build args
+      const args = [scriptPath, mode, cloudApiKey, ...imagePaths];
+      
+      console.log(`🐍 Calling Python batch processor: mode=${mode}`);
+      
+      // Spawn Python process
+      const pythonProcess = spawn('python', args, {
+        cwd: pythonDir
+      });
+      
+      let stdoutData = '';
+      let stderrData = '';
+      
+      pythonProcess.stdout.on('data', (data) => {
+        stdoutData += data.toString();
+      });
+      
+      pythonProcess.stderr.on('data', (data) => {
+        const text = data.toString();
+        stderrData += text;
+        console.log(`[Python batch]: ${text.trim()}`);
+      });
+      
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            // Parse JSON output from stdout
+            const results = JSON.parse(stdoutData);
+            console.log(`✅ Batch process complete: ${results.length} results`);
+            resolve({ success: true, results: results });
+          } catch (e) {
+            console.error('Failed to parse batch results:', e);
+            resolve({ success: false, error: 'Failed to parse results', results: [] });
+          }
+        } else {
+          console.error(`Batch process failed with code ${code}`);
+          resolve({ success: false, error: `Process exited with code ${code}`, results: [] });
+        }
+      });
+      
+      pythonProcess.on('error', (err) => {
+        console.error('Batch process error:', err);
+        resolve({ success: false, error: err.message, results: [] });
+      });
+      
+    } catch (err) {
+      console.error('Batch process handler error:', err);
+      resolve({ success: false, error: err.message, results: [] });
+    }
+  });
+});
+
 ipcMain.handle('read-image-data-url', async (event, filePath) => {
   try {
     const ext = path.extname(filePath).toLowerCase();

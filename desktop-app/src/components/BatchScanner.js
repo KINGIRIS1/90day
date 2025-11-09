@@ -297,17 +297,19 @@ function BatchScanner() {
               // Scan single file
               let fileResult = await window.electronAPI.processDocumentOffline(imagePath);
               
-              // Apply sequential naming if UNKNOWN
-              fileResult = applySequentialNaming(fileResult, lastKnownType);
+              // Apply sequential naming if UNKNOWN (use local variable, not state!)
+              fileResult = applySequentialNaming(fileResult, currentLastKnown);
               
               if (fileResult.success) {
-                // Update lastKnownType if not UNKNOWN
+                // Update LOCAL currentLastKnown if not UNKNOWN (synchronous update!)
                 if (fileResult.short_code !== 'UNKNOWN') {
-                  setLastKnownType({
+                  currentLastKnown = {
                     short_code: fileResult.short_code,
                     doc_type: fileResult.doc_type,
                     confidence: fileResult.confidence
-                  });
+                  };
+                  // Also update state for UI display (optional)
+                  setLastKnownType(currentLastKnown);
                 }
                 // Load preview
                 let previewUrl = null;

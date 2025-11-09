@@ -175,6 +175,114 @@ ipcMain.handle('select-files', async () => {
   return result.filePaths;
 });
 
+ipcMain.handle('select-txt-file', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [
+      { name: 'Text Files', extensions: ['txt'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  });
+  return result.canceled ? null : (result.filePaths[0] || null);
+});
+
+ipcMain.handle('process-batch-scan', async (event, txtPath, outputOption, outputFolder) => {
+  return new Promise(async (resolve, reject) => {
+    const ocrEngineType = store.get('ocrEngine', store.get('ocrEngineType', 'tesseract'));
+
+    let cloudApiKey = null;
+
+    // Get API key if using cloud OCR
+    if (ocrEngineType === 'google') {
+      cloudApiKey = store.get('cloudOCR.google.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({ success: false, error: 'Google Cloud Vision API key not configured. Please add it in Cloud OCR settings.' });
+        return;
+      }
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-lite') {
+      cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
+      if (!cloudApiKey) {
+        resolve({ success: false, error: 'Google API key not configured for Gemini Flash. Please add it in Cloud OCR settings.' });
+        return;
+      }
+    }
+
+    const pyInfo = discoverPython();
+    if (!pyInfo.ok) {
+      reject(new Error('Python 3.10–3.12 not found. Please install Python.'));
+      return;
+    }
+
+    const scriptPath = isDev ? path.join(__dirname, '../python/batch_scanner.py') : getPythonScriptPath('batch_scanner.py');
+    const args = [scriptPath, txtPath, ocrEngineType];
+    
+    // Add API key if available
+    if (cloudApiKey) {
+      args.push(cloudApiKey);
+    } else {
+      args.push('none');
+    }
+    
+    // Add output option and folder
+    args.push(outputOption);
+    if (outputFolder) {
+      args.push(outputFolder);
+    }
+
+    console.log(`Spawning batch scan: ${pyInfo.executable} ${args.map(a => (a === cloudApiKey ? '[API_KEY]' : a)).join(' ')}`);
+
+    const pythonScriptDir = path.dirname(scriptPath);
+    
+    const child = spawn(pyInfo.executable, args, {
+      cwd: pythonScriptDir,
+      env: buildPythonEnv({ 
+        GOOGLE_API_KEY: cloudApiKey || process.env.GOOGLE_API_KEY || ''
+      }, pyInfo, pythonScriptDir)
+    });
+
+    let result = '';
+    let errorLogs = '';
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+
+    child.stdout.on('data', (d) => { result += d; });
+    child.stderr.on('data', (d) => { 
+      console.log('[Batch Scanner stderr]:', d); 
+      errorLogs += d; 
+      // Send progress updates to renderer if needed
+      event.sender.send('batch-scan-progress', d);
+    });
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        try {
+          const lines = result.trim().split('\n');
+          let jsonLine = lines[lines.length - 1];
+          if (!jsonLine || !jsonLine.trim().startsWith('{')) jsonLine = lines.find(l => l.trim().startsWith('{'));
+          if (!jsonLine) throw new Error('No JSON found in output');
+          const jsonResult = JSON.parse(jsonLine);
+          resolve(jsonResult);
+        } catch (e) {
+          console.error('JSON parse error:', e); 
+          console.error('Raw output:', result); 
+          console.error('Stderr logs:', errorLogs);
+          reject(new Error(`Failed to parse batch scan result: ${e.message}`));
+        }
+      } else {
+        console.error('Process exited with code:', code); 
+        console.error('Stderr:', errorLogs);
+        reject(new Error(errorLogs || `Batch scan failed with code ${code}`));
+      }
+    });
+
+    // Longer timeout for batch processing: 5 minutes
+    setTimeout(() => { 
+      try { child.kill(); } catch {} 
+      reject(new Error('Batch scan timeout (300s)')); 
+    }, 300000);
+  });
+});
+
 ipcMain.handle('list-files-in-folder', async (event, folderPath) => {
   try {
     const entries = fs.readdirSync(folderPath, { withFileTypes: true });

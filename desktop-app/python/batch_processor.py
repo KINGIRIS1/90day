@@ -298,26 +298,47 @@ Lưu ý:
 """
 
 
-def batch_classify_fixed(image_paths, api_key, batch_size=5):
+def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
     """
-    Phương án 1: Fixed Batch Size
-    Gom mỗi 5 files và gửi cùng lúc
+    Phương án 1: Fixed Batch Size với OVERLAP
+    Gom mỗi 5 files nhưng overlap 3 files để giữ context
+    
+    Ví dụ overlap=3, batch_size=15:
+      Batch 1: Files 0-14  (15 files)
+      Batch 2: Files 12-29 (18 files) → Overlap files 12,13,14
+      Batch 3: Files 27-44 (18 files) → Overlap files 27,28,29
+      
+    Tại sao? File 15,16,17 có thể là continuation của file 14.
+    Nếu batch 2 không thấy file 14 → classify sai!
     """
     print(f"\n{'='*80}", file=sys.stderr)
-    print(f"🔄 BATCH MODE 1: Fixed Batch Size ({batch_size} images per batch)", file=sys.stderr)
+    print(f"🔄 BATCH MODE 1: Fixed Batch Size ({batch_size} files, overlap {overlap})", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
     all_results = []
-    total_batches = (len(image_paths) + batch_size - 1) // batch_size
     processed_files = set()  # Track processed files to detect missing ones
+    batch_num = 0
+    current_idx = 0
     
-    for batch_idx in range(0, len(image_paths), batch_size):
-        batch_paths = image_paths[batch_idx:batch_idx + batch_size]
-        batch_num = batch_idx // batch_size + 1
+    while current_idx < len(image_paths):
+        batch_num += 1
         
-        print(f"\n📦 Batch {batch_num}/{total_batches}: Processing {len(batch_paths)} images", file=sys.stderr)
+        # Calculate batch range with overlap
+        batch_start = max(0, current_idx - overlap) if batch_num > 1 else current_idx
+        batch_end = min(len(image_paths), current_idx + batch_size)
+        batch_paths = image_paths[batch_start:batch_end]
+        
+        # Track which files are NEW in this batch (not overlap)
+        new_file_start_idx = current_idx - batch_start
+        
+        print(f"\n📦 Batch {batch_num}: Files {batch_start}-{batch_end-1} ({len(batch_paths)} images)", file=sys.stderr)
+        if batch_num > 1:
+            print(f"   ↩️ Overlap: {overlap} files from previous batch (for context)", file=sys.stderr)
+            print(f"   🆕 New files: {batch_end - current_idx} (starting from index {new_file_start_idx})", file=sys.stderr)
+        
         for i, path in enumerate(batch_paths):
-            print(f"   [{i}] {os.path.basename(path)}", file=sys.stderr)
+            marker = "🆕" if i >= new_file_start_idx else "↩️"
+            print(f"   [{i}] {marker} {os.path.basename(path)}", file=sys.stderr)
         
         # Encode all images in batch
         print(f"🖼️ Encoding {len(batch_paths)} images...", file=sys.stderr)

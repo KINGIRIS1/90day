@@ -206,6 +206,60 @@ PCTSVC = Văn bản phân chia tài sản VỢ CHỒNG (không phải hộ gia �
 - ❌ TUYỆT ĐỐI không trả về GCNM hoặc GCNC, chỉ trả về GCN
 - Nếu không khớp 98 loại → trả về "UNKNOWN"
 
+🎯 QUY TẮC PHÂN BIỆT DỄ NHẦM:
+
+**1. HDCQ vs HDUQ (CỰC KỲ QUAN TRỌNG):**
+- HDCQ = "HỢP ĐỒNG CHUYỂN NHƯỢNG" (transfer ownership)
+  * Keywords: "CHUYỂN NHƯỢNG", "TẶNG CHO"
+  * ✅ "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT" → HDCQ
+- HDUQ = "HỢP ĐỒNG ỦY QUYỀN" (power of attorney)
+  * Keywords: "ỦY QUYỀN"
+  * ✅ "HỢP ĐỒNG ỦY QUYỀN" → HDUQ
+- ⚠️ KHÔNG nhầm: Nếu thấy "ỦY QUYỀN" → BẮT BUỘC là HDUQ, không phải HDCQ
+
+**2. TTHGD vs PCTSVC vs VBTK (DỄ NHẦM):**
+- TTHGD = Thỏa thuận HỘ GIA ĐÌNH
+  * Keywords: "HỘ GIA ĐÌNH" (family members)
+  * ✅ "THỎA THUẬN QSDĐ HỘ GIA ĐÌNH" → TTHGD
+  * ✅ "PHÂN CHIA TÀI SẢN HỘ GIA ĐÌNH" → TTHGD
+- PCTSVC = Phân chia VỢ CHỒNG
+  * Keywords: "VỢ CHỒNG" (couple)
+  * ✅ "PHÂN CHIA TÀI SẢN VỢ CHỒNG" → PCTSVC
+- VBTK = Phân chia DI SẢN THỪA KẾ
+  * Keywords: "DI SẢN THỪA KẾ", "KẾ THỪA" (inheritance)
+  * ✅ "THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ" → VBTK
+
+**3. DDKBD vs DDK:**
+- DDKBD = Có chữ "BIẾN ĐỘNG"
+  * ✅ "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI" → DDKBD
+- DDK = KHÔNG có "BIẾN ĐỘNG"
+  * ✅ "ĐƠN ĐĂNG KÝ ĐẤT ĐAI" → DDK
+
+**4. PKTHS vs GTLQ:**
+- PKTHS = "KIỂM TRA HỒ SƠ"
+  * ✅ "PHIẾU KIỂM TRA HỒ SƠ" → PKTHS
+- GTLQ = "KIỂM SOÁT" hoặc "TIẾP NHẬN"
+  * ✅ "PHIẾU KIỂM SOÁT QUÁ TRÌNH" → GTLQ
+  * ✅ "GIẤY TIẾP NHẬN HỒ SƠ" → GTLQ
+
+**5. GUQ (GIẤY) vs HDUQ (HỢP ĐỒNG):**
+- GUQ = "GIẤY ỦY QUYỀN" (simple authorization letter)
+  * ✅ "GIẤY ỦY QUYỀN" → GUQ
+- HDUQ = "HỢP ĐỒNG ỦY QUYỀN" (formal contract)
+  * ✅ "HỢP ĐỒNG ỦY QUYỀN" → HDUQ
+
+❌ VÍ DỤ SAI (KHÔNG LÀM NHƯ VẦY):
+- "HỢP ĐỒNG ỦY QUYỀN" → HDCQ ❌ (Sai! Phải là HDUQ)
+- "PHÂN CHIA TÀI SẢN VỢ CHỒNG" → TTHGD ❌ (Sai! Phải là PCTSVC)
+- "Giấy chứng nhận màu hồng" → GCNM ❌ (Sai! Phải là GCN)
+- "ĐIỀU 2: NỘI DUNG THỎA THUẬN" → TTHGD ❌ (Section header, không phải title)
+
+✅ VÍ DỤ ĐÚNG:
+- Trang có "HỢP ĐỒNG CHUYỂN NHƯỢNG" ở TOP → HDCQ ✅
+- Trang có "HỢP ĐỒNG ỦY QUYỀN" ở TOP → HDUQ ✅
+- Trang có "ĐIỀU 2" ở TOP → UNKNOWN (continuation page) ✅
+- Trang có "THỎA THUẬN...HỘ GIA ĐÌNH" → TTHGD ✅
+
 🚨 ĐẶC BIỆT VỚI GCN:
 - Luôn trả về "GCN" (không phải GCNM/GCNC)
 - BẮT BUỘC tìm NGÀY CẤP (issue_date) ở mọi trang

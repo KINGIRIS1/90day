@@ -100,7 +100,7 @@ function BatchScanner() {
         setResults(result);
         setSkippedFolders(result.skipped_folders || []);
         setErrors(result.errors || []);
-        alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- Lỗi: ${result.error_count}`);
+        alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- PDFs đã tạo: ${result.merged_pdfs_count || 0}\n- Lỗi: ${result.error_count}`);
       } else {
         alert(`❌ Lỗi: ${result.error}`);
       }

@@ -625,8 +625,18 @@ ipcMain.handle('choose-save-path', async (event, defaultName) => {
 });
 
 ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
+  console.log('='.repeat(80));
+  console.log('🚀 MERGE HANDLER CALLED IN MAIN.JS');
+  console.log('📦 Items count:', items.length);
+  console.log('⚙️ Options:', JSON.stringify(options, null, 2));
+  console.log('='.repeat(80));
+  
   const { PDFDocument } = require('pdf-lib');
   const groups = items.reduce((acc, it) => { const key = it.short_code || 'UNKNOWN'; if (!acc[key]) acc[key] = []; acc[key].push(it.filePath); return acc; }, {});
+  
+  console.log('📊 Groups created:', Object.keys(groups).join(', '));
+  console.log('📊 Group details:', Object.entries(groups).map(([k, v]) => `${k}: ${v.length} files`).join(', '));
+  
   const results = [];
   for (const [shortCode, filePaths] of Object.entries(groups)) {
     try {

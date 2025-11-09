@@ -779,12 +779,15 @@ if __name__ == "__main__":
     print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode with '{engine_type}'", file=sys.stderr)
     
     if mode == 'fixed':
-        results = batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=5, overlap=2)
+        batch_data = batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=5, last_known_type=None)
     elif mode == 'smart':
-        results = batch_classify_smart(image_paths, api_key, engine_type=engine_type)
+        batch_data = batch_classify_smart(image_paths, api_key, engine_type=engine_type, last_known_type=None)
     else:
         print(f"❌ Unknown mode: {mode}", file=sys.stderr)
         sys.exit(1)
+    
+    # Extract results
+    results = batch_data['results'] if isinstance(batch_data, dict) else batch_data
     
     # Output JSON to stdout for IPC
     print(json.dumps(results, ensure_ascii=False))

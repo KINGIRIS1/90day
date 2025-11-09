@@ -821,9 +821,19 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
       
       console.log(`🐍 Calling Python batch processor: mode=${mode}`);
       
+      // Discover Python executable
+      const pyInfo = discoverPython();
+      if (!pyInfo.ok) {
+        resolve({ success: false, error: 'Python not found', results: [] });
+        return;
+      }
+      
+      console.log(`   Python: ${pyInfo.executable}`);
+      
       // Spawn Python process
-      const pythonProcess = spawn('python', args, {
-        cwd: pythonDir
+      const pythonProcess = spawn(pyInfo.executable, args, {
+        cwd: pythonDir,
+        env: buildPythonEnv({}, pyInfo, pythonDir)
       });
       
       let stdoutData = '';

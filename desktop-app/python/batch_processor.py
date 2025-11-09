@@ -245,22 +245,48 @@ def encode_image_base64(image_path, max_width=1500, max_height=2100):
 
 
 
-def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
+def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=5, overlap=3):
     """
     Phương án 1: Fixed Batch Size với OVERLAP
-    Gom mỗi 5 files nhưng overlap 3 files để giữ context
     
-    Ví dụ overlap=3, batch_size=15:
-      Batch 1: Files 0-14  (15 files)
-      Batch 2: Files 12-29 (18 files) → Overlap files 12,13,14
-      Batch 3: Files 27-44 (18 files) → Overlap files 27,28,29
-      
-    Tại sao? File 15,16,17 có thể là continuation của file 14.
-    Nếu batch 2 không thấy file 14 → classify sai!
+    Args:
+        image_paths: List of file paths
+        api_key: Google API key
+        engine_type: 'gemini-flash', 'gemini-flash-lite', or 'gemini-flash-hybrid'
+        batch_size: Files per batch
+        overlap: Overlap files between batches
+    
+    Engine types:
+        - gemini-flash: Use Flash Full prompt + model
+        - gemini-flash-lite: Use Flash Lite prompt + model  
+        - gemini-flash-hybrid: Use Two-tier (Lite → Full if needed)
     """
-    print(f"\n{'='*80}", file=sys.stderr)
-    print(f"🔄 BATCH MODE 1: Fixed Batch Size ({batch_size} files, overlap {overlap})", file=sys.stderr)
-    print(f"{'='*80}", file=sys.stderr)
+    
+    # Determine model and prompt based on engine type
+    if engine_type == 'gemini-flash-lite':
+        model_name = 'gemini-2.5-flash-lite'
+        prompt_getter = get_multi_image_prompt_lite
+        print(f"\n{'='*80}", file=sys.stderr)
+        print(f"⚡ BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash LITE", file=sys.stderr)
+        print(f"   Model: {model_name}", file=sys.stderr)
+        print(f"   Prompt: Lite (simplified, 60% crop rules)", file=sys.stderr)
+        print(f"{'='*80}", file=sys.stderr)
+    elif engine_type == 'gemini-flash-hybrid':
+        model_name = 'gemini-2.5-flash-lite'  # Start with Lite for hybrid
+        prompt_getter = get_multi_image_prompt_lite
+        print(f"\n{'='*80}", file=sys.stderr)
+        print(f"🔄 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + HYBRID", file=sys.stderr)
+        print(f"   Strategy: Two-tier (Lite → Full if low confidence)", file=sys.stderr)
+        print(f"   Model (Tier 1): {model_name}", file=sys.stderr)
+        print(f"{'='*80}", file=sys.stderr)
+    else:  # gemini-flash (default)
+        model_name = 'gemini-2.5-flash'
+        prompt_getter = get_multi_image_prompt_full
+        print(f"\n{'='*80}", file=sys.stderr)
+        print(f"🤖 BATCH MODE: Fixed ({batch_size} files, overlap {overlap}) + Flash FULL", file=sys.stderr)
+        print(f"   Model: {model_name}", file=sys.stderr)
+        print(f"   Prompt: Full (complete 98-rule classification)", file=sys.stderr)
+        print(f"{'='*80}", file=sys.stderr)
     
     all_results = []
     processed_files = set()  # Track processed files to detect missing ones

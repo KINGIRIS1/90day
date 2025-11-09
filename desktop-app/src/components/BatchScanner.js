@@ -291,7 +291,7 @@ function BatchScanner() {
         results: allResults
       };
 
-      console.log('✅ Batch scan result:', result);
+      console.log('✅ Batch scan complete:', result);
 
       if (result.success) {
         setScanResults(result);

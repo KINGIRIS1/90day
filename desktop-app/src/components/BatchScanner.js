@@ -1571,6 +1571,13 @@ function BatchScanner() {
                 <div className="mt-2 text-xs text-gray-600">
                   Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span>
                 </div>
+                {/* Timing Info */}
+                {result.durationSeconds && (
+                  <div className="mt-1 text-xs text-orange-600 flex items-center gap-1">
+                    <span>⏱️</span>
+                    <span className="font-medium">{result.durationSeconds}s</span>
+                  </div>
+                )}
 
                       {/* Inline Editor */}
                       <div className="mt-2 p-2 bg-gray-50 border rounded">

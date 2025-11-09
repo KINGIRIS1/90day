@@ -791,8 +791,8 @@ function CloudSettings() {
         </div>
       )}
 
-      {/* Batch Processing Mode - Only for Hybrid mode */}
-      {ocrEngine === 'gemini-flash-hybrid' && (
+      {/* Batch Processing Mode - For all Gemini engines */}
+      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') && (
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <span>⚡</span> Chế Độ Xử Lý Hàng Loạt

@@ -1052,20 +1052,20 @@ function BatchScanner() {
                   Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span>
                 </div>
 
-                    {/* Inline Editor */}
-                    <div className="mt-2 p-2 bg-gray-50 border rounded">
-                      <InlineShortCodeEditor 
-                        value={result.short_code} 
-                        onChange={(newCode) => {
-                          setFolderTabs(prev => prev.map(t => {
-                            if (t.path !== tab.path) return t;
-                            const newFiles = [...t.files];
-                            newFiles[idx] = { ...newFiles[idx], short_code: newCode };
-                            return { ...t, files: newFiles };
-                          }));
-                        }} 
-                      />
-                    </div>
+                      {/* Inline Editor */}
+                      <div className="mt-2 p-2 bg-gray-50 border rounded">
+                        <InlineShortCodeEditor 
+                          value={result.short_code} 
+                          onChange={(newCode) => {
+                            setFolderTabs(prev => prev.map(t => {
+                              if (t.path !== activeFolder) return t;
+                              const newFiles = [...t.files];
+                              newFiles[idx] = { ...newFiles[idx], short_code: newCode };
+                              return { ...t, files: newFiles };
+                            }));
+                          }} 
+                        />
+                      </div>
 
                     {/* Action Buttons */}
                     <div className="mt-2 flex gap-2">

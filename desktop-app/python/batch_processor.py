@@ -397,7 +397,8 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
                 "temperature": 0.1,
                 "topP": 0.8,
                 "topK": 10,
-                "maxOutputTokens": 4000  # Larger for multi-document response
+                "maxOutputTokens": 8000,  # Large enough for 20 documents × 400 tokens each
+                "responseMimeType": "application/json"  # Force JSON output
             },
             "safetySettings": [
                 {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH"},

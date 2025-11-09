@@ -449,11 +449,30 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5, overlap=3):
                                 batch_result = json.loads(response_text)
                             
                                 print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
+                                
+                                # Validate: Check if all pages are covered
+                                total_pages_in_batch = len(batch_paths)
+                                pages_returned = set()
+                                
                                 for doc in batch_result.get('documents', []):
                                     doc_type = doc.get('type', 'UNKNOWN')
                                     pages = doc.get('pages', [])
                                     confidence = doc.get('confidence', 0)
                                     print(f"   📄 {doc_type}: {len(pages)} pages, confidence {confidence:.0%}", file=sys.stderr)
+                                    
+                                    # Collect all page indices
+                                    for p in pages:
+                                        pages_returned.add(p)
+                                
+                                # Check for missing pages
+                                expected_pages = set(range(total_pages_in_batch))
+                                missing_pages = expected_pages - pages_returned
+                                
+                                if missing_pages:
+                                    print(f"   ⚠️ WARNING: AI didn't return {len(missing_pages)} pages: {sorted(missing_pages)}", file=sys.stderr)
+                                    print(f"      These files will be processed by fallback", file=sys.stderr)
+                                else:
+                                    print(f"   ✅ All {total_pages_in_batch} pages accounted for", file=sys.stderr)
                                 
                                 # Map results back to original file paths
                                 # ONLY process NEW files (skip overlap files)

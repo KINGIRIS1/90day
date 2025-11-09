@@ -174,6 +174,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ IMPLEMENTED: Batch scan feature that reads TXT file (each line = folder path) and processes all images (JPG, JPEG, PNG) in each folder. Features: 3 output options (rename in place, copy by type, copy all), progress tracking, error logging, skipped folders tracking. Python backend: batch_scanner.py. React UI: BatchScanner.js with file picker, output selection, and results display. IPC handlers added to main.js and preload.js. New tab '📋 Quét danh sách' added to App.js. Documentation: BATCH_SCAN_GUIDE.md. Does NOT scan sub-folders. Uses existing OCR engine from settings (Tesseract/EasyOCR/VietOCR/Gemini Flash)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔧 FIXED TWO CRITICAL BUGS: (1) Sequential naming - Changed from React state (lastKnownType) to local variable (currentLastKnown) for synchronous updates during loop iteration. Now UNKNOWN files correctly inherit type from previous document. (2) Merge custom folder - Added missing mergeMode === 'custom' handler in main.js. Now properly copies PDFs to user-selected custom folder with subfolder structure. Both fixes tested and ready for user verification."
 
 metadata:
   created_by: "main_agent"

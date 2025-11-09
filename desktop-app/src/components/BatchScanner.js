@@ -74,8 +74,14 @@ function BatchScanner() {
     }
 
     setIsProcessing(true);
-    setProgress({ current: 0, total: 0 });
-    setCurrentFolder('');
+    setProgress({ 
+      currentFolder: '',
+      currentFile: '',
+      processedFiles: 0,
+      totalFiles: 0,
+      processedFolders: 0,
+      totalFolders: 0
+    });
     setScanResults(null);
     setFileResults([]);
     setErrors([]);

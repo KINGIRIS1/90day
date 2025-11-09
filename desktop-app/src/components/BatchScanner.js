@@ -250,7 +250,7 @@ function BatchScanner() {
         {outputOption === 'custom_folder' && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              4️⃣ Chọn thư mục đích
+              5️⃣ Chọn thư mục đích
             </label>
             <div className="flex items-center gap-3">
               <button

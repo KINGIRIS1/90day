@@ -528,12 +528,27 @@ function CloudSettings() {
       )}
 
       {/* Gemini Flash Setup */}
-      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-lite') && (
-        <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
+      {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') && (
+        <div className={`border-2 rounded-lg p-6 mb-6 ${
+          ocrEngine === 'gemini-flash-hybrid' ? 'bg-yellow-50 border-yellow-400' : 
+          ocrEngine === 'gemini-flash-lite' ? 'bg-green-50 border-green-200' : 
+          'bg-purple-50 border-purple-200'
+        }`}>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span>🤖</span> Gemini {ocrEngine === 'gemini-flash-lite' ? '2.5 Flash Lite' : '2.5 Flash'} API Key
-            <span className={`text-white text-xs px-2 py-1 rounded ml-2 ${ocrEngine === 'gemini-flash-lite' ? 'bg-green-600' : 'bg-purple-600'}`}>
-              {ocrEngine === 'gemini-flash-lite' ? 'RẺ NHẤT - NHANH NHẤT' : 'ACCURACY CAO'}
+            <span>{ocrEngine === 'gemini-flash-hybrid' ? '🔄' : '🤖'}</span> 
+            Gemini {
+              ocrEngine === 'gemini-flash-hybrid' ? 'Hybrid (Two-Tier)' :
+              ocrEngine === 'gemini-flash-lite' ? '2.5 Flash Lite' : 
+              '2.5 Flash'
+            } API Key
+            <span className={`text-white text-xs px-2 py-1 rounded ml-2 ${
+              ocrEngine === 'gemini-flash-hybrid' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 font-bold' :
+              ocrEngine === 'gemini-flash-lite' ? 'bg-green-600' : 
+              'bg-purple-600'
+            }`}>
+              {ocrEngine === 'gemini-flash-hybrid' ? '⭐ CÂN BẰNG TỐI ƯU' :
+               ocrEngine === 'gemini-flash-lite' ? 'RẺ NHẤT - NHANH NHẤT' : 
+               'ACCURACY CAO'}
             </span>
           </h2>
 

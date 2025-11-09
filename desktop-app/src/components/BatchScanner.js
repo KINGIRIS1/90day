@@ -41,30 +41,29 @@ const BatchScanner = () => {
       return;
     }
 
+    // Check if analyzeBatchFile API exists
+    if (!api.analyzeBatchFile) {
+      addLog('❌ analyzeBatchFile API not found. App needs restart.', 'error');
+      return;
+    }
+
     try {
-      // Use native file input as fallback
+      // Use native file input
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.csv,.xlsx,.xls';
       input.onchange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-          // In Electron, we need the file path, not the File object
-          // We'll use a workaround by reading the file path from input
           const filePath = file.path || file.name;
           setCsvFile(filePath);
           addLog(`✅ Đã chọn file: ${filePath}`, 'success');
           
-          // For now, show a message that user needs to provide full path
-          if (!file.path) {
-            addLog('⚠️ Vui lòng nhập đường dẫn đầy đủ của file CSV/Excel', 'warning');
-            const userPath = prompt('Nhập đường dẫn đầy đủ của file CSV/Excel:');
-            if (userPath) {
-              setCsvFile(userPath);
-              await analyzeBatch(userPath);
-            }
-          } else {
+          // In Electron, file.path should always exist
+          if (file.path) {
             await analyzeBatch(file.path);
+          } else {
+            addLog('❌ Không thể đọc đường dẫn file. Vui lòng thử lại.', 'error');
           }
         }
       };

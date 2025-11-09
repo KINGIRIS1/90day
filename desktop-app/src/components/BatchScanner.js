@@ -23,6 +23,10 @@ function BatchScanner() {
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeInProgress, setMergeInProgress] = useState(false);
   const [density, setDensity] = useState('medium');
+  
+  // Folder tabs state
+  const [folderTabs, setFolderTabs] = useState([]); // [{path, name, count, status, files: []}]
+  const [activeFolder, setActiveFolder] = useState(null);
 
   // Load OCR engine from config on mount
   useEffect(() => {

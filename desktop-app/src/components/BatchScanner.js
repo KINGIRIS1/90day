@@ -1750,7 +1750,7 @@ function BatchScanner() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Thống kê tổng quan</h3>
 
           {/* Statistics Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{scanResults.total_folders}</div>
               <div className="text-sm text-gray-600">Tổng thư mục</div>
@@ -1766,6 +1766,18 @@ function BatchScanner() {
             <div className="bg-red-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-red-600">{scanResults.error_count}</div>
               <div className="text-sm text-gray-600">Lỗi</div>
+            </div>
+            {/* Timer Stats */}
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600">
+                {Math.floor(timers.batchElapsedSeconds / 60)}:{String(timers.batchElapsedSeconds % 60).padStart(2, '0')}
+              </div>
+              <div className="text-sm text-gray-600">⏱️ Tổng thời gian</div>
+              {scanResults.processed_files > 0 && (
+                <div className="text-xs text-orange-500 mt-1">
+                  ~{(timers.batchElapsedSeconds / scanResults.processed_files).toFixed(1)}s/file
+                </div>
+              )}
             </div>
           </div>
 

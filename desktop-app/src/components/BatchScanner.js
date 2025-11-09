@@ -776,8 +776,8 @@ function BatchScanner() {
         </div>
       )}
 
-      {/* Folder Tabs */}
-      {folderTabs.length > 0 && (
+      {/* Folder Tabs - Only show after scanning */}
+      {folderTabs.length > 0 && !isScanning && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">📂 Thư mục đã quét ({folderTabs.length})</h2>

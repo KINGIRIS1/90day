@@ -133,7 +133,13 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                         }
                     }
                 ]
-            }]
+            }],
+            "generationConfig": {
+                "temperature": 0.1,  # Low temperature for consistent, deterministic output
+                "topP": 0.8,         # Slightly lower top_p for more focused responses
+                "topK": 10,          # Limit to top 10 tokens for consistency
+                "maxOutputTokens": 500  # Limit output length (classification doesn't need long responses)
+            }
         }
         
         print(f"📡 Sending request to {model_name}...", file=sys.stderr)

@@ -139,7 +139,7 @@ def validate_folder(folder_path: str) -> dict:
     return {"valid": True, "image_files": sorted(image_files), "error": None}
 
 
-def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, output_option: str = "rename_in_place", output_folder: str = None) -> dict:
+def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, output_option: str = "same_folder", merge_suffix: str = "_merged", output_folder: str = None) -> dict:
     """
     Main batch scanning function
     

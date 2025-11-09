@@ -692,19 +692,26 @@ function BatchScanner() {
         }
       });
       
-      // Step 4: Extract color and dates
+      // Step 5: Extract color and dates from each pair
       const pairsWithData = pairs.map(pair => {
-        const color = pair.page1?.color || pair.page2?.color || null;
-        const issueDate = pair.page1?.issue_date || pair.page2?.issue_date || null;
-        const issueDateConfidence = pair.page1?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+        // Color already determined by grouping
+        const color = pair.colorGroup === 'red' ? 'red' : (pair.colorGroup === 'pink' ? 'pink' : 'unknown');
         
-        return {
+        // Extract date from either page (prefer page2, then page1)
+        const issueDate = pair.page2?.issue_date || pair.page1?.issue_date || null;
+        const issueDateConfidence = pair.page2?.issue_date_confidence || pair.page1?.issue_date_confidence || null;
+        
+        const pairData = {
           ...pair,
           color,
           issueDate,
           issueDateConfidence,
           parsedDate: parseIssueDate(issueDate, issueDateConfidence)
         };
+        
+        console.log(`    📅 Pair ${pair.pairIndex + 1} (${color}): date=${issueDate || 'null'}, confidence=${issueDateConfidence || 'null'}`);
+        
+        return pairData;
       });
       
       // Step 5: Check if mixed colors (red vs pink)

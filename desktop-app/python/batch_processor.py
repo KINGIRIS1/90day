@@ -412,6 +412,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
                                     for page_idx in doc.get('pages', []):
                                         if page_idx < len(batch_paths):
                                             file_path = batch_paths[page_idx]
+                                            processed_files.add(file_path)  # Track this file
                                             all_results.append({
                                                 'file_path': file_path,
                                                 'file_name': os.path.basename(file_path),

@@ -851,6 +851,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       console.log(`${'='*80}\n`);
       
       setProgress({ current: 0, total: filesToProcess.length });
+      setActiveBatchMode(batchMode); // Set active batch mode for UI indicator
       
       // Use batch processing
       const batchResults = await handleProcessFilesBatch(filesToProcess, batchMode);

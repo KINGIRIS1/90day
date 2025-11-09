@@ -487,12 +487,46 @@ function BatchScanner() {
             
             processedFolderPaths.push(folder.path);
           }
+          
+          // Save folder timing
+          const folderEndTime = Date.now();
+          const folderDurationMs = folderEndTime - folderStartTime;
+          console.log(`\n✅ Folder "${folder.name}" completed in ${(folderDurationMs / 1000).toFixed(2)}s (${folderResults.length} files)`);
+          
+          setTimers(prev => ({
+            ...prev,
+            folderTimings: [...prev.folderTimings, {
+              folderName: folder.name,
+              folderPath: folder.path,
+              startTime: folderStartTime,
+              endTime: folderEndTime,
+              durationMs: folderDurationMs,
+              fileCount: folderResults.length,
+              avgTimePerFile: folderResults.length > 0 ? (folderDurationMs / folderResults.length).toFixed(0) : 0
+            }]
+          }));
         } catch (err) {
           console.error(`Error scanning ${folder.path}:`, err);
           allErrors.push({
             folder: folder.path,
             error: err.message
           });
+          
+          // Still save folder timing even if error
+          const folderEndTime = Date.now();
+          const folderDurationMs = folderEndTime - folderStartTime;
+          setTimers(prev => ({
+            ...prev,
+            folderTimings: [...prev.folderTimings, {
+              folderName: folder.name,
+              folderPath: folder.path,
+              startTime: folderStartTime,
+              endTime: folderEndTime,
+              durationMs: folderDurationMs,
+              fileCount: 0,
+              error: true
+            }]
+          }));
         }
       }
 

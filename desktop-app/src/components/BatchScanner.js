@@ -90,10 +90,18 @@ function BatchScanner() {
       // Parse found files: "🖼️  Found 10 image file(s)"
       const foundMatch = logText.match(/Found\s+(\d+)\s+image/);
       if (foundMatch) {
+        const count = parseInt(foundMatch[1]);
         setProgress(prev => ({
           ...prev,
-          totalFiles: parseInt(foundMatch[1])
+          totalFiles: count
         }));
+
+        // Update current folder tab count
+        setFolderTabs(prev => 
+          prev.map(t => 
+            t.path === progress.currentFolder ? { ...t, count } : t
+          )
+        );
       }
     };
 

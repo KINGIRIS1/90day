@@ -738,6 +738,10 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   → ❌ SAI! (1) Có section number "I.", (2) Không ở top 20%
   → Phải là {short_code: "UNKNOWN"}
 
+- Trang có "PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC" + quốc huy + "CỘNG HÒA..." nhưng classify thành PKTHS
+  → ❌ SAI! Có quốc huy + 3 dòng + nội dung về đo đạc → Phải là PXNKQDD (KHÔNG phải PKTHS)
+  → PKTHS không có quốc huy, PXNKQDD CÓ quốc huy
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 98 MÃ TRÊN!
 
 📋 VÍ DỤ RESPONSE FORMAT:

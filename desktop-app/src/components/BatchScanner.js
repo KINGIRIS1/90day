@@ -702,14 +702,14 @@ function BatchScanner() {
           )}
 
           {/* Success Message */}
-          {results.processed_files > 0 && (
+          {scanResults.processed_files > 0 && (
             <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">✅</span>
                 <div>
                   <div className="font-semibold text-green-900">Quét hoàn tất!</div>
                   <div className="text-sm text-green-700 mt-1">
-                    Đã xử lý thành công {results.processed_files} file từ {results.valid_folders} thư mục.
+                    Đã xử lý thành công {scanResults.processed_files} file từ {scanResults.valid_folders} thư mục.
                   </div>
                 </div>
               </div>

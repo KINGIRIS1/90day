@@ -309,6 +309,7 @@ def batch_classify_fixed(image_paths, api_key, batch_size=5):
     
     all_results = []
     total_batches = (len(image_paths) + batch_size - 1) // batch_size
+    processed_files = set()  # Track processed files to detect missing ones
     
     for batch_idx in range(0, len(image_paths), batch_size):
         batch_paths = image_paths[batch_idx:batch_idx + batch_size]

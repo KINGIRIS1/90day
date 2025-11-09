@@ -95,9 +95,12 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
     Returns:
         JSON object with results, errors, and statistics
     """
-    print(f"📋 Starting batch scan from: {txt_path}", file=sys.stderr)
-    print(f"🔧 OCR Engine: {ocr_engine}", file=sys.stderr)
-    print(f"📤 Output Option: {output_option}", file=sys.stderr)
+    try:
+        print(f"📋 Starting batch scan from: {txt_path}")
+        print(f"🔧 OCR Engine: {ocr_engine}")
+        print(f"📤 Output Option: {output_option}")
+    except:
+        pass  # Ignore print errors
     
     # Read folder list from TXT
     folders = read_txt_file(txt_path)

@@ -25,6 +25,128 @@ from ocr_engine_gemini_flash import (
 )
 
 
+def adapt_prompt_for_multi_image(single_image_prompt, batch_size):
+    """
+    Adapt single-image prompt to multi-image batch context
+    
+    Changes:
+    1. Add multi-image context introduction
+    2. Add document grouping instructions
+    3. Change output format from single result to documents array
+    4. Add page indexing (0-indexed)
+    5. Emphasize MUST return ALL pages
+    """
+    
+    multi_image_intro = f"""🎯 BATCH ANALYSIS - {batch_size} TRANG SCAN
+
+Bạn đang phân tích {batch_size} trang scan tài liệu đất đai Việt Nam.
+Các trang này có thể thuộc 1 hoặc nhiều tài liệu khác nhau.
+
+NHIỆM VỤ:
+1. Xác định có BAO NHIÊU tài liệu khác nhau trong {batch_size} trang này
+2. Nhóm các trang theo tài liệu (pages array)
+3. Phân loại loại tài liệu của từng nhóm
+4. Trích xuất metadata (ngày cấp cho GCN, màu sắc, v.v.)
+
+DẤU HIỆU NHẬN BIẾT:
+
+TRANG 1 CỦA TÀI LIỆU (New Document):
+- Có TIÊU ĐỀ CHÍNH ở TOP 30% (đầu trang)
+- Cỡ chữ LỚN, IN HOA, căn giữa
+- Có quốc huy (đối với GCN)
+- Khác biệt rõ về format/màu sắc so với trang trước
+
+TRANG TIẾP NỐI (Continuation - Trang 2, 3, 4...):
+- KHÔNG có tiêu đề chính ở đầu
+- Chỉ có section headers: "II.", "III.", "ĐIỀU 2", "PHẦN II"
+- Cùng format/màu sắc với trang trước
+- Nội dung liên tục (điều khoản, chữ ký, bảng biểu)
+
+RANH GIỚI GIỮA CÁC TÀI LIỆU:
+- Thay đổi rõ rệt: màu giấy (hồng → trắng), format khác
+- Xuất hiện tiêu đề chính mới ở TOP
+- Layout hoàn toàn khác
+
+---
+
+"""
+
+    output_format = f"""
+
+---
+
+🎯 OUTPUT FORMAT - BẮT BUỘC:
+
+{{
+  "documents": [
+    {{
+      "type": "HDCQ",
+      "pages": [0, 1, 2, 3, 4],
+      "confidence": 0.95,
+      "reasoning": "5 trang đầu cùng format, trang 0 có tiêu đề 'HỢP ĐỒNG CHUYỂN NHƯỢNG', trang 1-4 là continuation pages với ĐIỀU 2, ĐIỀU 3",
+      "metadata": {{}}
+    }},
+    {{
+      "type": "GCN",
+      "pages": [5, 6],
+      "confidence": 0.98,
+      "reasoning": "Trang 5-6 là GCN màu hồng, có quốc huy, tìm thấy ngày cấp ở trang 6",
+      "metadata": {{
+        "color": "pink",
+        "issue_date": "27/10/2021",
+        "issue_date_confidence": "full"
+      }}
+    }},
+    {{
+      "type": "UNKNOWN",
+      "pages": [7, 8, 9],
+      "confidence": 0.3,
+      "reasoning": "3 trang cuối không rõ ràng, không có tiêu đề, không match 98 loại",
+      "metadata": {{}}
+    }}
+  ]
+}}
+
+🚨 CỰC KỲ QUAN TRỌNG - BẮT BUỘC RETURN TẤT CẢ {batch_size} PAGES:
+- Bạn PHẢI assign MỌI page (0 đến {batch_size-1}) vào 1 document
+- Nếu page không rõ → assign vào document type "UNKNOWN"
+- KHÔNG BAO GIỜ bỏ qua page nào
+- Tổng số pages trong "pages" arrays = {batch_size}
+
+VÍ DỤ ĐÚNG ({batch_size} pages):
+- Document 1: pages [0,1,2,3,4] (5 pages)
+- Document 2: pages [5,6,7,8] (4 pages)
+- Document 3: pages [9,10,...,{batch_size-1}] ({batch_size-9} pages)
+→ Total: {batch_size} pages ✅
+
+VÍ DỤ SAI:
+- Document 1: pages [0,1,2] (3 pages only)
+- Document 2: pages [5,6] (2 pages, SKIP pages 3-4!)
+→ Total: 5 pages ❌ (Missing pages 3,4,7,8,...,{batch_size-1})
+
+INDEXING:
+- pages dùng 0-indexed (trang đầu tiên = 0, trang cuối = {batch_size-1})
+- Nếu chỉ có 1 document → vẫn trả về array với 1 phần tử
+"""
+
+    # Combine: intro + original rules + output format
+    full_multi_prompt = multi_image_intro + single_image_prompt + output_format
+    
+    return full_multi_prompt
+
+
+def get_multi_image_prompt_full(batch_size):
+    """Get FULL prompt (Flash Full rules) for multi-image batch"""
+    single_prompt = get_classification_prompt()
+    return adapt_prompt_for_multi_image(single_prompt, batch_size)
+
+
+def get_multi_image_prompt_lite(batch_size):
+    """Get LITE prompt (Flash Lite rules) for multi-image batch"""
+    single_prompt = get_classification_prompt_lite()
+    return adapt_prompt_for_multi_image(single_prompt, batch_size)
+
+
 def encode_image_base64(image_path, max_width=1500, max_height=2100):
     """Encode image to base64 with smart resize"""
     try:

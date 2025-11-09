@@ -18,6 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Batch scan processing
   processBatchScan: (txtPath, outputOption, mergeSuffix, outputFolder) => ipcRenderer.invoke('process-batch-scan', txtPath, outputOption, mergeSuffix, outputFolder),
+  onBatchScanProgress: (callback) => ipcRenderer.on('batch-scan-progress', (event, data) => callback(data)),
   
   // Cloud Boost processing
   processDocumentCloud: (filePath) => ipcRenderer.invoke('process-document-cloud', filePath),

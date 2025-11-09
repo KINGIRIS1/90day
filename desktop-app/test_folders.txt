@@ -1,0 +1,7 @@
+# Test file for batch scanner
+# Each line = folder path
+# You can replace these with real folder paths on your system
+
+C:\Documents\TestFolder1
+C:\Documents\TestFolder2
+/home/user/Documents/TestFolder3

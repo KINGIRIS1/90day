@@ -95,10 +95,36 @@ def classify_document_gemini_flash_hybrid(
             print(f"   📋 GCN Special: Will scan 100% full image to extract issue_date", file=sys.stderr)
         
         # Reason 3: ERROR or UNKNOWN with very low confidence
+        # BUT: Check if this is GCN continuation page (section headers, no title)
         elif tier1_code in ['ERROR', 'UNKNOWN'] and tier1_confidence < 0.5:
-            needs_tier2 = True
-            escalation_reason = f"Uncertain classification ({tier1_code} with {tier1_confidence:.2%} confidence)"
-            print(f"\n⚠️ ESCALATION TRIGGER: {escalation_reason}", file=sys.stderr)
+            # Check reasoning for GCN continuation indicators
+            is_gcn_continuation = any(keyword in tier1_reasoning.lower() for keyword in [
+                'section header',
+                'thửa đất',
+                'sơ đồ thửa đất',
+                'ii.',
+                'iii.',
+                'iv.'
+            ])
+            
+            if is_gcn_continuation:
+                # This is likely GCN page 2/3 - no need for Tier 2
+                print(f"\n💡 DETECTED GCN CONTINUATION PAGE - SKIP TIER 2", file=sys.stderr)
+                print(f"   ├─ Reasoning contains: section headers (II., III., etc.)", file=sys.stderr)
+                print(f"   ├─ This is likely GCN page 2/3 (no title, no date)", file=sys.stderr)
+                print(f"   └─ Will be auto-classified via sequential naming", file=sys.stderr)
+                
+                # Keep UNKNOWN for now, sequential naming will fix it
+                tier1_result['tier_used'] = 'tier1_only'
+                tier1_result['tier1_confidence'] = tier1_confidence
+                tier1_result['escalation_reason'] = 'GCN continuation page detected - no escalation needed'
+                tier1_result['cost_estimate'] = 'low'
+                
+                return tier1_result
+            else:
+                needs_tier2 = True
+                escalation_reason = f"Uncertain classification ({tier1_code} with {tier1_confidence:.2%} confidence)"
+                print(f"\n⚠️ ESCALATION TRIGGER: {escalation_reason}", file=sys.stderr)
         
         # If Tier 1 is good enough, return immediately
         if not needs_tier2:

@@ -11,7 +11,7 @@ from PIL import Image
 import io
 
 
-def resize_image_smart(img, max_width=2000, max_height=2800):
+def resize_image_smart(img, max_width=1500, max_height=2100):
     """
     Smart resize: Only resize if image exceeds max dimensions
     Maintains aspect ratio

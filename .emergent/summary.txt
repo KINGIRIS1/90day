@@ -1,33 +1,28 @@
 <analysis>
-The AI engineer's work spanned enhancing an OCR application, primarily focusing on document classification and installer creation. Initially, the task was to create a one-click installer, which led to the generation of multiple build scripts (, ) and documentation. This process faced immediate issues: a missing  in  and a hanging Yarn installation during the build, both successfully resolved.
+The previous AI engineer's work focused on two main areas: refining the OCR document classification and implementing a Batch Scan from List feature. Initially, the engineer successfully addressed several classification inaccuracies by updating Python scripts and prompts. A one-click installer task led to new build scripts and documentation.
 
-Simultaneously, the engineer addressed several critical document classification inaccuracies reported by the user, including mapping HDTG to HDCQ, BVDS to HSKT, and refining DDKBD to DXTHT, and DDK to PCTSVC. These fixes involved updating , , and  prompts. UI improvements like updating the rescan warning message were also implemented.
-
-A config error during scanning was traced to a missing API key, which the user resolved. The engineer engaged in detailed prompt engineering discussions, including comparing a user-provided prompt with the existing one, and later a HYBRID prompt attempt, eventually discarding the hybrid due to real-world inaccuracies. The conversation concluded with a new directive: prioritize Flash Lite optimization, and a question about why HDCQ was correctly classified.
+The significant challenge arose during the Batch Scan feature implementation. Despite multiple attempts to integrate new IPC handlers and expose APIs in Electron's  and , the app consistently failed to recognize the new APIs, often due to persistent caching, incorrect file paths, port conflicts, and  issues. This involved extensive debugging, clean-up, and rebuilding attempts across both Linux (server) and Windows (desktop app) environments. Ultimately, the feature implementation was fully reverted, and new, simplified approaches were proposed to the user, highlighting the deep-seated challenges encountered with Electron's IPC and build system in this context.
 </analysis>
 
 <product_requirements>
-The application is a desktop OCR scanner for Vietnamese land documents, aiming for accurate classification, renaming, and batch processing using Gemini Flash AI.
-**Key requirements addressed:**
-*   **One-click installer:** Develop an automated build process for a single-executable installer.
-*   **Document Classification:**
-    *   Correctly classify HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT (HDTG) as HDCQ.
-    *   Map Bản vẽ đồ đạc/bản đồ địa chính (BVDS) to HSKT.
-    *   Ensure ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT is classified as DXTHT (not DDKBD).
-    *   Classify VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG (DDK) as PCTSVC.
+The application is a desktop OCR scanner for Vietnamese land documents, designed for accurate classification, renaming, and batch processing using Google's Gemini Flash AI.
+**Key requirements addressed/intended:**
+*   **One-click installer:** Develop an automated build process for a single-executable installer (partially implemented with scripts and docs).
+*   **Document Classification:** Correctly classify various Vietnamese land document types, including HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT (HDTG) as HDCQ, Bản vẽ đồ đạc/bản đồ địa chính (BVDS) as HSKT, ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT as DXTHT, and VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG (DDK) as PCTSVC.
 *   **Performance:** Optimize Gemini prompts for cost (Flash Lite) and accuracy.
 *   **UI/UX:** Modify the rescan folder warning message.
-*   **Rate Limit Management:** Provide guidance on Delay giữa các request for multiple machines.
+*   **Rate Limit Management:** Provide guidance on Delay giữa các request.
+*   **Batch Scan from List:** Implement a feature to scan documents from a list of predefined folder paths provided via CSV/Excel, processing only image files (JPG, JPEG, PNG), without scanning sub-folders. The output should offer three options: rename in place, copy by document type, or copy all to a user-selected folder. Invalid paths should be skipped with logging.
 </product_requirements>
 
 <key_technical_concepts>
 - **Electron**: Desktop app framework.
 - **React**: Frontend UI.
-- **Python**: Backend for OCR and AI.
+- **Python**: Backend for OCR and AI, batch processing.
 - **Gemini Flash API**: Google's AI for document OCR/classification (Flash & Flash Lite).
-- **Prompt Engineering**: Iterative refinement of LLM inputs for accurate classification and structured JSON output.
+- **Prompt Engineering**: LLM input refinement.
 - **NSIS**: Nullsoft Scriptable Install System for Windows installers.
-- **Client-side Post-processing**: JavaScript logic in  for classification rules.
+- **IPC (Inter-Process Communication)**: Electron's method for main/renderer process communication.
 </key_technical_concepts>
 
 <code_architecture>
@@ -36,68 +31,58 @@ The application has a , , and  structure.
 
 
 -   ****:
-    -   **Summary**: Defines project metadata, dependencies, and build scripts for the Electron app.
-    -   **Changes**: Removed  from the  configuration to fix a build error.
+    -   **Summary**: Defines project metadata, dependencies, and build scripts.
+    -   **Changes**: Initially removed , and  script modified for Linux compatibility. All batch scan related dependencies were removed upon reversion.
 -   ****:
-    -   **Summary**: Core Python script for Gemini OCR and classification. Contains prompts for Gemini Flash and Flash Lite models.
-    -   **Changes**:
-        -   Prompt updated to include HDTG as an example for HDCQ.
-        -   Prompt updated to include BVDS as an example for HSKT.
-        -   Prompt updated to include DXTHT in NHÓM 3 and distinguish it from DDKBD.
-        -   Prompt updated to include VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG as an example for PCTSVC.
+    -   **Summary**: Core Python script for Gemini OCR and classification, containing prompts for Flash and Flash Lite.
+    -   **Changes**: Prompts updated for HDTG as HDCQ, BVDS as HSKT, DXTHT distinction, and VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG as PCTSVC. The AI also analyzed its rules for HDCQ classification and identified a rule violation related to title position.
 -   ****:
-    -   **Summary**: Orchestrates document processing, calls OCR engine, and structures output.
+    -   **Summary**: Orchestrates document processing, calls OCR engine.
     -   **Changes**: Added  mapping:  to  and  to .
 -   ****:
-    -   **Summary**: Defines document classification rules and valid codes.
-    -   **Changes**:
-        -   Added  to  for HỢP ĐỒNG TẶNG CHO QUYỀN SỬ DỤNG ĐẤT.
-        -   Added  to  for ĐỒ ĐẠC CHÍNH LÝ BẢN ĐỒ ĐỊA CHÍNH.
-        -   Added variants for  in  to better capture ĐƠN ĐỀ NGHỊ TÁCH THỪA ĐẤT, HỢP THỪA ĐẤT.
-        -   Added  to  for VĂN BẢN ĐỀ NGHỊ ĐĂNG KÝ TÀI SẢN CHUNG VỢ CHỒNG.
+    -   **Summary**: Defines document classification rules.
+    -   **Changes**: Added , , ,  to  with specific titles/variants.
 -   ****:
-    -   **Summary**: Handles scanning, displays results, and contains post-processing logic.
-    -   **Changes**: Modified the rescan folder warning message from Phát hiện lỗi nhiều file? Quét lại thư mục này để sửa to Nếu bạn phát hiện nhiều file bị lỗi. Hãy sử dụng tính năng quét lại thư mục này để sửa.
+    -   **Summary**: Handles scanning, displays results.
+    -   **Changes**: Modified rescan warning message.
 -   ****:
-    -   **Summary**: Documentation for building the installer.
-    -   **Changes**: Updated to include instructions for newly created build scripts.
--   **New Build Scripts and Docs**:
-    -   : Main batch script for one-click installer.
-    -   : PowerShell script for installer.
-    -   : Simplified batch script for faster rebuilds.
-    -   : README for build scripts.
-    -   : Script to test the installer.
-    -   : Quick start guide.
-    -   : Index of build scripts.
-    -   : Build-specific README.
-    -   : Summary of build process.
-    -   : A new file representing a hybrid prompt attempt, later discarded.
-    -   : Summary for the hybrid engine.
-    -   : Test script for the hybrid engine.
+    -   **Summary**: Electron's main process, sets up browser window, handles IPC.
+    -   **Changes**: Initially added IPC handlers for batch scanning (e.g., , ), debug logging for preload path, then reverted to its original state.
+-   ****:
+    -   **Summary**: Exposes Node.js APIs to the renderer process safely.
+    -   **Changes**: Initially added  and  to , then reverted to its original state.
+-   ****:
+    -   **Summary**: Main React component, handles navigation and routing.
+    -   **Changes**: Initially added a new tab for Batch Scan and its rendering logic, then reverted.
+-   ****: (, , , , , , , , )
+    -   **Summary**: New files generated to automate and document the one-click installer build process.
+-   ****: (, , )
+    -   **Summary**: Files created for a hybrid prompt attempt, which was later discarded due to real-world inaccuracies.
+-   ****: (, , , , , and many other temporary fix/debug/doc files)
+    -   **Summary**: A suite of new Python, React, and documentation files were created to implement the Batch Scan from List feature. These included a Python backend for file processing, a React component for the UI (with progress, pause/resume), and Electron IPC for communication. **All these files were subsequently deleted or reverted** due to persistent technical issues with Electron's caching and API loading mechanisms.
 </code_architecture>
 
 <pending_tasks>
--   Implement full logic for the all-in-one installer (beyond documentation).
--   Fine-tune remaining document types in  and .
--   Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
--   Migrate or pin React/Webpack versions.
--   Test the backend with 5-10 real images to validate Hybrid OCR.
--   Update icon for macOS (.icns).
--   Implement license/activation key feature.
--   Implement Parallel Local Processing for batch scanning.
--   Handle deep path length issues in the application.
--   Implement Batch Scan from List feature.
--   Address the slow startup of the app.
--   Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
--   Implement a code patch for robust cache pathing and single-instance lock in .
+- Implement full logic for the all-in-one installer.
+- Fine-tune remaining document types in  and .
+- Monitor OpenAI quota/plan for Emergent LLM Key (if Cloud Boost is used).
+- Migrate or pin React/Webpack versions.
+- Update icon for macOS (.icns).
+- Implement license/activation key feature.
+- Implement Parallel Local Processing for batch scanning.
+- Handle deep path length issues in the application.
+- Implement Batch Scan from List feature (reverted and needs new approach).
+- Address the slow startup of the app.
+- Add configurable single price rates (INPUT_RATE_PER_M, OUTPUT_RATE_PER_M) in Cloud Settings.
+- Implement a code patch for robust cache pathing and single-instance lock in .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer had addressed several document classification issues and provided cost calculations. The user reported that a previously introduced HYBRID prompt version showed many errors in real-world testing. The AI engineer analyzed the current app's  and realized the existing Flash Lite prompt was significantly more optimized than the proposed hybrid, recommending against deploying the hybrid.
+Immediately before this summary request, the AI engineer had concluded an extensive and ultimately unsuccessful attempt to implement the Batch Scan from List feature. The initial implementation involved creating new Python scripts (), a React component (), and Electron IPC handlers (, ). However, the feature faced critical and persistent issues, primarily with Electron's  not correctly loading or exposing the new  API, leading to numerous debugging cycles focused on cache clearing, file path verification, build processes, port conflicts, and Electron's  security features. Despite many troubleshooting steps and workarounds, the issue persisted.
 
-The user then discarded the hybrid and set a new directive: all future optimizations should prioritize the **Flash Lite** version. Only content explicitly requested for *both* Flash versions should be added to the full Flash version; otherwise, it's for Flash Lite only. The user provided a scan log for a document titled HỢP ĐỒNG CHUYỂN NHƯỢNG which was correctly classified as HDCQ using Flash Lite and asked for an explanation as to why it was correctly classified. The AI engineer was about to analyze the image to explain the classification.
+Following the user's explicit request to xóa hết phần liên quan đến quét danh sách và làm lại từ đầu (delete everything related to batch scanning and start over), the AI engineer meticulously reverted all code changes and deleted all new files related to the Batch Scan from List feature. The codebase is now in a state prior to this feature's development. The AI engineer has just proposed three new approaches for reimplementing the Batch Scan from List feature, ranging from using only existing APIs to a CSV-based drag & drop solution without needing new IPC, and is awaiting the user's selection.
 </current_work>
 
 <optional_next_step>
-Analyze the provided HỢP ĐỒNG CHUYỂN NHƯỢNG image to explain its classification as HDCQ by the Flash Lite model.
+Wait for the user to select one of the proposed new approaches for the Batch Scan from List feature.
 </optional_next_step>

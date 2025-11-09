@@ -180,15 +180,15 @@ function BatchScanner() {
               <input
                 type="radio"
                 name="outputOption"
-                value="rename_in_place"
-                checked={outputOption === 'rename_in_place'}
+                value="same_folder"
+                checked={outputOption === 'same_folder'}
                 onChange={(e) => setOutputOption(e.target.value)}
                 disabled={isProcessing}
                 className="text-blue-600"
               />
               <div>
-                <div className="font-medium text-gray-900">Đổi tên tại chỗ</div>
-                <div className="text-xs text-gray-500">File được đổi tên trong thư mục gốc (SHORT_CODE_filename.jpg)</div>
+                <div className="font-medium text-gray-900">Lưu trong thư mục gốc</div>
+                <div className="text-xs text-gray-500">Merge ảnh cùng loại thành PDF, lưu trong thư mục gốc (HDCQ.pdf, GCNM.pdf)</div>
               </div>
             </label>
 
@@ -196,15 +196,15 @@ function BatchScanner() {
               <input
                 type="radio"
                 name="outputOption"
-                value="copy_by_type"
-                checked={outputOption === 'copy_by_type'}
+                value="new_folder"
+                checked={outputOption === 'new_folder'}
                 onChange={(e) => setOutputOption(e.target.value)}
                 disabled={isProcessing}
                 className="text-blue-600"
               />
               <div>
-                <div className="font-medium text-gray-900">Copy theo loại tài liệu</div>
-                <div className="text-xs text-gray-500">Copy và tổ chức vào thư mục con theo loại (HDCQ/, GCNM/, ...)</div>
+                <div className="font-medium text-gray-900">Lưu trong thư mục mới (có suffix)</div>
+                <div className="text-xs text-gray-500">Tạo thư mục mới bên cạnh với suffix, merge PDF vào đó (Folder1_merged/HDCQ.pdf)</div>
               </div>
             </label>
 
@@ -212,22 +212,42 @@ function BatchScanner() {
               <input
                 type="radio"
                 name="outputOption"
-                value="copy_all"
-                checked={outputOption === 'copy_all'}
+                value="custom_folder"
+                checked={outputOption === 'custom_folder'}
                 onChange={(e) => setOutputOption(e.target.value)}
                 disabled={isProcessing}
                 className="text-blue-600"
               />
               <div>
-                <div className="font-medium text-gray-900">Copy tất cả vào 1 thư mục</div>
-                <div className="text-xs text-gray-500">Copy tất cả file đã đổi tên vào 1 thư mục (SHORT_CODE_filename.jpg)</div>
+                <div className="font-medium text-gray-900">Lưu trong thư mục chỉ định</div>
+                <div className="text-xs text-gray-500">Merge PDF, lưu trong thư mục chỉ định, tổ chức theo tên thư mục gốc (Output/Folder1/HDCQ.pdf)</div>
               </div>
             </label>
           </div>
         </div>
 
-        {/* Output Folder Selection (only for copy modes) */}
-        {(outputOption === 'copy_by_type' || outputOption === 'copy_all') && (
+        {/* Merge Suffix Input (only for new_folder mode) */}
+        {outputOption === 'new_folder' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              4️⃣ Nhập suffix cho thư mục mới
+            </label>
+            <input
+              type="text"
+              value={mergeSuffix}
+              onChange={(e) => setMergeSuffix(e.target.value)}
+              disabled={isProcessing}
+              placeholder="Ví dụ: _merged, _output, _pdf"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Ví dụ: Folder1 → Folder1{mergeSuffix}
+            </p>
+          </div>
+        )}
+
+        {/* Output Folder Selection (only for custom_folder mode) */}
+        {outputOption === 'custom_folder' && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               4️⃣ Chọn thư mục đích

@@ -462,44 +462,24 @@ def group_by_document(quick_results, file_paths):
 
 def batch_classify_smart(image_paths, api_key):
     """
-    Phương án 2: Smart Batching
-    Quét nhanh tất cả → Nhóm theo document → Gửi từng nhóm
+    Phương án 2: Smart Batching - IMPROVED
+    Gửi TẤT CẢ files trong 1 batch lớn, để Gemini tự nhóm documents
     """
     print(f"\n{'='*80}", file=sys.stderr)
-    print(f"🧠 BATCH MODE 2: Smart Batching (Group by Document)", file=sys.stderr)
+    print(f"🧠 BATCH MODE 2: Smart Batching (AI-Powered Grouping)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
-    # Step 1: Quick scan all images
-    print(f"\n📊 STEP 1: Quick scan {len(image_paths)} images...", file=sys.stderr)
-    quick_results = []
-    for i, path in enumerate(image_paths):
-        print(f"   [{i+1}/{len(image_paths)}] Scanning {os.path.basename(path)}...", file=sys.stderr)
-        result = quick_scan_tier1(path, api_key)
-        quick_results.append(result)
-        print(f"      → {result.get('short_code')} ({result.get('confidence', 0):.0%})", file=sys.stderr)
+    # Check batch size - if too large, use fixed batches
+    if len(image_paths) > 30:
+        print(f"⚠️ Too many files ({len(image_paths)}), using Fixed Batch mode (5 files) instead", file=sys.stderr)
+        return batch_classify_fixed(image_paths, api_key, batch_size=5)
     
-    # Step 2: Group by document
-    print(f"\n📊 STEP 2: Grouping by document boundaries...", file=sys.stderr)
-    document_groups = group_by_document(quick_results, image_paths)
+    # Smart batching: Send all files in ONE batch
+    print(f"\n📊 Smart Batching: Sending {len(image_paths)} files in 1 batch", file=sys.stderr)
+    print(f"   Let AI detect document boundaries and group pages automatically", file=sys.stderr)
     
-    # Step 3: Process each document group
-    print(f"\n📊 STEP 3: Detailed analysis of {len(document_groups)} documents...", file=sys.stderr)
-    all_results = []
-    
-    for doc_idx, group_indices in enumerate(document_groups):
-        group_paths = [image_paths[i] for i in group_indices]
-        
-        print(f"\n📄 Document {doc_idx + 1}/{len(document_groups)}: {len(group_paths)} pages", file=sys.stderr)
-        
-        # Use fixed batch for this document
-        group_results = batch_classify_fixed(group_paths, api_key, batch_size=len(group_paths))
-        all_results.extend(group_results)
-    
-    print(f"\n{'='*80}", file=sys.stderr)
-    print(f"✅ BATCH MODE 2 COMPLETE: {len(all_results)} files processed in {len(document_groups)} documents", file=sys.stderr)
-    print(f"{'='*80}", file=sys.stderr)
-    
-    return all_results
+    # Use fixed batch with size = all files
+    return batch_classify_fixed(image_paths, api_key, batch_size=len(image_paths))
 
 
 # CLI interface for testing

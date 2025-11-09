@@ -11,20 +11,10 @@ from pathlib import Path
 import shutil
 import warnings
 
-# Force UTF-8 encoding
-import io
-if sys.platform == 'win32':
-    try:
-        if hasattr(sys.stdout, 'buffer'):
-            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
-        if hasattr(sys.stderr, 'buffer'):
-            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace', line_buffering=True)
-    except Exception:
-        pass
-
-# Suppress warnings
+# Suppress warnings FIRST
 warnings.filterwarnings('ignore')
 os.environ['GLOG_minloglevel'] = '2'
+os.environ['FLAGS_use_mkldnn'] = '0'
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(__file__))

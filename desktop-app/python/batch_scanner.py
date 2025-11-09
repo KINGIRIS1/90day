@@ -254,7 +254,8 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                 "processed_files": 0,
                 "skipped_folders": [],
                 "errors": [],
-                "results": []
+                "results": [],
+                "merged_pdfs": []
             }
     
     # Statistics
@@ -263,6 +264,7 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
     skipped_folders = []
     errors = []
     results = []
+    merged_pdfs = []
     
     # Process each folder
     for idx, folder_path in enumerate(folders):
@@ -281,6 +283,9 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
         image_files = validation["image_files"]
         total_files += len(image_files)
         print(f"🖼️  Found {len(image_files)} image file(s)")
+        
+        # Group to store classified images
+        folder_groups = {}  # {short_code: [image_paths]}
         
         # Process each image
         for file_idx, image_path in enumerate(image_files):
@@ -306,24 +311,14 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                 
                 print(f"   ✅ {short_code} ({doc_type}) - Confidence: {confidence:.0%}")
                 
-                # Handle output based on option
-                new_path = None
-                if output_option == "rename_in_place":
-                    # Rename file in place
-                    new_path = rename_file_in_place(image_path, short_code)
-                
-                elif output_option == "copy_by_type":
-                    # Copy to output folder, organized by document type
-                    new_path = copy_file_by_type(image_path, short_code, output_folder)
-                
-                elif output_option == "copy_all":
-                    # Copy to output folder with renamed file
-                    new_path = copy_file_to_output(image_path, short_code, output_folder)
+                # Group images by short_code
+                if short_code not in folder_groups:
+                    folder_groups[short_code] = []
+                folder_groups[short_code].append(image_path)
                 
                 processed_files += 1
                 results.append({
                     "original_path": image_path,
-                    "new_path": new_path,
                     "short_code": short_code,
                     "doc_type": doc_type,
                     "confidence": confidence,
@@ -336,6 +331,57 @@ def process_batch_scan(txt_path: str, ocr_engine: str, api_key: str = None, outp
                     "file": image_path,
                     "error": str(e)
                 })
+        
+        # Merge images to PDF by short_code
+        if folder_groups:
+            print(f"\n📚 Merging images to PDF for folder: {os.path.basename(folder_path)}")
+            
+            # Determine output directory
+            if output_option == "same_folder":
+                # Save in source folder
+                output_dir = folder_path
+            elif output_option == "new_folder":
+                # Save in new folder with suffix
+                parent_dir = os.path.dirname(folder_path)
+                folder_name = os.path.basename(folder_path)
+                output_dir = os.path.join(parent_dir, folder_name + merge_suffix)
+                os.makedirs(output_dir, exist_ok=True)
+            elif output_option == "custom_folder":
+                # Save in output_folder/folder_name/
+                folder_name = os.path.basename(folder_path)
+                output_dir = os.path.join(output_folder, folder_name)
+                os.makedirs(output_dir, exist_ok=True)
+            else:
+                output_dir = folder_path
+            
+            # Merge each group
+            for short_code, img_paths in folder_groups.items():
+                pdf_name = f"{short_code}.pdf"
+                pdf_path = os.path.join(output_dir, pdf_name)
+                
+                # Handle duplicate PDF names
+                counter = 1
+                while os.path.exists(pdf_path):
+                    pdf_name = f"{short_code}({counter}).pdf"
+                    pdf_path = os.path.join(output_dir, pdf_name)
+                    counter += 1
+                
+                print(f"   📄 Merging {len(img_paths)} images → {pdf_name}")
+                
+                success = merge_images_to_pdf(img_paths, pdf_path)
+                if success:
+                    merged_pdfs.append({
+                        "short_code": short_code,
+                        "path": pdf_path,
+                        "count": len(img_paths),
+                        "folder": folder_path
+                    })
+                    print(f"   ✅ Saved: {pdf_path}")
+                else:
+                    errors.append({
+                        "file": folder_path,
+                        "error": f"Failed to merge PDF for {short_code}"
+                    })
     
     # Summary
     print(f"\n✅ Batch scan complete!")

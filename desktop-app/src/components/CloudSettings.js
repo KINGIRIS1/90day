@@ -16,6 +16,9 @@ function CloudSettings() {
   const [enableResize, setEnableResize] = useState(true);
   const [maxWidth, setMaxWidth] = useState(2000);
   const [maxHeight, setMaxHeight] = useState(2800);
+  
+  // Batch processing mode
+  const [batchMode, setBatchMode] = useState('sequential');
 
   useEffect(() => {
     loadSettings();

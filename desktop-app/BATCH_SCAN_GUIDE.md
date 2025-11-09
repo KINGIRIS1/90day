@@ -53,6 +53,19 @@ E:\Scan\ThangĐÈN
 - Tổ chức theo cấu trúc rõ ràng
 - Backup/archive toàn bộ batch
 
+### 🚀 Cách sử dụng:
+
+1. Click tab **"📋 Quét danh sách"**
+2. Chọn file TXT (mỗi dòng = đường dẫn thư mục)
+3. Click **"🚀 Bắt đầu quét"** và đợi hoàn tất
+4. Xem kết quả: Grid hiển thị tất cả file đã quét với preview
+5. Click **"📚 Gộp PDF"** để merge ảnh thành PDF
+6. Chọn chế độ output trong modal:
+   - **Gộp vào thư mục gốc**: Lưu PDF trong thư mục gốc
+   - **Tạo thư mục mới**: Nhập suffix (VD: `_merged`, `_output`)
+   - **Lưu vào thư mục chỉ định**: Chọn thư mục đích
+7. Click **"Bắt đầu gộp"** và đợi hoàn tất
+
 ## 📝 Hướng dẫn từng bước
 
 ### Bước 1: Chuẩn bị file TXT

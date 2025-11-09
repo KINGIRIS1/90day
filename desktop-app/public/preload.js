@@ -22,6 +22,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   processBatchScan: (txtPath, outputOption, mergeSuffix, outputFolder) => ipcRenderer.invoke('process-batch-scan', txtPath, outputOption, mergeSuffix, outputFolder),
   onBatchScanProgress: (callback) => ipcRenderer.on('batch-scan-progress', (event, data) => callback(data)),
   
+  // Batch multi-image processing (NEW)
+  batchProcessDocuments: (params) => ipcRenderer.invoke('batch-process-documents', params),
+  
   // Cloud Boost processing
   processDocumentCloud: (filePath) => ipcRenderer.invoke('process-document-cloud', filePath),
   
@@ -32,7 +35,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Backend URL for cloud boost
   getBackendUrl: () => ipcRenderer.invoke('get-backend-url'),
   // PDF merge
-  mergeByShortCode: (items, options) => ipcRenderer.invoke('merge-by-short-code', items, options),
+  mergeByShortCode: (items, options) => {
+    console.log('📡 PRELOAD.JS: mergeByShortCode called');
+    console.log('   Items:', items.length);
+    console.log('   Options:', options);
+    return ipcRenderer.invoke('merge-by-short-code', items, options);
+  },
   chooseSavePath: (defaultName) => ipcRenderer.invoke('choose-save-path', defaultName),
   readImageDataUrl: (filePath) => ipcRenderer.invoke('read-image-data-url', filePath),
 

@@ -158,6 +158,39 @@ def classify_document_gemini_flash_hybrid(
         print(f"   └─ Reasoning: {tier2_reasoning[:100]}...", file=sys.stderr)
         
         # Compare Tier 1 vs Tier 2
+        # 🔧 FIX: If Tier 2 fails or returns worse result than Tier 1, keep Tier 1
+        tier2_failed = (
+            tier2_code == 'UNKNOWN' and 
+            tier1_code != 'UNKNOWN' and 
+            tier2_confidence < tier1_confidence
+        )
+        
+        if tier2_failed:
+            print(f"\n⚠️ TIER 2 WORSE THAN TIER 1 - KEEPING TIER 1 RESULT:", file=sys.stderr)
+            print(f"   ├─ Tier 1: {tier1_code} ({tier1_confidence:.2%}) ✅ FINAL", file=sys.stderr)
+            print(f"   └─ Tier 2: {tier2_code} ({tier2_confidence:.2%}) ❌ DISCARDED", file=sys.stderr)
+            print(f"   └─ Reason: Tier 2 parse failed or returned UNKNOWN with lower confidence", file=sys.stderr)
+            
+            # Return Tier 1 result with Tier 2 metadata
+            tier1_result['tier_used'] = 'tier2_fallback_to_tier1'
+            tier1_result['tier1_confidence'] = tier1_confidence
+            tier1_result['tier2_confidence'] = tier2_confidence
+            tier1_result['tier2_failed'] = True
+            tier1_result['tier2_error_reason'] = 'Parse failed or UNKNOWN with lower confidence'
+            tier1_result['escalation_reason'] = escalation_reason
+            tier1_result['cost_estimate'] = 'medium'  # Both tiers used but Tier 1 kept
+            
+            print(f"\n💰 COST SUMMARY:", file=sys.stderr)
+            print(f"   ├─ Tier 1 (Flash Lite): ~$0.08/1K", file=sys.stderr)
+            print(f"   ├─ Tier 2 (Flash Full): ~$0.16/1K (failed)", file=sys.stderr)
+            print(f"   └─ Total: ~$0.24/1K (kept Tier 1 result)", file=sys.stderr)
+            print(f"\n🛡️ FALLBACK PROTECTION:", file=sys.stderr)
+            print(f"   └─ Tier 1 result preserved: {tier1_code} ({tier1_confidence:.2%})", file=sys.stderr)
+            print("=" * 80, file=sys.stderr)
+            
+            return tier1_result
+        
+        # Normal case: Tier 2 succeeded
         if tier1_code != 'ERROR' and tier2_code != tier1_code:
             print(f"\n🔄 CLASSIFICATION CHANGED:", file=sys.stderr)
             print(f"   ├─ Tier 1: {tier1_code} ({tier1_confidence:.2%})", file=sys.stderr)

@@ -276,8 +276,8 @@ function BatchScanner() {
           // Scan each file and display immediately
           const folderResults = [];
           for (let j = 0; j < validImages.length; j++) {
-            // Check shouldStop at start of each iteration
-            if (shouldStop) {
+            // Check stopRef at start of each iteration
+            if (stopRef.current) {
               console.log('⏹️ Stopping at file:', j + 1);
               break;
             }

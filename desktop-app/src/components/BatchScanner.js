@@ -78,15 +78,13 @@ function BatchScanner() {
       console.log('🚀 Starting batch scan...');
       console.log('📄 TXT file:', txtFilePath);
       console.log('🔧 OCR Engine:', ocrEngine);
-      console.log('📤 Output Option:', outputOption);
-      console.log('📝 Merge Suffix:', mergeSuffix);
-      console.log('📁 Output Folder:', outputFolder);
 
+      // Just scan files, don't merge yet (merge will be done manually via modal)
       const result = await window.electronAPI.processBatchScan(
         txtFilePath,
-        outputOption,
-        mergeSuffix,
-        outputFolder
+        'scan_only', // Special mode: only scan, no merge
+        '_merged',
+        null
       );
 
       console.log('✅ Batch scan result:', result);

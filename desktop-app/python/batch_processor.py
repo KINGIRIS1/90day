@@ -359,25 +359,26 @@ def batch_classify_smart(image_paths, api_key):
 # CLI interface for testing
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("Usage: python batch_processor.py <mode> <api_key> <image1> <image2> ...")
-        print("Modes: fixed, smart")
-        print("Example: python batch_processor.py fixed AIza... img1.jpg img2.jpg img3.jpg")
+        print("Usage: python batch_processor.py <mode> <api_key> <image1> <image2> ...", file=sys.stderr)
+        print("Modes: fixed, smart", file=sys.stderr)
+        print("Example: python batch_processor.py fixed AIza... img1.jpg img2.jpg img3.jpg", file=sys.stderr)
         sys.exit(1)
     
     mode = sys.argv[1]
     api_key = sys.argv[2]
     image_paths = sys.argv[3:]
     
-    print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode\n")
+    print(f"🔍 Batch processing {len(image_paths)} images in '{mode}' mode", file=sys.stderr)
     
     if mode == 'fixed':
         results = batch_classify_fixed(image_paths, api_key, batch_size=5)
     elif mode == 'smart':
         results = batch_classify_smart(image_paths, api_key)
     else:
-        print(f"❌ Unknown mode: {mode}")
+        print(f"❌ Unknown mode: {mode}", file=sys.stderr)
         sys.exit(1)
     
-    print(f"\n📊 RESULTS:")
-    for result in results:
-        print(f"   {result['file_name']}: {result['short_code']} ({result['confidence']:.0%})")
+    # Output JSON to stdout for IPC
+    print(json.dumps(results, ensure_ascii=False))
+    
+    print(f"\n📊 BATCH COMPLETE: {len(results)} files processed", file=sys.stderr)

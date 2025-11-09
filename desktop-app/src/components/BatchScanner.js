@@ -47,12 +47,33 @@ function BatchScanner() {
       // Parse folder progress: "📂 [1/3] Processing: C:\Folder1"
       const folderMatch = logText.match(/📂\s*\[(\d+)\/(\d+)\]\s*Processing:\s*(.+)/);
       if (folderMatch) {
+        const folderPath = folderMatch[3].trim();
+        const folderName = folderPath.split(/[/\\]/).pop() || folderPath;
+        
         setProgress(prev => ({
           ...prev,
           processedFolders: parseInt(folderMatch[1]),
           totalFolders: parseInt(folderMatch[2]),
-          currentFolder: folderMatch[3].trim()
+          currentFolder: folderPath
         }));
+
+        // Update or create folder tab with 'scanning' status
+        setFolderTabs(prev => {
+          const existing = prev.find(t => t.path === folderPath);
+          if (existing) {
+            return prev.map(t => 
+              t.path === folderPath ? { ...t, status: 'scanning' } : t
+            );
+          } else {
+            return [...prev, {
+              path: folderPath,
+              name: folderName,
+              count: 0,
+              status: 'scanning',
+              files: []
+            }];
+          }
+        });
       }
 
       // Parse file progress: "   [1/10] Processing: image001.jpg"

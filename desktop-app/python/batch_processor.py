@@ -200,8 +200,8 @@ INDEXING:
 - Nếu chỉ có 1 document → vẫn trả về array với 1 phần tử
 """
 
-    # Combine: intro + original rules + output format
-    full_multi_prompt = multi_image_intro + single_image_prompt + output_format
+    # Combine: intro + original rules + unknown rules + output format
+    full_multi_prompt = multi_image_intro + single_image_prompt + unknown_rules + output_format
     
     return full_multi_prompt
 

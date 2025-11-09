@@ -860,6 +860,37 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     // Force UI update
     setResults([...finalResults]);
+    
+    // End timer
+    if (!isResume && timers.scanStartTime) {
+      const scanEndTime = Date.now();
+      const scanElapsedMs = scanEndTime - timers.scanStartTime;
+      const scanElapsedSeconds = Math.floor(scanElapsedMs / 1000);
+      
+      console.log(`⏱️ File scan timer ended: ${new Date(scanEndTime).toLocaleTimeString()}`);
+      console.log(`⏱️ Total scan time: ${scanElapsedSeconds}s (${(scanElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+      
+      setTimers(prev => ({
+        ...prev,
+        scanEndTime: scanEndTime,
+        scanElapsedSeconds: scanElapsedSeconds
+      }));
+      
+      // Save file timings
+      const fileTimings = finalResults.map(r => ({
+        fileName: r.fileName,
+        startTime: r.startTime,
+        endTime: r.endTime,
+        durationMs: r.durationMs,
+        engineType: currentOcrEngine,
+        method: r.method || 'offline_ocr'
+      })).filter(t => t.startTime && t.endTime);
+      
+      setTimers(prev => ({
+        ...prev,
+        fileTimings: fileTimings
+      }));
+    }
 
     setProcessing(false);
   };

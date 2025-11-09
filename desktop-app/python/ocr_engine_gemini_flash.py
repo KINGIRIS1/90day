@@ -385,15 +385,27 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
 GCNB = Giấy chứng nhận bản sao
 GCNL = Giấy chứng nhận lãnh sự
 
-NHÓM 2 - HỢP ĐỒNG:
-HDCQ = Hợp đồng chuyển nhượng quyền sử dụng đất (bao gồm cả hợp đồng tặng cho)
-HDTG = Hợp đồng tặng cho quyền sử dụng đất (alias của HDCQ, có thể dùng cả 2)
+NHÓM 2 - HỢP ĐỒNG (QUAN TRỌNG - PHÂN BIỆT RÕ):
+⚠️ PHÂN BIỆT CHÍNH XÁC:
+HDCQ = Hợp đồng chuyển nhượng, tặng cho quyền sử dụng đất
+  • Tiêu đề CHÍNH XÁC: "HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT"
+  • Hoặc: "HỢP ĐỒNG CHUYỂN NHƯỢNG QUYỀN SỬ DỤNG ĐẤT"
+  • Keywords: "chuyển nhượng", "tặng cho", "bán đất", "mua đất", "quyền sử dụng đất"
+  • Nội dung: Chuyển quyền sở hữu đất từ A sang B (bán/tặng)
+  • ✅ VD ĐÚNG: Title có "CHUYỂN NHƯỢNG" → HDCQ
+
 HDUQ = Hợp đồng ủy quyền
+  • Tiêu đề CHÍNH XÁC: "HỢP ĐỒNG ỦY QUYỀN"
+  • Keywords: "ủy quyền", "người ủy quyền", "người được ủy quyền", "thay mặt"
+  • Nội dung: A ủy quyền cho B làm thủ tục (KHÔNG chuyển quyền sở hữu)
+  • ✅ VD ĐÚNG: Title có "ỦY QUYỀN" (KHÔNG có "chuyển nhượng") → HDUQ
+  • 🚨 QUAN TRỌNG: Nếu title là "HỢP ĐỒNG ỦY QUYỀN" → BẮT BUỘC trả về HDUQ (KHÔNG phải HDCQ)
+
 HDGO = Hợp đồng góp vốn
 HDMB = Hợp đồng mua bán
 HDSD = Hợp đồng sử dụng
 HDTH = Hợp đồng cho thuê
-HDTG = Hợp đồng thế chấp
+HDTC = Hợp đồng thế chấp
 HDTL = Hợp đồng tặng cho
 
 NHÓM 3 - ĐƠN (APPLICATION FORMS):

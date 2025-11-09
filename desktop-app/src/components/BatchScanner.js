@@ -62,8 +62,13 @@ function BatchScanner() {
       return;
     }
 
-    if ((outputOption === 'copy_by_type' || outputOption === 'copy_all') && !outputFolder) {
+    if (outputOption === 'custom_folder' && !outputFolder) {
       alert('Vui lòng chọn thư mục đích!');
+      return;
+    }
+    
+    if (outputOption === 'new_folder' && !mergeSuffix) {
+      alert('Vui lòng nhập suffix cho thư mục mới!');
       return;
     }
 

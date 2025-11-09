@@ -677,25 +677,114 @@ function BatchScanner() {
       
       console.log(`  🎨 Unique colors: ${uniqueColors.join(', ') || 'none'}`);
       
-      // Step 6: Classify by color if mixed
+      // Step 6: Classify - Prioritize date over color, then use color as fallback
+      console.log(`  📊 Starting classification...`);
+      
+      // Group pairs by color
+      const redPairs = pairsWithData.filter(p => p.color === 'red' || p.color === 'orange');
+      const pinkPairs = pairsWithData.filter(p => p.color === 'pink');
+      const unknownColorPairs = pairsWithData.filter(p => !p.color || p.color === 'unknown');
+      
+      console.log(`  🎨 Red pairs: ${redPairs.length}, Pink pairs: ${pinkPairs.length}, Unknown: ${unknownColorPairs.length}`);
+      
+      // If mixed colors (red vs pink), use color-based classification
       if (hasMixedColors && hasRedAndPink) {
-        console.log(`  🎨 Mixed colors → Classify by color`);
+        console.log(`  🎨 Mixed colors detected → Using color for base classification`);
         
-        pairsWithData.forEach(pair => {
-          const classification = (pair.color === 'red' || pair.color === 'orange') ? 'GCNC' : 'GCNM';
-          const note = `Màu ${pair.color} → ${classification}`;
+        // Classify red pairs by date (oldest red = GCNC, newer red = GCNM)
+        const redPairsWithDate = redPairs.filter(p => p.parsedDate);
+        if (redPairsWithDate.length > 0) {
+          redPairsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+          console.log(`  📅 Red pairs with dates: ${redPairsWithDate.length}`);
           
+          redPairsWithDate.forEach((pair, idx) => {
+            const classification = idx === 0 ? 'GCNC' : 'GCNM';
+            const note = `Màu đỏ, ngày ${pair.issueDate} → ${classification} ${idx === 0 ? '(cũ nhất trong đỏ)' : ''}`;
+            
+            console.log(`    ✅ Red Pair ${idx + 1}: ${note}`);
+            
+            [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+              const index = normalizedResults.indexOf(page);
+              normalizedResults[index] = {
+                ...page,
+                short_code: classification,
+                reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+                gcn_classification_note: `📌 ${note}`
+              };
+            });
+          });
+        }
+        
+        // All red pairs without dates → GCNC (default old)
+        const redPairsNoDate = redPairs.filter(p => !p.parsedDate);
+        redPairsNoDate.forEach(pair => {
+          const note = `Màu đỏ, không có ngày → GCNC (mặc định cũ)`;
           [pair.page1, pair.page2].filter(Boolean).forEach(page => {
             const index = normalizedResults.indexOf(page);
             normalizedResults[index] = {
               ...page,
-              short_code: classification,
+              short_code: 'GCNC',
               reasoning: `${page.reasoning || 'GCN'} - ${note}`,
               gcn_classification_note: `📌 ${note}`
             };
           });
         });
         
+        // Classify pink pairs by date (oldest pink = could be GCNC, but likely GCNM)
+        const pinkPairsWithDate = pinkPairs.filter(p => p.parsedDate);
+        if (pinkPairsWithDate.length > 0) {
+          pinkPairsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+          console.log(`  📅 Pink pairs with dates: ${pinkPairsWithDate.length}`);
+          
+          pinkPairsWithDate.forEach((pair, idx) => {
+            // All pink → GCNM (new format)
+            const classification = 'GCNM';
+            const note = `Màu hồng, ngày ${pair.issueDate} → ${classification}`;
+            
+            console.log(`    ✅ Pink Pair ${idx + 1}: ${note}`);
+            
+            [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+              const index = normalizedResults.indexOf(page);
+              normalizedResults[index] = {
+                ...page,
+                short_code: classification,
+                reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+                gcn_classification_note: `📌 ${note}`
+              };
+            });
+          });
+        }
+        
+        // All pink pairs without dates → GCNM (default new)
+        const pinkPairsNoDate = pinkPairs.filter(p => !p.parsedDate);
+        pinkPairsNoDate.forEach(pair => {
+          const note = `Màu hồng, không có ngày → GCNM (mặc định mới)`;
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: 'GCNM',
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note}`
+            };
+          });
+        });
+        
+        // Unknown color → default GCNM
+        unknownColorPairs.forEach(pair => {
+          const note = `Không xác định màu → GCNM (mặc định)`;
+          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+            const index = normalizedResults.indexOf(page);
+            normalizedResults[index] = {
+              ...page,
+              short_code: 'GCNM',
+              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+              gcn_classification_note: `📌 ${note}`
+            };
+          });
+        });
+        
+        console.log('✅ GCN classification by color+date complete');
         return normalizedResults;
       }
       

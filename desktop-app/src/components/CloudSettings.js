@@ -304,6 +304,35 @@ function CloudSettings() {
             </div>
           </label>
 
+          {/* Gemini Flash Hybrid (Two-Tier) - AI Classification (RECOMMENDED) */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-yellow-50 transition border-yellow-400 bg-yellow-50/30">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="gemini-flash-hybrid"
+              checked={ocrEngine === 'gemini-flash-hybrid'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium flex items-center gap-2">
+                <span>🔄 Gemini Hybrid (Two-Tier)</span>
+                <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-2 py-1 rounded font-bold">⭐ CÂN BẰNG TỐI ƯU</span>
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                • <strong>🎯 Chiến lược 2 tầng thông minh:</strong><br />
+                &nbsp;&nbsp;→ Tier 1: Flash Lite (nhanh, rẻ) cho documents dễ<br />
+                &nbsp;&nbsp;→ Tier 2: Flash Full (chính xác) nếu confidence &lt; 80% hoặc doc phức tạp (GCN)<br />
+                • <strong>⚖️ Accuracy: 92-96%</strong> (cân bằng cost/accuracy)<br />
+                • <strong>💰 Chi phí: ~50-70% so với Flash Full</strong><br />
+                • Tốc độ: 0.5-2s (tùy tier)<br />
+                • <strong>🎖️ Tự động chọn tier phù hợp</strong><br />
+                • Free tier: Có (monthly limits)<br />
+                • ⚠️ Cần Google API key (BYOK)
+              </div>
+            </div>
+          </label>
+
           {/* Gemini Flash 2.5 Lite - AI Classification (Faster & Cheaper) */}
           <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition border-green-200">
             <input

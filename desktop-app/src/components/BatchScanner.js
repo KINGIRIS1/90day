@@ -12,7 +12,7 @@ function BatchScanner() {
   const [isLoadingFolders, setIsLoadingFolders] = useState(false);
   const [discoveredFolders, setDiscoveredFolders] = useState([]); // [{path, name, imageCount, valid, selected}]
   const [isScanning, setIsScanning] = useState(false);
-  const [shouldStop, setShouldStop] = useState(false);
+  const stopRef = useRef(false); // Use ref for stop button (mutable across renders)
   const [progress, setProgress] = useState({ 
     currentFolder: '',
     currentFile: '',

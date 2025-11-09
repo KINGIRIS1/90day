@@ -1298,9 +1298,36 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
               <div className="animate-spin text-2xl">⚙️</div>
-              <span className="text-gray-700 font-medium">
-                Đang xử lý... ({progress.current}/{selectedFiles.length})
-              </span>
+              <div>
+                <span className="text-gray-700 font-medium">
+                  Đang xử lý... ({progress.current}/{selectedFiles.length})
+                </span>
+                {/* Batch Mode Indicator */}
+                {activeBatchMode && activeBatchMode !== 'sequential' && (
+                  <div className="flex items-center gap-2 mt-1">
+                    {activeBatchMode === 'fixed' && (
+                      <span className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                        <span>📦</span> Batch Mode: Gom 5 Files
+                      </span>
+                    )}
+                    {activeBatchMode === 'smart' && (
+                      <span className="inline-flex items-center gap-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                        <span>🧠</span> Batch Mode: Gom Thông Minh
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      (⚡ Nhanh hơn 3-9 lần)
+                    </span>
+                  </div>
+                )}
+                {(!activeBatchMode || activeBatchMode === 'sequential') && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
+                      <span>🔄</span> Tuần Tự (File by File)
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-3">
               {/* Live Timer */}

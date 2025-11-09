@@ -149,10 +149,46 @@ function BatchScanner() {
     }
   };
 
-  // Handle batch scan start
-  const handleStartScan = async () => {
+  // Step 1: Load and validate folders from TXT
+  const handleLoadFolders = async () => {
     if (!txtFilePath) {
       alert('Vui lòng chọn file TXT trước!');
+      return;
+    }
+
+    setIsLoadingFolders(true);
+    setDiscoveredFolders([]);
+
+    try {
+      console.log('📄 Loading folders from TXT:', txtFilePath);
+      
+      // Call IPC to read and validate folders
+      const result = await window.electronAPI.validateBatchFolders(txtFilePath);
+      
+      if (!result.success) {
+        alert(`❌ Lỗi: ${result.error}`);
+        return;
+      }
+
+      console.log('✅ Discovered folders:', result.folders);
+      setDiscoveredFolders(result.folders);
+      
+      const validCount = result.folders.filter(f => f.valid).length;
+      alert(`✅ Tìm thấy ${result.folders.length} thư mục\n\n- Hợp lệ: ${validCount}\n- Không hợp lệ: ${result.folders.length - validCount}\n\nVui lòng xem danh sách và bấm "Quét tất cả" để bắt đầu.`);
+    } catch (err) {
+      console.error('Load folders error:', err);
+      alert(`❌ Lỗi đọc file TXT: ${err.message}`);
+    } finally {
+      setIsLoadingFolders(false);
+    }
+  };
+
+  // Step 2: Start scanning selected folders
+  const handleStartScan = async () => {
+    const selectedFolders = discoveredFolders.filter(f => f.selected && f.valid);
+    
+    if (selectedFolders.length === 0) {
+      alert('Vui lòng chọn ít nhất 1 thư mục hợp lệ để quét!');
       return;
     }
 

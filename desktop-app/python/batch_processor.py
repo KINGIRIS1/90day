@@ -88,6 +88,32 @@ Các dấu hiệu sau = CONTINUATION (trang tiếp theo, KHÔNG phải document 
 3. Text body tiếp nối: "...tiếp theo...", "...như sau:", danh sách bullet points
 4. Chữ ký/con dấu ở cuối trang
 5. Không có header chính thức (quốc huy, cơ quan ban hành)
+6. **"LỜI CHỨNG CỦA CÔNG CHỨNG VIÊN"** → Trang chữ ký công chứng (cuối document)
+7. **Danh sách người ký, con dấu công chứng** → Trang cuối document
+
+🚨 ĐẶC BIỆT - TRANG CÔNG CHỨNG (KHÔNG phải document mới):
+Nếu trang có:
+- "LỜI CHỨNG CỦA CÔNG CHỨNG VIÊN"
+- "CÔNG CHỨNG VIÊN"
+- Con dấu công chứng (hồng/đỏ)
+- Danh sách chữ ký các Ông/Bà
+- Văn phòng công chứng
+
+→ Đây là TRANG CUỐI (signature page) của document
+→ KHÔNG phải document mới
+→ GOM VÀO document trước (TTHGD, PCTSVC, HDCQ, HDUQ, v.v.)
+
+VÍ DỤ ĐÚNG:
+Page 0: "THỎA THUẬN HỘ GIA ĐÌNH" → TTHGD
+Page 1-3: Nội dung thỏa thuận → TTHGD continuation
+Page 4: "LỜI CHỨNG CỦA CÔNG CHỨNG VIÊN" + danh sách → TTHGD continuation (signature page)
+Page 5: Con dấu, chữ ký → TTHGD continuation
+
+Result: {{"type": "TTHGD", "pages": [0,1,2,3,4,5]}} ✅
+
+KHÔNG LÀM:
+  {{"type": "TTHGD", "pages": [0,1,2,3]}},
+  {{"type": "GTLQ", "pages": [4,5]}}  ❌ SAI!
 
 VÍ DỤ CONTINUATION - PHẢI GOM VÀO DOCUMENT TRƯỚC:
 ✅ "III. TÍNH THUẾ CỦA CƠ QUAN THUẾ" + bảng 4.1, 4.2

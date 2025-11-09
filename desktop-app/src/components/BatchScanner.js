@@ -28,6 +28,7 @@ function BatchScanner() {
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeInProgress, setMergeInProgress] = useState(false);
   const [density, setDensity] = useState('medium');
+  const [selectedPreview, setSelectedPreview] = useState(null);
   
   // Folder tabs state
   const [folderTabs, setFolderTabs] = useState([]); // [{path, name, count, status, files: []}]

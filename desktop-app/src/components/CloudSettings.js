@@ -52,6 +52,9 @@ function CloudSettings() {
       const resizeMaxWidth = await window.electronAPI.getConfig('maxWidth');
       const resizeMaxHeight = await window.electronAPI.getConfig('maxHeight');
       
+      // Load batch mode settings
+      const batchModeConfig = await window.electronAPI.getConfig('batchMode');
+      
       setOcrEngine(uiEngine);
       setGoogleKey(google);
       setGeminiKey(gemini);
@@ -62,6 +65,9 @@ function CloudSettings() {
       setEnableResize(resizeEnabled !== null ? resizeEnabled : true);
       setMaxWidth(resizeMaxWidth || 2000);
       setMaxHeight(resizeMaxHeight || 2800);
+      
+      // Set batch mode with default
+      setBatchMode(batchModeConfig || 'sequential');
     } catch (error) {
       console.error('Error loading settings:', error);
     }

@@ -195,7 +195,7 @@ function BatchScanner() {
     }
 
     setIsScanning(true);
-    setShouldStop(false);
+    stopRef.current = false;
     setProgress({ 
       currentFolder: '',
       currentFile: '',

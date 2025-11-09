@@ -315,6 +315,21 @@ NHÓM 1 - GIẤY CHỨNG NHẬN:
   • ❌ TUYỆT ĐỐI KHÔNG trả về "GCNM" hoặc "GCNC" ❌
   • ✅ CHỈ trả về "GCN" (generic)
   
+  • 🔒 QUY TẮC CỨNG (HARD RULE) - PHẢI CÓ ÍT NHẤT MỘT TRONG HAI:
+    1. **QUỐC HUY** ở top center (national emblem với ngôi sao, búa liềm)
+    2. **CÁC DÒNG ĐẶC TRƯNG** ở top (PHẢI có đủ cả 3):
+       - "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
+       - "Độc lập - Tự do - Hạnh phúc"
+       - "Giấy chứng nhận quyền sử dụng đất..."
+    
+    ⚠️ NẾU KHÔNG CÓ quốc huy HOẶC không có 3 dòng trên → KHÔNG PHẢI GCN!
+    → Có thể là: DDKBD (form), BVDS (notice), hoặc loại khác
+    
+  • ❌ KHÔNG PHẢI GCN nếu chỉ có:
+    - Title "giấy chứng nhận" nhưng không có quốc huy/3 dòng → Có thể là copy/scan không rõ
+    - Title tương tự nhưng là form trống (có blank fields) → DDKBD
+    - Title tương tự nhưng là notice/trích lục → BVDS hoặc HSKT
+  
   • ⚠️ BẮT BUỘC 1: Xác định MÀU SẮC của giấy (COLOR DETECTION - QUAN TRỌNG NHẤT)
     - Màu ĐỎ/CAM (red/orange): GCN cũ → color: "red"
     - Màu HỒNG (pink): GCN mới → color: "pink"

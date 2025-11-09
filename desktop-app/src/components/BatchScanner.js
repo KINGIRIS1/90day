@@ -297,6 +297,17 @@ function BatchScanner() {
               // Scan single file
               let fileResult = await window.electronAPI.processDocumentOffline(imagePath);
               
+              // Debug: Log GCN fields if present
+              if (fileResult.short_code === 'GCN' || fileResult.short_code === 'GCNM' || fileResult.short_code === 'GCNC') {
+                console.log(`  🔍 GCN detected:`, {
+                  file: fileName,
+                  short_code: fileResult.short_code,
+                  color: fileResult.color || 'null',
+                  issue_date: fileResult.issue_date || 'null',
+                  issue_date_confidence: fileResult.issue_date_confidence || 'null'
+                });
+              }
+              
               // Apply sequential naming if UNKNOWN (use local variable, not state!)
               fileResult = applySequentialNaming(fileResult, currentLastKnown);
               

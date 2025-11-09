@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   selectFolders: () => ipcRenderer.invoke('select-folders'),
   selectFiles: () => ipcRenderer.invoke('select-files'),
+  selectTxtFile: () => ipcRenderer.invoke('select-txt-file'),
   listSubfoldersInFolder: (folderPath) => ipcRenderer.invoke('list-subfolders-in-folder', folderPath),
   listFolderTree: (folderPath) => ipcRenderer.invoke('list-folder-tree', folderPath),
   analyzeParentFolder: (folderPath) => ipcRenderer.invoke('analyze-parent-folder', folderPath),
@@ -14,6 +15,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Offline OCR processing
   processDocumentOffline: (filePath) => ipcRenderer.invoke('process-document-offline', filePath),
+  
+  // Batch scan processing
+  processBatchScan: (txtPath, outputOption, outputFolder) => ipcRenderer.invoke('process-batch-scan', txtPath, outputOption, outputFolder),
   
   // Cloud Boost processing
   processDocumentCloud: (filePath) => ipcRenderer.invoke('process-document-cloud', filePath),

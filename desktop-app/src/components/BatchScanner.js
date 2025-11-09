@@ -157,39 +157,68 @@ function BatchScanner() {
         setSkippedFolders(result.skipped_folders || []);
         setErrors(result.errors || []);
         
-        // Create file results with preview for display
-        const fileResultsWithPreview = await Promise.all(
-          (result.results || []).map(async (item) => {
-            try {
-              const previewUrl = await window.electronAPI.readImageDataUrl(item.original_path);
-              return {
-                filePath: item.original_path,
-                fileName: item.original_path.split(/[/\\]/).pop(),
-                short_code: item.short_code,
-                doc_type: item.doc_type,
-                confidence: item.confidence,
-                folder: item.folder,
-                previewUrl: previewUrl,
-                success: true,
-                method: 'offline_ocr'
-              };
-            } catch (err) {
-              return {
-                filePath: item.original_path,
-                fileName: item.original_path.split(/[/\\]/).pop(),
-                short_code: item.short_code,
-                doc_type: item.doc_type,
-                confidence: item.confidence,
-                folder: item.folder,
-                previewUrl: null,
-                success: true,
-                method: 'offline_ocr'
-              };
-            }
-          })
-        );
+        // Group results by folder
+        const folderMap = {};
+        for (const item of (result.results || [])) {
+          if (!folderMap[item.folder]) {
+            folderMap[item.folder] = [];
+          }
+          folderMap[item.folder].push(item);
+        }
+
+        // Create folder tabs
+        const tabs = [];
+        for (const [folderPath, items] of Object.entries(folderMap)) {
+          const folderName = folderPath.split(/[/\\]/).pop() || folderPath;
+          
+          // Load preview for all files in this folder
+          const filesWithPreview = await Promise.all(
+            items.map(async (item) => {
+              try {
+                const previewUrl = await window.electronAPI.readImageDataUrl(item.original_path);
+                return {
+                  filePath: item.original_path,
+                  fileName: item.original_path.split(/[/\\]/).pop(),
+                  short_code: item.short_code,
+                  doc_type: item.doc_type,
+                  confidence: item.confidence,
+                  folder: item.folder,
+                  previewUrl: previewUrl,
+                  success: true,
+                  method: 'offline_ocr'
+                };
+              } catch (err) {
+                return {
+                  filePath: item.original_path,
+                  fileName: item.original_path.split(/[/\\]/).pop(),
+                  short_code: item.short_code,
+                  doc_type: item.doc_type,
+                  confidence: item.confidence,
+                  folder: item.folder,
+                  previewUrl: null,
+                  success: true,
+                  method: 'offline_ocr'
+                };
+              }
+            })
+          );
+
+          tabs.push({
+            path: folderPath,
+            name: folderName,
+            count: items.length,
+            status: 'done',
+            files: filesWithPreview
+          });
+        }
+
+        setFolderTabs(tabs);
         
-        setFileResults(fileResultsWithPreview);
+        // Set first folder as active
+        if (tabs.length > 0) {
+          setActiveFolder(tabs[0].path);
+          setFileResults(tabs[0].files);
+        }
         
         alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- Lỗi: ${result.error_count}\n\n💡 Bạn có thể xem kết quả chi tiết và gộp PDF bên dưới.`);
       } else {

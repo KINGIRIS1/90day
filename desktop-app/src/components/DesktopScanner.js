@@ -707,6 +707,83 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
   };
 
+  // Batch processing using Python batch_processor.py
+  const handleProcessFilesBatch = async (filesToProcess, mode) => {
+    console.log(`\n${'='*80}`);
+    console.log(`🚀 BATCH PROCESSING START: mode=${mode}, files=${filesToProcess.length}`);
+    console.log(`${'='*80}`);
+    
+    if (!window.electronAPI) {
+      console.error('❌ Electron API not available');
+      return null;
+    }
+    
+    try {
+      // Get image paths only
+      const imagePaths = filesToProcess.map(f => f.path);
+      
+      // Call batch processor via IPC
+      const batchResult = await window.electronAPI.batchProcessDocuments({
+        mode: mode,
+        imagePaths: imagePaths,
+        ocrEngine: currentOcrEngine
+      });
+      
+      if (!batchResult.success) {
+        console.error('❌ Batch processing failed:', batchResult.error);
+        return null;
+      }
+      
+      console.log(`✅ Batch processing complete: ${batchResult.results.length} results`);
+      
+      // Map batch results back to our format
+      const mappedResults = [];
+      for (const batchItem of batchResult.results) {
+        const fileName = batchItem.file_name;
+        const filePath = batchItem.file_path;
+        
+        // Generate preview URL
+        let previewUrl = null;
+        try {
+          const toFileUrl = (p) => (/^[A-Za-z]:\\\\/.test(p) ? 'file:///' + p.replace(/\\\\/g, '/') : 'file://' + p);
+          if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
+            previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+            if (!previewUrl) previewUrl = toFileUrl(filePath);
+          }
+        } catch (e) {
+          console.error(`Error generating preview for ${fileName}:`, e);
+        }
+        
+        mappedResults.push({
+          fileName: fileName,
+          filePath: filePath,
+          previewUrl: previewUrl,
+          isPdf: /\.pdf$/i.test(fileName),
+          success: true,
+          short_code: batchItem.short_code || 'UNKNOWN',
+          confidence: batchItem.confidence || 0.5,
+          doc_type: batchItem.short_code || 'UNKNOWN', // Alias
+          method: `batch_${mode}`,
+          reasoning: batchItem.reasoning || '',
+          metadata: batchItem.metadata || {},
+          batch_num: batchItem.batch_num,
+          // Timing - batch doesn't have per-file timing yet
+          startTime: null,
+          endTime: null,
+          durationMs: null,
+          durationSeconds: null
+        });
+      }
+      
+      console.log(`✅ Mapped ${mappedResults.length} batch results to UI format`);
+      return mappedResults;
+      
+    } catch (error) {
+      console.error('❌ Batch processing error:', error);
+      return null;
+    }
+  };
+
   // Progressive file processing (vừa quét vừa hiện)
   const handleProcessFiles = async (useCloudBoost = false, isResume = false) => {
     let filesToProcess = selectedFiles;

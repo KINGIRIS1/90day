@@ -157,6 +157,43 @@ RANH GIỚI GIỮA CÁC TÀI LIỆU:
 - Xuất hiện tiêu đề chính mới ở TOP
 - Thay đổi hoàn toàn về layout
 
+🎯 DẤU HIỆU VISUAL - CÙNG DOCUMENT (CỰC KỲ QUAN TRỌNG):
+
+**1. DẤU GIÁP LAI (Overlapping Stamp):**
+Nếu thấy CON DẤU ĐỎ/HỒNG bị CẮT NGANG qua nhiều pages:
+- Page 1: Có PHẦN TRÊN của con dấu (top half)
+- Page 2: Có PHẦN GIỮA của con dấu (middle)
+- Page 3: Có PHẦN DƯỚI của con dấu (bottom half)
+
+→ Đây là DẤU GIÁP LAI!
+→ 3-4 pages này được đóng dấu CÙNG LÚC (giấy chồng lên nhau)
+→ **BẮT BUỘC CÙNG 1 DOCUMENT**
+→ PHẢI GOM TẤT CẢ pages có partial stamp vào 1 document
+
+VÍ DỤ:
+Page 0: "THỎA THUẬN HỘ GIA ĐÌNH" + phần trên con dấu đỏ (⬆️ top half)
+Page 1: Text body + phần giữa con dấu đỏ (⬌ middle)
+Page 2: Text body + phần giữa con dấu đỏ (⬌ middle)
+Page 3: "LỜI CHỨNG..." + phần dưới con dấu đỏ (⬇️ bottom half)
+
+→ **4 pages có cùng con dấu bị cắt** → CÙNG 1 DOCUMENT!
+→ Result: {{"type": "TTHGD", "pages": [0,1,2,3]}} ✅
+
+**2. DẤU HOÀN CHỈNH (Complete Stamp):**
+Nếu page có con dấu HOÀN CHỈNH (full circle, không bị cắt):
+→ Đây có thể là trang ĐỘC LẬP (single document)
+→ HOẶC trang cuối của document
+
+**3. KHÔNG CÓ DẤU:**
+Nếu page không có con dấu:
+→ Có thể là trang giữa document
+→ Check title và continuation patterns
+
+🚨 NGUYÊN TẮC DẤU GIÁP LAI:
+- Partial stamp (bị cắt) = **STRONG SIGNAL** cùng document
+- Ưu tiên cao hơn cả title/content analysis
+- Nếu thấy dấu giáp lai → GOM NGAY, không cần nghi ngờ
+
 ---
 
 """ % (batch_size, batch_size, batch_size)

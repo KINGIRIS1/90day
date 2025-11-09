@@ -257,6 +257,9 @@ function BatchScanner() {
 
         // Set active folder to show files as they're scanned
         setActiveFolder(folder.path);
+        
+        // Reset lastKnownType for new folder
+        setLastKnownType(null);
 
         try {
           // Get image files in folder

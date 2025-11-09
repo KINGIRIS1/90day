@@ -134,6 +134,8 @@ function BatchScanner() {
     setFileResults([]);
     setErrors([]);
     setSkippedFolders([]);
+    setFolderTabs([]);
+    setActiveFolder(null);
 
     try {
       console.log('🚀 Starting batch scan...');

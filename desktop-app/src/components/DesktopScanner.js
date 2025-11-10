@@ -492,10 +492,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           groupsWithDate.forEach((group, idx) => {
             const classification = (idx === 0) ? 'GCNC' : 'GCNM';
             group.files.forEach(file => {
-              const resIdx = finalResults.findIndex(r => r.fileName === file.fileName);
+              const resIdx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (resIdx >= 0) {
-                finalResults[resIdx].short_code = classification;
-                finalResults[resIdx].doc_type = classification;
+                normalizedResults[resIdx].short_code = classification;
+                normalizedResults[resIdx].doc_type = classification;
                 console.log(`  ✅ ${file.fileName}: ${group.issueDate} → ${classification}`);
               }
             });

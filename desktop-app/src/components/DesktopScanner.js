@@ -406,38 +406,38 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       
       // Check if results came from batch processing
       const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
-    
-    if (isBatchMode) {
-      console.log(`📦 Batch mode detected - Using AI grouping for GCN classification`);
-      console.log(`   (AI already grouped pages into documents, no need to pair)`);
       
-      // In batch mode, AI already grouped GCN pages
-      // Each unique metadata = 1 GCN document
-      // Just classify each group based on its metadata
-      
-      const gcnGroups = new Map();
-      
-      allGcnDocs.forEach((doc, idx) => {
-        const meta = doc.metadata || {};
-        const color = meta.color || 'unknown';
-        const issueDate = meta.issue_date || null;
-        const issueDateConf = meta.issue_date_confidence || null;
+      if (isBatchMode) {
+        console.log(`📦 Batch mode detected - Using AI grouping for GCN classification`);
+        console.log(`   (AI already grouped pages into documents, no need to pair)`);
         
-        // Use unique key: color + issueDate
-        const groupKey = `${color}_${issueDate || 'null'}`;
+        // In batch mode, AI already grouped GCN pages
+        // Each unique metadata = 1 GCN document
+        // Just classify each group based on its metadata
         
-        if (!gcnGroups.has(groupKey)) {
-          gcnGroups.set(groupKey, {
-            files: [],
-            color: color,
-            issueDate: issueDate,
-            issueDateConfidence: issueDateConf,
-            parsedDate: parseIssueDate(issueDate, issueDateConf)
-          });
-        }
+        const gcnGroups = new Map();
         
-        gcnGroups.get(groupKey).files.push(doc);
-      });
+        allGcnDocs.forEach((doc, idx) => {
+          const meta = doc.metadata || {};
+          const color = meta.color || 'unknown';
+          const issueDate = meta.issue_date || null;
+          const issueDateConf = meta.issue_date_confidence || null;
+          
+          // Use unique key: color + issueDate
+          const groupKey = `${color}_${issueDate || 'null'}`;
+          
+          if (!gcnGroups.has(groupKey)) {
+            gcnGroups.set(groupKey, {
+              files: [],
+              color: color,
+              issueDate: issueDate,
+              issueDateConfidence: issueDateConf,
+              parsedDate: parseIssueDate(issueDate, issueDateConf)
+            });
+          }
+          
+          gcnGroups.get(groupKey).files.push(doc);
+        });
       
       console.log(`📋 Found ${gcnGroups.size} unique GCN document(s) (by metadata)`);
       

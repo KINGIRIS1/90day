@@ -856,11 +856,25 @@ function BatchScanner() {
       return null;
     }
     
+    // Filter ONLY image files (skip PDFs)
+    const imageOnly = imagePaths.filter(path => 
+      /\.(jpg|jpeg|png|gif|bmp)$/i.test(path)
+    );
+    
+    if (imageOnly.length === 0) {
+      console.error('❌ No image files found (all PDFs)');
+      return null;
+    }
+    
+    if (imageOnly.length < imagePaths.length) {
+      console.log(`⏭️ Skipped ${imagePaths.length - imageOnly.length} PDF files, processing ${imageOnly.length} images`);
+    }
+    
     try {
       // Call batch processor via IPC
       const batchResult = await window.electronAPI.batchProcessDocuments({
         mode: mode,
-        imagePaths: imagePaths,
+        imagePaths: imageOnly,  // Use filtered images only
         ocrEngine: engineType
       });
       

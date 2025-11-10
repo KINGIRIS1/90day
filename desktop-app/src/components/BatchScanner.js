@@ -489,7 +489,13 @@ function BatchScanner() {
               // Continue to next folder (skip sequential loop)
               continue;
             } else {
-              console.warn('⚠️ Batch failed for folder, falling back to sequential');
+              const errorMsg = batchResults?.error || 'Batch returned no results';
+              console.error(`⚠️ BATCH FAILED for folder ${folder.name}:`, errorMsg);
+              console.warn('🔄 FALLBACK: Switching to sequential processing for this folder...');
+              console.log(`📋 Files in this folder will be scanned one by one (slower but reliable)`);
+              
+              // For batch scan, don't prompt user (too many prompts across folders)
+              // Just fallback silently with clear logs
               // Fall through to sequential
             }
           }

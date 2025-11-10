@@ -22,9 +22,9 @@ def calculate_tokens_and_cost(total_pages, batch_size=1, batch_mode='sequential'
     OUTPUT_TOKENS_PER_BATCH = 600  # 5 docs response (has wrapper overhead)
     OUTPUT_TOKENS_PER_SMART = 400  # Smart batch response (less overhead)
     
-    # Gemini 2.5 Flash pricing (December 2024)
-    INPUT_COST_PER_1M = 0.075  # $0.075 per 1M input tokens
-    OUTPUT_COST_PER_1M = 0.30  # $0.30 per 1M output tokens
+    # Gemini 2.5 Flash pricing (December 2024 - UPDATED)
+    INPUT_COST_PER_1M = 0.30  # $0.30 per 1M input tokens (text + images)
+    OUTPUT_COST_PER_1M = 2.50  # $2.50 per 1M output tokens
     
     # Calculate number of requests
     if batch_size == 1:

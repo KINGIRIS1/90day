@@ -409,8 +409,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         const restoredTabs = scanData.childTabs || [];
         setChildTabs(restoredTabs);
         setParentFolder(scanData.parentFolder || null);
-        setActiveChild(scanData.activeChild || null);
         setCurrentScanId(scan.scanId);
+        
+        // Set active to first completed folder to show results
+        const firstDone = restoredTabs.find(t => t.status === 'done');
+        if (firstDone) {
+          setActiveChild(firstDone.path);
+          console.log(`📂 Set active folder to: ${firstDone.name} (showing results)`);
+        }
         
         // Count completed folders and total files
         const completedFolders = restoredTabs.filter(t => t.status === 'done');
@@ -419,9 +425,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         console.log(`✅ Restored ${completedFolders.length}/${restoredTabs.length} folders`);
         console.log(`✅ Restored ${totalFiles} files from completed folders`);
         
+        // Log each completed folder
+        completedFolders.forEach(folder => {
+          console.log(`  📁 ${folder.name}: ${folder.results?.length || 0} files (status: done)`);
+        });
+        
         // Show notification
         alert(`✅ Đã load ${completedFolders.length}/${restoredTabs.length} folders đã quét.\n\n` +
               `📊 Tổng ${totalFiles} files đã được classify.\n\n` +
+              `📂 Results của folders đã quét đang hiển thị.\n\n` +
               `▶️ Click "Tiếp tục quét tất cả" để quét ${restoredTabs.length - completedFolders.length} folders còn lại.`);
         
       } else if (scanData.type === 'file_scan') {

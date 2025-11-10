@@ -85,12 +85,18 @@ function BatchScanner() {
       const allDone = folderTabs.length > 0 && folderTabs.every(t => t.status === 'done');
       
       if (folderTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
-        const scanId = currentScanId || `scan_${Date.now()}`;
+        // Use SAME scanId for entire scan session (overwrite, don't create new)
+        let scanId = currentScanId;
+        if (!scanId) {
+          scanId = `batch_scan_${Date.now()}`;
+          setCurrentScanId(scanId);
+        }
         
         await window.electronAPI.saveScanState({
+          scanId: scanId,  // Use same ID to overwrite
           type: 'batch_scan',
           status: 'incomplete',
-          folderTabs: folderTabs,  // Has results for done folders
+          folderTabs: folderTabs,
           discoveredFolders: discoveredFolders,
           fileResults: fileResults,
           txtFilePath: txtFilePath,
@@ -103,13 +109,12 @@ function BatchScanner() {
           timestamp: Date.now()
         });
         
-        if (!currentScanId) setCurrentScanId(scanId);
-        console.log(`💾 Auto-saved batch scan: ${doneFolders.length}/${folderTabs.length} folders done`);
+        console.log(`💾 Auto-saved (OVERWRITE): ${doneFolders.length}/${folderTabs.length} folders done`);
       }
     };
     
     autoSave();
-  }, [folderTabs]);  // Trigger on folderTabs change
+  }, [folderTabs]);
   
   // Load OCR engine from config on mount
   useEffect(() => {

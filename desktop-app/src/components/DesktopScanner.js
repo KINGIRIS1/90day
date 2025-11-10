@@ -1445,6 +1445,35 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     console.log(`🔄 Child folder scan complete (${childPath}), post-processing GCN documents...`);
     const finalChildResults = postProcessGCNBatch(childResults);
     setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
+    
+    // 💾 MANUAL SAVE after folder complete (before next folder starts)
+    if (window.electronAPI?.saveScanState) {
+      // Get current state for save
+      const currentChildTabs = childTabs.map((t, i) => 
+        i === idx ? { ...t, status: 'done', results: finalChildResults } : t
+      );
+      
+      const doneFolders = currentChildTabs.filter(t => t.status === 'done');
+      const scanId = currentScanId || `scan_${Date.now()}`;
+      
+      await window.electronAPI.saveScanState({
+        type: 'folder_scan',
+        status: 'incomplete',
+        parentFolder: parentFolder,
+        childTabs: currentChildTabs,
+        activeChild: activeChild,
+        progress: {
+          current: doneFolders.length,
+          total: currentChildTabs.length
+        },
+        engine: currentOcrEngine,
+        batchMode: batchMode,
+        timestamp: Date.now()
+      });
+      
+      if (!currentScanId) setCurrentScanId(scanId);
+      console.log(`💾 Manual save after folder complete: ${doneFolders.length}/${currentChildTabs.length} folders done`);
+    }
   };
 
   // Scan all child folders with pause support

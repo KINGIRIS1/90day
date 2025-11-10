@@ -62,6 +62,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
   const [activeBatchMode, setActiveBatchMode] = useState(null); // Track active batch mode during scan
   
+  // Auto-save & Resume
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [incompleteScans, setIncompleteScans] = useState([]);
+  const [currentScanId, setCurrentScanId] = useState(null);
+  
   // Timer states
   const [timers, setTimers] = useState({
     scanStartTime: null,

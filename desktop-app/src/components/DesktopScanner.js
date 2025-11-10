@@ -1185,8 +1185,30 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         setActiveBatchMode(null); // Reset batch mode indicator
         return;
       } else {
-        console.warn('⚠️ Batch processing failed or returned no results, falling back to sequential processing');
-        // Fall through to sequential processing
+        // Batch failed - show clear notification
+        const errorMsg = batchResults?.error || 'Unknown error';
+        console.error('⚠️ BATCH PROCESSING FAILED:', errorMsg);
+        console.warn('🔄 FALLBACK: Switching to sequential processing...');
+        
+        // Show user notification about fallback
+        if (window.confirm(
+          `⚠️ BATCH PROCESSING GẶP LỖI!\n\n` +
+          `Lỗi: ${errorMsg}\n\n` +
+          `App sẽ tự động chuyển sang quét TUẦN TỰ (từng trang một).\n\n` +
+          `⏱️ Thời gian sẽ lâu hơn (15s/trang thay vì 2s/trang batch)\n\n` +
+          `Bạn có muốn:\n` +
+          `• OK = Tiếp tục quét tuần tự\n` +
+          `• Cancel = Dừng lại, thử lại sau`
+        )) {
+          console.log('✅ User confirmed fallback to sequential');
+          setActiveBatchMode(null);
+          // Fall through to sequential processing
+        } else {
+          console.log('❌ User cancelled scan');
+          setProcessing(false);
+          setActiveBatchMode(null);
+          return;
+        }
       }
     }
 

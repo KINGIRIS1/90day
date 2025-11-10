@@ -933,8 +933,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     }
     
     try {
+      // Filter ONLY image files (skip PDFs)
+      const imageFiles = filesToProcess.filter(f => 
+        /\.(png|jpg|jpeg|gif|bmp)$/i.test(f.path || f.name || f)
+      );
+      
+      if (imageFiles.length === 0) {
+        console.error('❌ No image files found (all PDFs or unsupported)');
+        return null;
+      }
+      
+      if (imageFiles.length < filesToProcess.length) {
+        const skipped = filesToProcess.length - imageFiles.length;
+        console.log(`⏭️ Skipped ${skipped} PDF/unsupported files, processing ${imageFiles.length} images`);
+      }
+      
       // Get image paths only
-      const imagePaths = filesToProcess.map(f => f.path);
+      const imagePaths = imageFiles.map(f => f.path || f);
       
       // Call batch processor via IPC
       const batchResult = await window.electronAPI.batchProcessDocuments({

@@ -774,6 +774,13 @@ function BatchScanner() {
       console.error('Batch scan error:', err);
       alert(`❌ Lỗi xử lý: ${err.message}`);
     } finally {
+      // 🎉 MARK SCAN COMPLETE (nếu không bị stop giữa chừng)
+      if (!stopRef.current && currentScanId && window.electronAPI?.markScanComplete) {
+        await window.electronAPI.markScanComplete(currentScanId);
+        setCurrentScanId(null);
+        console.log(`✅ Marked batch scan complete`);
+      }
+      
       setIsScanning(false);
       stopRef.current = false;
     }

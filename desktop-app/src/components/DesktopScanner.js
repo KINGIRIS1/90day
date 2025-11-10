@@ -505,10 +505,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           console.log(`  ⚠️ Not enough dates for comparison → Default GCNM`);
           groupsArray.forEach(group => {
             group.files.forEach(file => {
-              const idx = finalResults.findIndex(r => r.fileName === file.fileName);
+              const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (idx >= 0) {
-                finalResults[idx].short_code = 'GCNM';
-                finalResults[idx].doc_type = 'GCNM';
+                normalizedResults[idx].short_code = 'GCNM';
+                normalizedResults[idx].doc_type = 'GCNM';
               }
             });
           });
@@ -516,7 +516,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
       
       console.log('✅ GCN post-processing complete (batch mode, AI-grouped)');
-      return finalResults;
+      return normalizedResults;
       
     } else {
       console.log(`📄 Single-file mode detected - Using manual pairing (2 files per GCN)`);

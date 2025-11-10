@@ -1593,6 +1593,15 @@ function BatchScanner() {
 
   return (
     <div className="space-y-6">
+      {/* Resume Dialog */}
+      {showResumeDialog && (
+        <ResumeDialog
+          scans={incompleteScans}
+          onResume={handleResumeScan}
+          onDismiss={handleDismissResume}
+        />
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">📋 Quét theo danh sách</h2>

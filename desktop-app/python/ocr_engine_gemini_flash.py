@@ -162,13 +162,47 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         
         print(f"📡 Sending request to {model_name}...", file=sys.stderr)
         
-        # Send request (timeout 60s for large images)
-        response = requests.post(
-            url,
-            json=payload,
-            headers={"Content-Type": "application/json"},
-            timeout=60  # Increased from 30s to handle large image processing
-        )
+        # Send request with retry logic
+        max_retries = 3
+        retry_delay = 10
+        response = None
+        
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    url,
+                    json=payload,
+                    headers={"Content-Type": "application/json"},
+                    timeout=60
+                )
+                
+                # Check for retryable errors
+                if response.status_code == 503:
+                    if attempt < max_retries - 1:
+                        wait_time = retry_delay * (2 ** attempt)
+                        print(f"⚠️ 503 Service Unavailable, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                elif response.status_code == 429:
+                    if attempt < max_retries - 1:
+                        wait_time = 60 * (2 ** attempt)
+                        print(f"⚠️ 429 Rate Limit, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                
+                # Success or non-retryable error
+                break
+                
+            except requests.exceptions.Timeout:
+                if attempt < max_retries - 1:
+                    print(f"⚠️ Timeout, retry {attempt + 1}/{max_retries}...", file=sys.stderr)
+                    import time
+                    time.sleep(retry_delay)
+                    continue
+                else:
+                    raise
         
         print(f"📊 Response status: {response.status_code}", file=sys.stderr)
         

@@ -776,7 +776,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           });
         });
       }
-    }
+    
+    } // End of else (single-file mode)
     
     console.log('✅ GCN post-processing complete (date-based)');
     return normalizedResults;

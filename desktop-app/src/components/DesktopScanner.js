@@ -515,6 +515,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         }
       }
       
+      console.log('✅ GCN post-processing complete (batch mode, AI-grouped)');
+      return finalResults;
+      
     } else {
       console.log(`📄 Single-file mode detected - Using manual pairing (2 files per GCN)`);
       

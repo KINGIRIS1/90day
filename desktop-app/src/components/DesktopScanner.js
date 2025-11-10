@@ -505,12 +505,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     // NEW LOGIC: Extract color and issue dates from pairs
     const pairsWithData = pairs.map(pair => {
-      // Try to get color from both pages (prioritize page1, then page2)
-      const color = pair.page1?.color || pair.page2?.color || null;
+      // Try to get color from metadata (batch mode) or direct fields (single-file mode)
+      const color = pair.page1?.metadata?.color || pair.page1?.color || 
+                    pair.page2?.metadata?.color || pair.page2?.color || null;
       
-      // Try to get issue_date from both pages (can be on page1 for A4, or page2 for A3)
-      const issueDate = pair.page1?.issue_date || pair.page2?.issue_date || null;
-      const issueDateConfidence = pair.page1?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+      // Try to get issue_date from metadata (batch mode) or direct fields (single-file mode)
+      const issueDate = pair.page1?.metadata?.issue_date || pair.page1?.issue_date || 
+                        pair.page2?.metadata?.issue_date || pair.page2?.issue_date || null;
+      const issueDateConfidence = pair.page1?.metadata?.issue_date_confidence || pair.page1?.issue_date_confidence || 
+                                   pair.page2?.metadata?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
       
       console.log(`  🎨 Pair ${pair.pairIndex + 1}: color = ${color || 'unknown'}`);
       console.log(`  📅 Pair ${pair.pairIndex + 1}: issue_date = ${issueDate || 'null'} (${issueDateConfidence || 'N/A'})`);

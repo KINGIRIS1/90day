@@ -524,21 +524,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       // OLD PAIRING LOGIC for single-file mode
       
       const pairs = [];
-    for (let i = 0; i < allGcnDocs.length; i += 2) {
-      const page1 = allGcnDocs[i];
-      const page2 = allGcnDocs[i + 1];
-      
-      if (page1 && page2) {
-        pairs.push({ page1, page2, pairIndex: i / 2 });
-        console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1) + ${page2.fileName} (trang 2)`);
-      } else if (page1) {
-        // Lẻ page (chỉ có trang 1, không có trang 2)
-        pairs.push({ page1, page2: null, pairIndex: i / 2 });
-        console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1 only, no pair)`);
+      for (let i = 0; i < allGcnDocs.length; i += 2) {
+        const page1 = allGcnDocs[i];
+        const page2 = allGcnDocs[i + 1];
+        
+        if (page1 && page2) {
+          pairs.push({ page1, page2, pairIndex: i / 2 });
+          console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1) + ${page2.fileName} (trang 2)`);
+        } else if (page1) {
+          // Lẻ page (chỉ có trang 1, không có trang 2)
+          pairs.push({ page1, page2: null, pairIndex: i / 2 });
+          console.log(`📄 Pair ${i/2 + 1}: ${page1.fileName} (trang 1 only, no pair)`);
+        }
       }
-    }
-    
-    console.log(`📋 Total pairs: ${pairs.length}`);
+      
+      console.log(`📋 Total pairs: ${pairs.length}`);
     
     /* ============================================
      * COMMENTED OUT: OLD LOGIC (certificate_number based)

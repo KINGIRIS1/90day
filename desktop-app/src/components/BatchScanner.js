@@ -78,8 +78,15 @@ function BatchScanner() {
       try {
         const engine = await window.electronAPI.getConfig('ocrEngine');
         if (engine) setOcrEngine(engine);
+        
+        // Load batch mode
+        const savedBatchMode = await window.electronAPI.getConfig('batchMode');
+        if (savedBatchMode) {
+          setBatchMode(savedBatchMode);
+          console.log(`📦 Loaded batch mode: ${savedBatchMode}`);
+        }
       } catch (err) {
-        console.error('Failed to load OCR engine config:', err);
+        console.error('Failed to load config:', err);
       }
     };
     loadConfig();

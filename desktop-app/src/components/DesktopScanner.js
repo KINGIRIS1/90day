@@ -465,10 +465,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         groupsArray.forEach(group => {
           const classification = (group.color === 'red' || group.color === 'orange') ? 'GCNC' : 'GCNM';
           group.files.forEach(file => {
-            const idx = finalResults.findIndex(r => r.fileName === file.fileName);
+            const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
             if (idx >= 0) {
-              finalResults[idx].short_code = classification;
-              finalResults[idx].doc_type = classification;
+              normalizedResults[idx].short_code = classification;
+              normalizedResults[idx].doc_type = classification;
               console.log(`  ✅ ${file.fileName}: ${group.color} → ${classification}`);
             }
           });

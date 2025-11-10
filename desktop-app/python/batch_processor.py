@@ -577,6 +577,13 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                         
                         print(f"📄 Raw response preview: {response_text[:200]}...", file=sys.stderr)
                         
+                        # DEBUG: Log full response for GCN documents
+                        if '"type": "GCN"' in response_text or '"GCN"' in response_text:
+                            print(f"\n🔍 DEBUG - GCN DETECTED in response!", file=sys.stderr)
+                            print(f"📄 Full JSON response:", file=sys.stderr)
+                            print(response_text, file=sys.stderr)
+                            print(f"\n", file=sys.stderr)
+                        
                         # Extract JSON from response - try multiple patterns
                         json_match = re.search(r'\{[\s\S]*"documents"[\s\S]*\}', response_text)
                         if not json_match:

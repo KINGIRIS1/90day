@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ResumeDialog from './ResumeDialog';
 
 function BatchScanner() {
   // State

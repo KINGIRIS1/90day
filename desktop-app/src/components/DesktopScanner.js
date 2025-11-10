@@ -389,6 +389,75 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     return result;
   };
 
+  // Handle resume scan from saved state
+  const handleResumeScan = async (scan) => {
+    try {
+      console.log(`🔄 Resuming scan: ${scan.scanId}`);
+      
+      // Load scan data
+      const loadResult = await window.electronAPI.loadScanState(scan.scanId);
+      if (!loadResult.success) {
+        alert('❌ Không thể load scan data');
+        return;
+      }
+      
+      const scanData = loadResult.data;
+      
+      // Restore state based on scan type
+      if (scanData.type === 'folder_scan') {
+        // Restore folder scan state
+        setChildTabs(scanData.childTabs || []);
+        setParentFolder(scanData.parentFolder || null);
+        setActiveChild(scanData.activeChild || null);
+        setCurrentScanId(scan.scanId);
+        
+        // Show notification
+        const completedFolders = scanData.childTabs?.filter(t => t.status === 'done').length || 0;
+        const totalFolders = scanData.childTabs?.length || 0;
+        alert(`✅ Đã load ${completedFolders}/${totalFolders} folders đã scan. Click "Tiếp tục quét" để scan tiếp.`);
+        
+      } else if (scanData.type === 'file_scan') {
+        // Restore file scan state
+        setResults(scanData.results || []);
+        setSelectedFiles(scanData.selectedFiles || []);
+        setLastKnownType(scanData.lastKnownType);
+        setRemainingFiles(scanData.remainingFiles || []);
+        setProgress(scanData.progress || {current: 0, total: 0});
+        setCurrentScanId(scan.scanId);
+        
+        alert(`✅ Đã load ${scanData.results?.length || 0} files đã scan. Click "Tiếp tục scan" để quét tiếp.`);
+      }
+      
+      setShowResumeDialog(false);
+      
+    } catch (error) {
+      console.error('Resume scan error:', error);
+      alert(`❌ Lỗi: ${error.message}`);
+    }
+  };
+
+  // Handle dismiss resume dialog
+  const handleDismissResume = async (scanId) => {
+    try {
+      if (scanId === 'all') {
+        // Delete all incomplete scans
+        for (const scan of incompleteScans) {
+          await window.electronAPI.deleteScanState(scan.scanId);
+        }
+        console.log(`🗑️ Deleted all ${incompleteScans.length} incomplete scans`);
+      } else {
+        // Delete specific scan
+        await window.electronAPI.deleteScanState(scanId);
+        console.log(`🗑️ Deleted scan: ${scanId}`);
+      }
+      
+      setShowResumeDialog(false);
+      setIncompleteScans([]);
+    } catch (error) {
+      console.error('Delete scan error:', error);
+    }
+  };
+
   // Post-process GCN documents after batch completion
   const postProcessGCNBatch = (results) => {
     try {

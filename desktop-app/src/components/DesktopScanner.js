@@ -1204,6 +1204,39 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     const childResults = [];
     stopRef.current = false;
     
+    // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED (same logic as File Scan)
+    const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(currentOcrEngine);
+    const shouldUseBatch = (
+      isGeminiEngine && // Gemini engine
+      (batchMode === 'fixed' || batchMode === 'smart') && // Batch mode enabled
+      files.length >= 3 // At least 3 files
+    );
+    
+    if (shouldUseBatch) {
+      console.log(`\n${'='*80}`);
+      console.log(`🚀 FOLDER BATCH MODE DETECTED: Using batch for ${files.length} files in ${childPath}`);
+      console.log(`   Mode: ${batchMode}`);
+      console.log(`   Engine: ${currentOcrEngine}`);
+      console.log(`${'='*80}\n`);
+      
+      // Use batch processing
+      const batchResults = await handleProcessFilesBatch(files, batchMode);
+      
+      if (batchResults && batchResults.length > 0) {
+        console.log(`✅ Folder batch complete: ${batchResults.length} results`);
+        
+        // Post-process GCN documents
+        const finalChildResults = postProcessGCNBatch(batchResults);
+        
+        setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
+        return;
+      } else {
+        console.warn('⚠️ Folder batch failed, falling back to sequential');
+        // Fall through to sequential processing
+      }
+    }
+    
+    // SEQUENTIAL PROCESSING (Original logic)
     let currentLastKnown = null;
     
     for (let i = 0; i < files.length; i++) {

@@ -948,6 +948,111 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
   } catch (e) { return { success: false, error: e.message }; }
 });
 
+// Scan History Management
+ipcMain.handle('save-scan-state', (event, scanData) => {
+  try {
+    const scanId = `scan_${Date.now()}`;
+    const scanHistory = store.get('scanHistory', {});
+    
+    // Add timestamp
+    scanData.timestamp = Date.now();
+    scanData.scanId = scanId;
+    
+    // Save to history
+    scanHistory[scanId] = scanData;
+    store.set('scanHistory', scanHistory);
+    
+    console.log(`💾 Saved scan state: ${scanId}, ${scanData.results?.length || 0} results`);
+    return { success: true, scanId: scanId };
+  } catch (e) {
+    console.error('Save scan state error:', e);
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('get-incomplete-scans', () => {
+  try {
+    const scanHistory = store.get('scanHistory', {});
+    const now = Date.now();
+    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+    
+    // Filter: incomplete + within 7 days
+    const incompleteScans = [];
+    const toDelete = [];
+    
+    for (const [scanId, scanData] of Object.entries(scanHistory)) {
+      if (scanData.timestamp < sevenDaysAgo) {
+        // Older than 7 days → mark for deletion
+        toDelete.push(scanId);
+      } else if (scanData.status === 'incomplete') {
+        // Recent + incomplete → return to user
+        incompleteScans.push({
+          scanId: scanId,
+          ...scanData
+        });
+      }
+    }
+    
+    // Auto-cleanup old scans
+    if (toDelete.length > 0) {
+      console.log(`🗑️ Auto-cleanup: Deleting ${toDelete.length} scans older than 7 days`);
+      toDelete.forEach(id => delete scanHistory[id]);
+      store.set('scanHistory', scanHistory);
+    }
+    
+    return { success: true, scans: incompleteScans };
+  } catch (e) {
+    console.error('Get incomplete scans error:', e);
+    return { success: false, error: e.message, scans: [] };
+  }
+});
+
+ipcMain.handle('load-scan-state', (event, scanId) => {
+  try {
+    const scanHistory = store.get('scanHistory', {});
+    const scanData = scanHistory[scanId];
+    
+    if (!scanData) {
+      return { success: false, error: 'Scan not found' };
+    }
+    
+    console.log(`📂 Loaded scan state: ${scanId}`);
+    return { success: true, data: scanData };
+  } catch (e) {
+    console.error('Load scan state error:', e);
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('delete-scan-state', (event, scanId) => {
+  try {
+    const scanHistory = store.get('scanHistory', {});
+    delete scanHistory[scanId];
+    store.set('scanHistory', scanHistory);
+    
+    console.log(`🗑️ Deleted scan state: ${scanId}`);
+    return { success: true };
+  } catch (e) {
+    console.error('Delete scan state error:', e);
+    return { success: false, error: e.message };
+  }
+});
+
+ipcMain.handle('mark-scan-complete', (event, scanId) => {
+  try {
+    const scanHistory = store.get('scanHistory', {});
+    if (scanHistory[scanId]) {
+      scanHistory[scanId].status = 'complete';
+      scanHistory[scanId].completedAt = Date.now();
+      store.set('scanHistory', scanHistory);
+      console.log(`✅ Marked scan complete: ${scanId}`);
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
 ipcMain.handle('open-rules-folder', async () => {
   try {
     const res = await spawnJsonPython([(isDev ? path.join(__dirname, '../python/rules_manager.py') : getPythonScriptPath('rules_manager.py')), 'folder']);

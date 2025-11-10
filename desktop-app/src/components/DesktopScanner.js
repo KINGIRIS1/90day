@@ -617,37 +617,37 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
      * ============================================
      * END OF COMMENTED OUT CODE
      * ============================================ */
-    
-    // NEW LOGIC: Extract color and issue dates from pairs
-    const pairsWithData = pairs.map(pair => {
-      // Try to get color from metadata (batch mode) or direct fields (single-file mode)
-      const color = pair.page1?.metadata?.color || pair.page1?.color || 
-                    pair.page2?.metadata?.color || pair.page2?.color || null;
       
-      // Try to get issue_date from metadata (batch mode) or direct fields (single-file mode)
-      const issueDate = pair.page1?.metadata?.issue_date || pair.page1?.issue_date || 
-                        pair.page2?.metadata?.issue_date || pair.page2?.issue_date || null;
-      const issueDateConfidence = pair.page1?.metadata?.issue_date_confidence || pair.page1?.issue_date_confidence || 
-                                   pair.page2?.metadata?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+      // NEW LOGIC: Extract color and issue dates from pairs
+      const pairsWithData = pairs.map(pair => {
+        // Try to get color from metadata (batch mode) or direct fields (single-file mode)
+        const color = pair.page1?.metadata?.color || pair.page1?.color || 
+                      pair.page2?.metadata?.color || pair.page2?.color || null;
+        
+        // Try to get issue_date from metadata (batch mode) or direct fields (single-file mode)
+        const issueDate = pair.page1?.metadata?.issue_date || pair.page1?.issue_date || 
+                          pair.page2?.metadata?.issue_date || pair.page2?.issue_date || null;
+        const issueDateConfidence = pair.page1?.metadata?.issue_date_confidence || pair.page1?.issue_date_confidence || 
+                                     pair.page2?.metadata?.issue_date_confidence || pair.page2?.issue_date_confidence || null;
+        
+        console.log(`  🎨 Pair ${pair.pairIndex + 1}: color = ${color || 'unknown'}`);
+        console.log(`  📅 Pair ${pair.pairIndex + 1}: issue_date = ${issueDate || 'null'} (${issueDateConfidence || 'N/A'})`);
+        
+        return {
+          ...pair,
+          color,
+          issueDate,
+          issueDateConfidence,
+          parsedDate: parseIssueDate(issueDate, issueDateConfidence)
+        };
+      });
       
-      console.log(`  🎨 Pair ${pair.pairIndex + 1}: color = ${color || 'unknown'}`);
-      console.log(`  📅 Pair ${pair.pairIndex + 1}: issue_date = ${issueDate || 'null'} (${issueDateConfidence || 'N/A'})`);
+      // Classification logic: Priority 1 = Color (if different), Priority 2 = Date
+      console.log('\n📊 Classifying GCN pairs...');
       
-      return {
-        ...pair,
-        color,
-        issueDate,
-        issueDateConfidence,
-        parsedDate: parseIssueDate(issueDate, issueDateConfidence)
-      };
-    });
-    
-    // Classification logic: Priority 1 = Color (if different), Priority 2 = Date
-    console.log('\n📊 Classifying GCN pairs...');
-    
-    // Check if there are different colors in batch
-    const colors = pairsWithData.map(p => p.color).filter(Boolean);
-    const uniqueColors = [...new Set(colors)];
+      // Check if there are different colors in batch
+      const colors = pairsWithData.map(p => p.color).filter(Boolean);
+      const uniqueColors = [...new Set(colors)];
     const hasMixedColors = uniqueColors.length > 1;
     const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
     

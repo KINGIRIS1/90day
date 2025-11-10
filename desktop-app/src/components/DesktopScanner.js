@@ -779,6 +779,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       
       } // End of else (single-file mode)
       
+      } // End of if-else (batch vs single-file mode)
+      
       console.log('✅ GCN post-processing complete (date-based)');
       return normalizedResults;
       

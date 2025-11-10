@@ -40,6 +40,11 @@ function BatchScanner() {
   // Batch processing mode
   const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
   
+  // Auto-save & Resume
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [incompleteScans, setIncompleteScans] = useState([]);
+  const [currentScanId, setCurrentScanId] = useState(null);
+  
   // Timer states
   const [timers, setTimers] = useState({
     batchStartTime: null,

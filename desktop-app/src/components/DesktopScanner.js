@@ -404,9 +404,121 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     
     console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
     
-    // NEW LOGIC: Pair documents (trang 1 + trang 2)
-    // Scan order: trang 1 (index 0) → trang 2 (index 1) → trang 1 (index 2) → trang 2 (index 3)...
-    // Trang 2 (index lẻ) có ngày cấp, trang 1 (index chẵn) không có hoặc có thể có
+    // Check if results came from batch processing
+    const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
+    
+    if (isBatchMode) {
+      console.log(`📦 Batch mode detected - Using AI grouping for GCN classification`);
+      console.log(`   (AI already grouped pages into documents, no need to pair)`);
+      
+      // In batch mode, AI already grouped GCN pages
+      // Each unique metadata = 1 GCN document
+      // Just classify each group based on its metadata
+      
+      const gcnGroups = new Map();
+      
+      allGcnDocs.forEach((doc, idx) => {
+        const meta = doc.metadata || {};
+        const color = meta.color || 'unknown';
+        const issueDate = meta.issue_date || null;
+        const issueDateConf = meta.issue_date_confidence || null;
+        
+        // Use unique key: color + issueDate
+        const groupKey = `${color}_${issueDate || 'null'}`;
+        
+        if (!gcnGroups.has(groupKey)) {
+          gcnGroups.set(groupKey, {
+            files: [],
+            color: color,
+            issueDate: issueDate,
+            issueDateConfidence: issueDateConf,
+            parsedDate: parseIssueDate(issueDate, issueDateConf)
+          });
+        }
+        
+        gcnGroups.get(groupKey).files.push(doc);
+      });
+      
+      console.log(`📋 Found ${gcnGroups.size} unique GCN document(s) (by metadata)`);
+      
+      const groupsArray = Array.from(gcnGroups.values());
+      
+      // Log each group
+      groupsArray.forEach((group, idx) => {
+        console.log(`  📄 GCN ${idx + 1}: ${group.files.length} pages`);
+        console.log(`     🎨 color = ${group.color}`);
+        console.log(`     📅 issue_date = ${group.issueDate || 'null'} (${group.issueDateConfidence || 'N/A'})`);
+      });
+      
+      // Classify by color first, then date
+      console.log('\n📊 Classifying GCN documents...');
+      
+      const colors = groupsArray.map(g => g.color).filter(c => c && c !== 'unknown');
+      const uniqueColors = [...new Set(colors)];
+      const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
+      
+      console.log(`  🎨 Unique colors: ${uniqueColors.join(', ') || 'none'}`);
+      
+      if (hasRedAndPink) {
+        // Different colors → classify by color
+        console.log(`  🎨 Mixed colors → Classify by color`);
+        groupsArray.forEach(group => {
+          const classification = (group.color === 'red' || group.color === 'orange') ? 'GCNC' : 'GCNM';
+          group.files.forEach(file => {
+            const idx = finalResults.findIndex(r => r.fileName === file.fileName);
+            if (idx >= 0) {
+              finalResults[idx].short_code = classification;
+              finalResults[idx].doc_type = classification;
+              console.log(`  ✅ ${file.fileName}: ${group.color} → ${classification}`);
+            }
+          });
+        });
+      } else {
+        // Same color or no color → classify by date
+        console.log(`  📅 Same/no color → Classify by date`);
+        
+        const groupsWithDate = groupsArray.filter(g => g.parsedDate && g.parsedDate.comparable > 0);
+        
+        if (groupsWithDate.length >= 2) {
+          // Sort by date
+          groupsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+          
+          console.log('\n📊 Sorted by date:');
+          groupsWithDate.forEach((group, idx) => {
+            console.log(`  ${idx + 1}. ${group.issueDate} (color: ${group.color})`);
+          });
+          
+          // Oldest = GCNC, others = GCNM
+          groupsWithDate.forEach((group, idx) => {
+            const classification = (idx === 0) ? 'GCNC' : 'GCNM';
+            group.files.forEach(file => {
+              const resIdx = finalResults.findIndex(r => r.fileName === file.fileName);
+              if (resIdx >= 0) {
+                finalResults[resIdx].short_code = classification;
+                finalResults[resIdx].doc_type = classification;
+                console.log(`  ✅ ${file.fileName}: ${group.issueDate} → ${classification}`);
+              }
+            });
+          });
+        } else {
+          // Not enough dates → default GCNM
+          console.log(`  ⚠️ Not enough dates for comparison → Default GCNM`);
+          groupsArray.forEach(group => {
+            group.files.forEach(file => {
+              const idx = finalResults.findIndex(r => r.fileName === file.fileName);
+              if (idx >= 0) {
+                finalResults[idx].short_code = 'GCNM';
+                finalResults[idx].doc_type = 'GCNM';
+              }
+            });
+          });
+        }
+      }
+      
+    } else {
+      console.log(`📄 Single-file mode detected - Using manual pairing (2 files per GCN)`);
+      
+      // OLD PAIRING LOGIC for single-file mode
     
     const pairs = [];
     for (let i = 0; i < allGcnDocs.length; i += 2) {

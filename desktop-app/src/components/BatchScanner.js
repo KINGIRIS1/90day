@@ -354,6 +354,14 @@ function BatchScanner() {
         }
 
         const folder = selectedFolders[i];
+        
+        // 🔄 SKIP if folder already done (resume scenario)
+        const existingFolder = folderTabs.find(t => t.path === folder.path);
+        if (existingFolder && existingFolder.status === 'done') {
+          console.log(`⏭️ Skipping folder (already done): ${folder.name}`);
+          continue;
+        }
+        
         const folderStartTime = Date.now();
         console.log(`\n📂 [${i + 1}/${selectedFolders.length}] Scanning: ${folder.path}`);
         console.log(`⏱️ Folder timer started: ${new Date(folderStartTime).toLocaleTimeString()}`);

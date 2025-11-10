@@ -648,122 +648,83 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       // Check if there are different colors in batch
       const colors = pairsWithData.map(p => p.color).filter(Boolean);
       const uniqueColors = [...new Set(colors)];
-    const hasMixedColors = uniqueColors.length > 1;
-    const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
-    
-    console.log(`  🎨 Unique colors detected: ${uniqueColors.join(', ') || 'none'}`);
-    console.log(`  🎨 Mixed colors (red vs pink)? ${hasMixedColors && hasRedAndPink ? 'Yes' : 'No'}`);
-    
-    // Step 1: Only classify by color if there are DIFFERENT colors (red vs pink)
-    const pairsClassifiedByColor = [];
-    const pairsNeedDateComparison = [];
-    
-    if (hasMixedColors && hasRedAndPink) {
-      // Mixed colors (red vs pink) → use color to classify
-      console.log(`  🎨 Mixed colors detected → Classify by color`);
+      const hasMixedColors = uniqueColors.length > 1;
+      const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
       
-      pairsWithData.forEach(pair => {
-        if (pair.color === 'red' || pair.color === 'orange') {
-          // Red/orange → GCNC
-          const classification = 'GCNC';
-          const colorName = 'đỏ/cam (cũ)';
-          const note = `Màu ${colorName} → ${classification}`;
-          
-          console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
-          
-          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
-            const index = normalizedResults.indexOf(page);
-            normalizedResults[index] = {
-              ...page,
-              short_code: classification,
-              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-              gcn_classification_note: `📌 ${note} (phân loại theo màu)`
-            };
-          });
-          
-          pairsClassifiedByColor.push(pair);
-        } else if (pair.color === 'pink') {
-          // Pink → GCNM
-          const classification = 'GCNM';
-          const colorName = 'hồng (mới)';
-          const note = `Màu ${colorName} → ${classification}`;
-          
-          console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
-          
-          [pair.page1, pair.page2].filter(Boolean).forEach(page => {
-            const index = normalizedResults.indexOf(page);
-            normalizedResults[index] = {
-              ...page,
-              short_code: classification,
-              reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-              gcn_classification_note: `📌 ${note} (phân loại theo màu)`
-            };
-          });
-          
-          pairsClassifiedByColor.push(pair);
-        } else {
-          // No color or unknown → need date comparison
-          pairsNeedDateComparison.push(pair);
-        }
-      });
-    } else {
-      // All same color or no color → need date comparison
-      console.log(`  📅 All same color or no color → Classify by date`);
-      pairsNeedDateComparison.push(...pairsWithData);
-    }
-    
-    // Step 2: Classify remaining pairs by date
-    if (pairsNeedDateComparison.length > 0) {
-      console.log('\n📅 Classifying remaining pairs by date...');
-      console.log(`  📊 ${pairsNeedDateComparison.length} pair(s) need date comparison`);
+      console.log(`  🎨 Unique colors detected: ${uniqueColors.join(', ') || 'none'}`);
+      console.log(`  🎨 Mixed colors (red vs pink)? ${hasMixedColors && hasRedAndPink ? 'Yes' : 'No'}`);
       
-      if (pairsNeedDateComparison.length === 1) {
-        // Only 1 pair → default GCNM
-        console.log('📄 Only 1 pair → Default GCNM');
-        const pair = pairsNeedDateComparison[0];
-        const classification = 'GCNM';
-        const dateStr = pair.issueDate || 'không có ngày cấp';
-        const colorStr = pair.color ? `màu ${pair.color}` : 'không detect màu';
-        const note = `${colorStr}, chỉ 1 GCN → GCNM (mặc định)`;
+      // Step 1: Only classify by color if there are DIFFERENT colors (red vs pink)
+      const pairsClassifiedByColor = [];
+      const pairsNeedDateComparison = [];
+      
+      if (hasMixedColors && hasRedAndPink) {
+        // Mixed colors (red vs pink) → use color to classify
+        console.log(`  🎨 Mixed colors detected → Classify by color`);
         
-        [pair.page1, pair.page2].filter(Boolean).forEach(page => {
-          const index = normalizedResults.indexOf(page);
-          normalizedResults[index] = {
-            ...page,
-            short_code: classification,
-            reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-            gcn_classification_note: `📌 ${note} (ngày cấp: ${dateStr})`
-          };
+        pairsWithData.forEach(pair => {
+          if (pair.color === 'red' || pair.color === 'orange') {
+            // Red/orange → GCNC
+            const classification = 'GCNC';
+            const colorName = 'đỏ/cam (cũ)';
+            const note = `Màu ${colorName} → ${classification}`;
+            
+            console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
+            
+            [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+              const index = normalizedResults.indexOf(page);
+              normalizedResults[index] = {
+                ...page,
+                short_code: classification,
+                reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+                gcn_classification_note: `📌 ${note} (phân loại theo màu)`
+              };
+            });
+            
+            pairsClassifiedByColor.push(pair);
+          } else if (pair.color === 'pink') {
+            // Pink → GCNM
+            const classification = 'GCNM';
+            const colorName = 'hồng (mới)';
+            const note = `Màu ${colorName} → ${classification}`;
+            
+            console.log(`  🎨 Pair ${pair.pairIndex + 1}: Màu ${pair.color} → ${classification}`);
+            
+            [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+              const index = normalizedResults.indexOf(page);
+              normalizedResults[index] = {
+                ...page,
+                short_code: classification,
+                reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+                gcn_classification_note: `📌 ${note} (phân loại theo màu)`
+              };
+            });
+            
+            pairsClassifiedByColor.push(pair);
+          } else {
+            // No color or unknown → need date comparison
+            pairsNeedDateComparison.push(pair);
+          }
         });
       } else {
-        // Multiple pairs → sort by date
-        const sortedPairs = [...pairsNeedDateComparison].sort((a, b) => {
-          if (!a.parsedDate && !b.parsedDate) return 0;
-          if (!a.parsedDate) return 1;
-          if (!b.parsedDate) return -1;
-          return a.parsedDate.comparable - b.parsedDate.comparable;
-        });
+        // All same color or no color → need date comparison
+        console.log(`  📅 All same color or no color → Classify by date`);
+        pairsNeedDateComparison.push(...pairsWithData);
+      }
+      
+      // Step 2: Classify remaining pairs by date
+      if (pairsNeedDateComparison.length > 0) {
+        console.log('\n📅 Classifying remaining pairs by date...');
+        console.log(`  📊 ${pairsNeedDateComparison.length} pair(s) need date comparison`);
         
-        console.log('\n📊 Sorted pairs by date:');
-        sortedPairs.forEach((pair, idx) => {
-          const dateStr = pair.issueDate || 'null';
-          const colorStr = pair.color || 'unknown';
-          console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr} (color: ${colorStr})`);
-        });
-        
-        // Classify: oldest = GCNC, others = GCNM
-        sortedPairs.forEach((pair, idx) => {
-          const isOldest = (idx === 0 && pair.parsedDate !== null);
-          const classification = isOldest ? 'GCNC' : 'GCNM';
+        if (pairsNeedDateComparison.length === 1) {
+          // Only 1 pair → default GCNM
+          console.log('📄 Only 1 pair → Default GCNM');
+          const pair = pairsNeedDateComparison[0];
+          const classification = 'GCNM';
           const dateStr = pair.issueDate || 'không có ngày cấp';
           const colorStr = pair.color ? `màu ${pair.color}` : 'không detect màu';
-          const note = isOldest 
-            ? `${colorStr}, ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
-            : pair.parsedDate 
-              ? `${colorStr}, ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
-              : `${colorStr}, không có ngày cấp → GCNM (mặc định)`;
-          
-          console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
+          const note = `${colorStr}, chỉ 1 GCN → GCNM (mặc định)`;
           
           [pair.page1, pair.page2].filter(Boolean).forEach(page => {
             const index = normalizedResults.indexOf(page);
@@ -771,12 +732,51 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
               ...page,
               short_code: classification,
               reasoning: `${page.reasoning || 'GCN'} - ${note}`,
-              gcn_classification_note: `📌 ${note} (phân loại theo ngày)`
+              gcn_classification_note: `📌 ${note} (ngày cấp: ${dateStr})`
             };
           });
-        });
-      }
-    
+        } else {
+          // Multiple pairs → sort by date
+          const sortedPairs = [...pairsNeedDateComparison].sort((a, b) => {
+            if (!a.parsedDate && !b.parsedDate) return 0;
+            if (!a.parsedDate) return 1;
+            if (!b.parsedDate) return -1;
+            return a.parsedDate.comparable - b.parsedDate.comparable;
+          });
+          
+          console.log('\n📊 Sorted pairs by date:');
+          sortedPairs.forEach((pair, idx) => {
+            const dateStr = pair.issueDate || 'null';
+            const colorStr = pair.color || 'unknown';
+            console.log(`  ${idx + 1}. Pair ${pair.pairIndex + 1}: ${dateStr} (color: ${colorStr})`);
+          });
+          
+          // Classify: oldest = GCNC, others = GCNM
+          sortedPairs.forEach((pair, idx) => {
+            const isOldest = (idx === 0 && pair.parsedDate !== null);
+            const classification = isOldest ? 'GCNC' : 'GCNM';
+            const dateStr = pair.issueDate || 'không có ngày cấp';
+            const colorStr = pair.color ? `màu ${pair.color}` : 'không detect màu';
+            const note = isOldest 
+              ? `${colorStr}, ngày cấp sớm nhất: ${dateStr} → GCNC (cũ)` 
+              : pair.parsedDate 
+                ? `${colorStr}, ngày cấp muộn hơn: ${dateStr} → GCNM (mới)`
+                : `${colorStr}, không có ngày cấp → GCNM (mặc định)`;
+            
+            console.log(`  ✅ Pair ${pair.pairIndex + 1}: ${dateStr} → ${classification}`);
+            
+            [pair.page1, pair.page2].filter(Boolean).forEach(page => {
+              const index = normalizedResults.indexOf(page);
+              normalizedResults[index] = {
+                ...page,
+                short_code: classification,
+                reasoning: `${page.reasoning || 'GCN'} - ${note}`,
+                gcn_classification_note: `📌 ${note} (phân loại theo ngày)`
+              };
+            });
+          });
+        }
+      
     } // End of else (single-file mode)
     
     console.log('✅ GCN post-processing complete (date-based)');

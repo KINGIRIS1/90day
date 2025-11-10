@@ -522,8 +522,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       console.log(`📄 Single-file mode detected - Using manual pairing (2 files per GCN)`);
       
       // OLD PAIRING LOGIC for single-file mode
-    
-    const pairs = [];
+      
+      const pairs = [];
     for (let i = 0; i < allGcnDocs.length; i += 2) {
       const page1 = allGcnDocs[i];
       const page2 = allGcnDocs[i + 1];

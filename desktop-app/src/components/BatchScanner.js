@@ -841,13 +841,21 @@ function BatchScanner() {
         const fileName = batchItem.file_name;
         const filePath = batchItem.file_path;
         
+        // Validate filePath
+        if (!filePath) {
+          console.error(`⚠️ Missing file_path for item:`, batchItem);
+          continue;
+        }
+        
         // Get folder path from file path
         const folderPath = filePath.substring(0, filePath.lastIndexOf(/[/\\]/.test(filePath) ? (filePath.includes('/') ? '/' : '\\') : '/'));
         
-        // Generate preview
+        // Generate preview (with validation)
         let previewUrl = null;
         try {
-          previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+          if (filePath && typeof filePath === 'string') {
+            previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+          }
         } catch (e) {
           console.error(`Preview error for ${fileName}:`, e);
         }

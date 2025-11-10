@@ -779,6 +779,72 @@ function BatchScanner() {
     return Math.round(conf * 100);
   };
 
+  // Handle resume scan from saved state
+  const handleResumeScan = async (scan) => {
+    try {
+      console.log(`🔄 Resuming batch scan: ${scan.scanId}`);
+      
+      const loadResult = await window.electronAPI.loadScanState(scan.scanId);
+      if (!loadResult.success) {
+        alert('❌ Không thể load scan data');
+        return;
+      }
+      
+      const scanData = loadResult.data;
+      
+      // Restore batch scan state
+      setFolderTabs(scanData.folderTabs || []);
+      setDiscoveredFolders(scanData.discoveredFolders || []);
+      setFileResults(scanData.fileResults || []);
+      setTxtFilePath(scanData.txtFilePath || null);
+      setCurrentScanId(scan.scanId);
+      
+      // Set active to first completed folder to show results
+      const firstDone = scanData.folderTabs?.find(t => t.status === 'done');
+      if (firstDone) {
+        setActiveFolder(firstDone.path);
+      }
+      
+      // Count completed
+      const completedFolders = scanData.folderTabs?.filter(t => t.status === 'done') || [];
+      const totalFolders = scanData.folderTabs?.length || 0;
+      const totalFiles = scanData.fileResults?.length || 0;
+      
+      console.log(`✅ Restored ${completedFolders.length}/${totalFolders} folders`);
+      console.log(`✅ Restored ${totalFiles} files`);
+      
+      alert(`✅ Đã load ${completedFolders.length}/${totalFolders} folders đã quét.\n\n` +
+            `📊 Tổng ${totalFiles} files đã được classify.\n\n` +
+            `▶️ Click "Quét tất cả" để quét ${totalFolders - completedFolders.length} folders còn lại.`);
+      
+      setShowResumeDialog(false);
+      
+    } catch (error) {
+      console.error('Resume scan error:', error);
+      alert(`❌ Lỗi: ${error.message}`);
+    }
+  };
+
+  // Handle dismiss resume dialog
+  const handleDismissResume = async (scanId) => {
+    try {
+      if (scanId === 'all') {
+        for (const scan of incompleteScans) {
+          await window.electronAPI.deleteScanState(scan.scanId);
+        }
+        console.log(`🗑️ Deleted all ${incompleteScans.length} incomplete scans`);
+      } else {
+        await window.electronAPI.deleteScanState(scanId);
+        console.log(`🗑️ Deleted scan: ${scanId}`);
+      }
+      
+      setShowResumeDialog(false);
+      setIncompleteScans([]);
+    } catch (error) {
+      console.error('Delete scan error:', error);
+    }
+  };
+
   // Apply sequential naming logic (UNKNOWN fallback)
   const applySequentialNaming = (result, lastType) => {
     console.log('🔍 applySequentialNaming:', { 

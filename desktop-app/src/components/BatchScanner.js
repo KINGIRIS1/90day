@@ -91,6 +91,17 @@ function BatchScanner() {
           setBatchMode(savedBatchMode);
           console.log(`📦 Loaded batch mode: ${savedBatchMode}`);
         }
+        
+        // Check for incomplete scans
+        const incompleteResult = await window.electronAPI.getIncompleteScans();
+        if (incompleteResult.success && incompleteResult.scans.length > 0) {
+          const batchScans = incompleteResult.scans.filter(s => s.type === 'batch_scan');
+          if (batchScans.length > 0) {
+            console.log(`🔄 Found ${batchScans.length} incomplete batch scan(s)`);
+            setIncompleteScans(batchScans);
+            setShowResumeDialog(true);
+          }
+        }
       } catch (err) {
         console.error('Failed to load config:', err);
       }

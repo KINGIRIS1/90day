@@ -883,6 +883,8 @@ function BatchScanner() {
           color: batchItem.metadata?.color || null,
           issue_date: batchItem.metadata?.issue_date || null,
           issue_date_confidence: batchItem.metadata?.issue_date_confidence || null,
+          // Additional fields for BatchScanner compatibility
+          original_path: filePath,  // Add this for folderMap compatibility
           // Timing
           startTime: null,
           endTime: null,

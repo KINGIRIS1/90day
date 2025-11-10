@@ -243,6 +243,92 @@ CHỈ TRẢ VỀ "UNKNOWN" KHI:
 
 """
 
+    # GCN-specific metadata rules (CRITICAL!)
+    gcn_metadata_rules = """
+
+🚨 CỰC KỲ QUAN TRỌNG - GCN METADATA (BẮT BUỘC):
+
+Khi classify bất kỳ page nào là "GCN", bạn PHẢI:
+
+**1. TÌM MÀU SẮC (color):**
+- Quan sát màu nền giấy
+- Màu đỏ/cam (red/orange) → "color": "red"
+- Màu hồng (pink) → "color": "pink"  
+- Màu trắng hoặc không rõ → "color": "unknown"
+
+**2. TÌM NGÀY CẤP (issue_date) - BẮT BUỘC:**
+- ⚠️ KHÔNG BAO GIỜ bỏ qua bước này!
+- Tìm ở trang 2 (nếu GCN A3) hoặc trang 1 bottom
+- Text gần: "Ngày cấp", "Cấp ngày", "TM. UBND", chữ ký
+- Có thể viết TAY (handwritten)
+
+**Formats phổ biến:**
+- "DD/MM/YYYY" → Return: "27/10/2021"
+- "Ngày 25 tháng 8 năm 2010" → Convert & return: "25/8/2010"
+- "MM/YYYY" (nếu mờ) → Return: "02/2012"
+- "YYYY" (nếu rất mờ) → Return: "2012"
+- Không tìm thấy → Return: null
+
+**Confidence levels:**
+- "full": Đọc được đầy đủ DD/MM/YYYY
+- "partial": Chỉ MM/YYYY
+- "year_only": Chỉ YYYY
+- "not_found": Không tìm thấy
+
+**3. METADATA RESPONSE - BẮT BUỘC:**
+
+✅ VÍ DỤ ĐÚNG (Có ngày cấp):
+{{
+  "type": "GCN",
+  "pages": [5, 6],
+  "confidence": 0.98,
+  "reasoning": "GCN màu hồng, quốc huy, ngày cấp 27/10/2021",
+  "metadata": {{
+    "color": "pink",
+    "issue_date": "27/10/2021",
+    "issue_date_confidence": "full"
+  }}
+}}
+
+✅ VÍ DỤ ĐÚNG (Không tìm thấy date):
+{{
+  "type": "GCN",
+  "pages": [0],
+  "confidence": 0.95,
+  "reasoning": "GCN trang 1, màu hồng, chưa có ngày cấp",
+  "metadata": {{
+    "color": "pink",
+    "issue_date": null,
+    "issue_date_confidence": "not_found"
+  }}
+}}
+
+❌ SAI - THIẾU METADATA:
+{{
+  "type": "GCN",
+  "pages": [5, 6],
+  "metadata": {{}}  // ❌ EMPTY! Must have color & issue_date!
+}}
+
+❌ SAI - KHÔNG TÌM DATE:
+{{
+  "type": "GCN",
+  "pages": [5, 6],
+  "metadata": {{
+    "color": "pink"
+    // ❌ MISSING issue_date fields!
+  }}
+}}
+
+⚠️ NHỚ: Mọi GCN document PHẢI có metadata với:
+- "color": "red" | "pink" | "unknown"
+- "issue_date": "DD/MM/YYYY" | null
+- "issue_date_confidence": "full" | "partial" | "year_only" | "not_found"
+
+---
+
+"""
+
     output_format = f"""
 
 ---

@@ -107,8 +107,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       // 1. Has childTabs
       // 2. At least 1 folder is done
       // 3. Not all done yet (incomplete)
+      // 4. NOT currently scanning (avoid interrupt)
       const doneFolders = childTabs.filter(t => t.status === 'done');
       const allDone = childTabs.length > 0 && childTabs.every(t => t.status === 'done');
+      const isScanning = childTabs.some(t => t.status === 'scanning');
+      
+      // DISABLE auto-save during active scan to avoid interrupting
+      if (isScanning) {
+        console.log(`⏸️ Skip auto-save: Scan in progress`);
+        return;
+      }
       
       if (childTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
         const scanId = currentScanId || `scan_${Date.now()}`;
@@ -134,7 +142,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     };
     
     autoSave();
-  }, [childTabs]);  // Trigger on childTabs change
+  }, [childTabs]);  // ONLY childTabs - avoid re-trigger on other state changes
   
   // Load config (guard electron)
   useEffect(() => {

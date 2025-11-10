@@ -331,6 +331,65 @@ function BatchScanner() {
           
           console.log(`Found ${validImages.length} images in ${folder.name}`);
           
+          // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED
+          const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(ocrEngine);
+          const shouldUseBatch = (
+            isGeminiEngine &&
+            (batchMode === 'fixed' || batchMode === 'smart') &&
+            validImages.length >= 3
+          );
+          
+          if (shouldUseBatch) {
+            console.log(`\n🚀 BATCH MODE for folder: ${folder.name}`);
+            console.log(`   Files: ${validImages.length}, Mode: ${batchMode}`);
+            
+            // Use batch processing for this folder
+            const batchResults = await processFolderBatch(validImages, batchMode, ocrEngine);
+            
+            if (batchResults && batchResults.length > 0) {
+              console.log(`✅ Folder batch success: ${batchResults.length} files`);
+              
+              // Add all batch results
+              batchResults.forEach(result => {
+                allFilesProcessed.push(result);
+                setFileResults(prev => [...prev, result]);
+              });
+              
+              folderResults.push(...batchResults);
+              
+              // Update progress
+              setProgress(prev => ({
+                ...prev,
+                processedFiles: prev.processedFiles + batchResults.length,
+                currentFile: ''
+              }));
+              
+              // Update folder timing
+              const folderEndTime = Date.now();
+              const folderDurationMs = folderEndTime - folderStartTime;
+              console.log(`✅ Folder "${folder.name}" completed in ${(folderDurationMs / 1000).toFixed(2)}s (BATCH MODE)`);
+              
+              setTimers(prev => ({
+                ...prev,
+                folderTimings: [...prev.folderTimings, {
+                  folderName: folder.name,
+                  startTime: folderStartTime,
+                  endTime: folderEndTime,
+                  durationMs: folderDurationMs,
+                  fileCount: batchResults.length,
+                  mode: `batch_${batchMode}`
+                }]
+              }));
+              
+              // Continue to next folder (skip sequential loop)
+              continue;
+            } else {
+              console.warn('⚠️ Batch failed for folder, falling back to sequential');
+              // Fall through to sequential
+            }
+          }
+          
+          // SEQUENTIAL PROCESSING (Original logic)
           // Scan each file and display immediately
           const folderResults = [];
           for (let j = 0; j < validImages.length; j++) {

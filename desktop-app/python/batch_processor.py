@@ -546,14 +546,64 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
             ]
         }
         
-        # Call Gemini API
+        # Call Gemini API with retry logic
         print(f"📡 Sending batch request to {model_name}...", file=sys.stderr)
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
+        max_retries = 3
+        retry_delay = 10  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(api_url, json=payload, timeout=120)
+                response.raise_for_status()
+                result_data = response.json()
+                break  # Success, exit retry loop
+                
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 503:
+                    # Service Unavailable - retry
+                    if attempt < max_retries - 1:
+                        wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
+                        print(f"⚠️ 503 Service Unavailable, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        print(f"❌ Max retries reached for batch {batch_num}", file=sys.stderr)
+                        raise
+                elif e.response.status_code == 429:
+                    # Rate limit - longer wait
+                    if attempt < max_retries - 1:
+                        wait_time = 60 * (2 ** attempt)  # Start with 60s
+                        print(f"⚠️ 429 Rate Limit, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        raise
+                else:
+                    # Other HTTP errors - don't retry
+                    raise
+            except requests.exceptions.RequestException as e:
+                # Network errors - retry
+                if attempt < max_retries - 1:
+                    wait_time = retry_delay * (2 ** attempt)
+                    print(f"⚠️ Network error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                    import time
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    raise
+        
+        # Add delay between batches to avoid rate limiting
+        if batch_num < ((len(image_paths) + batch_size - 1) // batch_size):
+            import time
+            inter_batch_delay = 2  # 2 seconds between batches
+            print(f"⏸️ Waiting {inter_batch_delay}s before next batch...", file=sys.stderr)
+            time.sleep(inter_batch_delay)
+        
         try:
-            response = requests.post(api_url, json=payload, timeout=120)
-            response.raise_for_status()
-            result_data = response.json()
             
             print(f"📊 Response status: {response.status_code}", file=sys.stderr)
             

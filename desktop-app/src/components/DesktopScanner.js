@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 import QuotaWarning from './QuotaWarning';
+import ResumeDialog from './ResumeDialog';
 
 const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   // Tab state - Main navigation

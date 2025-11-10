@@ -904,6 +904,97 @@ function BatchScanner() {
       
       console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
       
+      // Check if results came from batch processing
+      const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
+      
+      if (isBatchMode) {
+        console.log(`📦 Batch mode - Using AI grouping (same as DesktopScanner)`);
+        
+        // Group by metadata (color + issue_date)
+        const gcnGroups = new Map();
+        
+        allGcnDocs.forEach(doc => {
+          const meta = doc.metadata || {};
+          const color = meta.color || doc.color || 'unknown';
+          const issueDate = meta.issue_date || doc.issue_date || null;
+          const issueDateConf = meta.issue_date_confidence || doc.issue_date_confidence || null;
+          
+          const groupKey = `${color}_${issueDate || 'null'}`;
+          
+          if (!gcnGroups.has(groupKey)) {
+            gcnGroups.set(groupKey, {
+              files: [],
+              color: color,
+              issueDate: issueDate,
+              issueDateConfidence: issueDateConf,
+              parsedDate: parseIssueDate(issueDate, issueDateConf)
+            });
+          }
+          
+          gcnGroups.get(groupKey).files.push(doc);
+        });
+        
+        console.log(`📋 Found ${gcnGroups.size} unique GCN document(s)`);
+        
+        const groupsArray = Array.from(gcnGroups.values());
+        
+        // Classify by color or date
+        const colors = groupsArray.map(g => g.color).filter(c => c && c !== 'unknown');
+        const uniqueColors = [...new Set(colors)];
+        const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
+        
+        if (hasRedAndPink) {
+          console.log(`  🎨 Mixed colors → Classify by color`);
+          groupsArray.forEach(group => {
+            const classification = (group.color === 'red' || group.color === 'orange') ? 'GCNC' : 'GCNM';
+            group.files.forEach(file => {
+              const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+              if (idx >= 0) {
+                normalizedResults[idx].short_code = classification;
+                normalizedResults[idx].doc_type = classification;
+              }
+            });
+          });
+        } else {
+          console.log(`  📅 Same color → Classify by date`);
+          const groupsWithDate = groupsArray.filter(g => g.parsedDate && g.parsedDate.comparable > 0);
+          
+          if (groupsWithDate.length >= 2) {
+            groupsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+            console.log(`📊 Sorted: Oldest = GCNC, others = GCNM`);
+            
+            groupsWithDate.forEach((group, idx) => {
+              const classification = (idx === 0) ? 'GCNC' : 'GCNM';
+              group.files.forEach(file => {
+                const resIdx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                if (resIdx >= 0) {
+                  normalizedResults[resIdx].short_code = classification;
+                  normalizedResults[resIdx].doc_type = classification;
+                }
+              });
+            });
+          } else {
+            console.log(`  ⚠️ Not enough dates → Default GCNM`);
+            groupsArray.forEach(group => {
+              group.files.forEach(file => {
+                const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                if (idx >= 0) {
+                  normalizedResults[idx].short_code = 'GCNM';
+                  normalizedResults[idx].doc_type = 'GCNM';
+                }
+              });
+            });
+          }
+        }
+        
+        console.log('✅ GCN post-processing complete (batch mode)');
+        return normalizedResults;
+        
+      } else {
+        console.log(`📄 Single-file mode - Using pairing logic`);
+        
+        // OLD PAIRING LOGIC (keep for single-file mode)
+      
       // Step 3: Group by color first, then pair within same color
       console.log(`  🎨 Grouping GCN documents by color...`);
       

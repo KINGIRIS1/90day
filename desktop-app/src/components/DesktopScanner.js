@@ -1419,6 +1419,25 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           fileCount: tab.count || 0
         }]
       }));
+      
+      // 💾 AUTO-SAVE after each folder complete
+      if (window.electronAPI?.saveScanState) {
+        await window.electronAPI.saveScanState({
+          type: 'folder_scan',
+          status: 'incomplete',
+          parentFolder: parentFolder,
+          childTabs: childTabs,
+          activeChild: activeChild,
+          progress: {
+            current: childTabs.filter(t => t.status === 'done').length,
+            total: childTabs.length
+          },
+          engine: currentOcrEngine,
+          batchMode: batchMode,
+          timestamp: Date.now()
+        });
+        console.log(`💾 Auto-saved scan state after folder: ${tab.name}`);
+      }
     }
     
     // End timer

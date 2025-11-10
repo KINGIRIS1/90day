@@ -1456,22 +1456,31 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }));
       
       // 💾 AUTO-SAVE after each folder complete
+      // Need to wait for state update, then save
       if (window.electronAPI?.saveScanState) {
-        await window.electronAPI.saveScanState({
-          type: 'folder_scan',
-          status: 'incomplete',
-          parentFolder: parentFolder,
-          childTabs: childTabs,
-          activeChild: activeChild,
-          progress: {
-            current: childTabs.filter(t => t.status === 'done').length,
-            total: childTabs.length
-          },
-          engine: currentOcrEngine,
-          batchMode: batchMode,
-          timestamp: Date.now()
-        });
-        console.log(`💾 Auto-saved scan state after folder: ${tab.name}`);
+        // Use setTimeout to ensure childTabs state is updated
+        setTimeout(async () => {
+          // Get current childTabs (after setState)
+          const currentTabs = childTabs.map(t => 
+            t.path === tab.path ? { ...t, status: 'done', results: t.results } : t
+          );
+          
+          await window.electronAPI.saveScanState({
+            type: 'folder_scan',
+            status: 'incomplete',
+            parentFolder: parentFolder,
+            childTabs: currentTabs,  // Use updated tabs with results
+            activeChild: activeChild,
+            progress: {
+              current: currentTabs.filter(t => t.status === 'done').length,
+              total: currentTabs.length
+            },
+            engine: currentOcrEngine,
+            batchMode: batchMode,
+            timestamp: Date.now()
+          });
+          console.log(`💾 Auto-saved scan state after folder: ${tab.name}`);
+        }, 100);  // Small delay for state update
       }
     }
     

@@ -78,6 +78,39 @@ function BatchScanner() {
     };
   }, [isScanning, timers.batchStartTime]);
   
+  // Auto-save when folderTabs change (folders complete)
+  useEffect(() => {
+    const autoSave = async () => {
+      const doneFolders = folderTabs.filter(t => t.status === 'done');
+      const allDone = folderTabs.length > 0 && folderTabs.every(t => t.status === 'done');
+      
+      if (folderTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
+        const scanId = currentScanId || `scan_${Date.now()}`;
+        
+        await window.electronAPI.saveScanState({
+          type: 'batch_scan',
+          status: 'incomplete',
+          folderTabs: folderTabs,  // Has results for done folders
+          discoveredFolders: discoveredFolders,
+          fileResults: fileResults,
+          txtFilePath: txtFilePath,
+          progress: {
+            current: doneFolders.length,
+            total: folderTabs.length
+          },
+          engine: ocrEngine,
+          batchMode: batchMode,
+          timestamp: Date.now()
+        });
+        
+        if (!currentScanId) setCurrentScanId(scanId);
+        console.log(`💾 Auto-saved batch scan: ${doneFolders.length}/${folderTabs.length} folders done`);
+      }
+    };
+    
+    autoSave();
+  }, [folderTabs]);  // Trigger on folderTabs change
+  
   // Load OCR engine from config on mount
   useEffect(() => {
     const loadConfig = async () => {

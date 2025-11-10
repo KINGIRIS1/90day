@@ -394,18 +394,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         return r;
       });
     
-    // STEP 2: Find all GCN documents
-    const allGcnDocs = normalizedResults.filter(r => r.short_code === 'GCN');
-    
-    if (allGcnDocs.length === 0) {
-      console.log('✅ No GCN documents found in batch');
-      return normalizedResults;
-    }
-    
-    console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
-    
-    // Check if results came from batch processing
-    const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
+      // STEP 2: Find all GCN documents
+      const allGcnDocs = normalizedResults.filter(r => r.short_code === 'GCN');
+      
+      if (allGcnDocs.length === 0) {
+        console.log('✅ No GCN documents found in batch');
+        return normalizedResults;
+      }
+      
+      console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
+      
+      // Check if results came from batch processing
+      const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
     
     if (isBatchMode) {
       console.log(`📦 Batch mode detected - Using AI grouping for GCN classification`);

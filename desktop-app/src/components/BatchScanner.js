@@ -835,11 +835,19 @@ function BatchScanner() {
       
       console.log(`✅ Folder batch complete: ${batchResult.results.length} results`);
       
+      // DEBUG: Log first result structure
+      if (batchResult.results.length > 0) {
+        console.log(`🔍 DEBUG - First batch result:`, batchResult.results[0]);
+      }
+      
       // Map batch results to BatchScanner format
       const mappedResults = [];
       for (const batchItem of batchResult.results) {
         const fileName = batchItem.file_name;
         const filePath = batchItem.file_path;
+        
+        // DEBUG: Log item structure
+        console.log(`🔍 Mapping item: fileName=${fileName}, filePath=${filePath ? 'OK' : 'UNDEFINED'}`);
         
         // Validate filePath
         if (!filePath) {

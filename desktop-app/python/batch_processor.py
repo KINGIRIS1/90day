@@ -638,6 +638,18 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                                     doc_reasoning = doc.get('reasoning', '')
                                     doc_metadata = doc.get('metadata', {})
                                     
+                                    # DEBUG: Log metadata for GCN
+                                    if doc_type == 'GCN':
+                                        print(f"\n🔍 DEBUG - GCN Metadata:", file=sys.stderr)
+                                        print(f"   Type: {doc_type}", file=sys.stderr)
+                                        print(f"   Metadata: {doc_metadata}", file=sys.stderr)
+                                        print(f"   Has color: {'color' in doc_metadata}", file=sys.stderr)
+                                        print(f"   Has issue_date: {'issue_date' in doc_metadata}", file=sys.stderr)
+                                        if doc_metadata:
+                                            print(f"   color value: {doc_metadata.get('color', 'MISSING')}", file=sys.stderr)
+                                            print(f"   issue_date value: {doc_metadata.get('issue_date', 'MISSING')}", file=sys.stderr)
+                                        print(f"\n", file=sys.stderr)
+                                    
                                     for page_idx in doc.get('pages', []):
                                         if page_idx < len(batch_paths):
                                             file_path = batch_paths[page_idx]

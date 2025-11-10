@@ -777,10 +777,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
           });
         }
       
-    } // End of else (single-file mode)
-    
-    console.log('✅ GCN post-processing complete (date-based)');
-    return normalizedResults;
+      } // End of else (single-file mode)
+      
+      console.log('✅ GCN post-processing complete (date-based)');
+      return normalizedResults;
+      
     } catch (error) {
       console.error('❌ Error in GCN post-processing:', error);
       console.error('Stack trace:', error.stack);

@@ -351,7 +351,7 @@ function BatchScanner() {
               
               // Add all batch results
               batchResults.forEach(result => {
-                allFilesProcessed.push(result);
+                allResults.push(result);
                 setFileResults(prev => [...prev, result]);
               });
               

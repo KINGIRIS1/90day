@@ -1491,6 +1491,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
 
   return (
     <div className="space-y-4">
+      {/* Resume Dialog */}
+      {showResumeDialog && (
+        <ResumeDialog
+          scans={incompleteScans}
+          onResume={handleResumeScan}
+          onDismiss={handleDismissResume}
+        />
+      )}
+      
       {/* Quota Warning Modal */}
       {quotaError && <QuotaWarning error={quotaError} />}
       {/* Tab Navigation */}

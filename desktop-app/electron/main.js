@@ -951,18 +951,20 @@ ipcMain.handle('import-rules', async (event, mergeBool = true) => {
 // Scan History Management
 ipcMain.handle('save-scan-state', (event, scanData) => {
   try {
-    const scanId = `scan_${Date.now()}`;
+    // Use provided scanId or generate new one
+    const scanId = scanData.scanId || `scan_${Date.now()}`;
     const scanHistory = store.get('scanHistory', {});
     
-    // Add timestamp
-    scanData.timestamp = Date.now();
+    // Add/update scan (OVERWRITE if same scanId)
     scanData.scanId = scanId;
+    scanData.timestamp = Date.now();
     
-    // Save to history
+    // Overwrite existing or create new
     scanHistory[scanId] = scanData;
     store.set('scanHistory', scanHistory);
     
-    console.log(`💾 Saved scan state: ${scanId}, ${scanData.results?.length || 0} results`);
+    const action = scanHistory[scanId] ? 'Overwritten' : 'Created';
+    console.log(`💾 ${action} scan state: ${scanId}, ${scanData.results?.length || scanData.childTabs?.filter(t => t.status === 'done').length || 0} items`);
     return { success: true, scanId: scanId };
   } catch (e) {
     console.error('Save scan state error:', e);

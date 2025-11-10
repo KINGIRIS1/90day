@@ -62,6 +62,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteApiKey: (provider) => ipcRenderer.invoke('delete-api-key', provider),
   testApiKey: (data) => ipcRenderer.invoke('test-api-key', data),
   
+  // Scan History Management (Auto-save & Resume)
+  saveScanState: (scanData) => ipcRenderer.invoke('save-scan-state', scanData),
+  getIncompleteScans: () => ipcRenderer.invoke('get-incomplete-scans'),
+  loadScanState: (scanId) => ipcRenderer.invoke('load-scan-state', scanId),
+  deleteScanState: (scanId) => ipcRenderer.invoke('delete-scan-state', scanId),
+  markScanComplete: (scanId) => ipcRenderer.invoke('mark-scan-complete', scanId),
+  
   // Platform info
   platform: process.platform,
   isElectron: true

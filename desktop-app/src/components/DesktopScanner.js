@@ -1456,6 +1456,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }));
     }
     
+    // 🎉 MARK SCAN COMPLETE
+    if (currentScanId && window.electronAPI?.markScanComplete) {
+      await window.electronAPI.markScanComplete(currentScanId);
+      setCurrentScanId(null);
+      console.log(`✅ Marked scan complete`);
+    }
+    
     setRemainingTabs([]);
     setIsFolderPaused(false);
   };

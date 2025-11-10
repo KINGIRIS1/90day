@@ -131,6 +131,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
       
       console.log('🔍 Current OCR Engine:', engine);
+      
+      // Check for incomplete scans
+      const incompleteResult = await api.getIncompleteScans();
+      if (incompleteResult.success && incompleteResult.scans.length > 0) {
+        console.log(`🔄 Found ${incompleteResult.scans.length} incomplete scan(s)`);
+        setIncompleteScans(incompleteResult.scans);
+        setShowResumeDialog(true);
+      }
     };
     try { loadConfig(); } catch {}
   }, []);

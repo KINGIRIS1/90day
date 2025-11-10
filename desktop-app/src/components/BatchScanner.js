@@ -394,7 +394,6 @@ function BatchScanner() {
           
           // SEQUENTIAL PROCESSING (Original logic)
           // Scan each file and display immediately
-          const folderResults = [];
           for (let j = 0; j < validImages.length; j++) {
             // Check stopRef at start of each iteration
             if (stopRef.current) {

@@ -100,6 +100,42 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     };
   }, [processing, timers.scanStartTime]);
   
+  // Auto-save when childTabs change (folders complete)
+  useEffect(() => {
+    const autoSave = async () => {
+      // Only save if:
+      // 1. Has childTabs
+      // 2. At least 1 folder is done
+      // 3. Not all done yet (incomplete)
+      const doneFolders = childTabs.filter(t => t.status === 'done');
+      const allDone = childTabs.length > 0 && childTabs.every(t => t.status === 'done');
+      
+      if (childTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
+        const scanId = currentScanId || `scan_${Date.now()}`;
+        
+        await window.electronAPI.saveScanState({
+          type: 'folder_scan',
+          status: 'incomplete',
+          parentFolder: parentFolder,
+          childTabs: childTabs,  // This now has updated results!
+          activeChild: activeChild,
+          progress: {
+            current: doneFolders.length,
+            total: childTabs.length
+          },
+          engine: currentOcrEngine,
+          batchMode: batchMode,
+          timestamp: Date.now()
+        });
+        
+        if (!currentScanId) setCurrentScanId(scanId);
+        console.log(`💾 Auto-saved: ${doneFolders.length}/${childTabs.length} folders done`);
+      }
+    };
+    
+    autoSave();
+  }, [childTabs]);  // Trigger on childTabs change
+  
   // Load config (guard electron)
   useEffect(() => {
     const loadConfig = async () => {

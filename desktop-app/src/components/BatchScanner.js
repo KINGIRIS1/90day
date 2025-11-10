@@ -746,6 +746,81 @@ function BatchScanner() {
     }
   };
 
+  // Batch processing helper for folder
+  const processFolderBatch = async (imagePaths, mode, engineType) => {
+    console.log(`\n${'='*80}`);
+    console.log(`🚀 FOLDER BATCH PROCESSING: ${imagePaths.length} files`);
+    console.log(`   Mode: ${mode}`);
+    console.log(`   Engine: ${engineType}`);
+    console.log(`${'='*80}\n`);
+    
+    if (!window.electronAPI) {
+      console.error('❌ Electron API not available');
+      return null;
+    }
+    
+    try {
+      // Call batch processor via IPC
+      const batchResult = await window.electronAPI.batchProcessDocuments({
+        mode: mode,
+        imagePaths: imagePaths,
+        ocrEngine: engineType
+      });
+      
+      if (!batchResult.success) {
+        console.error('❌ Folder batch failed:', batchResult.error);
+        return null;
+      }
+      
+      console.log(`✅ Folder batch complete: ${batchResult.results.length} results`);
+      
+      // Map batch results to BatchScanner format
+      const mappedResults = [];
+      for (const batchItem of batchResult.results) {
+        const fileName = batchItem.file_name;
+        const filePath = batchItem.file_path;
+        
+        // Get folder path from file path
+        const folderPath = filePath.substring(0, filePath.lastIndexOf(/[/\\]/.test(filePath) ? (filePath.includes('/') ? '/' : '\\') : '/'));
+        
+        // Generate preview
+        let previewUrl = null;
+        try {
+          previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+        } catch (e) {
+          console.error(`Preview error for ${fileName}:`, e);
+        }
+        
+        mappedResults.push({
+          filePath: filePath,
+          fileName: fileName,
+          short_code: batchItem.short_code || 'UNKNOWN',
+          doc_type: batchItem.short_code || 'UNKNOWN',
+          confidence: batchItem.confidence || 0.5,
+          folder: folderPath,
+          previewUrl: previewUrl,
+          success: true,
+          method: `batch_${mode}`,
+          metadata: batchItem.metadata || {},
+          // GCN fields
+          color: batchItem.metadata?.color || null,
+          issue_date: batchItem.metadata?.issue_date || null,
+          issue_date_confidence: batchItem.metadata?.issue_date_confidence || null,
+          // Timing
+          startTime: null,
+          endTime: null,
+          durationMs: null
+        });
+      }
+      
+      return mappedResults;
+      
+    } catch (error) {
+      console.error('❌ Folder batch error:', error);
+      return null;
+    }
+  };
+
   // Post-process GCN batch (DATE-BASED classification)
   const postProcessGCNBatch = (folderResults) => {
     try {

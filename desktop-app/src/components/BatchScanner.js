@@ -36,6 +36,9 @@ function BatchScanner() {
   const [isMergeAll, setIsMergeAll] = useState(false); // Track if merging all folders
   const [lastKnownType, setLastKnownType] = useState(null); // For sequential naming (UNKNOWN fallback)
   
+  // Batch processing mode
+  const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
+  
   // Timer states
   const [timers, setTimers] = useState({
     batchStartTime: null,

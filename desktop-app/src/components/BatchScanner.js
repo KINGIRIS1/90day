@@ -331,6 +331,9 @@ function BatchScanner() {
           
           console.log(`Found ${validImages.length} images in ${folder.name}`);
           
+          // Initialize folderResults array
+          const folderResults = [];
+          
           // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED
           const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(ocrEngine);
           const shouldUseBatch = (

@@ -289,33 +289,53 @@ function BatchScanner() {
 
     setIsScanning(true);
     stopRef.current = false;
-    setProgress({ 
-      currentFolder: '',
-      currentFile: '',
-      processedFiles: 0,
-      totalFiles: 0,
-      processedFolders: 0,
-      totalFolders: selectedFolders.length
-    });
-    setScanResults(null);
-    setFileResults([]);
-    setErrors([]);
-    setSkippedFolders([]);
-    setFolderTabs([]);
-    setActiveFolder(null);
     
-    // Initialize timer
-    const batchStartTime = Date.now();
-    setTimers({
-      batchStartTime: batchStartTime,
-      batchEndTime: null,
-      batchElapsedSeconds: 0,
-      fileTimings: [],
-      folderTimings: []
-    });
-    setElapsedTime(0);
+    // Check if this is a resume (có folderTabs với status done)
+    const isResume = folderTabs.length > 0 && folderTabs.some(t => t.status === 'done');
     
-    console.log('⏱️ Batch timer started:', new Date(batchStartTime).toLocaleTimeString());
+    if (!isResume) {
+      // Fresh scan - reset everything
+      setProgress({ 
+        currentFolder: '',
+        currentFile: '',
+        processedFiles: 0,
+        totalFiles: 0,
+        processedFolders: 0,
+        totalFolders: selectedFolders.length
+      });
+      setScanResults(null);
+      setFileResults([]);
+      setErrors([]);
+      setSkippedFolders([]);
+      setFolderTabs([]);
+      setActiveFolder(null);
+      
+      // Initialize timer
+      const batchStartTime = Date.now();
+      setTimers({
+        batchStartTime: batchStartTime,
+        batchEndTime: null,
+        batchElapsedSeconds: 0,
+        fileTimings: [],
+        folderTimings: []
+      });
+      setElapsedTime(0);
+      
+      console.log('⏱️ Batch timer started:', new Date(batchStartTime).toLocaleTimeString());
+    } else {
+      // Resume scan - keep existing data
+      console.log('🔄 Resuming batch scan - keeping existing results');
+      
+      const doneFolders = folderTabs.filter(t => t.status === 'done');
+      console.log(`📂 Resuming with ${doneFolders.length} folders already done`);
+      
+      // Update progress for resume
+      setProgress(prev => ({
+        ...prev,
+        processedFolders: doneFolders.length,
+        totalFolders: selectedFolders.length
+      }));
+    }
 
     try {
       console.log('🚀 Starting batch scan...');

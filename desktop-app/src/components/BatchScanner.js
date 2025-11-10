@@ -1248,6 +1248,8 @@ function BatchScanner() {
         });
       });
       
+      } // End of else (single-file mode)
+      
       console.log('✅ GCN post-processing complete');
       return normalizedResults;
       

@@ -384,6 +384,25 @@ function BatchScanner() {
                 }]
               }));
               
+              // Post-process GCN documents for this folder
+              console.log(`🔄 Post-processing GCN for folder: ${folder.name}`);
+              const processedFolderResults = postProcessGCNBatch(folderResults);
+              
+              // Update folder tab status to 'done' with results
+              setFolderTabs(prev => prev.map(t => 
+                t.path === folder.path 
+                  ? { ...t, status: 'done', files: processedFolderResults }
+                  : t
+              ));
+              
+              // Update fileResults with post-processed
+              setFileResults(prev => {
+                const otherFolders = prev.filter(f => f.folder !== folder.path);
+                return [...otherFolders, ...processedFolderResults];
+              });
+              
+              processedFolderPaths.push(folder.path);
+              
               // Continue to next folder (skip sequential loop)
               continue;
             } else {

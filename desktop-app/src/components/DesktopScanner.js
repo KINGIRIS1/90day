@@ -1408,7 +1408,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
         return;
       } else {
-        console.warn('⚠️ Folder batch failed, falling back to sequential');
+        const errorMsg = batchResults?.error || 'Batch returned no results';
+        console.error(`⚠️ FOLDER BATCH FAILED for ${childPath}:`, errorMsg);
+        console.warn('🔄 FALLBACK: Switching to sequential for this folder...');
+        
+        // Don't ask user for folder scan (too many prompts), just fallback silently with clear log
+        console.log(`📋 Folder will be scanned sequentially (file by file)`);
         // Fall through to sequential processing
       }
     }

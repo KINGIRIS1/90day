@@ -71,11 +71,6 @@ function CloudSettings() {
         await window.electronAPI.saveApiKey({ provider: 'azureEndpoint', apiKey: azureEndpoint.trim() });
       }
       
-      // Save resize settings
-      await window.electronAPI.setConfig('enableResize', enableResize);
-      await window.electronAPI.setConfig('maxWidth', maxWidth);
-      await window.electronAPI.setConfig('maxHeight', maxHeight);
-      
       // Save batch mode settings
       await window.electronAPI.setConfig('batchMode', batchMode);
 

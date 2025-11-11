@@ -936,7 +936,10 @@ if __name__ == "__main__":
     if mode == 'fixed':
         batch_data = batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=5, last_known_type=None)
     elif mode == 'smart':
-        batch_data = batch_classify_smart(image_paths, api_key, engine_type=engine_type, last_known_type=None)
+        # Check for optional max_batch_size env variable
+        max_batch_size = int(os.environ.get('SMART_MAX_BATCH_SIZE', '15'))
+        print(f"📊 Smart mode max_batch_size: {max_batch_size}", file=sys.stderr)
+        batch_data = batch_classify_smart(image_paths, api_key, engine_type=engine_type, last_known_type=None, max_batch_size=max_batch_size)
     else:
         print(f"❌ Unknown mode: {mode}", file=sys.stderr)
         sys.exit(1)

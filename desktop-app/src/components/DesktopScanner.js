@@ -4,7 +4,7 @@ import InlineShortCodeEditor from './InlineShortCodeEditor';
 import QuotaWarning from './QuotaWarning';
 import ResumeDialog from './ResumeDialog';
 
-const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
+const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
   // Tab state - Main navigation
   const [activeTab, setActiveTab] = useState('files'); // 'files' or 'folders'
   

@@ -33,12 +33,14 @@ function CloudSettings() {
       
       // Load batch mode settings
       const batchModeConfig = await window.electronAPI.getConfig('batchMode');
+      const smartMaxBatchSizeConfig = await window.electronAPI.getConfig('smartMaxBatchSize');
       
       setOcrEngine(uiEngine);
       setGeminiKey(gemini);
       
       // Set batch mode with default
       setBatchMode(batchModeConfig || 'sequential');
+      setSmartMaxBatchSize(smartMaxBatchSizeConfig || 10);
     } catch (error) {
       console.error('Error loading settings:', error);
     }

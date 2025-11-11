@@ -2010,13 +2010,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             <h2 className="text-base font-semibold text-gray-900">Kết quả ({results.length})</h2>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2"><label className="text-xs text-gray-600">Mật độ:</label><select value={density} onChange={(e) => setDensity(e.target.value)} className="text-xs border rounded px-2 py-1"><option value="high">Cao (5)</option><option value="medium">TB (4)</option><option value="low">Thấp (3)</option></select></div>
-              <button onClick={async () => {
-                const payload = results.filter(r => r.success && r.short_code).map(r => ({ filePath: r.filePath, short_code: r.short_code }));
-                if (payload.length === 0) { alert('Không có trang hợp lệ để gộp.'); return; }
-                const merged = await window.electronAPI.mergeByShortCode(payload, { autoSave: true });
-                const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
-                alert(`Đã xử lý gộp theo short_code và lưu tự động. Thành công: ${okCount}/${(merged || []).length}.`);
-              }} className="px-4 py-2.5 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md font-medium">📚 Gộp PDF</button>
+              <button onClick={() => {
+                if (results.filter(r => r.success && r.short_code).length === 0) {
+                  alert('Không có trang hợp lệ để gộp.');
+                  return;
+                }
+                setShowFileMergeModal(true);
+              }} disabled={fileMergeInProgress} className="px-4 py-2.5 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md font-medium disabled:bg-gray-300">
+                {fileMergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp PDF'}
+              </button>
             </div>
           </div>
           <div className={`grid gap-3 ${gridColsClass}`}>

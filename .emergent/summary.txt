@@ -1,0 +1,88 @@
+<analysis>
+The AI engineer's work in this trajectory primarily focused on refining and stabilizing a desktop OCR application for Vietnamese land documents. Initially, the engineer verified existing features like batch processing and crash handlers, only to discover that critical crash handlers were missing from both  and , which they then implemented. A significant effort was made to address slow app startup and potential data loss during crashes by refactoring auto-save to use a separate  for scan history with immediate saving and aggressive cleanup. Several UI/UX improvements were completed, including removing obsolete OCR engine options and configuration sections, relocating resize settings, and adding a feature to sort GCN documents to the top of results. Critical bug fixes involved resolving a scope error during batch stop, correcting  dependencies, and fixing production/dev mode URL loading issues for Electron. The trajectory concluded with the engineer actively debugging and implementing fixes for preview images not loading on resume and optimizing the auto-continue scan functionality, which involved adding missing IPC handlers and correcting function calls.
+</analysis>
+
+<product_requirements>
+The application is a desktop OCR scanner for Vietnamese land documents, aiming for accurate classification, especially for multi-page documents like GCNs, while optimizing API costs and processing speed. Key requirements include a one-click installer, precise document classification (e.g., HDTG as HDCQ), optimized Gemini prompts, and robust rate limit management. The Batch Scan from List feature demands reading folder paths from TXT files, scanning only image files (JPG, JPEG, PNG), merging similar images into a single PDF, and outputting/renaming files based on classification. UI/UX requirements specify a dedicated Batch Scan tab, clear progress displays, a stop button, a dynamic result grid, and accurate OCR engine display. Recent refinements focused on GCN date-based classification, dấu giáp lai recognition, stable Gemini responses, Two-Tier OCR Classification, and enhanced performance for multi-page documents through batch processing. Additional explicit requests included auto-save and resume functionality, robust crash recovery, and a quick app startup. The user also requested sorting GCNs to the top and optimizing the resume flow for a single-click continuation.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Electron**: Framework for building cross-platform desktop applications.
+-   **React**: JavaScript library for building the user interface.
+-   **Python**: Backend for OCR processing and AI classification.
+-   **Gemini Flash API**: Google's AI models for OCR and prompt-based classification.
+-   **IPC (Inter-Process Communication)**: Electron's method for main/renderer process communication.
+-   **Electron-store**: A local key-value store used for application settings and data.
+-   **Debounce**: A technique to delay function execution, often for performance.
+-   **NSIS**: Nullsoft Scriptable Install System for Windows installers.
+</key_technical_concepts>
+
+<code_architecture>
+The application's core structure is , containing , , and . The recent intensive development has focused on .
+
+
+
+-   ****: Electron's main process, handling IPC and app lifecycle.
+    -   **Importance**: Orchestrates UI-Python communication, manages application state, and handles system events.
+    -   **Changes**: Implemented  and  crash handlers. Refactored  usage by creating a separate  for scan history to improve startup performance and prevent data loss. Updated , , ,  IPC handlers to use . Added  IPC handler for loading image previews. Modified URL loading logic to correctly distinguish between development and production builds.
+-   ****: Exposes Electron APIs securely to the renderer process.
+    -   **Importance**: Acts as a bridge, allowing frontend components to interact with the main process's restricted functionalities.
+    -   **Changes**: Exposed  to the renderer process for loading image previews.
+-   ****: The production-ready main Electron script.
+    -   **Importance**: The executable core of the deployed desktop application.
+    -   **Changes**: Synchronized regularly with  after crash handler,  refactoring, and URL loading logic updates.
+-   ****: Python script for multi-image batch processing.
+    -   **Importance**: Central to performance and accuracy for multi-page documents.
+    -   **Changes**: Verified to have retry logic for 503 HTTP errors.
+-   ****: Python script for Gemini OCR and classification.
+    -   **Importance**: Core logic for prompt engineering and Gemini API interaction.
+    -   **Changes**: Verified to include retry logic for 503 HTTP errors.
+-   ****: The main React component, managing overall app structure and tab navigation.
+    -   **Importance**: Determines which scanner component is displayed and manages global UI state.
+    -   **Changes**: Modified to pass  function to  and  to facilitate automatic tab switching during resume.
+-   ****: React component for configuring cloud OCR settings.
+    -   **Importance**: Provides the user interface for selecting OCR engine and batching preferences.
+    -   **Changes**: Removed outdated/unused OCR engine options (VietOCR, Google Cloud Vision, Azure, EasyOCR), their related API key sections, and associated state variables. Removed image resize settings, as requested.
+-   ****: React component for single file/folder scanning.
+    -   **Importance**: Manages UI and logic for individual scans and folder processing.
+    -   **Changes**: Removed debounce from auto-save logic for immediate saving. Fixed missing  dependencies. Implemented  function to arrange GCN results at the top. Added logic to reload preview images when resuming scans. Integrated  and auto-trigger continue scan logic for a seamless resume experience. Enhanced error logging for preview loading.
+-   ****: React component for Batch Scan from a list.
+    -   **Importance**: Handles UI and logic for scanning multiple folders/files from a list.
+    -   **Changes**: Removed debounce from auto-save logic for immediate saving. Fixed a bug where  was undefined during scan stop. Fixed missing  dependencies. Implemented  function for batch and sequential results. Added logic to reload preview images when resuming scans. Integrated  and auto-trigger  logic for a seamless resume experience. Enhanced error logging for preview loading. Corrected the function call for auto-triggering a continued batch scan from  to .
+-   ****: React component for general application settings.
+    -   **Importance**: Centralizes application configuration options.
+    -   **Changes**: Removed Cloud Boost Configuration, OCR Engine Selection, and Auto-fallback sections. Moved image resize settings from  to this component.
+-   ****: Project manifest.
+    -   **Importance**: Defines scripts, dependencies, and metadata.
+    -   **Changes**: Updated  script to set  environment variable to ensure correct URL loading in development.
+</code_architecture>
+
+<pending_tasks>
+-   Fine-tune remaining document types in  and .
+-   Monitor OpenAI quota/plan for Emergent LLM Key.
+-   Migrate or pin React/Webpack versions.
+-   Update icon for macOS (.icns).
+-   Implement license/activation key feature.
+-   Handle deep path length issues.
+-   Address slow app startup (already partially addressed, but monitoring needed).
+-   Add configurable single price rates in Cloud Settings.
+-   Implement code patch for robust cache pathing and single-instance lock in .
+-   Thoroughly test the newly implemented auto-save/resume and crash handlers.
+-   Resolve the  call in DesktopScanner (last point in trajectory).
+-   Address the disk space warning during build processes.
+</pending_tasks>
+
+<current_work>
+Immediately before this summary, the AI engineer was actively engaged in fixing two critical issues reported by the user regarding the resume functionality:
+
+1.  **Preview Images Not Loading**: The user reported that images were not displayed when resuming a scan (). The root cause was the absence of the  function.
+    *   **Action Taken**: The AI engineer identified that both the  IPC handler in  and its exposure in  were missing. They proceeded to add the IPC handler to  (which reads the image file and converts it to base64) and expose  via  in . These changes were then synced to the  and  files.
+2.  **Auto-Continue Scan Not Triggering**: The user also reported that after resuming, the app did not automatically start scanning ().
+    *   **Action Taken**: The AI engineer discovered that the  calls intended to auto-trigger the scan continuation in  were attempting to call a non-existent function (). They corrected this to . The trajectory ends as the engineer is about to make a similar correction in , replacing a non-existent  with .
+
+This indicates the system is currently in a state where the  functionality has been added, and the auto-continue logic for  is corrected, but the  auto-continue logic still requires the final correction.
+</current_work>
+
+<optional_next_step>
+Correct the auto-continue scan logic in  by replacing  with .
+</optional_next_step>

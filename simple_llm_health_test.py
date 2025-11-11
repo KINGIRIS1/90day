@@ -13,7 +13,7 @@ def test_llm_health():
     
     try:
         # Use the URL from frontend .env
-        url = "https://land-doc-ai-1.preview.emergentagent.com/api/llm/health"
+        url = "https://ocr-landocs.preview.emergentagent.com/api/llm/health"
         print(f"Calling: {url}")
         
         response = requests.get(url, timeout=30)

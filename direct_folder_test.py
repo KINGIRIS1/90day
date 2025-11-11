@@ -16,7 +16,7 @@ from pathlib import Path
 
 class DirectFolderScanTester:
     def __init__(self):
-        self.base_url = "https://land-doc-ai-1.preview.emergentagent.com/api"
+        self.base_url = "https://ocr-landocs.preview.emergentagent.com/api"
         self.auth_headers = {}
         self.test_results = []
         
@@ -248,7 +248,7 @@ class DirectFolderScanTester:
             return False
         
         # Construct full URL
-        full_url = f"https://land-doc-ai-1.preview.emergentagent.com{all_zip_url}"
+        full_url = f"https://ocr-landocs.preview.emergentagent.com{all_zip_url}"
         
         try:
             response = requests.get(full_url, headers=self.auth_headers)
@@ -318,7 +318,7 @@ class DirectFolderScanTester:
             print(f"   Testing PDF {i+1}/{total_count}: {pdf_url}")
             
             # Construct full URL
-            full_url = f"https://land-doc-ai-1.preview.emergentagent.com{pdf_url}"
+            full_url = f"https://ocr-landocs.preview.emergentagent.com{pdf_url}"
             
             try:
                 response = requests.get(full_url, headers=self.auth_headers)

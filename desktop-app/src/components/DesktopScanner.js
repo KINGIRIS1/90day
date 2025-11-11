@@ -531,10 +531,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
         const pendingFolders = tabsWithPreviews.filter(t => t.status === 'pending');
         if (pendingFolders.length > 0) {
           console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
+          setRemainingTabs(pendingFolders);
           // Trigger continue scan after a short delay to ensure UI is ready
           setTimeout(() => {
             setProcessing(true);
-            handleProcessFiles(false, true); // (useCloudBoost=false, isResume=true)
+            scanAllChildFolders(true); // Resume folder scan
           }, 500);
         } else {
           alert(`✅ Đã khôi phục tất cả ${tabsWithPreviews.length} folders (đã scan xong).`);

@@ -78,49 +78,44 @@ function BatchScanner() {
     };
   }, [isScanning, timers.batchStartTime]);
   
-  // Auto-save when folderTabs change (folders complete) - WITH DEBOUNCE
+  // Auto-save when folderTabs change (folders complete) - IMMEDIATE SAVE
   useEffect(() => {
-    // Debounce 2 seconds to avoid excessive saves
-    const timeoutId = setTimeout(() => {
-      const autoSave = async () => {
-        const doneFolders = folderTabs.filter(t => t.status === 'done');
-        const allDone = folderTabs.length > 0 && folderTabs.every(t => t.status === 'done');
-        
-        if (folderTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
-          let scanId = currentScanId;
-          if (!scanId) {
-            scanId = `batch_scan_${Date.now()}`;
-            setCurrentScanId(scanId);
-          }
-          
-          await window.electronAPI.saveScanState({
-            scanId: scanId,
-            type: 'batch_scan',
-            status: 'incomplete',
-            // Strip previewUrl to reduce memory
-            folderTabs: folderTabs.map(t => ({
-              ...t,
-              files: t.files?.map(f => ({ ...f, previewUrl: null })) || []
-            })),
-            discoveredFolders: discoveredFolders,
-            fileResults: fileResults.map(r => ({ ...r, previewUrl: null })),
-            txtFilePath: txtFilePath,
-            progress: {
-              current: doneFolders.length,
-              total: folderTabs.length
-            },
-            engine: ocrEngine,
-            batchMode: batchMode,
-            timestamp: Date.now()
-          });
-          
-          console.log(`💾 Auto-saved (OVERWRITE): ${doneFolders.length}/${folderTabs.length} folders done`);
+    const autoSave = async () => {
+      const doneFolders = folderTabs.filter(t => t.status === 'done');
+      const allDone = folderTabs.length > 0 && folderTabs.every(t => t.status === 'done');
+      
+      if (folderTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
+        let scanId = currentScanId;
+        if (!scanId) {
+          scanId = `batch_scan_${Date.now()}`;
+          setCurrentScanId(scanId);
         }
-      };
-      autoSave();
-    }, 2000); // Debounce 2 seconds
-    
-    return () => clearTimeout(timeoutId);
+        
+        await window.electronAPI.saveScanState({
+          scanId: scanId,
+          type: 'batch_scan',
+          status: 'incomplete',
+          // Strip previewUrl to reduce size
+          folderTabs: folderTabs.map(t => ({
+            ...t,
+            files: t.files?.map(f => ({ ...f, previewUrl: null })) || []
+          })),
+          discoveredFolders: discoveredFolders,
+          fileResults: fileResults.map(r => ({ ...r, previewUrl: null })),
+          txtFilePath: txtFilePath,
+          progress: {
+            current: doneFolders.length,
+            total: folderTabs.length
+          },
+          engine: ocrEngine,
+          batchMode: batchMode,
+          timestamp: Date.now()
+        });
+        
+        console.log(`💾 Auto-saved immediately: ${doneFolders.length}/${folderTabs.length} folders done`);
+      }
+    };
+    autoSave(); // Execute immediately (no debounce)
   }, [folderTabs]);
   
   // Load OCR engine from config on mount

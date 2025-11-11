@@ -561,16 +561,21 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                 break  # Success, exit retry loop
                 
             except requests.exceptions.HTTPError as e:
-                if e.response.status_code == 503:
-                    # Service Unavailable - retry
+                if e.response.status_code in [500, 503]:
+                    # 500 Internal Server Error or 503 Service Unavailable - retry
                     if attempt < max_retries - 1:
                         wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
-                        print(f"⚠️ 503 Service Unavailable, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        print(f"⚠️ {e.response.status_code} Server Error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        print(f"   Possible causes: Request too large, API overload, temporary issue", file=sys.stderr)
+                        if batch_size > 5:
+                            print(f"   💡 Tip: Try reducing Smart batch size to 5-8 in Settings", file=sys.stderr)
                         import time
                         time.sleep(wait_time)
                         continue
                     else:
                         print(f"❌ Max retries reached for batch {batch_num}", file=sys.stderr)
+                        print(f"   Batch size: {batch_size} files", file=sys.stderr)
+                        print(f"   💡 Recommendation: Reduce Smart batch size in Settings (⚙️ Cài đặt)", file=sys.stderr)
                         raise
                 elif e.response.status_code == 429:
                     # Rate limit - longer wait
@@ -583,7 +588,8 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                     else:
                         raise
                 else:
-                    # Other HTTP errors - don't retry
+                    # Other HTTP errors (400, 401, 404, etc.) - don't retry
+                    print(f"❌ HTTP {e.response.status_code} Error: {e}", file=sys.stderr)
                     raise
             except requests.exceptions.RequestException as e:
                 # Network errors - retry

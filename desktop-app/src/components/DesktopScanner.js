@@ -573,7 +573,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
           // Trigger continue scan after a short delay to ensure UI is ready
           setTimeout(() => {
             setProcessing(true);
-            handleProcessFiles(true); // Resume = true, will continue from remaining files
+            handleProcessFiles(false, true); // (useCloudBoost=false, isResume=true)
           }, 500);
         } else {
           alert(`✅ Đã khôi phục tất cả ${resultsWithPreviews.length} files (đã scan xong).`);

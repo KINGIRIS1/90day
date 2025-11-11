@@ -1285,3 +1285,7 @@ desktop-app/dist/win-unpacked/90dayChonThanh.exe
 *.env
 *.env.*
 desktop-app/dist/win-arm64-unpacked/90dayChonThanh.exe
+-e 
+# Environment files
+*.env
+*.env.*

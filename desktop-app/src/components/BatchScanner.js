@@ -943,10 +943,13 @@ function BatchScanner({ onSwitchTab }) {
       const fileResultsWithPreviews = await Promise.all((scanData.fileResults || []).map(async (file) => {
         if (file.filePath) {
           try {
+            console.log(`📸 Loading preview for fileResult: ${file.fileName}`);
             const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
+            console.log(`✅ Preview loaded for fileResult: ${file.fileName}`);
             return { ...file, previewUrl };
           } catch (err) {
-            console.warn(`⚠️ Could not load preview for: ${file.fileName}`);
+            console.error(`❌ Failed to load preview for fileResult: ${file.fileName}`, err);
+            console.error(`   File path: ${file.filePath}`);
             return file;
           }
         }

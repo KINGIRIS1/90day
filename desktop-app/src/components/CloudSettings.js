@@ -69,10 +69,6 @@ function CloudSettings() {
       // Map UI values to backend values
       const engineMapping = {
         'offline-tesseract': 'tesseract',
-        'offline-easyocr': 'easyocr',
-        'offline-vietocr': 'vietocr',
-        'google': 'google',
-        'azure': 'azure',
         'gemini-flash': 'gemini-flash',
         'gemini-flash-hybrid': 'gemini-flash-hybrid',
         'gemini-flash-lite': 'gemini-flash-lite'

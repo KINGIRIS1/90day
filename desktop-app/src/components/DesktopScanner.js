@@ -2488,8 +2488,38 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     </div>
                   )}
                   
+                  {/* Pagination for folder results */}
+                  {(t.results || []).length > ITEMS_PER_PAGE && (
+                    <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between text-xs">
+                      <div className="text-gray-700">
+                        ⚠️ {Math.min(currentPage * ITEMS_PER_PAGE, (t.results || []).length)}/{(t.results || []).length} files (giới hạn {ITEMS_PER_PAGE}/trang)
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                          className="px-2 py-1 bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          ←
+                        </button>
+                        <span className="text-gray-600">
+                          {currentPage}/{Math.ceil((t.results || []).length / ITEMS_PER_PAGE)}
+                        </span>
+                        <button
+                          onClick={() => setCurrentPage(p => Math.min(Math.ceil((t.results || []).length / ITEMS_PER_PAGE), p + 1))}
+                          disabled={currentPage >= Math.ceil((t.results || []).length / ITEMS_PER_PAGE)}
+                          className="px-2 py-1 bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className={`grid gap-3 ${gridColsClass}`}>
-                    {(t.results || []).map((r, idx) => (
+                    {(t.results || [])
+                      .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                      .map((r, idx) => (
                       <div key={idx} className="p-3 border rounded-lg bg-white">
                         <div className="mb-2">
                           {r.previewUrl ? (

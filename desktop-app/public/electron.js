@@ -172,6 +172,42 @@ function buildPythonEnv(extra = {}, pythonInfo = null, scriptDir = '') {
   return env;
 }
 
+// ========== CRASH HANDLERS ==========
+// Handle uncaught exceptions in main process
+process.on('uncaughtException', (error) => {
+  console.error('❌ UNCAUGHT EXCEPTION in main process:', error);
+  console.error('Stack:', error.stack);
+  
+  // Show error dialog
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    dialog.showErrorBox(
+      'Lỗi hệ thống',
+      `Ứng dụng gặp lỗi không mong muốn:\n\n${error.message}\n\nDữ liệu scan đã được tự động lưu.\nỨng dụng sẽ tiếp tục hoạt động.`
+    );
+  }
+  
+  // Don't exit - try to keep app running
+  // app.exit(1); // Only exit if absolutely necessary
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ UNHANDLED PROMISE REJECTION:', reason);
+  console.error('Promise:', promise);
+  
+  // Log but don't crash - these are often non-fatal
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    console.warn('⚠️ Logging unhandled rejection but continuing...');
+  }
+});
+
+// Handle process warnings
+process.on('warning', (warning) => {
+  console.warn('⚠️ PROCESS WARNING:', warning.name);
+  console.warn('Message:', warning.message);
+  console.warn('Stack:', warning.stack);
+});
+
 app.whenReady().then(() => {
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });

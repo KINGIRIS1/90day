@@ -68,6 +68,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   loadScanState: (scanId) => ipcRenderer.invoke('load-scan-state', scanId),
   deleteScanState: (scanId) => ipcRenderer.invoke('delete-scan-state', scanId),
   markScanComplete: (scanId) => ipcRenderer.invoke('mark-scan-complete', scanId),
+  getBase64Image: (filePath) => ipcRenderer.invoke('get-base64-image', filePath),
   
   // Platform info
   platform: process.platform,

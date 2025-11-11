@@ -2429,7 +2429,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         </div>
       )}
 
-      {/* Merge Modal */}
+      {/* Folder Scan Merge Modal */}
       {showMergeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
@@ -2437,56 +2437,86 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               📚 {activeChildForMerge ? `Gộp thư mục "${activeChildForMerge.name}"` : 'Gộp tất cả thư mục con'}
             </h3>
             
-            <div className="space-y-4">
-              {/* Option 1: Gộp vào thư mục gốc */}
-              <label className="flex items-start space-x-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="mergeOption"
-                  value="root"
-                  checked={mergeOption === 'root'}
-                  onChange={(e) => setMergeOption(e.target.value)}
-                  className="mt-1"
-                />
-                <div>
-                  <div className="font-medium text-gray-900">Gộp vào thư mục gốc</div>
-                  <div className="text-sm text-gray-600">PDF sẽ được lưu trực tiếp vào thư mục gốc</div>
+            {/* Output Location */}
+            <div className="space-y-3 mb-4">
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="mergeOption"
+                    value="root"
+                    checked={mergeOption === 'root'}
+                    onChange={(e) => setMergeOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📁 Lưu trong thư mục gốc</span>
                 </div>
+                <p className="text-xs text-gray-500 ml-6">PDF sẽ được lưu trực tiếp vào thư mục gốc của mỗi subfolder</p>
               </label>
 
-              {/* Option 2: Tạo thư mục mới */}
-              <label className="flex items-start space-x-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="mergeOption"
-                  value="new"
-                  checked={mergeOption === 'new'}
-                  onChange={(e) => setMergeOption(e.target.value)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">Tạo thư mục mới</div>
-                  <div className="text-sm text-gray-600 mb-2">Tên thư mục = Thư mục gốc + ký tự tùy chọn</div>
-                  {mergeOption === 'new' && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-700">Ký tự thêm vào:</span>
-                      <input
-                        type="text"
-                        value={mergeSuffix}
-                        onChange={(e) => setMergeSuffix(e.target.value)}
-                        placeholder="_merged"
-                        className="flex-1 px-2 py-1 text-sm border rounded"
-                      />
-                    </div>
-                  )}
-                  {mergeOption === 'new' && parentFolder && (
-                    <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                      Ví dụ: <span className="font-mono">{parentFolder.split(/[\\\/]/).pop()}{mergeSuffix}</span>
-                    </div>
-                  )}
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="mergeOption"
+                    value="new"
+                    checked={mergeOption === 'new'}
+                    onChange={(e) => setMergeOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📂 Tạo thư mục mới trong mỗi subfolder</span>
                 </div>
+                <p className="text-xs text-gray-500 ml-6">Tạo subfolder "_merged" hoặc tùy chỉnh trong mỗi thư mục con</p>
+              </label>
+
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="mergeOption"
+                    value="custom"
+                    checked={mergeOption === 'custom'}
+                    onChange={(e) => setMergeOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📍 Chọn thư mục tùy chỉnh</span>
+                </div>
+                {mergeOption === 'custom' && (
+                  <div className="ml-6 mt-2">
+                    <button
+                      onClick={async () => {
+                        const folder = await window.electronAPI.selectFolder();
+                        if (folder) setFileOutputFolder(folder);
+                      }}
+                      className="px-3 py-1.5 text-xs bg-gray-100 rounded hover:bg-gray-200 border"
+                    >
+                      {fileOutputFolder ? `✅ ${fileOutputFolder}` : 'Chọn thư mục...'}
+                    </button>
+                  </div>
+                )}
               </label>
             </div>
+
+            {/* Merge Suffix */}
+            {mergeOption === 'new' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tên thư mục con (suffix):
+                </label>
+                <input
+                  type="text"
+                  value={mergeSuffix}
+                  onChange={(e) => setMergeSuffix(e.target.value)}
+                  placeholder="_merged"
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+                {parentFolder && (
+                  <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    Ví dụ: <span className="font-mono">{parentFolder.split(/[\\\/]/).pop()}{mergeSuffix}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 mt-6">
@@ -2503,26 +2533,47 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   const mergeOptions = {
                     autoSave: true,
                     mergeMode: mergeOption,
-                    mergeSuffix: mergeSuffix,
-                    parentFolder: parentFolder
+                    mergeSuffix: mergeSuffix || '_merged',
+                    parentFolder: parentFolder,
+                    customOutputFolder: mergeOption === 'custom' ? fileOutputFolder : null
                   };
+                  
+                  console.log('📚 Folder merge options:', mergeOptions);
+                  
                   const tabsToMerge = activeChildForMerge ? [activeChildForMerge] : childTabs;
+                  let totalMerged = 0;
+                  let totalSuccess = 0;
+                  
                   for (const ct of tabsToMerge) {
                     const payload = (ct.results || [])
                       .filter(r => r.success && r.short_code)
                       .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
                     if (payload.length === 0) continue;
-                    const merged = await window.electronAPI.mergeByShortCode(payload, mergeOptions);
-                    (merged || []).forEach(m => {
-                      if (m && m.success && m.path) {
-                        finalLines.push(`✓ [${ct.name}] ${m.short_code}: ${m.path}`);
-                      }
-                    });
+                    
+                    try {
+                      const merged = await window.electronAPI.mergeByShortCode(payload, mergeOptions);
+                      console.log(`✅ Merged folder ${ct.name}:`, merged);
+                      const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+                      totalMerged += (merged || []).length;
+                      totalSuccess += okCount;
+                      
+                      (merged || []).forEach(m => {
+                        if (m && m.success && m.path) {
+                          finalLines.push(`✓ [${ct.name}] ${m.short_code}: ${m.path}`);
+                        }
+                      });
+                    } catch (mergeErr) {
+                      console.error(`❌ Merge failed for ${ct.name}:`, mergeErr);
+                      finalLines.push(`✗ [${ct.name}] Lỗi: ${mergeErr.message}`);
+                    }
                   }
+                  
                   setChildMergeReport(finalLines);
                   setActiveChildForMerge(null);
+                  
+                  alert(`✅ Gộp PDF hoàn tất!\n\nThành công: ${totalSuccess}/${totalMerged} file PDF`);
                 }}
-                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-sm font-medium"
+                className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all shadow-sm font-medium"
               >
                 Bắt đầu gộp
               </button>

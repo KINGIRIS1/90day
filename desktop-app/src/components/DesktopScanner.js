@@ -32,6 +32,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     : density === 'low'
       ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
       : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+  
+  // Pagination to prevent memory overflow
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 50; // Limit to 50 images per page
 
   // Parent folder analysis + child tabs
   const [childMergeReport, setChildMergeReport] = useState([]); // lines of saved PDFs across tabs

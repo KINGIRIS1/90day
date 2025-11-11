@@ -983,7 +983,8 @@ function BatchScanner({ onSwitchTab }) {
         console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
         // Trigger continue scan after a short delay to ensure UI is ready
         setTimeout(() => {
-          handleStartScan(); // Auto-resume scanning
+          setIsScanning(true);
+          handleProcessBatchFiles(true); // Resume = true
         }, 500);
       } else {
         alert(`✅ Đã khôi phục tất cả ${totalFolders} folders (đã scan xong).`);

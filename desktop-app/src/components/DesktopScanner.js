@@ -2241,6 +2241,24 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               </button>
             </div>
           </div>
+          {/* Memory warning banner */}
+          {results.length > 50 && (
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div>
+                  <div className="font-bold text-red-900 mb-1">CẢNH BÁO: RỦI RO CRASH CAO!</div>
+                  <div className="text-sm text-red-800">
+                    • Bạn có <strong>{results.length} files</strong> - rất nhiều!<br/>
+                    • Preview đã tắt để tránh crash<br/>
+                    • Khuyến nghị: <strong>KHÔNG bật preview</strong> với số lượng này<br/>
+                    • Nếu app crash, giảm số files xuống &lt;30
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Pagination controls */}
           {results.length > ITEMS_PER_PAGE && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">

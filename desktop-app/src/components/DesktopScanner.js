@@ -1416,7 +1416,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       setPostProcessingStatus(`🔄 Đang phân loại ${gcnCount} GCN documents...`);
     }
     
-    const finalResults = postProcessGCNBatch(newResults);
+    const processedResults = postProcessGCNBatch(newResults);
     
     console.log('======================================================================');
     console.log('✅ POST-PROCESSING COMPLETE - UPDATING UI');
@@ -1424,13 +1424,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     
     // Update notification
     if (gcnCount > 0) {
-      const gcncCount = finalResults.filter(r => r.short_code === 'GCNC').length;
-      const gcnmCount = finalResults.filter(r => r.short_code === 'GCNM').length;
+      const gcncCount = processedResults.filter(r => r.short_code === 'GCNC').length;
+      const gcnmCount = processedResults.filter(r => r.short_code === 'GCNM').length;
       setPostProcessingStatus(`✅ Hoàn tất: ${gcncCount} GCNC, ${gcnmCount} GCNM`);
       
       // Clear after 5 seconds
       setTimeout(() => setPostProcessingStatus(null), 5000);
     }
+    
+    // Sort results: GCN (GCNC, GCNM) on top for easy review
+    const finalResults = sortResultsWithGCNOnTop(processedResults);
     
     // Force UI update
     setResults([...finalResults]);

@@ -44,6 +44,33 @@ function createWindow() {
 
   if (isDev) mainWindow.webContents.openDevTools();
 
+  // Renderer crash recovery
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('❌ Renderer process crashed:', details);
+    dialog.showMessageBoxSync({
+      type: 'error',
+      title: 'Ứng dụng gặp sự cố',
+      message: 'Ứng dụng đã gặp sự cố và sẽ được khởi động lại.\n\nDữ liệu scan đã được tự động lưu.',
+      buttons: ['OK']
+    });
+    mainWindow.reload();
+  });
+
+  mainWindow.webContents.on('unresponsive', () => {
+    console.warn('⚠️ Renderer became unresponsive');
+    const choice = dialog.showMessageBoxSync({
+      type: 'warning',
+      title: 'Ứng dụng không phản hồi',
+      message: 'Ứng dụng đang không phản hồi (có thể do scan quá nhiều files).\n\nBạn muốn:',
+      buttons: ['Đợi thêm', 'Khởi động lại'],
+      defaultId: 0,
+      cancelId: 0
+    });
+    if (choice === 1) {
+      mainWindow.reload();
+    }
+  });
+
   // Handle close event with confirmation dialog
   mainWindow.on('close', (e) => {
     const choice = dialog.showMessageBoxSync(mainWindow, {

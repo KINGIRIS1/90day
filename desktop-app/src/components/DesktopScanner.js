@@ -602,21 +602,48 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Restore file scan state
         const savedResults = scanData.results || [];
         
+        // Validate results structure
+        if (!Array.isArray(savedResults)) {
+          console.error('❌ Invalid results structure:', savedResults);
+          alert('❌ Dữ liệu file không hợp lệ. Vui lòng xóa và quét lại.');
+          await window.electronAPI.deleteScanState(scan.scanId);
+          setShowResumeDialog(false);
+          return;
+        }
+        
         // Reload preview URLs (previewUrl was stripped on save)
+        let previewLoadErrors = 0;
         const resultsWithPreviews = await Promise.all(savedResults.map(async (result) => {
-          if (result.filePath) {
-            try {
-              const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
-              return { ...result, previewUrl };
-            } catch (err) {
-              console.warn(`⚠️ Could not load preview for: ${result.fileName}`);
-              return result;
-            }
+          if (!result || !result.filePath) {
+            return result;
           }
-          return result;
+          
+          try {
+            const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
+            return { ...result, previewUrl };
+          } catch (err) {
+            previewLoadErrors++;
+            console.warn(`⚠️ Could not load preview for: ${result.fileName || 'unknown'}`);
+            return result;
+          }
         }));
         
-        setResults(resultsWithPreviews);
+        // Filter out null/invalid results
+        const validResults = resultsWithPreviews.filter(r => r !== null && r !== undefined);
+        
+        if (validResults.length === 0 && savedResults.length > 0) {
+          console.error('❌ No valid results after loading');
+          alert('❌ Không có dữ liệu hợp lệ để khôi phục. Vui lòng xóa và quét lại.');
+          await window.electronAPI.deleteScanState(scan.scanId);
+          setShowResumeDialog(false);
+          return;
+        }
+        
+        if (previewLoadErrors > 0) {
+          console.warn(`⚠️ Failed to load ${previewLoadErrors} preview images (files may have been moved/deleted)`);
+        }
+        
+        setResults(validResults);
         setSelectedFiles(scanData.selectedFiles || []);
         setLastKnownType(scanData.lastKnownType);
         setRemainingFiles(scanData.remainingFiles || []);
@@ -634,7 +661,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             handleProcessFiles(false, true); // (useCloudBoost=false, isResume=true)
           }, 500);
         } else {
-          alert(`✅ Đã khôi phục tất cả ${resultsWithPreviews.length} files (đã scan xong).`);
+          const message = previewLoadErrors > 0 
+            ? `✅ Đã khôi phục ${validResults.length} files.\n\n⚠️ ${previewLoadErrors} ảnh preview không load được (có thể đã bị di chuyển/xóa).`
+            : `✅ Đã khôi phục tất cả ${validResults.length} files (đã scan xong).`;
+          alert(message);
         }
       }
       

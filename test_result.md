@@ -1417,6 +1417,50 @@ agent_communication:
   - agent: "main"
     timestamp: "2025-01-XX"
     message: |
+      🎨 UI REDESIGN: BatchScanner - Compact & Professional Layout
+      
+      **CHANGES IMPLEMENTED:**
+      
+      **1. Compact Top Bar (1 line):**
+      - ✅ Consolidated: Title + Chọn TXT + OCR Engine + Tìm kiếm button
+      - ✅ Removed verbose descriptions and notes
+      - ✅ Everything fits in 1 horizontal line
+      
+      **2. Discovered Folders - Table Style:**
+      - ✅ Changed from large card style to compact table rows
+      - ✅ Folder name and path on SAME LINE (separated by •)
+      - ✅ Hover effects for better UX
+      - ✅ Actions moved to header (inline with title)
+      - ✅ Scan button now in header (not bottom)
+      
+      **3. More Workspace:**
+      - ✅ Removed unnecessary padding and spacing
+      - ✅ Cleaner borders and shadows
+      - ✅ Image grid gets more screen space
+      
+      **4. Fixed: Sort GCN to Top:**
+      - ✅ Added `sortResultsWithGCNOnTop()` to all scan types
+      - ✅ DesktopScanner File Scan (batch mode) - line 1253
+      - ✅ DesktopScanner File Scan (sequential) - line 1427
+      - ✅ DesktopScanner Folder Scan (batch mode) - line 1510
+      - ✅ DesktopScanner Folder Scan (sequential) - line 1573 (already had)
+      - ✅ BatchScanner - line 505, 671 (already had)
+      
+      **VERIFICATION:**
+      - ✅ All scan types now sort GCNC/GCNM to top
+      - ✅ GCN documents appear first in results for easy review
+      - ✅ Applied consistently across DesktopScanner & BatchScanner
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/src/components/BatchScanner.js (UI redesign)
+      - ✅ /app/desktop-app/src/components/DesktopScanner.js (GCN sort added)
+      - ✅ Build successful: build/static/js/main.1dd5b819.js (86.84 kB)
+      
+      🎯 STATUS: ✅ Implementation Complete | ⏳ User Testing Required
+
+  - agent: "main"
+    timestamp: "2025-01-XX"
+    message: |
       🔧 BUG FIX: Auto-Switch to Correct Tab When Resume
       
       **ISSUE REPORTED:**

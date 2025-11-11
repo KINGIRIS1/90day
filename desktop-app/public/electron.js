@@ -4,7 +4,9 @@ const { spawn, spawnSync } = require('child_process');
 const Store = require('electron-store');
 const fs = require('fs');
 
-const store = new Store();
+// Separate stores for better performance
+const store = new Store({ name: 'config' }); // Settings only (~100 KB)
+const scanStore = new Store({ name: 'scan-history' }); // Scan data (can be large)
 let mainWindow;
 
 const isDev = !app.isPackaged;
@@ -172,6 +174,46 @@ function buildPythonEnv(extra = {}, pythonInfo = null, scriptDir = '') {
   return env;
 }
 
+// ========== SCAN HISTORY CLEANUP ==========
+function cleanupOldScans() {
+  try {
+    const scans = scanStore.get('scans', {});
+    const now = Date.now();
+    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+    
+    let cleaned = 0;
+    const remaining = {};
+    
+    // Keep only recent scans (< 7 days) and limit to 20 most recent
+    const entries = Object.entries(scans)
+      .filter(([_, scanData]) => {
+        if (scanData.timestamp < sevenDaysAgo) {
+          cleaned++;
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .slice(0, 20); // Keep only 20 most recent
+    
+    entries.forEach(([scanId, scanData]) => {
+      remaining[scanId] = scanData;
+    });
+    
+    const totalRemoved = Object.keys(scans).length - entries.length;
+    
+    if (totalRemoved > 0) {
+      scanStore.set('scans', remaining);
+      console.log(`🗑️ Startup cleanup: Removed ${totalRemoved} scans (${cleaned} old, ${totalRemoved - cleaned} excess)`);
+      console.log(`📊 Remaining scans: ${entries.length}`);
+    } else {
+      console.log(`✅ Scan history clean: ${entries.length} scans`);
+    }
+  } catch (e) {
+    console.error('❌ Cleanup error:', e);
+  }
+}
+
 // ========== CRASH HANDLERS ==========
 // Handle uncaught exceptions in main process
 process.on('uncaughtException', (error) => {
@@ -209,6 +251,10 @@ process.on('warning', (warning) => {
 });
 
 app.whenReady().then(() => {
+  // Cleanup old scans on startup (keep scan-history.json small)
+  console.log('🧹 Running startup cleanup...');
+  cleanupOldScans();
+  
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
@@ -1016,41 +1062,34 @@ ipcMain.handle('save-scan-state', (event, scanData) => {
   try {
     // Use provided scanId or generate new one
     const scanId = scanData.scanId || `scan_${Date.now()}`;
-    const scanHistory = store.get('scanHistory', {});
+    const scans = scanStore.get('scans', {});
     
     // Add/update scan (OVERWRITE if same scanId)
     scanData.scanId = scanId;
     scanData.timestamp = Date.now();
     
     // Overwrite existing or create new
-    scanHistory[scanId] = scanData;
-    store.set('scanHistory', scanHistory);
+    scans[scanId] = scanData;
+    scanStore.set('scans', scans);
     
-    const action = scanHistory[scanId] ? 'Overwritten' : 'Created';
-    console.log(`💾 ${action} scan state: ${scanId}, ${scanData.results?.length || scanData.childTabs?.filter(t => t.status === 'done').length || 0} items`);
+    const action = scans[scanId] ? 'Updated' : 'Created';
+    console.log(`💾 ${action} scan state: ${scanId}, ${scanData.results?.length || scanData.folderTabs?.filter(t => t.status === 'done').length || 0} items`);
     return { success: true, scanId: scanId };
   } catch (e) {
-    console.error('Save scan state error:', e);
+    console.error('❌ Save scan state error:', e);
     return { success: false, error: e.message };
   }
 });
 
 ipcMain.handle('get-incomplete-scans', () => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    const now = Date.now();
-    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+    const scans = scanStore.get('scans', {});
     
-    // Filter: incomplete + within 7 days
+    // Filter: incomplete only (cleanup already done on startup)
     const incompleteScans = [];
-    const toDelete = [];
     
-    for (const [scanId, scanData] of Object.entries(scanHistory)) {
-      if (scanData.timestamp < sevenDaysAgo) {
-        // Older than 7 days → mark for deletion
-        toDelete.push(scanId);
-      } else if (scanData.status === 'incomplete') {
-        // Recent + incomplete → return to user
+    for (const [scanId, scanData] of Object.entries(scans)) {
+      if (scanData.status === 'incomplete') {
         incompleteScans.push({
           scanId: scanId,
           ...scanData
@@ -1058,24 +1097,18 @@ ipcMain.handle('get-incomplete-scans', () => {
       }
     }
     
-    // Auto-cleanup old scans
-    if (toDelete.length > 0) {
-      console.log(`🗑️ Auto-cleanup: Deleting ${toDelete.length} scans older than 7 days`);
-      toDelete.forEach(id => delete scanHistory[id]);
-      store.set('scanHistory', scanHistory);
-    }
-    
+    console.log(`📋 Found ${incompleteScans.length} incomplete scan(s)`);
     return { success: true, scans: incompleteScans };
   } catch (e) {
-    console.error('Get incomplete scans error:', e);
+    console.error('❌ Get incomplete scans error:', e);
     return { success: false, error: e.message, scans: [] };
   }
 });
 
 ipcMain.handle('load-scan-state', (event, scanId) => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    const scanData = scanHistory[scanId];
+    const scans = scanStore.get('scans', {});
+    const scanData = scans[scanId];
     
     if (!scanData) {
       return { success: false, error: 'Scan not found' };
@@ -1091,14 +1124,14 @@ ipcMain.handle('load-scan-state', (event, scanId) => {
 
 ipcMain.handle('delete-scan-state', (event, scanId) => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    delete scanHistory[scanId];
-    store.set('scanHistory', scanHistory);
+    const scans = scanStore.get('scans', {});
+    delete scans[scanId];
+    scanStore.set('scans', scans);
     
     console.log(`🗑️ Deleted scan state: ${scanId}`);
     return { success: true };
   } catch (e) {
-    console.error('Delete scan state error:', e);
+    console.error('❌ Delete scan state error:', e);
     return { success: false, error: e.message };
   }
 });

@@ -272,6 +272,7 @@ function App() {
                 initialFolder={f}
                 onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
                 onSwitchTab={setActiveTab}
+                disableResumeCheck={true}
               />
             </div>
           ) : null;

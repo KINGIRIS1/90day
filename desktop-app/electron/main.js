@@ -174,6 +174,46 @@ function buildPythonEnv(extra = {}, pythonInfo = null, scriptDir = '') {
   return env;
 }
 
+// ========== SCAN HISTORY CLEANUP ==========
+function cleanupOldScans() {
+  try {
+    const scans = scanStore.get('scans', {});
+    const now = Date.now();
+    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+    
+    let cleaned = 0;
+    const remaining = {};
+    
+    // Keep only recent scans (< 7 days) and limit to 20 most recent
+    const entries = Object.entries(scans)
+      .filter(([_, scanData]) => {
+        if (scanData.timestamp < sevenDaysAgo) {
+          cleaned++;
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .slice(0, 20); // Keep only 20 most recent
+    
+    entries.forEach(([scanId, scanData]) => {
+      remaining[scanId] = scanData;
+    });
+    
+    const totalRemoved = Object.keys(scans).length - entries.length;
+    
+    if (totalRemoved > 0) {
+      scanStore.set('scans', remaining);
+      console.log(`🗑️ Startup cleanup: Removed ${totalRemoved} scans (${cleaned} old, ${totalRemoved - cleaned} excess)`);
+      console.log(`📊 Remaining scans: ${entries.length}`);
+    } else {
+      console.log(`✅ Scan history clean: ${entries.length} scans`);
+    }
+  } catch (e) {
+    console.error('❌ Cleanup error:', e);
+  }
+}
+
 // ========== CRASH HANDLERS ==========
 // Handle uncaught exceptions in main process
 process.on('uncaughtException', (error) => {

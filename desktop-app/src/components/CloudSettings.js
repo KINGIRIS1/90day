@@ -2,15 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 function CloudSettings() {
   const [ocrEngine, setOcrEngine] = useState('offline-tesseract');
-  const [googleKey, setGoogleKey] = useState('');
   const [geminiKey, setGeminiKey] = useState('');
-  const [azureKey, setAzureKey] = useState('');
-  const [azureEndpoint, setAzureEndpoint] = useState('');
   const [loading, setLoading] = useState(false);
   const [testingKey, setTestingKey] = useState(null);
-  const [showGoogleGuide, setShowGoogleGuide] = useState(false);
   const [showGeminiGuide, setShowGeminiGuide] = useState(false);
-  const [showAzureGuide, setShowAzureGuide] = useState(false);
   
   // Image resize settings
   const [enableResize, setEnableResize] = useState(true);

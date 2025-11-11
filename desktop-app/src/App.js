@@ -271,6 +271,7 @@ function App() {
               <DesktopScanner
                 initialFolder={f}
                 onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
+                onSwitchTab={setActiveTab}
               />
             </div>
           ) : null;

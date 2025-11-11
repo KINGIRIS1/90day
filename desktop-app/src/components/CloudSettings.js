@@ -31,10 +31,6 @@ function CloudSettings() {
       // Map backend values to UI values
       const uiEngineMapping = {
         'tesseract': 'offline-tesseract',
-        'easyocr': 'offline-easyocr',
-        'vietocr': 'offline-vietocr',
-        'google': 'google',
-        'azure': 'azure',
         'gemini-flash': 'gemini-flash',
         'gemini-flash-hybrid': 'gemini-flash-hybrid',
         'gemini-flash-lite': 'gemini-flash-lite'
@@ -42,10 +38,7 @@ function CloudSettings() {
       
       const uiEngine = uiEngineMapping[backendEngine] || 'offline-tesseract';
       
-      const google = await window.electronAPI.getApiKey('google') || '';
       const gemini = await window.electronAPI.getApiKey('gemini') || '';
-      const azure = await window.electronAPI.getApiKey('azure') || '';
-      const azureEp = await window.electronAPI.getApiKey('azureEndpoint') || '';
       
       // Load resize settings
       const resizeEnabled = await window.electronAPI.getConfig('enableResize');

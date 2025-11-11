@@ -36,7 +36,21 @@ function createWindow() {
     icon: path.join(__dirname, '../assets/icon.png')
   });
 
-  const startUrl = isDev ? 'http://localhost:3001' : `file://${path.join(__dirname, '../build/index.html')}`;
+  // Smart URL detection: Check if build folder exists
+  const buildIndexPath = path.join(__dirname, '../build/index.html');
+  const hasBuild = fs.existsSync(buildIndexPath);
+  
+  let startUrl;
+  if (isDev && !hasBuild) {
+    // Development mode: No build folder → Use localhost
+    startUrl = 'http://localhost:3001';
+    console.log('🔧 Development mode: Loading from localhost:3001');
+  } else {
+    // Production mode OR build exists → Use build folder
+    startUrl = `file://${buildIndexPath}`;
+    console.log('🚀 Production mode: Loading from build folder');
+  }
+  
   mainWindow.loadURL(startUrl);
 
   mainWindow.once('ready-to-show', () => {

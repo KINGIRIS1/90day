@@ -526,14 +526,30 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
         
       } else if (scanData.type === 'file_scan') {
         // Restore file scan state
-        setResults(scanData.results || []);
+        const savedResults = scanData.results || [];
+        
+        // Reload preview URLs (previewUrl was stripped on save)
+        const resultsWithPreviews = await Promise.all(savedResults.map(async (result) => {
+          if (result.filePath) {
+            try {
+              const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
+              return { ...result, previewUrl };
+            } catch (err) {
+              console.warn(`⚠️ Could not load preview for: ${result.fileName}`);
+              return result;
+            }
+          }
+          return result;
+        }));
+        
+        setResults(resultsWithPreviews);
         setSelectedFiles(scanData.selectedFiles || []);
         setLastKnownType(scanData.lastKnownType);
         setRemainingFiles(scanData.remainingFiles || []);
         setProgress(scanData.progress || {current: 0, total: 0});
         setCurrentScanId(scan.scanId);
         
-        alert(`✅ Đã load ${scanData.results?.length || 0} files đã scan. Click "Tiếp tục scan" để quét tiếp.`);
+        alert(`✅ Đã load ${resultsWithPreviews.length} files đã scan. Click "Tiếp tục scan" để quét tiếp.`);
       }
       
       setShowResumeDialog(false);

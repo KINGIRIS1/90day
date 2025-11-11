@@ -1513,7 +1513,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`✅ Folder batch complete: ${batchResults.length} results`);
         
         // Post-process GCN documents
-        const finalChildResults = postProcessGCNBatch(batchResults);
+        const processedResults = postProcessGCNBatch(batchResults);
+        
+        // Sort results: GCN (GCNC, GCNM) on top for easy review
+        const finalChildResults = sortResultsWithGCNOnTop(processedResults);
         
         setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
         return;

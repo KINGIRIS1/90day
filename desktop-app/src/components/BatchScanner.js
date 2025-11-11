@@ -1725,7 +1725,7 @@ function BatchScanner({ onSwitchTab }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Resume Dialog */}
       {showResumeDialog && (
         <ResumeDialog
@@ -1735,78 +1735,43 @@ function BatchScanner({ onSwitchTab }) {
         />
       )}
       
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">📋 Quét theo danh sách</h2>
-        <p className="text-gray-600 text-sm">
-          Quét nhiều thư mục cùng lúc từ file TXT (mỗi dòng = đường dẫn thư mục)
-        </p>
-      </div>
-
-      {/* Configuration Section */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">⚙️ Cấu hình</h3>
-
-        {/* TXT File Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            1️⃣ Chọn file TXT danh sách thư mục
-          </label>
-          <div className="flex items-center gap-3">
-            <button
+      {/* COMPACT TOP BAR - 1 line */}
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="flex items-center gap-4">
+          {/* Title */}
+          <div className="flex-shrink-0">
+            <h2 className="text-lg font-bold text-gray-900">📋 Quét danh sách</h2>
+          </div>
+          
+          {/* File TXT Input */}
+          <div className="flex items-center gap-2 flex-1">
+            <button 
               onClick={handleSelectTxtFile}
               disabled={isLoadingFolders || isScanning}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:bg-gray-300 transition-colors font-medium"
             >
-              📄 Chọn file TXT
+              📄 Chọn TXT
             </button>
             {txtFilePath && (
-              <span className="text-sm text-gray-600" title={txtFilePath}>
+              <span className="text-sm text-gray-600 truncate" title={txtFilePath}>
                 ✅ {getFileName(txtFilePath)}
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            File TXT với mỗi dòng là đường dẫn đến 1 thư mục (ví dụ: C:\Documents\Folder1)
-          </p>
-        </div>
-
-        {/* OCR Engine Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            2️⃣ OCR Engine (từ cài đặt)
-          </label>
-          <div className="px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-700">
-            🔧 <strong>{ocrEngine}</strong>
+          
+          {/* OCR Engine */}
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border flex-shrink-0">
+            <span className="text-xs text-gray-500">OCR:</span>
+            <span className="text-sm font-medium text-gray-900">{ocrEngine}</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Để thay đổi OCR engine, vui lòng vào tab "⚙️ Cài đặt"
-          </p>
-        </div>
-
-        {/* Note about merging */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">💡</span>
-            <div>
-              <div className="font-semibold text-blue-900 mb-1">Về tính năng gộp PDF</div>
-              <div className="text-sm text-blue-800">
-                Sau khi quét, bạn sẽ thấy danh sách tất cả file đã quét. 
-                Sử dụng nút <strong>"📚 Gộp PDF"</strong> để merge các ảnh cùng loại thành file PDF 
-                và chọn nơi lưu (thư mục gốc, thư mục mới, hoặc thư mục tùy chọn).
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Load Folders Button */}
-        <div className="pt-4 border-t">
-          <button
+          
+          {/* Search Button */}
+          <button 
             onClick={handleLoadFolders}
             disabled={isLoadingFolders || !txtFilePath}
-            className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:bg-gray-300 transition-colors font-medium shadow-sm flex-shrink-0"
           >
-            {isLoadingFolders ? '⏳ Đang tìm thư mục...' : '🔍 Tìm kiếm thư mục'}
+            {isLoadingFolders ? '⏳ Đang tìm...' : '🔍 Tìm kiếm thư mục'}
           </button>
         </div>
       </div>

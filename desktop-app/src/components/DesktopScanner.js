@@ -533,7 +533,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
           console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
           // Trigger continue scan after a short delay to ensure UI is ready
           setTimeout(() => {
-            scanAllChildFolders(true); // This will continue from where it left off
+            setProcessing(true);
+            handleProcessFiles(true); // Resume = true, will continue from pending folders
           }, 500);
         } else {
           alert(`✅ Đã khôi phục tất cả ${tabsWithPreviews.length} folders (đã scan xong).`);

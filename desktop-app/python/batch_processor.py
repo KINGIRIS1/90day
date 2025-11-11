@@ -937,7 +937,9 @@ if __name__ == "__main__":
         batch_data = batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=5, last_known_type=None)
     elif mode == 'smart':
         # Check for optional max_batch_size env variable
-        max_batch_size = int(os.environ.get('SMART_MAX_BATCH_SIZE', '15'))
+        env_value = os.environ.get('SMART_MAX_BATCH_SIZE', '10')
+        print(f"🔍 DEBUG: SMART_MAX_BATCH_SIZE env = '{env_value}'", file=sys.stderr)
+        max_batch_size = int(env_value)
         print(f"📊 Smart mode max_batch_size: {max_batch_size}", file=sys.stderr)
         batch_data = batch_classify_smart(image_paths, api_key, engine_type=engine_type, last_known_type=None, max_batch_size=max_batch_size)
     else:

@@ -39,6 +39,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [mergeOption, setMergeOption] = useState('root'); // 'root' or 'new'
   const [mergeSuffix, setMergeSuffix] = useState('_merged');
   const [activeChildForMerge, setActiveChildForMerge] = useState(null);
+  
+  // File scan merge modal
+  const [showFileMergeModal, setShowFileMergeModal] = useState(false);
+  const [fileOutputOption, setFileOutputOption] = useState('same_folder'); // 'same_folder', 'new_folder', 'custom_folder'
+  const [fileMergeSuffix, setFileMergeSuffix] = useState('_merged');
+  const [fileOutputFolder, setFileOutputFolder] = useState(null);
+  const [fileMergeInProgress, setFileMergeInProgress] = useState(false);
 
   const [parentFolder, setParentFolder] = useState(null);
   const [parentSummary, setParentSummary] = useState(null); // { subfolderCount, rootFileCount }

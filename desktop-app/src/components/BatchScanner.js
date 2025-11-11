@@ -501,10 +501,14 @@ function BatchScanner() {
               console.log(`🔄 Post-processing GCN for folder: ${folder.name}`);
               const processedFolderResults = postProcessGCNBatch(folderResults);
               
+              // Sort results: GCN (GCNC, GCNM) on top for easy review
+              const sortedResults = sortResultsWithGCNOnTop(processedFolderResults);
+              console.log(`📊 Sorted results: ${sortedResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+              
               // Update folder tab status to 'done' with results
               setFolderTabs(prev => prev.map(t => 
                 t.path === folder.path 
-                  ? { ...t, status: 'done', files: processedFolderResults }
+                  ? { ...t, status: 'done', files: sortedResults }
                   : t
               ));
               

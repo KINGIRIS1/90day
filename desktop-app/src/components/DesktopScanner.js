@@ -505,28 +505,57 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Restore folder scan state WITH RESULTS
         const restoredTabs = scanData.childTabs || [];
         
+        // Validate childTabs structure
+        if (!Array.isArray(restoredTabs)) {
+          console.error('❌ Invalid childTabs structure:', restoredTabs);
+          alert('❌ Dữ liệu thư mục không hợp lệ. Vui lòng xóa và quét lại.');
+          await window.electronAPI.deleteScanState(scan.scanId);
+          setShowResumeDialog(false);
+          return;
+        }
+        
         // Reload preview URLs for completed folders (previewUrl was stripped on save)
+        let previewLoadErrors = 0;
         const tabsWithPreviews = await Promise.all(restoredTabs.map(async (tab) => {
+          if (!tab || !tab.path || !tab.name) {
+            console.warn('⚠️ Invalid tab structure, skipping:', tab);
+            return null;
+          }
+          
           if (tab.status === 'done' && tab.results && tab.results.length > 0) {
             const resultsWithPreviews = await Promise.all(tab.results.map(async (result) => {
-              if (result.filePath) {
-                try {
-                  console.log(`📸 Loading preview for: ${result.fileName}`);
-                  const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
-                  console.log(`✅ Preview loaded: ${result.fileName}`);
-                  return { ...result, previewUrl };
-                } catch (err) {
-                  console.error(`❌ Failed to load preview for: ${result.fileName}`, err);
-                  console.error(`   File path: ${result.filePath}`);
-                  return result;
-                }
+              if (!result || !result.filePath) {
+                return result;
               }
-              return result;
+              
+              try {
+                const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
+                return { ...result, previewUrl };
+              } catch (err) {
+                previewLoadErrors++;
+                console.warn(`⚠️ Failed to load preview for: ${result.fileName || 'unknown'}`);
+                return result;
+              }
             }));
             return { ...tab, results: resultsWithPreviews };
           }
           return tab;
         }));
+        
+        // Filter out null tabs (invalid)
+        const validTabs = tabsWithPreviews.filter(t => t !== null);
+        
+        if (validTabs.length === 0) {
+          console.error('❌ No valid tabs after loading');
+          alert('❌ Không có dữ liệu hợp lệ để khôi phục. Vui lòng xóa và quét lại.');
+          await window.electronAPI.deleteScanState(scan.scanId);
+          setShowResumeDialog(false);
+          return;
+        }
+        
+        if (previewLoadErrors > 0) {
+          console.warn(`⚠️ Failed to load ${previewLoadErrors} preview images (files may have been moved/deleted)`);
+        }
         
         setChildTabs(tabsWithPreviews);
         setParentFolder(scanData.parentFolder || null);

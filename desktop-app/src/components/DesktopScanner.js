@@ -36,6 +36,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   // Pagination to prevent memory overflow
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 20; // Limit to 20 images per page (reduced to prevent crashes)
+  const [previewsEnabled, setPreviewsEnabled] = useState(true); // Toggle previews to save memory
 
   // Parent folder analysis + child tabs
   const [childMergeReport, setChildMergeReport] = useState([]); // lines of saved PDFs across tabs

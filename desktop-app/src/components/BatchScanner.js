@@ -667,26 +667,30 @@ function BatchScanner() {
             // Post-process GCN documents (date-based classification)
             const processedFolderResults = postProcessGCNBatch(folderResults);
             
+            // Sort results: GCN (GCNC, GCNM) on top for easy review
+            const sortedResults = sortResultsWithGCNOnTop(processedFolderResults);
+            console.log(`📊 Sorted results: ${sortedResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+            
             // Update allResults with post-processed results
             const startIndex = allResults.length - folderResults.length;
-            for (let i = 0; i < processedFolderResults.length; i++) {
+            for (let i = 0; i < sortedResults.length; i++) {
               allResults[startIndex + i] = {
-                original_path: processedFolderResults[i].filePath,
-                short_code: processedFolderResults[i].short_code,
-                doc_type: processedFolderResults[i].doc_type,
-                confidence: processedFolderResults[i].confidence,
-                folder: processedFolderResults[i].folder
+                original_path: sortedResults[i].filePath,
+                short_code: sortedResults[i].short_code,
+                doc_type: sortedResults[i].doc_type,
+                confidence: sortedResults[i].confidence,
+                folder: sortedResults[i].folder
               };
             }
             
-            // Update folder tabs with post-processed results
+            // Update folder tabs with sorted results
             setFolderTabs(prev => prev.map(t => {
               if (t.path === folder.path) {
                 return { 
                   ...t, 
                   status: 'done', 
-                  count: processedFolderResults.length,
-                  files: processedFolderResults 
+                  count: sortedResults.length,
+                  files: sortedResults 
                 };
               }
               return t;

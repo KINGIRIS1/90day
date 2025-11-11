@@ -1107,8 +1107,8 @@ ipcMain.handle('get-incomplete-scans', () => {
 
 ipcMain.handle('load-scan-state', (event, scanId) => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    const scanData = scanHistory[scanId];
+    const scans = scanStore.get('scans', {});
+    const scanData = scans[scanId];
     
     if (!scanData) {
       return { success: false, error: 'Scan not found' };

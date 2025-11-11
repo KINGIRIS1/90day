@@ -474,7 +474,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       if (scanData.type === 'folder_scan') {
         // Restore folder scan state WITH RESULTS
         const restoredTabs = scanData.childTabs || [];
-        setChildTabs(restoredTabs);
+        
+        // Reload preview URLs for completed folders (previewUrl was stripped on save)
+        const tabsWithPreviews = await Promise.all(restoredTabs.map(async (tab) => {
+          if (tab.status === 'done' && tab.results && tab.results.length > 0) {
+            const resultsWithPreviews = await Promise.all(tab.results.map(async (result) => {
+              if (result.filePath) {
+                try {
+                  const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
+                  return { ...result, previewUrl };
+                } catch (err) {
+                  console.warn(`⚠️ Could not load preview for: ${result.fileName}`);
+                  return result;
+                }
+              }
+              return result;
+            }));
+            return { ...tab, results: resultsWithPreviews };
+          }
+          return tab;
+        }));
+        
+        setChildTabs(tabsWithPreviews);
         setParentFolder(scanData.parentFolder || null);
         setCurrentScanId(scan.scanId);
         

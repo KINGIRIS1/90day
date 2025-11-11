@@ -1083,20 +1083,13 @@ ipcMain.handle('save-scan-state', (event, scanData) => {
 
 ipcMain.handle('get-incomplete-scans', () => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    const now = Date.now();
-    const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+    const scans = scanStore.get('scans', {});
     
-    // Filter: incomplete + within 7 days
+    // Filter: incomplete only (cleanup already done on startup)
     const incompleteScans = [];
-    const toDelete = [];
     
-    for (const [scanId, scanData] of Object.entries(scanHistory)) {
-      if (scanData.timestamp < sevenDaysAgo) {
-        // Older than 7 days → mark for deletion
-        toDelete.push(scanId);
-      } else if (scanData.status === 'incomplete') {
-        // Recent + incomplete → return to user
+    for (const [scanId, scanData] of Object.entries(scans)) {
+      if (scanData.status === 'incomplete') {
         incompleteScans.push({
           scanId: scanId,
           ...scanData
@@ -1104,16 +1097,10 @@ ipcMain.handle('get-incomplete-scans', () => {
       }
     }
     
-    // Auto-cleanup old scans
-    if (toDelete.length > 0) {
-      console.log(`🗑️ Auto-cleanup: Deleting ${toDelete.length} scans older than 7 days`);
-      toDelete.forEach(id => delete scanHistory[id]);
-      store.set('scanHistory', scanHistory);
-    }
-    
+    console.log(`📋 Found ${incompleteScans.length} incomplete scan(s)`);
     return { success: true, scans: incompleteScans };
   } catch (e) {
-    console.error('Get incomplete scans error:', e);
+    console.error('❌ Get incomplete scans error:', e);
     return { success: false, error: e.message, scans: [] };
   }
 });

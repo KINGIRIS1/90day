@@ -116,7 +116,7 @@ function BatchScanner() {
       }
     };
     autoSave(); // Execute immediately (no debounce)
-  }, [folderTabs]);
+  }, [folderTabs, currentScanId, discoveredFolders, fileResults, txtFilePath, ocrEngine, batchMode]);
   
   // Load OCR engine from config on mount
   useEffect(() => {

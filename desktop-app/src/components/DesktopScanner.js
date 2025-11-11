@@ -564,8 +564,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
         setRemainingFiles(scanData.remainingFiles || []);
         setProgress(scanData.progress || {current: 0, total: 0});
         setCurrentScanId(scan.scanId);
+        setActiveTab('files'); // Switch to files tab
         
-        alert(`✅ Đã load ${resultsWithPreviews.length} files đã scan. Click "Tiếp tục scan" để quét tiếp.`);
+        // Auto-trigger continue scan if there are remaining files
+        const remainingCount = (scanData.remainingFiles || []).length;
+        if (remainingCount > 0) {
+          console.log(`🚀 Auto-resuming: ${remainingCount} remaining files`);
+          // Trigger continue scan after a short delay to ensure UI is ready
+          setTimeout(() => {
+            setProcessing(true);
+            handleProcessFiles(true); // Resume = true, will continue from remaining files
+          }, 500);
+        } else {
+          alert(`✅ Đã khôi phục tất cả ${resultsWithPreviews.length} files (đã scan xong).`);
+        }
       }
       
       setShowResumeDialog(false);

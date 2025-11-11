@@ -2009,43 +2009,38 @@ function BatchScanner({ onSwitchTab }) {
             </div>
           )}
 
-          {/* Nút "Gộp thư mục này" - hiển thị khi tab done có files */}
-          {activeFolder && folderTabs.find(t => t.path === activeFolder && t.status === 'done' && t.files.length > 0) && !isScanning && (
-            <div className="mb-4 p-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl border border-indigo-200">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">
-                    📂 {folderTabs.find(t => t.path === activeFolder).name} - {folderTabs.find(t => t.path === activeFolder).files.length} files
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    Gộp các file ảnh cùng loại thành PDF
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleMerge(false)}
-                  disabled={mergeInProgress}
-                  className="ml-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors disabled:bg-gray-300"
-                >
-                  📚 Gộp thư mục này
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Files grid cho tab active */}
           {activeFolder && folderTabs.find(t => t.path === activeFolder && t.files.length > 0) && (
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-gray-700">Files ({folderTabs.find(t => t.path === activeFolder).files.length})</span>
-                <select 
-                  value={density} 
-                  onChange={(e) => setDensity(e.target.value)} 
-                  className="text-xs border rounded px-2 py-1"
-                >
-                  <option value="high">Mật độ cao (5)</option>
-                  <option value="medium">Trung bình (4)</option>
-                  <option value="low">Thấp (3)</option>
-                </select>
+              <div className="flex items-center justify-between mb-3 p-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border border-indigo-200">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-gray-900">
+                    📂 {folderTabs.find(t => t.path === activeFolder).name}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    ({folderTabs.find(t => t.path === activeFolder).files.length} files)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {folderTabs.find(t => t.path === activeFolder && t.status === 'done') && !isScanning && (
+                    <button
+                      onClick={() => handleMerge(false)}
+                      disabled={mergeInProgress}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors disabled:bg-gray-300"
+                    >
+                      {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp thư mục này'}
+                    </button>
+                  )}
+                  <select 
+                    value={density} 
+                    onChange={(e) => setDensity(e.target.value)} 
+                    className="text-xs border rounded px-2 py-1 bg-white"
+                  >
+                    <option value="high">Mật độ cao (5)</option>
+                    <option value="medium">Trung bình (4)</option>
+                    <option value="low">Thấp (3)</option>
+                  </select>
+                </div>
               </div>
 
               {/* Grid */}

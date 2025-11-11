@@ -258,6 +258,7 @@ function App() {
           <div style={{ display: activeTab === 'scanner' ? 'block' : 'none' }}>
             <DesktopScanner
               onDisplayFolder={(folderPath) => addFolderTab(folderPath)}
+              onSwitchTab={setActiveTab}
             />
           </div>
         )}

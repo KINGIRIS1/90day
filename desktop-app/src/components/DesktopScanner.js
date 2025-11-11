@@ -1723,6 +1723,72 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     );
   };
 
+  // Execute file scan merge (similar to BatchScanner)
+  const executeFileMerge = async () => {
+    console.log('🚀 executeFileMerge called:', { fileOutputOption, fileMergeSuffix, fileOutputFolder });
+    
+    setShowFileMergeModal(false);
+    setFileMergeInProgress(true);
+
+    try {
+      const payload = results
+        .filter(r => r.success && r.short_code)
+        .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+
+      if (payload.length === 0) {
+        alert('Không có trang hợp lệ để gộp.');
+        setFileMergeInProgress(false);
+        return;
+      }
+
+      // Group files by folder
+      const folderGroups = {};
+      payload.forEach(item => {
+        const result = results.find(r => r.filePath === item.filePath);
+        const folder = result?.folder || '';
+        if (!folderGroups[folder]) {
+          folderGroups[folder] = [];
+        }
+        folderGroups[folder].push(item);
+      });
+
+      let totalMerged = 0;
+      let totalSuccess = 0;
+
+      // Merge each folder separately
+      for (const [folder, items] of Object.entries(folderGroups)) {
+        const mergeOptions = {
+          autoSave: true,
+          mergeMode: fileOutputOption === 'same_folder' ? 'root' : (fileOutputOption === 'new_folder' ? 'new' : 'custom'),
+          mergeSuffix: fileMergeSuffix || '_merged',
+          parentFolder: folder,
+          customOutputFolder: fileOutputOption === 'custom_folder' ? fileOutputFolder : null
+        };
+        
+        console.log('Merge options:', mergeOptions);
+        console.log('Items to merge:', items.length, 'files');
+        
+        try {
+          const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);
+          console.log('Merge result:', merged);
+          const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+          totalMerged += (merged || []).length;
+          totalSuccess += okCount;
+        } catch (mergeErr) {
+          console.error('❌ Merge failed for folder:', folder, mergeErr);
+          alert(`❌ Lỗi merge folder ${folder}:\n${mergeErr.message}`);
+        }
+      }
+
+      alert(`✅ Gộp PDF hoàn tất!\n\nThành công: ${totalSuccess}/${totalMerged} file PDF`);
+    } catch (err) {
+      console.error('Merge error:', err);
+      alert(`❌ Lỗi khi gộp PDF: ${err.message}`);
+    } finally {
+      setFileMergeInProgress(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Resume Dialog */}

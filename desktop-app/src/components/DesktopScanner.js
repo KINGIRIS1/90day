@@ -2427,22 +2427,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                       </div>
                     ))}
                   </div>
-                  <div className="mt-3 flex items-center gap-2">
-                    {t.status !== 'done' && (
-                      <button onClick={() => { stopRef.current = false; scanChildFolder(t.path); }} className="px-3 py-2 text-xs rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all shadow-sm font-medium">Quét thư mục này</button>
-                    )}
-                    {(t.results && t.results.length > 0) && (
-                      <button
-                        onClick={() => {
-                          setActiveChildForMerge(t);
-                          setShowMergeModal(true);
-                        }}
-                        className="px-3 py-2 text-xs rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-sm font-medium"
-                      >
-                        📚 Gộp thư mục này
-                      </button>
-                    )}
-                  </div>
                 </div>
               )
             ))}

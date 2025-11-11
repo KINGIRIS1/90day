@@ -1,5 +1,115 @@
 import React, { useState, useEffect } from 'react';
 
+const ResizeSetting = () => {
+  const [enableResize, setEnableResize] = useState(true);
+  const [maxWidth, setMaxWidth] = useState(2000);
+  const [maxHeight, setMaxHeight] = useState(2800);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const resizeEnabled = await window.electronAPI.getConfig('enableResize');
+      const width = await window.electronAPI.getConfig('maxWidth');
+      const height = await window.electronAPI.getConfig('maxHeight');
+      
+      setEnableResize(resizeEnabled !== null ? resizeEnabled : true);
+      setMaxWidth(width || 2000);
+      setMaxHeight(height || 2800);
+    })();
+  }, []);
+
+  const handleSave = async () => {
+    await window.electronAPI.setConfig('enableResize', enableResize);
+    await window.electronAPI.setConfig('maxWidth', maxWidth);
+    await window.electronAPI.setConfig('maxHeight', maxHeight);
+    
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Enable/Disable Toggle */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-medium text-gray-900">Tự động resize ảnh trước khi scan</div>
+          <div className="text-sm text-gray-500">Giảm kích thước ảnh để tăng tốc độ xử lý</div>
+        </div>
+        <button
+          onClick={() => setEnableResize(!enableResize)}
+          className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+            enableResize ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'
+          }`}
+        >
+          {enableResize ? 'Đang BẬT' : 'Đang TẮT'}
+        </button>
+      </div>
+
+      {/* Size Settings (only show when enabled) */}
+      {enableResize && (
+        <div className="pl-4 border-l-2 border-gray-200 space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Max Width: {maxWidth}px
+            </label>
+            <input
+              type="range"
+              min="1000"
+              max="4000"
+              step="100"
+              value={maxWidth}
+              onChange={(e) => setMaxWidth(parseInt(e.target.value))}
+              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>1000px</span>
+              <span>2000px (khuyến nghị)</span>
+              <span>4000px</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Max Height: {maxHeight}px
+            </label>
+            <input
+              type="range"
+              min="1000"
+              max="4000"
+              step="100"
+              value={maxHeight}
+              onChange={(e) => setMaxHeight(parseInt(e.target.value))}
+              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>1000px</span>
+              <span>2800px (khuyến nghị)</span>
+              <span>4000px</span>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 p-3 rounded text-sm text-blue-800">
+            💡 <strong>Lưu ý:</strong> Ảnh lớn hơn sẽ được resize về {maxWidth}x{maxHeight}px. 
+            Ảnh nhỏ hơn giữ nguyên kích thước.
+          </div>
+        </div>
+      )}
+
+      {/* Save Button */}
+      <button
+        onClick={handleSave}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+      >
+        💾 Lưu cài đặt Resize
+      </button>
+
+      {saved && (
+        <div className="text-xs text-green-700">✓ Đã lưu</div>
+      )}
+    </div>
+  );
+};
+
 const RequestDelaySetting = () => {
   const [delay, setDelay] = useState(1200); // Default 1.2s
   const [saved, setSaved] = useState(false);

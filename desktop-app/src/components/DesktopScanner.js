@@ -671,8 +671,22 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       setShowResumeDialog(false);
       
     } catch (error) {
-      console.error('Resume scan error:', error);
-      alert(`❌ Lỗi: ${error.message}`);
+      console.error('❌ Resume scan error:', error);
+      console.error('Error stack:', error.stack);
+      
+      // Try to delete corrupt scan state
+      try {
+        await window.electronAPI.deleteScanState(scan.scanId);
+        console.log('🗑️ Deleted corrupt scan state');
+      } catch (deleteErr) {
+        console.error('Failed to delete scan state:', deleteErr);
+      }
+      
+      alert(`❌ Lỗi khi khôi phục scan.\n\nLỗi: ${error.message}\n\nDữ liệu có thể bị corrupt. Đã xóa scan state. Vui lòng quét lại.`);
+      setShowResumeDialog(false);
+      
+      // Reload to refresh state
+      window.location.reload();
     }
   };
 

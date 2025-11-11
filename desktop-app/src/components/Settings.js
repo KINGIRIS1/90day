@@ -243,44 +243,12 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Backend URL Configuration */}
+      {/* Image Resize Settings */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Cấu hình Cloud Boost
+          🖼️ Cài đặt Resize Ảnh
         </h2>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Backend URL (cho Cloud Boost)
-            </label>
-            <input
-              type="text"
-              value={backendUrl}
-              onChange={(e) => setBackendUrl(e.target.value)}
-              placeholder="https://your-backend-url.com/api"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              URL của backend server để sử dụng tính năng Cloud Boost (GPT-4)
-            </p>
-          </div>
-
-          <button
-            onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            💾 Lưu cài đặt
-          </button>
-
-          {saved && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-800">
-                ✓ Đã lưu cài đặt thành công!
-              </p>
-            </div>
-          )}
-        </div>
+        <ResizeSetting />
       </div>
 
       {/* Request Delay Setting */}

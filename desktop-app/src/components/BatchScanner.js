@@ -911,10 +911,44 @@ function BatchScanner() {
       
       const scanData = loadResult.data;
       
+      // Reload preview URLs for completed folders (previewUrl was stripped on save)
+      const foldersWithPreviews = await Promise.all((scanData.folderTabs || []).map(async (folder) => {
+        if (folder.status === 'done' && folder.files && folder.files.length > 0) {
+          const filesWithPreviews = await Promise.all(folder.files.map(async (file) => {
+            if (file.filePath) {
+              try {
+                const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
+                return { ...file, previewUrl };
+              } catch (err) {
+                console.warn(`⚠️ Could not load preview for: ${file.fileName}`);
+                return file;
+              }
+            }
+            return file;
+          }));
+          return { ...folder, files: filesWithPreviews };
+        }
+        return folder;
+      }));
+      
+      // Reload preview URLs for fileResults
+      const fileResultsWithPreviews = await Promise.all((scanData.fileResults || []).map(async (file) => {
+        if (file.filePath) {
+          try {
+            const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
+            return { ...file, previewUrl };
+          } catch (err) {
+            console.warn(`⚠️ Could not load preview for: ${file.fileName}`);
+            return file;
+          }
+        }
+        return file;
+      }));
+      
       // Restore batch scan state
-      setFolderTabs(scanData.folderTabs || []);
+      setFolderTabs(foldersWithPreviews);
       setDiscoveredFolders(scanData.discoveredFolders || []);
-      setFileResults(scanData.fileResults || []);
+      setFileResults(fileResultsWithPreviews);
       setTxtFilePath(scanData.txtFilePath || null);
       setCurrentScanId(scan.scanId);
       

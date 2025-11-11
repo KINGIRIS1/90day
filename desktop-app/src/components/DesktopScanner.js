@@ -137,7 +137,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
       }
     };
     autoSave(); // Execute immediately (no debounce)
-  }, [childTabs]);
+  }, [childTabs, currentScanId, parentFolder, activeChild, currentOcrEngine, batchMode]);
   
   // Load config (guard electron)
   useEffect(() => {

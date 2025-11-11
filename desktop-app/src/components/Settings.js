@@ -213,38 +213,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* OCR Engine Selection - Redirect to Cloud OCR tab */}
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-blue-900 mb-3">
-          🔍 Chọn OCR Engine
-        </h2>
-        <p className="text-sm text-blue-800 mb-4">
-          Để chọn OCR engine (Tesseract, EasyOCR, VietOCR, Google Cloud Vision, Azure Computer Vision), 
-          vui lòng vào tab <strong>"☁️ Cloud OCR"</strong>.
-        </p>
-        <button
-          onClick={() => {
-            // Trigger tab change to 'cloud'
-            window.dispatchEvent(new CustomEvent('navigate-to-cloud'));
-          }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          ☁️ Đi tới Cloud OCR Settings
-        </button>
-      </div>
-
-      {/* Auto-fallback setting - DEPRECATED, kept for backward compatibility */}
-      <div className="bg-gray-50 border-2 border-gray-200 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-gray-700 mb-3">
-          ⚠️ Auto-fallback (Legacy)
-        </h2>
-        <p className="text-sm text-gray-600 mb-4">
-          <strong>Ghi chú:</strong> Tính năng này chỉ áp dụng cho Cloud Boost (GPT-4) qua backend server, 
-          không áp dụng cho BYOK Cloud OCR engines (Google/Azure).
-        </p>
-        <AutoFallbackSetting />
-      </div>
-
       {/* Request Delay Setting */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">

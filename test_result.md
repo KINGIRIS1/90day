@@ -1371,6 +1371,48 @@ agent_communication:
       - ⏳ Test force quit → Resume should work perfectly
       
       🎯 STATUS: ✅ Implementation Complete | ⏳ User Testing Required
+
+agent_communication:
+  - agent: "main"
+    timestamp: "2025-01-XX"
+    message: |
+      🔧 BUG FIX: Resume Auto-Continue Functionality
+      
+      **ISSUES FIXED:**
+      1. ❌ Preview images không load khi resume → ✅ Đã fix (getBase64Image IPC handler)
+      2. ❌ Auto-continue scan không trigger khi resume → ✅ Đã fix
+      
+      **CHANGES MADE - DesktopScanner.js:**
+      
+      **A. Folder Scan Resume (line ~530-541):**
+      - Fixed: `handleProcessFiles(true)` → `scanAllChildFolders(true)` 
+      - Added: `setRemainingTabs(pendingFolders)` để track pending folders
+      - Result: Folder scan tự động tiếp tục sau khi resume
+      
+      **B. File Scan Resume (line ~561-577):**
+      - Added: Auto-continue logic cho file scan (trước đó chỉ có alert thủ công)
+      - Added: Switch to 'files' tab khi resume
+      - Added: Check remainingFiles và auto-trigger `handleProcessFiles(false, true)`
+      - Result: File scan tự động tiếp tục nếu còn file chưa scan
+      
+      **VERIFIED:**
+      - ✅ BatchScanner.js: Đã có logic đúng từ trước (`handleProcessBatchFiles(true)`)
+      - ✅ Function signatures: 
+        - `handleProcessFiles(useCloudBoost, isResume)` 
+        - `scanAllChildFolders(isResume)`
+      - ✅ Build successful (87.05 kB main.js)
+      
+      **TESTING NEEDED:**
+      1. Resume folder scan → Tự động quét tiếp các folder pending
+      2. Resume file scan → Tự động quét tiếp các file còn lại
+      3. Resume batch scan → Tự động quét tiếp (đã có từ trước)
+      4. Preview images hiển thị đúng khi resume (getBase64Image)
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/src/components/DesktopScanner.js
+      - ✅ Build successful: build/static/js/main.26b8e83a.js
+      
+      🎯 STATUS: ✅ Bug Fix Complete | ⏳ User Testing Required
       
   - agent: "main"
     message: |

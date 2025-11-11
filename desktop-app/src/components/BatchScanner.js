@@ -903,6 +903,11 @@ function BatchScanner({ onSwitchTab }) {
     try {
       console.log(`🔄 Resuming batch scan: ${scan.scanId}`);
       
+      // Auto-switch to batch tab if needed
+      if (onSwitchTab) {
+        onSwitchTab('batch');
+      }
+      
       const loadResult = await window.electronAPI.loadScanState(scan.scanId);
       if (!loadResult.success) {
         alert('❌ Không thể load scan data');

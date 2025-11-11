@@ -2230,8 +2230,17 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           {/* Pagination controls */}
           {results.length > ITEMS_PER_PAGE && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">
-              <div className="text-sm text-gray-700">
-                ⚠️ Hiển thị {Math.min(currentPage * ITEMS_PER_PAGE, results.length)}/{results.length} files (giới hạn {ITEMS_PER_PAGE}/trang để tránh quá tải RAM)
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-700">
+                  ⚠️ Hiển thị {Math.min(currentPage * ITEMS_PER_PAGE, results.length)}/{results.length} files (giới hạn {ITEMS_PER_PAGE}/trang)
+                </div>
+                <button
+                  onClick={() => setPreviewsEnabled(!previewsEnabled)}
+                  className={`px-3 py-1 text-xs rounded font-medium ${previewsEnabled ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-700'}`}
+                  title={previewsEnabled ? 'Click để tắt preview (tiết kiệm RAM)' : 'Click để bật preview'}
+                >
+                  {previewsEnabled ? '🖼️ Preview ON' : '🖼️ Preview OFF'}
+                </button>
               </div>
               <div className="flex items-center gap-2">
                 <button

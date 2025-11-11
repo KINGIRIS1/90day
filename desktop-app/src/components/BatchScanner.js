@@ -971,9 +971,17 @@ function BatchScanner({ onSwitchTab }) {
       console.log(`✅ Restored ${completedFolders.length}/${totalFolders} folders`);
       console.log(`✅ Restored ${totalFiles} files`);
       
-      alert(`✅ Đã load ${completedFolders.length}/${totalFolders} folders đã quét.\n\n` +
-            `📊 Tổng ${totalFiles} files đã được classify.\n\n` +
-            `▶️ Click "Quét tất cả" để quét ${totalFolders - completedFolders.length} folders còn lại.`);
+      // Auto-trigger continue scan
+      const pendingFolders = foldersWithPreviews.filter(f => f.status === 'pending');
+      if (pendingFolders.length > 0) {
+        console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
+        // Trigger continue scan after a short delay to ensure UI is ready
+        setTimeout(() => {
+          handleProcessBatchFiles(true); // Resume flag = true
+        }, 500);
+      } else {
+        alert(`✅ Đã khôi phục tất cả ${totalFolders} folders (đã scan xong).`);
+      }
       
       setShowResumeDialog(false);
       

@@ -100,41 +100,48 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     };
   }, [processing, timers.scanStartTime]);
   
-  // Auto-save when childTabs change (folders complete)
+  // Auto-save when childTabs change (folders complete) - WITH DEBOUNCE
   useEffect(() => {
-    const autoSave = async () => {
-      const doneFolders = childTabs.filter(t => t.status === 'done');
-      const allDone = childTabs.length > 0 && childTabs.every(t => t.status === 'done');
-      
-      if (childTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
-        // Use SAME scanId for entire scan session (overwrite, don't create new)
-        let scanId = currentScanId;
-        if (!scanId) {
-          scanId = `folder_scan_${Date.now()}`;
-          setCurrentScanId(scanId);
+    // Debounce 2 seconds to avoid excessive saves
+    const timeoutId = setTimeout(() => {
+      const autoSave = async () => {
+        const doneFolders = childTabs.filter(t => t.status === 'done');
+        const allDone = childTabs.length > 0 && childTabs.every(t => t.status === 'done');
+        
+        if (childTabs.length > 0 && doneFolders.length > 0 && !allDone && window.electronAPI?.saveScanState) {
+          let scanId = currentScanId;
+          if (!scanId) {
+            scanId = `folder_scan_${Date.now()}`;
+            setCurrentScanId(scanId);
+          }
+          
+          await window.electronAPI.saveScanState({
+            scanId: scanId,
+            type: 'folder_scan',
+            status: 'incomplete',
+            parentFolder: parentFolder,
+            // Strip previewUrl to reduce memory by 80%
+            childTabs: childTabs.map(t => ({
+              ...t,
+              results: t.results?.map(r => ({ ...r, previewUrl: null })) || []
+            })),
+            activeChild: activeChild,
+            progress: {
+              current: doneFolders.length,
+              total: childTabs.length
+            },
+            engine: currentOcrEngine,
+            batchMode: batchMode,
+            timestamp: Date.now()
+          });
+          
+          console.log(`💾 Auto-saved (OVERWRITE): ${doneFolders.length}/${childTabs.length} folders done`);
         }
-        
-        await window.electronAPI.saveScanState({
-          scanId: scanId,  // Use same ID to overwrite
-          type: 'folder_scan',
-          status: 'incomplete',
-          parentFolder: parentFolder,
-          childTabs: childTabs,
-          activeChild: activeChild,
-          progress: {
-            current: doneFolders.length,
-            total: childTabs.length
-          },
-          engine: currentOcrEngine,
-          batchMode: batchMode,
-          timestamp: Date.now()
-        });
-        
-        console.log(`💾 Auto-saved (OVERWRITE): ${doneFolders.length}/${childTabs.length} folders done`);
-      }
-    };
+      };
+      autoSave();
+    }, 2000); // Debounce 2 seconds
     
-    autoSave();
+    return () => clearTimeout(timeoutId);
   }, [childTabs]);
   
   // Load config (guard electron)

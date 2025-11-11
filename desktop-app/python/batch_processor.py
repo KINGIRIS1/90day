@@ -890,9 +890,12 @@ def group_by_document(quick_results, file_paths):
     return groups
 
 
-def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_known_type=None):
+def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_known_type=None, max_batch_size=15):
     """
     Phương án 2: Smart Batching với SEQUENTIAL METADATA
+    
+    Args:
+        max_batch_size: Maximum files per batch (default 15, can be reduced if needed)
     """
     print(f"\n{'='*80}", file=sys.stderr)
     print("🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
@@ -900,16 +903,13 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_
     
     total_files = len(image_paths)
     
-    # Smart batch size strategy WITHOUT overlap
-    if total_files <= 20:
+    # Smart batch size strategy WITH user-configurable max
+    if total_files <= max_batch_size:
         batch_size = total_files
-        print(f"📊 Strategy: Send ALL {total_files} files in 1 batch", file=sys.stderr)
-    elif total_files <= 60:
-        batch_size = 20
-        print(f"📊 Strategy: Send {batch_size} files per batch", file=sys.stderr)
+        print(f"📊 Strategy: Send ALL {total_files} files in 1 batch (max={max_batch_size})", file=sys.stderr)
     else:
-        batch_size = 15
-        print(f"📊 Strategy: Send {batch_size} files per batch (large dataset)", file=sys.stderr)
+        batch_size = max_batch_size
+        print(f"📊 Strategy: Send {batch_size} files per batch (user configured max={max_batch_size})", file=sys.stderr)
     
     print("   Sequential metadata: Pass lastKnown between batches (0% overhead)", file=sys.stderr)
     

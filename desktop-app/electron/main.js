@@ -1157,6 +1157,31 @@ ipcMain.handle('delete-scan-state', (event, scanId) => {
   }
 });
 
+// Get base64 image for preview
+ipcMain.handle('get-base64-image', async (event, filePath) => {
+  try {
+    if (!fs.existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+    
+    const imageBuffer = fs.readFileSync(filePath);
+    const base64Image = imageBuffer.toString('base64');
+    const ext = path.extname(filePath).toLowerCase();
+    
+    // Determine MIME type
+    let mimeType = 'image/jpeg';
+    if (ext === '.png') mimeType = 'image/png';
+    else if (ext === '.gif') mimeType = 'image/gif';
+    else if (ext === '.bmp') mimeType = 'image/bmp';
+    else if (ext === '.webp') mimeType = 'image/webp';
+    
+    return `data:${mimeType};base64,${base64Image}`;
+  } catch (e) {
+    console.error('❌ Get base64 image error:', filePath, e.message);
+    throw e;
+  }
+});
+
 ipcMain.handle('mark-scan-complete', (event, scanId) => {
   try {
     const scanHistory = store.get('scanHistory', {});

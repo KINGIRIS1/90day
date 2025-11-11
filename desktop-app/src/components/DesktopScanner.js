@@ -1249,7 +1249,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`✅ Batch processing returned ${batchResults.length} results`);
         
         // Post-process GCN documents
-        const finalResults = postProcessGCNBatch(batchResults);
+        const processedResults = postProcessGCNBatch(batchResults);
+        
+        // Sort results: GCN (GCNC, GCNM) on top for easy review
+        const finalResults = sortResultsWithGCNOnTop(processedResults);
         
         // Update results
         setResults(finalResults);

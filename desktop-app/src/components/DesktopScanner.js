@@ -1400,9 +1400,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         setProgress({ current: finalResults.length, total: filesToProcess.length });
         
         // Auto-disable previews if too many files to prevent crashes
-        if (finalResults.length > 100 && previewsEnabled) {
-          console.warn(`⚠️ Auto-disabling previews: ${finalResults.length} files (>100) to prevent memory overflow`);
+        if (finalResults.length > 30 && previewsEnabled) {
+          console.warn(`⚠️ Auto-disabling previews: ${finalResults.length} files (>30) to prevent memory overflow`);
           setPreviewsEnabled(false);
+          alert('⚠️ Preview đã được tắt tự động\n\n' + 
+                `Lý do: ${finalResults.length} files (>30)\n\n` +
+                'Để tránh crash, bạn có thể:\n' +
+                '1. Giữ preview OFF (khuyến nghị)\n' +
+                '2. Bật lại preview (rủi ro cao)');
         }
         
         // End timer

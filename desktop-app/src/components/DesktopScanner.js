@@ -2323,7 +2323,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     </div>
                   )}
                   
-                  {/* Rescan folder button */}
+                  {/* Rescan folder button + Merge button */}
                   {t.status === 'done' && (t.results || []).length > 0 && (
                     <div className="mb-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-200">
                       <div className="flex items-center justify-between">
@@ -2335,24 +2335,35 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                             Nếu bạn phát hiện nhiều file bị lỗi. Hãy sử dụng tính năng quét lại thư mục này để sửa
                           </div>
                         </div>
-                        <button
-                          onClick={async () => {
-                            if (window.confirm(`Quét lại thư mục "${t.name}"?\n\nTất cả kết quả cũ sẽ bị xóa và quét lại từ đầu.`)) {
-                              const idx = childTabs.findIndex(x => x.path === t.path);
-                              if (idx >= 0) {
-                                // Reset status and results
-                                setChildTabs(prev => prev.map((ct, i) => 
-                                  i === idx ? { ...ct, status: 'pending', results: [] } : ct
-                                ));
-                                // Rescan this folder
-                                await scanChildFolder(idx);
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setActiveChildForMerge(t);
+                              setShowMergeModal(true);
+                            }}
+                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors"
+                          >
+                            📚 Gộp thư mục này
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (window.confirm(`Quét lại thư mục "${t.name}"?\n\nTất cả kết quả cũ sẽ bị xóa và quét lại từ đầu.`)) {
+                                const idx = childTabs.findIndex(x => x.path === t.path);
+                                if (idx >= 0) {
+                                  // Reset status and results
+                                  setChildTabs(prev => prev.map((ct, i) => 
+                                    i === idx ? { ...ct, status: 'pending', results: [] } : ct
+                                  ));
+                                  // Rescan this folder
+                                  await scanChildFolder(idx);
+                                }
                               }
-                            }
-                          }}
-                          className="ml-4 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors"
-                        >
-                          🔄 Quét lại thư mục này
-                        </button>
+                            }}
+                            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors"
+                          >
+                            🔄 Quét lại thư mục này
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}

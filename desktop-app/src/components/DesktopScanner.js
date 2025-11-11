@@ -459,6 +459,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
   // Handle resume scan from saved state
   const handleResumeScan = async (scan) => {
     try {
+      // Auto-switch to scanner tab if needed
+      if (onSwitchTab) {
+        onSwitchTab('scanner');
+      }
+      
       console.log(`🔄 Resuming scan: ${scan.scanId}`);
       
       // Load scan data

@@ -49,10 +49,7 @@ function CloudSettings() {
       const batchModeConfig = await window.electronAPI.getConfig('batchMode');
       
       setOcrEngine(uiEngine);
-      setGoogleKey(google);
       setGeminiKey(gemini);
-      setAzureKey(azure);
-      setAzureEndpoint(azureEp);
       
       // Set resize settings with defaults
       setEnableResize(resizeEnabled !== null ? resizeEnabled : true);

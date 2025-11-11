@@ -729,6 +729,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`  📅 Same/no color → Classify by date`);
         
         const groupsWithDate = groupsArray.filter(g => g.parsedDate && g.parsedDate.comparable > 0);
+        const groupsWithoutDate = groupsArray.filter(g => !g.parsedDate || g.parsedDate.comparable === 0);
         
         if (groupsWithDate.length >= 2) {
           // Sort by date
@@ -751,15 +752,57 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               }
             });
           });
+          
+          // Groups without date → default GCNM
+          if (groupsWithoutDate.length > 0) {
+            console.log(`  ⚠️ ${groupsWithoutDate.length} group(s) without date → Default GCNM`);
+            groupsWithoutDate.forEach(group => {
+              group.files.forEach(file => {
+                const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                if (idx >= 0) {
+                  normalizedResults[idx].short_code = 'GCNM';
+                  normalizedResults[idx].doc_type = 'GCNM';
+                  console.log(`  ✅ ${file.fileName}: No date → GCNM (default)`);
+                }
+              });
+            });
+          }
+        } else if (groupsWithDate.length === 1) {
+          // Only 1 group with date → classify as GCNC (oldest available)
+          console.log(`  ⚠️ Only 1 group with date → GCNC (oldest available)`);
+          groupsWithDate[0].files.forEach(file => {
+            const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+            if (idx >= 0) {
+              normalizedResults[idx].short_code = 'GCNC';
+              normalizedResults[idx].doc_type = 'GCNC';
+              console.log(`  ✅ ${file.fileName}: ${groupsWithDate[0].issueDate} → GCNC (only date available)`);
+            }
+          });
+          
+          // Other groups without date → GCNM
+          if (groupsWithoutDate.length > 0) {
+            console.log(`  ⚠️ ${groupsWithoutDate.length} group(s) without date → GCNM`);
+            groupsWithoutDate.forEach(group => {
+              group.files.forEach(file => {
+                const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                if (idx >= 0) {
+                  normalizedResults[idx].short_code = 'GCNM';
+                  normalizedResults[idx].doc_type = 'GCNM';
+                  console.log(`  ✅ ${file.fileName}: No date → GCNM (default)`);
+                }
+              });
+            });
+          }
         } else {
-          // Not enough dates → default GCNM
-          console.log(`  ⚠️ Not enough dates for comparison → Default GCNM`);
+          // No dates at all → default GCNM
+          console.log(`  ⚠️ No dates for comparison → Default GCNM for all`);
           groupsArray.forEach(group => {
             group.files.forEach(file => {
               const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (idx >= 0) {
                 normalizedResults[idx].short_code = 'GCNM';
                 normalizedResults[idx].doc_type = 'GCNM';
+                console.log(`  ✅ ${file.fileName}: No date → GCNM (default)`);
               }
             });
           });

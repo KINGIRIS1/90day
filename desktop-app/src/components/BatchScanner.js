@@ -78,6 +78,34 @@ function BatchScanner() {
     };
   }, [isScanning, timers.batchStartTime]);
   
+  // Helper: Sort results with GCN (GCNC, GCNM) on top
+  const sortResultsWithGCNOnTop = (results) => {
+    if (!results || results.length === 0) return results;
+    
+    const gcnResults = [];
+    const otherResults = [];
+    
+    results.forEach(result => {
+      const shortCode = result.short_code || result.classification || '';
+      if (shortCode === 'GCNC' || shortCode === 'GCNM') {
+        gcnResults.push(result);
+      } else {
+        otherResults.push(result);
+      }
+    });
+    
+    // GCN first (GCNC then GCNM), then others
+    const sortedGCN = gcnResults.sort((a, b) => {
+      const aCode = a.short_code || a.classification || '';
+      const bCode = b.short_code || b.classification || '';
+      if (aCode === 'GCNC' && bCode === 'GCNM') return -1;
+      if (aCode === 'GCNM' && bCode === 'GCNC') return 1;
+      return 0;
+    });
+    
+    return [...sortedGCN, ...otherResults];
+  };
+  
   // Auto-save when folderTabs change (folders complete) - IMMEDIATE SAVE
   useEffect(() => {
     const autoSave = async () => {

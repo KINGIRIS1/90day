@@ -2530,25 +2530,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 onClick={async () => {
                   setShowMergeModal(false);
                   const finalLines = [];
-                  const mergeOptions = {
-                    autoSave: true,
-                    mergeMode: mergeOption,
-                    mergeSuffix: mergeSuffix || '_merged',
-                    parentFolder: parentFolder,
-                    customOutputFolder: mergeOption === 'custom' ? fileOutputFolder : null
-                  };
-                  
-                  console.log('📚 Folder merge options:', mergeOptions);
                   
                   const tabsToMerge = activeChildForMerge ? [activeChildForMerge] : childTabs;
                   let totalMerged = 0;
                   let totalSuccess = 0;
                   
+                  // Merge each folder separately (like BatchScanner)
                   for (const ct of tabsToMerge) {
                     const payload = (ct.results || [])
                       .filter(r => r.success && r.short_code)
                       .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
                     if (payload.length === 0) continue;
+                    
+                    // Each folder has its own parentFolder (ct.path)
+                    const mergeOptions = {
+                      autoSave: true,
+                      mergeMode: mergeOption,
+                      mergeSuffix: mergeSuffix || '_merged',
+                      parentFolder: ct.path, // Use subfolder path as parent
+                      customOutputFolder: mergeOption === 'custom' ? fileOutputFolder : null
+                    };
+                    
+                    console.log(`📚 Merge folder ${ct.name}:`, mergeOptions);
                     
                     try {
                       const merged = await window.electronAPI.mergeByShortCode(payload, mergeOptions);

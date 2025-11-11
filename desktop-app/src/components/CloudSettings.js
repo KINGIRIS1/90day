@@ -741,18 +741,51 @@ function CloudSettings() {
                 />
                 <div className="flex-1">
                   <div className="font-medium flex items-center gap-2">
-                    <span>🧠 Gom Thông Minh (15-20 Files)</span>
+                    <span>🧠 Gom Thông Minh</span>
                     <span className="bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">CHÍNH XÁC NHẤT</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    • Gom 15-20 files → AI tự detect ranh giới documents<br />
+                    • AI tự detect ranh giới documents<br />
                     • <strong>🎯 Chính xác nhất (97%+)</strong> - AI hiểu full context<br />
-                    • <strong>⚡ Nhanh hơn 8-10 lần</strong><br />
+                    • <strong>⚡ Nhanh hơn 7-9 lần</strong><br />
                     • <strong>💰 Tiết kiệm 85-90% chi phí</strong><br />
                     • Phù hợp: Multi-page documents khác nhau (20-100 files)
                   </div>
                 </div>
               </label>
+              
+              {/* Smart Mode Max Batch Size Setting */}
+              {batchMode === 'smart' && (
+                <div className="ml-11 mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-900 mb-3">
+                    ⚙️ Số file tối đa mỗi batch: <span className="text-green-700 font-bold">{smartMaxBatchSize}</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="3"
+                    max="20"
+                    step="1"
+                    value={smartMaxBatchSize}
+                    onChange={(e) => setSmartMaxBatchSize(parseInt(e.target.value))}
+                    className="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <div className="flex justify-between text-xs text-gray-600 mt-1">
+                    <span>3 (An toàn)</span>
+                    <span>10 (Đề xuất)</span>
+                    <span>20 (Nhanh nhất)</span>
+                  </div>
+                  <div className="mt-3 p-3 bg-white rounded border border-green-300">
+                    <p className="text-xs text-gray-700">
+                      <strong>💡 Khuyến nghị:</strong>
+                    </p>
+                    <ul className="text-xs text-gray-600 mt-1 space-y-1">
+                      <li>• <strong>3-5:</strong> Nếu hay bị lỗi fallback (an toàn nhất)</li>
+                      <li>• <strong>8-12:</strong> Cân bằng giữa tốc độ và độ ổn định (đề xuất)</li>
+                      <li>• <strong>15-20:</strong> Tối đa tốc độ (có thể bị lỗi với docs phức tạp)</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Info Box */}

@@ -548,6 +548,11 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         
         # Call Gemini API with retry logic
         print(f"📡 Sending batch request to {model_name}...", file=sys.stderr)
+        print(f"   Batch size: {len(batch_paths)} files", file=sys.stderr)
+        # Calculate approximate request size
+        import json
+        payload_size_mb = len(json.dumps(payload)) / (1024 * 1024)
+        print(f"   Request size: ~{payload_size_mb:.2f} MB", file=sys.stderr)
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
         
         max_retries = 3

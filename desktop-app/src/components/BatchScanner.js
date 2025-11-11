@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ResumeDialog from './ResumeDialog';
 
-function BatchScanner() {
+function BatchScanner({ onSwitchTab }) {
   // State
   const [txtFilePath, setTxtFilePath] = useState(null);
   const [ocrEngine, setOcrEngine] = useState('tesseract');

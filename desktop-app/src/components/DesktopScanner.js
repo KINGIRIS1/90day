@@ -2220,8 +2220,38 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               </button>
             </div>
           </div>
+          {/* Pagination controls */}
+          {results.length > ITEMS_PER_PAGE && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                ⚠️ Hiển thị {Math.min(currentPage * ITEMS_PER_PAGE, results.length)}/{results.length} files (giới hạn {ITEMS_PER_PAGE}/trang để tránh quá tải RAM)
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
+                >
+                  ← Trước
+                </button>
+                <span className="text-sm text-gray-600">
+                  Trang {currentPage}/{Math.ceil(results.length / ITEMS_PER_PAGE)}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(results.length / ITEMS_PER_PAGE), p + 1))}
+                  disabled={currentPage >= Math.ceil(results.length / ITEMS_PER_PAGE)}
+                  className="px-3 py-1 text-sm bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Sau →
+                </button>
+              </div>
+            </div>
+          )}
+          
           <div className={`grid gap-3 ${gridColsClass}`}>
-            {results.map((result, idx) => (
+            {results
+              .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+              .map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white">
                 <div className="mb-2">
                   {result.previewUrl ? (

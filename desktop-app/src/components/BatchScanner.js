@@ -1776,91 +1776,80 @@ function BatchScanner({ onSwitchTab }) {
         </div>
       </div>
 
-      {/* Discovered Folders List */}
+      {/* DISCOVERED FOLDERS - Compact Table Style */}
       {discoveredFolders.length > 0 && !isScanning && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-gray-900">
               📂 Thư mục tìm thấy ({discoveredFolders.filter(f => f.selected && f.valid).length}/{discoveredFolders.filter(f => f.valid).length})
-            </h2>
-            <div className="flex items-center gap-2">
+            </h3>
+            <div className="flex gap-2">
               <button
                 onClick={() => selectAllFolders(true)}
-                className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                className="text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
               >
                 ✓ Chọn tất cả
               </button>
               <button
                 onClick={() => selectAllFolders(false)}
-                className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
               >
-                ✕ Bỏ chọn tất cả
+                ✕ Bỏ chọn
+              </button>
+              <button
+                onClick={handleStartScan}
+                disabled={discoveredFolders.filter(f => f.selected && f.valid).length === 0}
+                className="px-4 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:bg-gray-300 font-medium"
+              >
+                🚀 Quét {discoveredFolders.filter(f => f.selected && f.valid).length} thư mục
               </button>
             </div>
           </div>
-
-          {/* Folder List */}
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          
+          {/* Table style list */}
+          <div className="divide-y max-h-96 overflow-y-auto">
             {discoveredFolders.map((folder, idx) => (
               <div 
                 key={idx}
-                className={`p-4 border rounded-lg ${
+                className={`px-4 py-3 flex items-center gap-3 ${
                   folder.valid 
-                    ? (folder.selected ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200')
-                    : 'bg-gray-50 border-gray-200 opacity-60'
+                    ? (folder.selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50')
+                    : 'opacity-60'
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  {/* Checkbox */}
-                  {folder.valid && (
-                    <input
-                      type="checkbox"
-                      checked={folder.selected}
-                      onChange={() => toggleFolderSelection(folder.path)}
-                      className="w-5 h-5 text-blue-600"
-                    />
-                  )}
-                  {!folder.valid && (
-                    <div className="w-5 h-5 flex items-center justify-center text-red-500">
-                      ✕
-                    </div>
-                  )}
+                {/* Checkbox */}
+                {folder.valid && (
+                  <input
+                    type="checkbox"
+                    checked={folder.selected}
+                    onChange={() => toggleFolderSelection(folder.path)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                )}
+                {!folder.valid && (
+                  <div className="w-4 h-4 flex items-center justify-center text-red-500 text-sm">✕</div>
+                )}
 
-                  {/* Folder Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900 truncate" title={folder.name}>
-                        {folder.name}
-                      </span>
-                      {folder.valid && (
-                        <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                          {folder.imageCount} ảnh
-                        </span>
-                      )}
-                      {!folder.valid && (
-                        <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
-                          {folder.error}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate mt-1" title={folder.path}>
-                      {folder.path}
-                    </div>
-                  </div>
+                {/* Folder Info - Name and path on SAME LINE */}
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <span className="font-medium text-sm text-gray-900 flex-shrink-0">{folder.name}</span>
+                  <span className="text-xs text-gray-400">•</span>
+                  <span className="text-xs text-gray-500 truncate" title={folder.path}>{folder.path}</span>
                 </div>
+
+                {/* Badge */}
+                {folder.valid && (
+                  <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium flex-shrink-0">
+                    {folder.imageCount} ảnh
+                  </span>
+                )}
+                {!folder.valid && (
+                  <span className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded-full font-medium flex-shrink-0">
+                    {folder.error}
+                  </span>
+                )}
               </div>
             ))}
-          </div>
-
-          {/* Scan Button */}
-          <div className="mt-6 pt-4 border-t">
-            <button
-              onClick={handleStartScan}
-              disabled={discoveredFolders.filter(f => f.selected && f.valid).length === 0}
-              className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              🚀 Quét {discoveredFolders.filter(f => f.selected && f.valid).length} thư mục
-            </button>
           </div>
         </div>
       )}

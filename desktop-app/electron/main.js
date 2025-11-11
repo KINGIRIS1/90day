@@ -36,19 +36,26 @@ function createWindow() {
     icon: path.join(__dirname, '../assets/icon.png')
   });
 
-  // Smart URL detection: Check if build folder exists
-  const buildIndexPath = path.join(__dirname, '../build/index.html');
-  const hasBuild = fs.existsSync(buildIndexPath);
-  
+  // Smart URL detection: Check environment variable first, then build folder
   let startUrl;
-  if (isDev && !hasBuild) {
-    // Development mode: No build folder → Use localhost
-    startUrl = 'http://localhost:3001';
-    console.log('🔧 Development mode: Loading from localhost:3001');
+  
+  // Check if ELECTRON_START_URL is set (for dev mode)
+  if (process.env.ELECTRON_START_URL) {
+    startUrl = process.env.ELECTRON_START_URL;
+    console.log('🔧 Dev mode (from env): Loading from', startUrl);
   } else {
-    // Production mode OR build exists → Use build folder
-    startUrl = `file://${buildIndexPath}`;
-    console.log('🚀 Production mode: Loading from build folder');
+    const buildIndexPath = path.join(__dirname, '../build/index.html');
+    const hasBuild = fs.existsSync(buildIndexPath);
+    
+    if (isDev && !hasBuild) {
+      // Development mode: No build folder → Use localhost
+      startUrl = 'http://localhost:3001';
+      console.log('🔧 Development mode: Loading from localhost:3001');
+    } else {
+      // Production mode OR build exists → Use build folder
+      startUrl = `file://${buildIndexPath}`;
+      console.log('🚀 Production mode: Loading from build folder');
+    }
   }
   
   mainWindow.loadURL(startUrl);

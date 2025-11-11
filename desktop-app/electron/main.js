@@ -1062,21 +1062,21 @@ ipcMain.handle('save-scan-state', (event, scanData) => {
   try {
     // Use provided scanId or generate new one
     const scanId = scanData.scanId || `scan_${Date.now()}`;
-    const scanHistory = store.get('scanHistory', {});
+    const scans = scanStore.get('scans', {});
     
     // Add/update scan (OVERWRITE if same scanId)
     scanData.scanId = scanId;
     scanData.timestamp = Date.now();
     
     // Overwrite existing or create new
-    scanHistory[scanId] = scanData;
-    store.set('scanHistory', scanHistory);
+    scans[scanId] = scanData;
+    scanStore.set('scans', scans);
     
-    const action = scanHistory[scanId] ? 'Overwritten' : 'Created';
-    console.log(`💾 ${action} scan state: ${scanId}, ${scanData.results?.length || scanData.childTabs?.filter(t => t.status === 'done').length || 0} items`);
+    const action = scans[scanId] ? 'Updated' : 'Created';
+    console.log(`💾 ${action} scan state: ${scanId}, ${scanData.results?.length || scanData.folderTabs?.filter(t => t.status === 'done').length || 0} items`);
     return { success: true, scanId: scanId };
   } catch (e) {
-    console.error('Save scan state error:', e);
+    console.error('❌ Save scan state error:', e);
     return { success: false, error: e.message };
   }
 });

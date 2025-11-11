@@ -199,12 +199,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       
       console.log('🔍 Current OCR Engine:', engine);
       
-      // Check for incomplete scans
-      const incompleteResult = await api.getIncompleteScans();
-      if (incompleteResult.success && incompleteResult.scans.length > 0) {
-        console.log(`🔄 Found ${incompleteResult.scans.length} incomplete scan(s)`);
-        setIncompleteScans(incompleteResult.scans);
-        setShowResumeDialog(true);
+      // Check for incomplete scans (only for main scanner tab, not folder tabs)
+      if (!disableResumeCheck) {
+        const incompleteResult = await api.getIncompleteScans();
+        if (incompleteResult.success && incompleteResult.scans.length > 0) {
+          console.log(`🔄 Found ${incompleteResult.scans.length} incomplete scan(s)`);
+          setIncompleteScans(incompleteResult.scans);
+          setShowResumeDialog(true);
+        }
       }
     };
     try { loadConfig(); } catch {}

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Scanner - New Design Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 p-6">
+  
+  <div class="max-w-7xl mx-auto space-y-4">
+    
+    <!-- COMPACT TOP BAR - 1 dòng -->
+    <div class="bg-white rounded-lg shadow-sm border p-4">
+      <div class="flex items-center gap-4">
+        <!-- Title -->
+        <div class="flex-shrink-0">
+          <h2 class="text-lg font-bold text-gray-900">📋 Quét danh sách</h2>
+        </div>
+        
+        <!-- File TXT Input -->
+        <div class="flex items-center gap-2 flex-1">
+          <button class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            📄 Chọn TXT
+          </button>
+          <span class="text-sm text-gray-600">✅ danh_sach_thu_muc.txt</span>
+        </div>
+        
+        <!-- OCR Engine -->
+        <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border">
+          <span class="text-xs text-gray-500">OCR:</span>
+          <span class="text-sm font-medium text-gray-900">gemini-flash</span>
+        </div>
+        
+        <!-- Search Button -->
+        <button class="px-5 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors font-medium shadow-sm">
+          🔍 Tìm kiếm thư mục
+        </button>
+      </div>
+    </div>
+
+    <!-- DISCOVERED FOLDERS - Compact Table Style -->
+    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <div class="px-4 py-3 bg-gray-50 border-b flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-gray-900">📂 Thư mục tìm thấy (3/5)</h3>
+        <div class="flex gap-2">
+          <button class="text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100">✓ Chọn tất cả</button>
+          <button class="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200">✕ Bỏ chọn</button>
+          <button class="px-4 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 font-medium">
+            🚀 Quét 3 thư mục
+          </button>
+        </div>
+      </div>
+      
+      <!-- Table style list -->
+      <div class="divide-y">
+        <div class="px-4 py-3 flex items-center gap-3 hover:bg-gray-50">
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900">Folder_001_Nguyen_Van_A</div>
+            <div class="text-xs text-gray-500 truncate">C:\Documents\Batch\Folder_001_Nguyen_Van_A</div>
+          </div>
+          <span class="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium">12 ảnh</span>
+        </div>
+        
+        <div class="px-4 py-3 flex items-center gap-3 hover:bg-gray-50">
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900">Folder_002_Tran_Thi_B</div>
+            <div class="text-xs text-gray-500 truncate">C:\Documents\Batch\Folder_002_Tran_Thi_B</div>
+          </div>
+          <span class="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium">8 ảnh</span>
+        </div>
+        
+        <div class="px-4 py-3 flex items-center gap-3 hover:bg-gray-50">
+          <input type="checkbox" checked class="w-4 h-4 text-blue-600">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900">Folder_003_Le_Van_C</div>
+            <div class="text-xs text-gray-500 truncate">C:\Documents\Batch\Folder_003_Le_Van_C</div>
+          </div>
+          <span class="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full font-medium">15 ảnh</span>
+        </div>
+        
+        <div class="px-4 py-3 flex items-center gap-3 hover:bg-gray-50 opacity-60">
+          <div class="w-4 h-4 flex items-center justify-center text-red-500 text-sm">✕</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-gray-900">Folder_004_Empty</div>
+            <div class="text-xs text-gray-500 truncate">C:\Documents\Batch\Folder_004_Empty</div>
+          </div>
+          <span class="px-2 py-1 bg-red-50 text-red-700 text-xs rounded-full font-medium">Không có ảnh</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCAN RESULTS - Large workspace -->
+    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <!-- Header with actions -->
+      <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-b flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h3 class="text-sm font-semibold text-gray-900">📂 Kết quả scan (3 thư mục)</h3>
+          <!-- Live timer -->
+          <div class="flex items-center gap-1 px-2 py-1 bg-white rounded border">
+            <span class="text-xs">⏱️</span>
+            <span class="text-xs font-mono font-medium">2:34</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition-colors font-medium">
+            ⏹️ Dừng
+          </button>
+          <button class="px-3 py-1.5 bg-emerald-600 text-white text-xs rounded-lg hover:bg-emerald-700 transition-colors font-medium">
+            📚 Gộp tất cả
+          </button>
+          <select class="text-xs border rounded px-2 py-1.5 bg-white">
+            <option>Mật độ cao (5)</option>
+            <option>Trung bình (4)</option>
+            <option>Thấp (3)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Folder tabs - horizontal -->
+      <div class="px-4 py-2 bg-gray-50 border-b flex items-center gap-2 overflow-x-auto">
+        <button class="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white font-medium whitespace-nowrap">
+          Nguyen_Van_A (12) ✓
+        </button>
+        <button class="px-3 py-1.5 text-xs rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 whitespace-nowrap">
+          Tran_Thi_B (8) ⚙️
+        </button>
+        <button class="px-3 py-1.5 text-xs rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 whitespace-nowrap">
+          Le_Van_C (15) ○
+        </button>
+      </div>
+
+      <!-- Progress bar cho folder đang scan -->
+      <div class="px-4 py-2 bg-blue-50 border-b">
+        <div class="flex items-center justify-between text-xs mb-1">
+          <span class="text-blue-700">Đang quét Tran_Thi_B... 5/8</span>
+          <span class="text-blue-600 font-medium">63%</span>
+        </div>
+        <div class="w-full bg-blue-200 rounded-full h-1.5">
+          <div class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 63%"></div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE - Image Grid -->
+      <div class="p-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <!-- Image card -->
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_001.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">GCNC</span>
+                <span class="text-xs text-gray-500">95%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_002.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded font-medium">CMND</span>
+                <span class="text-xs text-gray-500">92%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_003.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs rounded font-medium">HDCQ</span>
+                <span class="text-xs text-gray-500">88%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_004.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">GCNM</span>
+                <span class="text-xs text-gray-500">97%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_005.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-xs rounded font-medium">SHCC</span>
+                <span class="text-xs text-gray-500">91%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- More images... -->
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_006.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded font-medium">CMND</span>
+                <span class="text-xs text-gray-500">94%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_007.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs rounded font-medium">HDCQ</span>
+                <span class="text-xs text-gray-500">89%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_008.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium">GCNC</span>
+                <span class="text-xs text-gray-500">96%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_009.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-xs rounded font-medium">SHCC</span>
+                <span class="text-xs text-gray-500">90%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+            <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span class="text-4xl">🖼️</span>
+            </div>
+            <div class="p-2 bg-white border-t">
+              <div class="text-xs font-medium text-gray-900 truncate">IMG_010.jpg</div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded font-medium">CMND</span>
+                <span class="text-xs text-gray-500">93%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer note -->
+  <div class="max-w-7xl mx-auto mt-4 text-center text-xs text-gray-500">
+    🎨 Mockup - Thiết kế mới cho Batch Scanner
+  </div>
+
+</body>
+</html>

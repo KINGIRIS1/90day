@@ -37,6 +37,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10; // EMERGENCY: Ultra-safe limit (10 items)
   const [previewsEnabled, setPreviewsEnabled] = useState(false); // DEFAULT OFF to prevent crashes
+  
+  // Memory cleanup when changing pages
+  useEffect(() => {
+    // Force garbage collection hint (not guaranteed but helps)
+    if (window.gc) {
+      console.log('🗑️ Triggering garbage collection');
+      window.gc();
+    }
+  }, [currentPage]);
 
   // Parent folder analysis + child tabs
   const [childMergeReport, setChildMergeReport] = useState([]); // lines of saved PDFs across tabs

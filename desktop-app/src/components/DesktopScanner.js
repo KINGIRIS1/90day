@@ -486,10 +486,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab }) => {
             const resultsWithPreviews = await Promise.all(tab.results.map(async (result) => {
               if (result.filePath) {
                 try {
+                  console.log(`📸 Loading preview for: ${result.fileName}`);
                   const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
+                  console.log(`✅ Preview loaded: ${result.fileName}`);
                   return { ...result, previewUrl };
                 } catch (err) {
-                  console.warn(`⚠️ Could not load preview for: ${result.fileName}`);
+                  console.error(`❌ Failed to load preview for: ${result.fileName}`, err);
+                  console.error(`   File path: ${result.filePath}`);
                   return result;
                 }
               }

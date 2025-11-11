@@ -2261,8 +2261,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               .map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white">
                 <div className="mb-2">
-                  {result.previewUrl ? (
+                  {previewsEnabled && result.previewUrl ? (
                     <img src={result.previewUrl} alt={result.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
+                  ) : !previewsEnabled ? (
+                    <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
+                      🖼️ Preview disabled<br/>(tiết kiệm RAM)
+                    </div>
                   ) : (
                     <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">{result.isPdf ? 'PDF (không có preview)' : 'Không có preview'}</div>
                   )}

@@ -484,11 +484,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       // Load scan data
       const loadResult = await window.electronAPI.loadScanState(scan.scanId);
       if (!loadResult.success) {
-        alert('❌ Không thể load scan data');
+        console.error('❌ Load scan state failed:', loadResult.error);
+        alert(`❌ Không thể load scan data.\n\nLỗi: ${loadResult.error || 'Unknown error'}\n\nDữ liệu có thể bị corrupt. Hãy xóa scan này và quét lại.`);
         return;
       }
       
       const scanData = loadResult.data;
+      
+      // Validate scan data structure
+      if (!scanData || !scanData.type) {
+        console.error('❌ Invalid scan data structure:', scanData);
+        alert('❌ Dữ liệu scan không hợp lệ. Vui lòng xóa và quét lại.');
+        await window.electronAPI.deleteScanState(scan.scanId);
+        setShowResumeDialog(false);
+        return;
+      }
       
       // Restore state based on scan type
       if (scanData.type === 'folder_scan') {

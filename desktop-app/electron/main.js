@@ -4,7 +4,9 @@ const { spawn, spawnSync } = require('child_process');
 const Store = require('electron-store');
 const fs = require('fs');
 
-const store = new Store();
+// Separate stores for better performance
+const store = new Store({ name: 'config' }); // Settings only (~100 KB)
+const scanStore = new Store({ name: 'scan-history' }); // Scan data (can be large)
 let mainWindow;
 
 const isDev = !app.isPackaged;

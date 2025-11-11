@@ -78,6 +78,34 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
   const [elapsedTime, setElapsedTime] = useState(0); // Live elapsed time in seconds
   const timerIntervalRef = useRef(null);
 
+  // Helper: Sort results with GCN (GCNC, GCNM) on top
+  const sortResultsWithGCNOnTop = (results) => {
+    if (!results || results.length === 0) return results;
+    
+    const gcnResults = [];
+    const otherResults = [];
+    
+    results.forEach(result => {
+      const shortCode = result.short_code || result.classification || '';
+      if (shortCode === 'GCNC' || shortCode === 'GCNM') {
+        gcnResults.push(result);
+      } else {
+        otherResults.push(result);
+      }
+    });
+    
+    // GCN first (GCNC then GCNM), then others
+    const sortedGCN = gcnResults.sort((a, b) => {
+      const aCode = a.short_code || a.classification || '';
+      const bCode = b.short_code || b.classification || '';
+      if (aCode === 'GCNC' && bCode === 'GCNM') return -1;
+      if (aCode === 'GCNM' && bCode === 'GCNC') return 1;
+      return 0;
+    });
+    
+    return [...sortedGCN, ...otherResults];
+  };
+
   // Live timer effect - update elapsed time every second
   useEffect(() => {
     if (processing && timers.scanStartTime) {

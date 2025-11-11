@@ -1413,6 +1413,58 @@ agent_communication:
       - ✅ Build successful: build/static/js/main.26b8e83a.js
       
       🎯 STATUS: ✅ Bug Fix Complete | ⏳ User Testing Required
+
+  - agent: "main"
+    timestamp: "2025-01-XX"
+    message: |
+      🔧 BUG FIX: Auto-Switch to Correct Tab When Resume
+      
+      **ISSUE REPORTED:**
+      - ❌ Khi bấm "Tiếp tục scan" trong popup resume, không tự động nhảy đến tab đúng
+      - Ví dụ: Đang quét thư mục → cần nhảy đến tab "Quét tài liệu" (Scanner)
+      - Đang batch scan → cần nhảy đến tab "Quét danh sách" (Batch)
+      
+      **ROOT CAUSES:**
+      1. Folder tabs không nhận `onSwitchTab` prop → Không thể switch tab
+      2. Mỗi DesktopScanner instance check incomplete scans → Multiple resume dialogs
+      3. DesktopScanner không filter scan type → Hiển thị cả batch_scan trong scanner dialog
+      
+      **FIXES IMPLEMENTED:**
+      
+      **A. App.js (line 266-277):**
+      - ✅ Added `onSwitchTab={setActiveTab}` to folder tabs
+      - ✅ Added `disableResumeCheck={true}` to folder tabs
+      - Result: Only main scanner tab checks for incomplete scans
+      
+      **B. DesktopScanner.js:**
+      - ✅ Added `disableResumeCheck` prop (line 7)
+      - ✅ Only check incomplete scans if `!disableResumeCheck` (line 203)
+      - ✅ Filter to only show `folder_scan` and `file_scan` types (line 205-207)
+      - ✅ Already had `onSwitchTab('scanner')` (line 464)
+      
+      **C. BatchScanner.js:**
+      - ✅ Already had filter for `batch_scan` type (line 166)
+      - ✅ Already had `onSwitchTab('batch')` (line 908)
+      
+      **BEHAVIOR NOW:**
+      - ✅ Scanner tab → Check và hiển thị folder_scan + file_scan
+      - ✅ Batch tab → Check và hiển thị batch_scan
+      - ✅ Folder tabs → Không check (tránh duplicate dialogs)
+      - ✅ Resume folder_scan/file_scan → Tự động switch đến 'scanner' tab
+      - ✅ Resume batch_scan → Tự động switch đến 'batch' tab
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/src/App.js
+      - ✅ /app/desktop-app/src/components/DesktopScanner.js
+      - ✅ Build successful: build/static/js/main.f545ac96.js (87.09 kB)
+      
+      🧪 TESTING SCENARIOS:
+      1. Start folder scan → Close app → Reopen → Resume → Auto switch to Scanner tab ✓
+      2. Start file scan → Close app → Reopen → Resume → Auto switch to Scanner tab ✓
+      3. Start batch scan → Close app → Reopen → Resume → Auto switch to Batch tab ✓
+      4. No duplicate resume dialogs ✓
+      
+      🎯 STATUS: ✅ Bug Fix Complete | ⏳ User Testing Required
       
   - agent: "main"
     message: |

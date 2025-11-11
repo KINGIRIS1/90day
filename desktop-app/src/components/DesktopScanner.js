@@ -1399,6 +1399,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         setResults(finalResults);
         setProgress({ current: finalResults.length, total: filesToProcess.length });
         
+        // Auto-disable previews if too many files to prevent crashes
+        if (finalResults.length > 100 && previewsEnabled) {
+          console.warn(`⚠️ Auto-disabling previews: ${finalResults.length} files (>100) to prevent memory overflow`);
+          setPreviewsEnabled(false);
+        }
+        
         // End timer
         if (timers.scanStartTime) {
           const scanEndTime = Date.now();

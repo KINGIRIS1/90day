@@ -960,10 +960,13 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
       
       console.log(`   Python: ${pyInfo.executable}`);
       
+      // Get smart batch size setting
+      const smartMaxBatchSize = store.get('smartMaxBatchSize') || 10;
+      
       // Spawn Python process
       const pythonProcess = spawn(pyInfo.executable, args, {
         cwd: pythonDir,
-        env: buildPythonEnv({}, pyInfo, pythonDir)
+        env: buildPythonEnv({ SMART_MAX_BATCH_SIZE: smartMaxBatchSize.toString() }, pyInfo, pythonDir)
       });
       
       let stdoutData = '';

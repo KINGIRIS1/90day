@@ -557,23 +557,23 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           console.warn(`⚠️ Failed to load ${previewLoadErrors} preview images (files may have been moved/deleted)`);
         }
         
-        setChildTabs(tabsWithPreviews);
+        setChildTabs(validTabs);
         setParentFolder(scanData.parentFolder || null);
         setCurrentScanId(scan.scanId);
         setActiveTab('folders'); // Switch to folders tab
         
         // Set active to first completed folder to show results
-        const firstDone = restoredTabs.find(t => t.status === 'done');
+        const firstDone = validTabs.find(t => t.status === 'done');
         if (firstDone) {
           setActiveChild(firstDone.path);
           console.log(`📂 Set active folder to: ${firstDone.name} (showing results)`);
         }
         
         // Count completed folders and total files
-        const completedFolders = restoredTabs.filter(t => t.status === 'done');
+        const completedFolders = validTabs.filter(t => t.status === 'done');
         const totalFiles = completedFolders.reduce((sum, t) => sum + (t.results?.length || 0), 0);
         
-        console.log(`✅ Restored ${completedFolders.length}/${restoredTabs.length} folders`);
+        console.log(`✅ Restored ${completedFolders.length}/${validTabs.length} folders`);
         console.log(`✅ Restored ${totalFiles} files from completed folders`);
         
         // Log each completed folder
@@ -582,7 +582,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         });
         
         // Auto-trigger continue scan
-        const pendingFolders = tabsWithPreviews.filter(t => t.status === 'pending');
+        const pendingFolders = validTabs.filter(t => t.status === 'pending');
         if (pendingFolders.length > 0) {
           console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
           setRemainingTabs(pendingFolders);
@@ -592,7 +592,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             scanAllChildFolders(true); // Resume folder scan
           }, 500);
         } else {
-          alert(`✅ Đã khôi phục tất cả ${tabsWithPreviews.length} folders (đã scan xong).`);
+          const message = previewLoadErrors > 0 
+            ? `✅ Đã khôi phục ${validTabs.length} folders.\n\n⚠️ ${previewLoadErrors} ảnh preview không load được (có thể đã bị di chuyển/xóa).`
+            : `✅ Đã khôi phục tất cả ${validTabs.length} folders (đã scan xong).`;
+          alert(message);
         }
         
       } else if (scanData.type === 'file_scan') {

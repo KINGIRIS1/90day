@@ -279,7 +279,7 @@ function App() {
         {/* Batch Scan tab - rendered after first visit, just hidden when not active */}
         {visitedTabs.has('batch') && (
           <div style={{ display: activeTab === 'batch' ? 'block' : 'none' }}>
-            <BatchScanner />
+            <BatchScanner onSwitchTab={setActiveTab} />
           </div>
         )}
 

@@ -1494,7 +1494,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder }) => {
     // Post-process GCN documents for this child folder
     console.log(`🔄 Child folder scan complete (${childPath}), post-processing GCN documents...`);
     const finalChildResults = postProcessGCNBatch(childResults);
-    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
+    
+    // Sort results: GCN (GCNC, GCNM) on top for easy review
+    const sortedResults = sortResultsWithGCNOnTop(finalChildResults);
+    console.log(`📊 Sorted results: ${sortedResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+    
+    setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: sortedResults } : t));
     
     // 💾 MANUAL SAVE after folder complete (before next folder starts)
     if (window.electronAPI?.saveScanState) {

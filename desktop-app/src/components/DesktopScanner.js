@@ -2530,6 +2530,107 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           </div>
         </div>
       )}
+
+      {/* File Scan Merge Modal */}
+      {showFileMergeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">⚙️ Tùy chọn gộp PDF</h3>
+            
+            {/* Output Location */}
+            <div className="space-y-3 mb-4">
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="fileOutputOption"
+                    value="same_folder"
+                    checked={fileOutputOption === 'same_folder'}
+                    onChange={(e) => setFileOutputOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📁 Lưu trong thư mục gốc của file</span>
+                </div>
+                <p className="text-xs text-gray-500 ml-6">PDF sẽ được lưu cùng thư mục với ảnh gốc</p>
+              </label>
+
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="fileOutputOption"
+                    value="new_folder"
+                    checked={fileOutputOption === 'new_folder'}
+                    onChange={(e) => setFileOutputOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📂 Tạo thư mục mới trong thư mục gốc</span>
+                </div>
+                <p className="text-xs text-gray-500 ml-6">Tạo subfolder "_merged" hoặc tùy chỉnh</p>
+              </label>
+
+              <label className="block">
+                <div className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="fileOutputOption"
+                    value="custom_folder"
+                    checked={fileOutputOption === 'custom_folder'}
+                    onChange={(e) => setFileOutputOption(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-gray-700">📍 Chọn thư mục tùy chỉnh</span>
+                </div>
+                {fileOutputOption === 'custom_folder' && (
+                  <div className="ml-6 mt-2">
+                    <button
+                      onClick={async () => {
+                        const folder = await window.electronAPI.selectFolder();
+                        if (folder) setFileOutputFolder(folder);
+                      }}
+                      className="px-3 py-1.5 text-xs bg-gray-100 rounded hover:bg-gray-200 border"
+                    >
+                      {fileOutputFolder ? `✅ ${fileOutputFolder}` : 'Chọn thư mục...'}
+                    </button>
+                  </div>
+                )}
+              </label>
+            </div>
+
+            {/* Merge Suffix */}
+            {fileOutputOption === 'new_folder' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tên thư mục con (suffix):
+                </label>
+                <input
+                  type="text"
+                  value={fileMergeSuffix}
+                  onChange={(e) => setFileMergeSuffix(e.target.value)}
+                  placeholder="_merged"
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={() => setShowFileMergeModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={executeFileMerge}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-sm font-medium"
+              >
+                Bắt đầu gộp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

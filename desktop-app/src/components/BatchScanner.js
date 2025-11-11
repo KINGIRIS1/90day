@@ -727,11 +727,13 @@ function BatchScanner() {
 
       // End batch timer
       const batchEndTime = Date.now();
-      const batchElapsedMs = batchEndTime - batchStartTime;
+      const batchElapsedMs = timers.batchStartTime ? (batchEndTime - timers.batchStartTime) : 0;
       const batchElapsedSeconds = Math.floor(batchElapsedMs / 1000);
       
       console.log('✅ Batch scan complete:', result);
-      console.log(`⏱️ Total batch time: ${batchElapsedSeconds}s (${(batchElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+      if (timers.batchStartTime) {
+        console.log(`⏱️ Total batch time: ${batchElapsedSeconds}s (${(batchElapsedMs / 1000 / 60).toFixed(2)} minutes)`);
+      }
       
       setTimers(prev => ({
         ...prev,

@@ -251,6 +251,10 @@ process.on('warning', (warning) => {
 });
 
 app.whenReady().then(() => {
+  // Cleanup old scans on startup (keep scan-history.json small)
+  console.log('🧹 Running startup cleanup...');
+  cleanupOldScans();
+  
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });

@@ -1124,14 +1124,14 @@ ipcMain.handle('load-scan-state', (event, scanId) => {
 
 ipcMain.handle('delete-scan-state', (event, scanId) => {
   try {
-    const scanHistory = store.get('scanHistory', {});
-    delete scanHistory[scanId];
-    store.set('scanHistory', scanHistory);
+    const scans = scanStore.get('scans', {});
+    delete scans[scanId];
+    scanStore.set('scans', scans);
     
     console.log(`🗑️ Deleted scan state: ${scanId}`);
     return { success: true };
   } catch (e) {
-    console.error('Delete scan state error:', e);
+    console.error('❌ Delete scan state error:', e);
     return { success: false, error: e.message };
   }
 });

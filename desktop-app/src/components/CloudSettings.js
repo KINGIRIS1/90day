@@ -76,6 +76,7 @@ function CloudSettings() {
       
       // Save batch mode settings
       await window.electronAPI.setConfig('batchMode', batchMode);
+      await window.electronAPI.setConfig('smartMaxBatchSize', smartMaxBatchSize);
 
       alert('✅ Đã lưu cài đặt thành công!');
     } catch (error) {

@@ -12,7 +12,7 @@ from PIL import Image
 import base64
 
 class GCNQuocHuyTester:
-    def __init__(self, base_url="https://vietnamdocs.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://land-doc-ai-1.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.test_results = {}
         

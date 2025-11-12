@@ -16,9 +16,15 @@
 
 ```python
 # Valid document codes - MUST match rule_classifier.py
-# Total: 98 valid codes (95 from classifier + GCNC + GCNM + hoadon)
+# Total: 98 valid codes (95 from classifier + GCN + GCNC + GCNM + hoadon)
+# NOTE: "GCN" is a TEMPORARY code used during batch processing
+#       It will be post-processed to GCNC (old) or GCNM (new) based on issue date
 VALID_DOCUMENT_CODES = {
-    'BBBDG', 'BBGD', 'BBHDDK', ... (98 mã)
+    'BBBDG', 'BBGD', 'BBHDDK', ..., 
+    'GCN',   # TEMPORARY - chờ phân loại
+    'GCNC',  # GCN cũ (màu đỏ/nâu)
+    'GCNM',  # GCN mới (màu hồng)
+    ... (98 mã)
 }
 ```
 

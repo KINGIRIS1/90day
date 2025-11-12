@@ -789,7 +789,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         }
       }
       
-      setShowResumeDialog(false);
+      // Note: setShowResumeDialog(false) is called in both folder_scan and file_scan flows above
       
     } catch (error) {
       console.error('❌ Resume scan error:', error);

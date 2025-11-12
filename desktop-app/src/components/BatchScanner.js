@@ -2006,12 +2006,28 @@ function BatchScanner({ onSwitchTab }) {
                 key={tab.path} 
                 onClick={() => setActiveFolder(tab.path)}
                 title={`${tab.name} (${tab.files.length} files)`}
-                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] ${
+                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] relative ${
                   activeFolder === tab.path 
                     ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' 
                     : 'bg-white hover:bg-gray-50 border-gray-300'
                 }`}
               >
+                {/* UNKNOWN badge */}
+                {(() => {
+                  const unknownCount = (tab.files || []).filter(f => f.short_code === 'UNKNOWN').length;
+                  if (unknownCount > 0 && tab.status === 'done') {
+                    return (
+                      <span 
+                        className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-white"
+                        title={`${unknownCount} file(s) UNKNOWN`}
+                      >
+                        {unknownCount}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <span className="truncate flex-1">{tab.name} ({tab.files.length})</span>
                 {tab.status === 'scanning' ? (
                   <span className="animate-spin flex-shrink-0">⚙️</span>

@@ -940,6 +940,9 @@ function BatchScanner({ onSwitchTab }) {
       setTxtFilePath(scanData.txtFilePath || null);
       setCurrentScanId(scan.scanId);
       
+      // CLOSE DIALOG IMMEDIATELY - don't block user
+      setShowResumeDialog(false);
+      
       // Set active to first completed folder to show results
       const firstDone = scanData.folderTabs?.find(t => t.status === 'done');
       if (firstDone) {
@@ -955,7 +958,7 @@ function BatchScanner({ onSwitchTab }) {
       console.log(`✅ Restored ${totalFiles} files`);
       
       // Auto-trigger continue scan
-      const pendingFolders = foldersWithPreviews.filter(f => f.status === 'pending');
+      const pendingFolders = foldersWithoutPreviews.filter(f => f.status === 'pending');
       if (pendingFolders.length > 0) {
         console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
         // Trigger continue scan after a short delay to ensure UI is ready
@@ -964,10 +967,8 @@ function BatchScanner({ onSwitchTab }) {
           handleProcessBatchFiles(true); // Resume = true
         }, 500);
       } else {
-        alert(`✅ Đã khôi phục tất cả ${totalFolders} folders (đã scan xong).`);
+        alert(`✅ Đã khôi phục tất cả ${totalFolders} folders (đã scan xong).\n\nPreview images sẽ được load on-demand khi cần.`);
       }
-      
-      setShowResumeDialog(false);
       
     } catch (error) {
       console.error('Resume scan error:', error);

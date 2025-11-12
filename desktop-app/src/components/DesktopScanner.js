@@ -2690,8 +2690,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     ))}
                   </div>
                 </div>
-              )
-            ))}
+              );
+            })()}
           </div>
         </div>
       )}

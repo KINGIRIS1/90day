@@ -2537,6 +2537,32 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             </div>
           </div>
           
+          {/* Progressive Tab Loading Indicator */}
+          {isLoadingTabs && tabLoadProgress.total > 0 && (
+            <div className="mb-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-300 shadow-sm">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="animate-spin text-2xl">⏳</div>
+                <div className="flex-1">
+                  <div className="text-sm text-blue-900 font-bold">
+                    Đang khôi phục dữ liệu... ({tabLoadProgress.current}/{tabLoadProgress.total} thư mục)
+                  </div>
+                  <div className="text-xs text-blue-700 mt-1">
+                    Load dần từng thư mục để tránh quá tải RAM
+                  </div>
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div className="w-full bg-blue-200 rounded-full h-3 overflow-hidden shadow-inner">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-300 ease-out relative shadow-md" 
+                  style={{ width: `${(tabLoadProgress.current / tabLoadProgress.total) * 100}%` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-40 animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Paused indicator for folder scan */}
           {isFolderPaused && remainingTabs.length > 0 && (
             <div className="mb-3 p-3 bg-orange-50 rounded-xl border border-orange-200">

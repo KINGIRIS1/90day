@@ -11,13 +11,18 @@ from PIL import Image
 import io
 
 # Valid document codes - MUST match rule_classifier.py
-# Total: 97 valid codes (95 from classifier + GCNC + GCNM)
+# Total: 98 valid codes (95 from classifier + GCNC + GCNM + GCN)
+# NOTE: "GCN" is a TEMPORARY code used during batch processing
+#       It will be post-processed to GCNC (old) or GCNM (new) based on issue date
 VALID_DOCUMENT_CODES = {
     'BBBDG', 'BBGD', 'BBHDDK', 'BBKTDC', 'BBKTHT', 'BBKTSS', 'BBNT',
     'BKKDT', 'BLTT', 'BMT', 'BVHC', 'BVN', 'CCCD', 'CDLK', 'CHTGD',
     'CKDC', 'CKTSR', 'DCK', 'DCQDGD', 'DDCTH', 'DDK', 'DDKBD', 'DGH',
     'DICHUC', 'DKTC', 'DKTD', 'DKXTC', 'DMD', 'DMG', 'DSCG', 'DSCK',
-    'DXCD', 'DXCMD', 'DXGD', 'DXN', 'DXNTH', 'DXTHT', 'GCNC', 'GCNM',
+    'DXCD', 'DXCMD', 'DXGD', 'DXN', 'DXNTH', 'DXTHT',
+    'GCN',   # TEMPORARY - will be post-processed to GCNC or GCNM
+    'GCNC',  # GCN old (red/brown certificate)
+    'GCNM',  # GCN new (pink certificate)
     'GKH', 'GKS', 'GNT', 'GPXD', 'GSND', 'GTLQ', 'GUQ', 'GXNDKLD',
     'GXNNVTC', 'HCLK', 'HDBDG', 'HDCQ', 'HDTCO', 'HDTD', 'HDTHC', 'HDUQ',
     'HSKT', 'HTBTH', 'HTNVTC', 'KTCKCG', 'KTCKMG', 'PCT', 'PCTSVC',

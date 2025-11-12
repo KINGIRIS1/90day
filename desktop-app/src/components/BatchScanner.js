@@ -47,6 +47,7 @@ function BatchScanner({ onSwitchTab }) {
   const [currentScanId, setCurrentScanId] = useState(null);
   const [foldersPreviewsLoaded, setFoldersPreviewsLoaded] = useState(new Set()); // Track which folders have previews loaded
   const [loadingPreviewFor, setLoadingPreviewFor] = useState(null); // Track which folder is loading previews
+  const [isEditingFileId, setIsEditingFileId] = useState(null); // Track which file is being edited (prevent update conflicts)
   
   // Timer states
   const [timers, setTimers] = useState({

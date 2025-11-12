@@ -75,6 +75,7 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
   // Get color based on code validity
   const getCodeColor = (code) => {
     if (code === 'UNKNOWN') return 'text-red-600 bg-red-50';
+    if (code === 'GCN') return 'text-yellow-600 bg-yellow-50 font-bold'; // Temporary - needs post-processing
     if (code === 'GCNC' || code === 'GCNM') return 'text-green-600 bg-green-50 font-bold';
     return 'text-blue-600 bg-blue-50';
   };

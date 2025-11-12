@@ -165,6 +165,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "Added new UI section for OCR engine selection. Users can choose between Tesseract (fast, 85-88%) and VietOCR (Vietnamese specialized, 90-95%). Preference saved via electron-store. Dynamic display of selected engine in App Info section."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ FREE RESIZE DIMENSIONS: Changed resize settings from slider (1000-4000px) to free text input. Users can now enter any positive number for Max Width and Max Height. Removed min/max constraints. Added validation to ensure positive numbers only. UI updated with text input fields instead of range sliders."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

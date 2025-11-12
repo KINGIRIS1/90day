@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function ResumeDialog({ scans, onResume, onDismiss }) {
+  const [previewMode, setPreviewMode] = useState('gcn-only'); // 'none', 'gcn-only', 'all'
+  
   if (!scans || scans.length === 0) return null;
 
   const formatTime = (timestamp) => {

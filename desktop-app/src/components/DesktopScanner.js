@@ -2550,13 +2550,38 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               const t = activeTab;
               return (
                 <div key={t.path}>
+                  {/* Preview Mode Info */}
+                  {previewLoadMode !== 'all' && (
+                    <div className="mb-3 p-2 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm">
+                            {previewLoadMode === 'none' ? '🚫' : '⭐'}
+                          </span>
+                          <span className="text-xs font-medium text-cyan-900">
+                            {previewLoadMode === 'none' 
+                              ? 'Chế độ: Không hiển thị ảnh (tiết kiệm RAM)'
+                              : 'Chế độ: Chỉ hiển thị ảnh GCN (tiết kiệm RAM)'}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setPreviewLoadMode(previewLoadMode === 'none' ? 'gcn-only' : previewLoadMode === 'gcn-only' ? 'all' : 'none')}
+                          className="text-xs bg-cyan-600 hover:bg-cyan-700 text-white px-2 py-1 rounded"
+                          title="Nhấn để thay đổi chế độ"
+                        >
+                          Đổi chế độ
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Loading indicator for preview loading */}
                   {isLoadingPreviews && (
                     <div className="mb-3 p-2 bg-purple-50 rounded-lg border border-purple-200">
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin text-sm">⏳</div>
                         <span className="text-xs text-purple-900 font-medium">
-                          Đang tải preview images...
+                          Đang tải preview images{previewLoadMode === 'gcn-only' ? ' (chỉ GCN)' : ''}...
                         </span>
                       </div>
                     </div>

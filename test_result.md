@@ -168,6 +168,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ FREE RESIZE DIMENSIONS: Changed resize settings from slider (1000-4000px) to free text input. Users can now enter any positive number for Max Width and Max Height. Removed min/max constraints. Added validation to ensure positive numbers only. UI updated with text input fields instead of range sliders."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ JPEG QUALITY OPTIMIZATION (Fix 503 errors): Reduced JPEG quality from 95 → 85 in batch_processor.py. Expected results: ~60% smaller request size (5.34 MB → ~2.1 MB for 5 files), 98-99% OCR accuracy maintained. Should resolve 503 Server Error during batch processing. File: /app/desktop-app/python/batch_processor.py line 422."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

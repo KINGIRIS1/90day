@@ -417,9 +417,9 @@ def encode_image_base64(image_path, max_width=1500, max_height=2100):
         # Resize
         resized_img, resize_info = resize_image_smart(img, max_width, max_height)
         
-        # Encode to base64
+        # Encode to base64 with quality 85 (balance between size and OCR accuracy)
         buffer = io.BytesIO()
-        resized_img.save(buffer, format='JPEG', quality=95)
+        resized_img.save(buffer, format='JPEG', quality=85, optimize=True)
         img_bytes = buffer.getvalue()
         encoded = base64.b64encode(img_bytes).decode('utf-8')
         

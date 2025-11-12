@@ -76,9 +76,62 @@ function ResumeDialog({ scans, onResume, onDismiss }) {
                 </div>
               )}
 
+              {/* Preview Loading Options */}
+              <div className="mt-3 mb-3 bg-white rounded-lg p-3 border border-gray-200">
+                <div className="text-xs font-semibold text-gray-700 mb-2">🖼️ Hiển thị ảnh preview:</div>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input
+                      type="radio"
+                      name={`preview-${scan.scanId}`}
+                      value="none"
+                      checked={previewMode === 'none'}
+                      onChange={(e) => setPreviewMode(e.target.value)}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">🚀 Không load ảnh</div>
+                      <div className="text-xs text-gray-600">Nhanh nhất, tiết kiệm RAM tối đa</div>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded border-2 border-green-300 bg-green-50">
+                    <input
+                      type="radio"
+                      name={`preview-${scan.scanId}`}
+                      value="gcn-only"
+                      checked={previewMode === 'gcn-only'}
+                      onChange={(e) => setPreviewMode(e.target.value)}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <div>
+                      <div className="text-sm font-medium text-green-900">
+                        ⭐ Chỉ load ảnh GCN <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded">Khuyến nghị</span>
+                      </div>
+                      <div className="text-xs text-green-700">Cân bằng - chỉ load tài liệu quan trọng</div>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input
+                      type="radio"
+                      name={`preview-${scan.scanId}`}
+                      value="all"
+                      checked={previewMode === 'all'}
+                      onChange={(e) => setPreviewMode(e.target.value)}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">📸 Load tất cả ảnh</div>
+                      <div className="text-xs text-gray-600">Đầy đủ nhất (có thể chậm nếu nhiều ảnh)</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <div className="flex gap-2 mt-3">
                 <button
-                  onClick={() => onResume(scan)}
+                  onClick={() => onResume(scan, previewMode)}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
                 >
                   ▶️ Tiếp Tục Scan

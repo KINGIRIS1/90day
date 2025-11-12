@@ -647,9 +647,17 @@ function BatchScanner({ onSwitchTab }) {
 
                 // Add to fileResults and folder tab immediately (realtime display)
                 setFileResults(prev => [...prev, fileWithPreview]);
-                setFolderTabs(prev => prev.map(t => 
-                  t.path === folder.path ? { ...t, files: [...t.files, fileWithPreview] } : t
-                ));
+                
+                // IMPORTANT: Skip update if user is editing a file in this folder
+                // This prevents input from jumping/resetting while user is typing
+                const isEditingThisFolder = isEditingFileId && isEditingFileId.startsWith(folder.path);
+                if (!isEditingThisFolder) {
+                  setFolderTabs(prev => prev.map(t => 
+                    t.path === folder.path ? { ...t, files: [...t.files, fileWithPreview] } : t
+                  ));
+                } else {
+                  console.log(`⏸️ Skipping folder tab update (user is editing)`);
+                }
 
                 console.log(`  ✅ ${fileResult.short_code} - ${Math.round(fileResult.confidence * 100)}%`);
               } else {

@@ -79,11 +79,14 @@ Gemini trả về: "ABC123" → Backend validate → Không hợp lệ → "UNKN
 
 ### Trường Hợp Bị Ảnh Hưởng:
 
-**1. Mã "GCN" (không có C/M)**
+**1. Mã "GCN" (temporary code)**
 - **Trước**: Gemini trả về "GCN" → accept
-- **Bây giờ**: "GCN" không hợp lệ → "UNKNOWN"
-- **Lý do**: Phải là "GCNC" (cũ) hoặc "GCNM" (mới)
-- **Giải pháp**: Prompt đã được thiết kế để Gemini phân biệt GCNC/GCNM dựa vào màu sắc
+- **Bây giờ**: "GCN" hợp lệ (TEMPORARY) → accept
+- **Post-processing**: Sau khi batch complete, `postProcessGCNBatch()` sẽ:
+  - Đọc issue_date từ GCN
+  - Nếu issue_date < 2014 → GCNC (cũ)
+  - Nếu issue_date >= 2014 → GCNM (mới)
+- **Kết quả cuối**: User chỉ thấy GCNC hoặc GCNM (không thấy "GCN")
 
 **2. Typo hoặc Mã Tùy Ý**
 - **Trước**: "GCNN", "GCN1", "XYZ" → accept

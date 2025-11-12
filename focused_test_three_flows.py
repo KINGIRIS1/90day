@@ -20,7 +20,7 @@ from PIL import Image
 import base64
 
 class ThreeFlowTester:
-    def __init__(self, base_url="https://ocr-landocs.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://ocrviet-desktop.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.session = requests.Session()
         self.auth_token = None

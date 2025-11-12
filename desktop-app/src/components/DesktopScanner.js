@@ -73,6 +73,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [previewLoadMode, setPreviewLoadMode] = useState('gcn-only'); // 'none', 'gcn-only', 'all'
   const [isLoadingTabs, setIsLoadingTabs] = useState(false); // Track progressive tab loading
   const [tabLoadProgress, setTabLoadProgress] = useState({ current: 0, total: 0 }); // Progress for tab loading
+  const [isEditingResultId, setIsEditingResultId] = useState(null); // Track which result is being edited (prevent update conflicts)
   const stopRef = useRef(false);
   const [isPaused, setIsPaused] = useState(false); // Track pause state
   const [remainingFiles, setRemainingFiles] = useState([]); // Files left to process

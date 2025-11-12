@@ -19,9 +19,23 @@ const ResizeSetting = () => {
   }, []);
 
   const handleSave = async () => {
+    // Validate that values are positive numbers
+    const widthNum = parseInt(maxWidth);
+    const heightNum = parseInt(maxHeight);
+    
+    if (isNaN(widthNum) || widthNum <= 0) {
+      alert('⚠️ Max Width phải là số dương');
+      return;
+    }
+    
+    if (isNaN(heightNum) || heightNum <= 0) {
+      alert('⚠️ Max Height phải là số dương');
+      return;
+    }
+    
     await window.electronAPI.setConfig('enableResize', enableResize);
-    await window.electronAPI.setConfig('maxWidth', maxWidth);
-    await window.electronAPI.setConfig('maxHeight', maxHeight);
+    await window.electronAPI.setConfig('maxWidth', widthNum);
+    await window.electronAPI.setConfig('maxHeight', heightNum);
     
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -47,50 +61,44 @@ const ResizeSetting = () => {
 
       {/* Size Settings (only show when enabled) */}
       {enableResize && (
-        <div className="pl-4 border-l-2 border-gray-200 space-y-3">
+        <div className="pl-4 border-l-2 border-gray-200 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Max Width: {maxWidth}px
+              Max Width (px)
             </label>
             <input
-              type="range"
-              min="1000"
-              max="4000"
-              step="100"
+              type="number"
+              min="1"
               value={maxWidth}
-              onChange={(e) => setMaxWidth(parseInt(e.target.value))}
-              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+              onChange={(e) => setMaxWidth(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ví dụ: 1500, 2000, 3000..."
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>1000px</span>
-              <span>2000px (khuyến nghị)</span>
-              <span>4000px</span>
+            <div className="text-xs text-gray-500 mt-1">
+              💡 Nhập giá trị tự do (khuyến nghị: 1500-2500px)
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Max Height: {maxHeight}px
+              Max Height (px)
             </label>
             <input
-              type="range"
-              min="1000"
-              max="4000"
-              step="100"
+              type="number"
+              min="1"
               value={maxHeight}
-              onChange={(e) => setMaxHeight(parseInt(e.target.value))}
-              className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+              onChange={(e) => setMaxHeight(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ví dụ: 2100, 2800, 4000..."
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>1000px</span>
-              <span>2800px (khuyến nghị)</span>
-              <span>4000px</span>
+            <div className="text-xs text-gray-500 mt-1">
+              💡 Nhập giá trị tự do (khuyến nghị: 2100-3500px)
             </div>
           </div>
 
           <div className="bg-blue-50 p-3 rounded text-sm text-blue-800">
             💡 <strong>Lưu ý:</strong> Ảnh lớn hơn sẽ được resize về {maxWidth}x{maxHeight}px. 
-            Ảnh nhỏ hơn giữ nguyên kích thước.
+            Ảnh nhỏ hơn giữ nguyên kích thước. Bạn có thể nhập bất kỳ giá trị nào phù hợp với nhu cầu của mình.
           </div>
         </div>
       )}

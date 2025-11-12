@@ -626,31 +626,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        // DO NOT load preview URLs on resume - they will be lazy-loaded on-demand
-        // This prevents memory overflow when resuming scans with many tabs
-        const tabsWithPreviews = restoredTabs.map((tab) => {
-          if (!tab || !tab.path || !tab.name) {
-            console.warn('⚠️ Invalid tab structure, skipping:', tab);
-            return null;
-          }
-          
-          // Return tab as-is without loading previews
-          return {
-            ...tab,
-            results: (tab.results || []).map(r => ({
-              ...r,
-              previewUrl: null // Explicitly set to null, will be lazy-loaded
-            }))
-          };
-        }).filter(t => t !== null);
+        // PROGRESSIVE TAB LOADING: Load and display tabs one by one
+        // This prevents memory overflow by not loading all tabs at once
+        console.log(`🔄 Progressive loading: Will load ${restoredTabs.length} tabs one by one...`);
         
-        // Reset preview tracking - all tabs need lazy loading
-        setTabPreviewsLoaded(new Set());
-        
-        console.log(`🔄 Resume: Previews will be lazy-loaded on-demand for ${tabsWithPreviews.length} tabs`);
-        
-        // Validate tabs
-        if (tabsWithPreviews.length === 0) {
+        // Validate tabs array
+        const validRestoredTabs = restoredTabs.filter(tab => tab && tab.path && tab.name);
+        if (validRestoredTabs.length === 0) {
           console.error('❌ No valid tabs after loading');
           alert('❌ Không có dữ liệu hợp lệ để khôi phục. Vui lòng xóa và quét lại.');
           await window.electronAPI.deleteScanState(scan.scanId);
@@ -658,24 +640,65 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        setChildTabs(tabsWithPreviews);
+        // Setup initial state
         setParentFolder(scanData.parentFolder || null);
         setCurrentScanId(scan.scanId);
-        setActiveTab('folders'); // Switch to folders tab
+        setActiveTab('folders');
+        setTabPreviewsLoaded(new Set());
         
-        // Set active to first completed folder to show results
-        const firstDone = validTabs.find(t => t.status === 'done');
-        if (firstDone) {
-          setActiveChild(firstDone.path);
-          console.log(`📂 Set active folder to: ${firstDone.name} (showing results)`);
+        // Initialize with empty tabs first (just structure, no results)
+        const initialTabs = validRestoredTabs.map(tab => ({
+          name: tab.name,
+          path: tab.path,
+          count: tab.count || 0,
+          status: 'loading', // Special status for progressive loading
+          results: []
+        }));
+        setChildTabs(initialTabs);
+        
+        console.log(`📂 Initialized ${initialTabs.length} tabs (empty), loading progressively...`);
+        
+        // Progressive loading: Load each tab one by one with delay
+        let loadedCount = 0;
+        for (let i = 0; i < validRestoredTabs.length; i++) {
+          const tab = validRestoredTabs[i];
+          
+          // Simulate async operation (give React time to update UI)
+          await new Promise(resolve => setTimeout(resolve, 50)); // Small delay for UI responsiveness
+          
+          console.log(`📥 Loading tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)...`);
+          
+          // Load this tab's data (without previews)
+          const loadedTab = {
+            ...tab,
+            results: (tab.results || []).map(r => ({
+              ...r,
+              previewUrl: null // Will be lazy-loaded on demand
+            }))
+          };
+          
+          // Update state with this tab's data
+          setChildTabs(prev => prev.map((t, idx) => 
+            idx === i ? loadedTab : t
+          ));
+          
+          loadedCount++;
+          console.log(`✅ Loaded tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)`);
+          
+          // Set active to first completed folder
+          if (i === 0 && tab.status === 'done') {
+            setActiveChild(tab.path);
+            console.log(`📂 Set active to first tab: ${tab.name}`);
+          }
         }
         
         // Count completed folders and total files
-        const completedFolders = validTabs.filter(t => t.status === 'done');
+        const completedFolders = validRestoredTabs.filter(t => t.status === 'done');
         const totalFiles = completedFolders.reduce((sum, t) => sum + (t.results?.length || 0), 0);
         
-        console.log(`✅ Restored ${completedFolders.length}/${validTabs.length} folders`);
-        console.log(`✅ Restored ${totalFiles} files from completed folders`);
+        console.log(`✅ Progressive loading complete: ${loadedCount}/${validRestoredTabs.length} tabs loaded`);
+        console.log(`✅ Restored ${completedFolders.length}/${validRestoredTabs.length} completed folders`);
+        console.log(`✅ Restored ${totalFiles} files total`);
         
         // Log each completed folder
         completedFolders.forEach(folder => {

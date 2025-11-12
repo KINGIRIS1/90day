@@ -610,7 +610,7 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         # Add delay between batches to avoid rate limiting
         if batch_num < ((len(image_paths) + batch_size - 1) // batch_size):
             import time
-            inter_batch_delay = 2  # 2 seconds between batches
+            inter_batch_delay = 5  # 5 seconds between batches
             print(f"⏸️ Waiting {inter_batch_delay}s before next batch...", file=sys.stderr)
             time.sleep(inter_batch_delay)
         

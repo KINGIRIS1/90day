@@ -2588,7 +2588,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] ${activeChild === t.path ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' : 'bg-white hover:bg-gray-50 border-gray-300'}`}
               >
                 <span className="truncate flex-1">{t.name} ({t.count})</span>
-                {t.status === 'scanning' ? (
+                {t.status === 'loading' ? (
+                  <span className="animate-pulse flex-shrink-0">⏳</span>
+                ) : t.status === 'scanning' ? (
                   <span className="animate-spin flex-shrink-0">⚙️</span>
                 ) : t.status === 'done' ? (
                   <span className="text-green-600 flex-shrink-0">✓</span>

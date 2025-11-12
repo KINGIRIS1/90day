@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { VALID_DOCUMENT_CODES, getCodeDescription } from '../constants/documentCodes';
 
-const InlineShortCodeEditor = ({ value, onChange }) => {
+const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value || '');
   const [selectedIndex, setSelectedIndex] = useState(0);

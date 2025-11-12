@@ -42,8 +42,9 @@ export const VALID_DOCUMENT_CODES = [
   'DXN',
   'DXNTH',
   'DXTHT',
-  'GCNC',  // GCN cũ (added manually)
-  'GCNM',  // GCN mới (added manually)
+  'GCN',   // TEMPORARY - will be post-processed to GCNC or GCNM based on issue date
+  'GCNC',  // GCN cũ (red/brown certificate)
+  'GCNM',  // GCN mới (pink certificate)
   'GKH',
   'GKS',
   'GNT',

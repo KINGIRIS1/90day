@@ -2840,6 +2840,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                                 return { ...ct, results: newRes };
                               }));
                             }}
+                            onEditStart={() => setIsEditingResultId(`${t.path}-${idx}`)}
+                            onEditEnd={() => setIsEditingResultId(null)}
                           />
                         </div>
                         

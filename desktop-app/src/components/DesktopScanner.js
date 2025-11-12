@@ -70,6 +70,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [remainingTabs, setRemainingTabs] = useState([]); // Tabs left to scan
   const [tabPreviewsLoaded, setTabPreviewsLoaded] = useState(new Set()); // Track which tabs have previews loaded
   const [isLoadingPreviews, setIsLoadingPreviews] = useState(false); // Track preview loading state
+  const [previewLoadMode, setPreviewLoadMode] = useState('gcn-only'); // 'none', 'gcn-only', 'all'
   const stopRef = useRef(false);
   const [isPaused, setIsPaused] = useState(false); // Track pause state
   const [remainingFiles, setRemainingFiles] = useState([]); // Files left to process

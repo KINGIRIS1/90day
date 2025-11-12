@@ -253,6 +253,75 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     // eslint-disable-next-line
   }, [initialFolder]);
 
+  // Load previews on-demand when switching active child tab
+  useEffect(() => {
+    const loadPreviewsForActiveTab = async () => {
+      if (!activeChild || !window.electronAPI) return;
+      
+      // Check if previews for this tab are already loaded
+      if (tabPreviewsLoaded.has(activeChild)) {
+        console.log(`✅ Previews already loaded for tab: ${activeChild}`);
+        return;
+      }
+      
+      const activeTabIndex = childTabs.findIndex(t => t.path === activeChild);
+      if (activeTabIndex === -1) return;
+      
+      const activeTabData = childTabs[activeTabIndex];
+      if (!activeTabData.results || activeTabData.results.length === 0) return;
+      
+      // Check if any result needs preview loading
+      const needsLoading = activeTabData.results.some(r => 
+        !r.previewUrl && r.filePath && /\.(png|jpg|jpeg|gif|bmp)$/i.test(r.fileName)
+      );
+      
+      if (!needsLoading) {
+        // Mark as loaded even if no previews needed
+        setTabPreviewsLoaded(prev => new Set([...prev, activeChild]));
+        return;
+      }
+      
+      console.log(`🖼️ Loading previews for tab: ${activeTabData.name}...`);
+      setIsLoadingPreviews(true);
+      
+      try {
+        // Load previews for this tab's results
+        const updatedResults = await Promise.all(
+          activeTabData.results.map(async (result) => {
+            // Skip if preview already exists or file is not an image
+            if (result.previewUrl || !result.filePath || !/\.(png|jpg|jpeg|gif|bmp)$/i.test(result.fileName)) {
+              return result;
+            }
+            
+            try {
+              const previewUrl = await window.electronAPI.readImageDataUrl(result.filePath);
+              return { ...result, previewUrl: previewUrl || null };
+            } catch (err) {
+              console.warn(`⚠️ Failed to load preview for: ${result.fileName}`);
+              return result;
+            }
+          })
+        );
+        
+        // Update only the active tab's results
+        setChildTabs(prev => prev.map((tab, idx) => 
+          idx === activeTabIndex ? { ...tab, results: updatedResults } : tab
+        ));
+        
+        // Mark this tab as having loaded previews
+        setTabPreviewsLoaded(prev => new Set([...prev, activeChild]));
+        
+        console.log(`✅ Previews loaded for tab: ${activeTabData.name}`);
+      } catch (error) {
+        console.error(`❌ Error loading previews:`, error);
+      } finally {
+        setIsLoadingPreviews(false);
+      }
+    };
+    
+    loadPreviewsForActiveTab();
+  }, [activeChild, childTabs]);
+
   const analyzeAndLoadFolder = async (folderPath) => {
     // Analyze parent and create child tabs + show root files list
     setParentFolder(folderPath);

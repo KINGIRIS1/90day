@@ -2523,6 +2523,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               const t = activeTab;
               return (
                 <div key={t.path}>
+                  {/* Loading indicator for preview loading */}
+                  {isLoadingPreviews && (
+                    <div className="mb-3 p-2 bg-purple-50 rounded-lg border border-purple-200">
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin text-sm">⏳</div>
+                        <span className="text-xs text-purple-900 font-medium">
+                          Đang tải preview images...
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Loading indicator for scanning tab */}
                   {t.status === 'scanning' && (
                     <div className="mb-3 p-3 bg-blue-50 rounded-xl border border-blue-200">

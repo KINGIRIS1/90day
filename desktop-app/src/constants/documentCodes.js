@@ -112,8 +112,9 @@ export const isValidDocumentCode = (code) => {
 // Get code description (can be expanded later with full mapping)
 export const getCodeDescription = (code) => {
   const descriptions = {
-    'GCNC': 'Giấy chứng nhận cũ',
-    'GCNM': 'Giấy chứng nhận mới',
+    'GCN': 'Giấy chứng nhận (tạm - chờ phân loại)',
+    'GCNC': 'Giấy chứng nhận cũ (màu đỏ/nâu)',
+    'GCNM': 'Giấy chứng nhận mới (màu hồng)',
     'CCCD': 'Căn cước công dân',
     'GKH': 'Giấy kết hôn',
     'GKS': 'Giấy khai sinh',

@@ -150,7 +150,8 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
                 >
                   <div className="flex items-center justify-between">
                     <span className={`font-mono font-bold ${
-                      code === 'GCNC' || code === 'GCNM' ? 'text-green-600' : 
+                      code === 'GCNC' || code === 'GCNM' ? 'text-green-600' :
+                      code === 'GCN' ? 'text-yellow-600' : 
                       code === 'UNKNOWN' ? 'text-red-600' : 
                       'text-blue-600'
                     }`}>

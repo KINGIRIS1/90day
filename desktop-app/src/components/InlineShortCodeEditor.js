@@ -63,13 +63,25 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
   };
 
   const handleKeyDown = (e) => {
-    // Ctrl+Enter always saves
+    // Escape: Always cancel/close
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (showDropdown) {
+        setShowDropdown(false); // Just close dropdown
+      } else {
+        handleCancel(); // Cancel editing
+      }
+      return;
+    }
+
+    // Ctrl+Enter: Always save immediately
     if (e.key === 'Enter' && e.ctrlKey) {
       e.preventDefault();
       handleSave();
       return;
     }
 
+    // Handle dropdown navigation
     if (showDropdown && filteredCodes.length > 0) {
       switch (e.key) {
         case 'ArrowDown':
@@ -81,25 +93,26 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
           setSelectedIndex(prev => Math.max(prev - 1, 0));
           break;
         case 'Tab':
-        case 'Enter':
+          // Tab: Always select from dropdown (don't save)
           if (filteredCodes[selectedIndex]) {
             e.preventDefault();
             handleSelect(filteredCodes[selectedIndex]);
           }
           break;
-        case 'Escape':
-          e.preventDefault();
-          setShowDropdown(false);
+        case 'Enter':
+          // Enter with dropdown open: Select suggestion (don't save yet)
+          if (filteredCodes[selectedIndex]) {
+            e.preventDefault();
+            handleSelect(filteredCodes[selectedIndex]);
+          }
           break;
         default:
           break;
       }
     } else if (e.key === 'Enter') {
+      // Enter without dropdown (or empty results): Save
       e.preventDefault();
       handleSave();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      handleCancel();
     }
   };
 

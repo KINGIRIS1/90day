@@ -723,33 +723,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           console.log(`✅ Background loading complete: ${loadedCount}/${validRestoredTabs.length} tabs loaded${errorCount > 0 ? `, ${errorCount} errors` : ''}`);
         })(); // IIFE - runs in background
         
-        // Function returns immediately, dialog closes, UI is responsive
-        
-        // Count completed folders and total files
-        const completedFolders = validRestoredTabs.filter(t => t.status === 'done');
-        const totalFiles = completedFolders.reduce((sum, t) => sum + (t.results?.length || 0), 0);
-        
-        console.log(`✅ Progressive loading complete: ${loadedCount}/${validRestoredTabs.length} tabs loaded`);
-        console.log(`✅ Restored ${completedFolders.length}/${validRestoredTabs.length} completed folders`);
-        console.log(`✅ Restored ${totalFiles} files total`);
-        
-        // Log each completed folder
-        completedFolders.forEach(folder => {
-          console.log(`  📁 ${folder.name}: ${folder.results?.length || 0} files (status: done)`);
-        });
-        
-        // Auto-trigger continue scan
+        // Check if there are pending tabs to continue scanning
         const pendingFolders = validRestoredTabs.filter(t => t.status === 'pending');
         if (pendingFolders.length > 0) {
-          console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
+          console.log(`🚀 Will auto-resume ${pendingFolders.length} pending folders after loading`);
           setRemainingTabs(pendingFolders);
-          // Trigger continue scan after a short delay to ensure UI is ready
+          // Trigger continue scan after tabs are loaded
           setTimeout(() => {
             setProcessing(true);
             scanAllChildFolders(true); // Resume folder scan
-          }, 500);
-        } else {
-          alert(`✅ Đã khôi phục tất cả ${validRestoredTabs.length} folders (đã scan xong).\n\nPreview images sẽ được load theo chế độ: ${previewMode === 'none' ? 'Không load ảnh' : previewMode === 'gcn-only' ? 'Chỉ ảnh GCN' : 'Tất cả ảnh'}`);
+          }, 1000); // Wait for first few tabs to load
         }
         
       } else if (scanData.type === 'file_scan') {

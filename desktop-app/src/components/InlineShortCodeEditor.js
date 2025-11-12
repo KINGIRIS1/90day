@@ -103,7 +103,7 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
         <button
           onClick={() => {
             setEditing(true);
-            setShowDropdown(true);
+            setInputValue(value || '');
           }}
           className={`text-xs px-2 py-0.5 rounded hover:opacity-80 ${getCodeColor(value)}`}
         >
@@ -116,31 +116,44 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
   return (
     <div className="space-y-2 relative" ref={dropdownRef}>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-600 font-medium">Chọn mã tài liệu:</span>
-        <span className="text-xs text-gray-500">({VALID_DOCUMENT_CODES.length} mã)</span>
+        <span className="text-xs text-gray-600 font-medium">Sửa mã tài liệu:</span>
+        <span className="text-xs text-gray-500">({VALID_DOCUMENT_CODES.length} gợi ý)</span>
       </div>
       
-      {/* Search Input */}
+      {/* Input with autocomplete */}
       <div className="flex items-center space-x-2">
         <div className="flex-1 relative">
           <input
+            ref={inputRef}
             type="text"
-            value={searchTerm}
+            value={inputValue}
             onChange={(e) => {
-              setSearchTerm(e.target.value);
+              const val = e.target.value;
+              setInputValue(val);
               setSelectedIndex(0);
-              setShowDropdown(true);
+              setShowDropdown(val.length > 0); // Show suggestions when typing
             }}
-            onFocus={() => setShowDropdown(true)}
+            onFocus={() => {
+              if (inputValue.length > 0) {
+                setShowDropdown(true);
+              }
+            }}
             onKeyDown={handleKeyDown}
-            placeholder="Tìm mã (vd: GCN, PCT, CCCD...)"
-            className="w-full px-2 py-1 text-xs border border-blue-300 rounded focus:outline-none focus:border-blue-500"
+            placeholder="Nhập hoặc chọn mã (vd: GCN, PCT, CCCD...)"
+            className="w-full px-2 py-1 text-xs border border-blue-300 rounded focus:outline-none focus:border-blue-500 font-mono uppercase"
             autoFocus
           />
           <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-            🔍
+            {showDropdown && filteredCodes.length > 0 ? '↓' : '✎'}
           </span>
         </div>
+        <button
+          onClick={handleSave}
+          className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 font-medium"
+          title="Lưu"
+        >
+          ✓
+        </button>
         <button
           onClick={handleCancel}
           className="px-2 py-1 text-xs bg-gray-400 text-white rounded hover:bg-gray-500"
@@ -150,51 +163,42 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
         </button>
       </div>
 
-      {/* Dropdown List */}
-      {showDropdown && (
+      {/* Dropdown Suggestions */}
+      {showDropdown && filteredCodes.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border-2 border-blue-300 rounded-lg shadow-xl max-h-64 overflow-y-auto">
-          {filteredCodes.length > 0 ? (
-            <div className="py-1">
-              {filteredCodes.map((code, index) => (
-                <button
-                  key={code}
-                  onClick={() => handleSelect(code)}
-                  onMouseEnter={() => setSelectedIndex(index)}
-                  className={`w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors ${
-                    index === selectedIndex ? 'bg-blue-100 border-l-4 border-blue-600' : ''
-                  } ${code === value ? 'bg-green-50' : ''}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={`font-mono font-bold ${
-                      code === 'GCNC' || code === 'GCNM' ? 'text-green-600' :
-                      code === 'GCN' ? 'text-yellow-600' : 
-                      code === 'UNKNOWN' ? 'text-red-600' : 
-                      'text-blue-600'
-                    }`}>
-                      {code}
-                    </span>
-                    {code === value && <span className="text-green-600 text-lg">✓</span>}
-                  </div>
-                  <div className="text-gray-600 mt-0.5 truncate">
-                    {getCodeDescription(code)}
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="px-3 py-4 text-xs text-center text-gray-500">
-              <div className="text-2xl mb-2">🔍</div>
-              <div>Không tìm thấy mã "{searchTerm}"</div>
-              <div className="mt-1 text-gray-400">Chỉ có {VALID_DOCUMENT_CODES.length} mã hợp lệ</div>
-            </div>
-          )}
+          <div className="py-1">
+            {filteredCodes.slice(0, 10).map((code, index) => (
+              <button
+                key={code}
+                onClick={() => handleSelect(code)}
+                onMouseEnter={() => setSelectedIndex(index)}
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors ${
+                  index === selectedIndex ? 'bg-blue-100 border-l-4 border-blue-600' : ''
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`font-mono font-bold ${
+                    code === 'GCNC' || code === 'GCNM' ? 'text-green-600' :
+                    code === 'GCN' ? 'text-yellow-600' : 
+                    code === 'UNKNOWN' ? 'text-red-600' : 
+                    'text-blue-600'
+                  }`}>
+                    {code}
+                  </span>
+                </div>
+                <div className="text-gray-600 mt-0.5 truncate text-[10px]">
+                  {getCodeDescription(code)}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Info hint */}
       <div className="text-xs text-gray-500 flex items-center gap-1">
         <span>💡</span>
-        <span>Chỉ cho phép chọn mã từ danh sách có sẵn</span>
+        <span>Gõ để tìm hoặc nhập mã bất kỳ • Tab/Enter để chọn gợi ý • Ctrl+Enter để lưu</span>
       </div>
     </div>
   );

@@ -685,25 +685,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        // Reload preview URLs (previewUrl was stripped on save)
-        let previewLoadErrors = 0;
-        const resultsWithPreviews = await Promise.all(savedResults.map(async (result) => {
-          if (!result || !result.filePath) {
-            return result;
-          }
-          
-          try {
-            const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
-            return { ...result, previewUrl };
-          } catch (err) {
-            previewLoadErrors++;
-            console.warn(`⚠️ Could not load preview for: ${result.fileName || 'unknown'}`);
-            return result;
-          }
-        }));
-        
-        // Filter out null/invalid results
-        const validResults = resultsWithPreviews.filter(r => r !== null && r !== undefined);
+        // DO NOT load preview URLs on resume - set to null for lazy loading
+        // For file scan, previews are less critical as user can see them immediately
+        const validResults = savedResults
+          .filter(r => r !== null && r !== undefined)
+          .map(r => ({ ...r, previewUrl: null })); // Will be lazy-loaded if needed
         
         if (validResults.length === 0 && savedResults.length > 0) {
           console.error('❌ No valid results after loading');
@@ -713,9 +699,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        if (previewLoadErrors > 0) {
-          console.warn(`⚠️ Failed to load ${previewLoadErrors} preview images (files may have been moved/deleted)`);
-        }
+        console.log(`🔄 Resume: ${validResults.length} files loaded (previews will be lazy-loaded if needed)`);
         
         setResults(validResults);
         setSelectedFiles(scanData.selectedFiles || []);

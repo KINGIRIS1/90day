@@ -772,6 +772,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         setCurrentScanId(scan.scanId);
         setActiveTab('files'); // Switch to files tab
         
+        // CLOSE DIALOG IMMEDIATELY - don't block user
+        setShowResumeDialog(false);
+        
         // Auto-trigger continue scan if there are remaining files
         const remainingCount = (scanData.remainingFiles || []).length;
         if (remainingCount > 0) {

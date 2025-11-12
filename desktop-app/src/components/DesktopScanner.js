@@ -2639,6 +2639,21 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     </div>
                   )}
                   
+                  {/* Error indicator for failed tab */}
+                  {t.status === 'error' && (
+                    <div className="mb-3 p-3 bg-red-50 rounded-xl border border-red-200">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-xl">⚠️</span>
+                        <div>
+                          <div className="text-sm text-red-900 font-medium">Lỗi khi load thư mục "{t.name}"</div>
+                          <div className="text-xs text-red-700 mt-1">
+                            {t.error || 'Không thể load dữ liệu'} - Tab này bị bỏ qua
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Loading indicator for preview loading */}
                   {isLoadingPreviews && (
                     <div className="mb-3 p-2 bg-purple-50 rounded-lg border border-purple-200">

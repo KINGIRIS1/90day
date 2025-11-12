@@ -706,7 +706,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         });
         
         // Auto-trigger continue scan
-        const pendingFolders = validTabs.filter(t => t.status === 'pending');
+        const pendingFolders = validRestoredTabs.filter(t => t.status === 'pending');
         if (pendingFolders.length > 0) {
           console.log(`🚀 Auto-resuming: ${pendingFolders.length} pending folders`);
           setRemainingTabs(pendingFolders);
@@ -716,10 +716,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             scanAllChildFolders(true); // Resume folder scan
           }, 500);
         } else {
-          const message = previewLoadErrors > 0 
-            ? `✅ Đã khôi phục ${validTabs.length} folders.\n\n⚠️ ${previewLoadErrors} ảnh preview không load được (có thể đã bị di chuyển/xóa).`
-            : `✅ Đã khôi phục tất cả ${validTabs.length} folders (đã scan xong).`;
-          alert(message);
+          alert(`✅ Đã khôi phục tất cả ${validRestoredTabs.length} folders (đã scan xong).\n\nPreview images sẽ được load theo chế độ: ${previewMode === 'none' ? 'Không load ảnh' : previewMode === 'gcn-only' ? 'Chỉ ảnh GCN' : 'Tất cả ảnh'}`);
         }
         
       } else if (scanData.type === 'file_scan') {

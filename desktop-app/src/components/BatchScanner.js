@@ -900,6 +900,56 @@ function BatchScanner({ onSwitchTab }) {
     return Math.round(conf * 100);
   };
 
+  // Load previews for a specific folder
+  const handleLoadPreviewsForFolder = async (folderPath) => {
+    if (!folderPath || !window.electronAPI) return;
+    
+    // Check if already loaded
+    if (foldersPreviewsLoaded.has(folderPath)) {
+      console.log(`✅ Previews already loaded for: ${folderPath}`);
+      return;
+    }
+    
+    const folderTab = folderTabs.find(t => t.path === folderPath);
+    if (!folderTab || !folderTab.files || folderTab.files.length === 0) return;
+    
+    console.log(`🖼️ Loading previews for folder: ${folderTab.name}...`);
+    setLoadingPreviewFor(folderPath);
+    
+    try {
+      let loadedCount = 0;
+      const filesWithPreviews = await Promise.all(
+        folderTab.files.map(async (file) => {
+          if (!file.filePath || file.previewUrl) return file; // Skip if no path or already has preview
+          
+          try {
+            const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
+            if (previewUrl) loadedCount++;
+            return { ...file, previewUrl };
+          } catch (err) {
+            console.warn(`⚠️ Failed to load preview: ${file.fileName}`);
+            return file;
+          }
+        })
+      );
+      
+      // Update folder with loaded previews
+      setFolderTabs(prev => prev.map(tab =>
+        tab.path === folderPath ? { ...tab, files: filesWithPreviews } : tab
+      ));
+      
+      // Mark as loaded
+      setFoldersPreviewsLoaded(prev => new Set([...prev, folderPath]));
+      
+      console.log(`✅ Loaded ${loadedCount} previews for: ${folderTab.name}`);
+    } catch (error) {
+      console.error(`❌ Error loading previews:`, error);
+      alert(`Lỗi khi load preview: ${error.message}`);
+    } finally {
+      setLoadingPreviewFor(null);
+    }
+  };
+
   // Handle resume scan from saved state
   const handleResumeScan = async (scan, previewMode = 'gcn-only') => {
     try {

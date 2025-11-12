@@ -1981,8 +1981,19 @@ def parse_gemini_response(response_text):
         conf_match = re.search(r'(?:confidence)[\s:]+([0-9.]+)', response_text)
         
         if code_match:
+            extracted_code = code_match.group(1).strip()
+            # VALIDATE extracted code
+            extracted_code_upper = extracted_code.upper()
+            if extracted_code_upper not in VALID_DOCUMENT_CODES and extracted_code not in VALID_DOCUMENT_CODES:
+                print(f"❌ INVALID CODE (text parse): '{extracted_code}' không hợp lệ → UNKNOWN", file=sys.stderr)
+                extracted_code = 'UNKNOWN'
+            else:
+                if extracted_code_upper in VALID_DOCUMENT_CODES:
+                    extracted_code = extracted_code_upper
+                print(f"✅ Valid code (text parse): '{extracted_code}'", file=sys.stderr)
+            
             return {
-                "short_code": code_match.group(1),
+                "short_code": extracted_code,
                 "confidence": float(conf_match.group(1)) if conf_match else 0.7,
                 "reasoning": "Parsed from text response",
                 "title_position": "unknown",

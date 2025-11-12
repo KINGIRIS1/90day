@@ -590,6 +590,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       
       console.log(`🔄 Resuming scan: ${scan.scanId} (preview mode: ${previewMode})`);
       
+      // Set preview load mode based on user selection
+      setPreviewLoadMode(previewMode);
+      
       // Load scan data
       const loadResult = await window.electronAPI.loadScanState(scan.scanId);
       if (!loadResult.success) {

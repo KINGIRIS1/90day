@@ -719,10 +719,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             handleProcessFiles(false, true); // (useCloudBoost=false, isResume=true)
           }, 500);
         } else {
-          const message = previewLoadErrors > 0 
-            ? `✅ Đã khôi phục ${validResults.length} files.\n\n⚠️ ${previewLoadErrors} ảnh preview không load được (có thể đã bị di chuyển/xóa).`
-            : `✅ Đã khôi phục tất cả ${validResults.length} files (đã scan xong).`;
-          alert(message);
+          alert(`✅ Đã khôi phục tất cả ${validResults.length} files (đã scan xong).`);
         }
       }
       

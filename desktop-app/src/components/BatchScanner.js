@@ -44,6 +44,8 @@ function BatchScanner({ onSwitchTab }) {
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [incompleteScans, setIncompleteScans] = useState([]);
   const [currentScanId, setCurrentScanId] = useState(null);
+  const [foldersPreviewsLoaded, setFoldersPreviewsLoaded] = useState(new Set()); // Track which folders have previews loaded
+  const [loadingPreviewFor, setLoadingPreviewFor] = useState(null); // Track which folder is loading previews
   
   // Timer states
   const [timers, setTimers] = useState({

@@ -628,9 +628,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        // PROGRESSIVE TAB LOADING: Load and display tabs one by one
-        // This prevents memory overflow by not loading all tabs at once
-        console.log(`🔄 Progressive loading: Will load ${restoredTabs.length} tabs one by one...`);
+        // ASYNC TAB LOADING: Load tabs in background without blocking UI
+        console.log(`🔄 Async loading: Will load ${restoredTabs.length} tabs in background...`);
         
         // Validate tabs array
         const validRestoredTabs = restoredTabs.filter(tab => tab && tab.path && tab.name);
@@ -647,61 +646,84 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         setCurrentScanId(scan.scanId);
         setActiveTab('folders');
         setTabPreviewsLoaded(new Set());
-        setIsLoadingTabs(true); // Start loading indicator
-        setTabLoadProgress({ current: 0, total: validRestoredTabs.length });
         
         // Initialize with empty tabs first (just structure, no results)
         const initialTabs = validRestoredTabs.map(tab => ({
           name: tab.name,
           path: tab.path,
           count: tab.count || 0,
-          status: 'loading', // Special status for progressive loading
+          status: 'loading', // Tab is being loaded
           results: []
         }));
         setChildTabs(initialTabs);
         
-        console.log(`📂 Initialized ${initialTabs.length} tabs (empty), loading progressively...`);
+        // CLOSE DIALOG IMMEDIATELY - don't block user
+        setShowResumeDialog(false);
         
-        // Progressive loading: Load each tab one by one with delay
-        let loadedCount = 0;
-        for (let i = 0; i < validRestoredTabs.length; i++) {
-          const tab = validRestoredTabs[i];
+        console.log(`📂 Dialog closed. Loading ${initialTabs.length} tabs in background...`);
+        
+        // Start async loading in background (non-blocking)
+        (async () => {
+          setIsLoadingTabs(true);
+          setTabLoadProgress({ current: 0, total: validRestoredTabs.length });
           
-          // Update progress
-          setTabLoadProgress({ current: i + 1, total: validRestoredTabs.length });
+          let loadedCount = 0;
+          let errorCount = 0;
           
-          // Simulate async operation (give React time to update UI)
-          await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UI responsiveness
-          
-          console.log(`📥 Loading tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)...`);
-          
-          // Load this tab's data (without previews)
-          const loadedTab = {
-            ...tab,
-            results: (tab.results || []).map(r => ({
-              ...r,
-              previewUrl: null // Will be lazy-loaded on demand
-            }))
-          };
-          
-          // Update state with this tab's data
-          setChildTabs(prev => prev.map((t, idx) => 
-            idx === i ? loadedTab : t
-          ));
-          
-          loadedCount++;
-          console.log(`✅ Loaded tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)`);
-          
-          // Set active to first completed folder
-          if (i === 0 && tab.status === 'done') {
-            setActiveChild(tab.path);
-            console.log(`📂 Set active to first tab: ${tab.name}`);
+          for (let i = 0; i < validRestoredTabs.length; i++) {
+            const tab = validRestoredTabs[i];
+            
+            try {
+              // Update progress
+              setTabLoadProgress({ current: i + 1, total: validRestoredTabs.length });
+              
+              // Small delay for UI responsiveness (non-blocking)
+              await new Promise(resolve => setTimeout(resolve, 50));
+              
+              console.log(`📥 Loading tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)...`);
+              
+              // Load this tab's data (without previews)
+              const loadedTab = {
+                ...tab,
+                results: (tab.results || []).map(r => ({
+                  ...r,
+                  previewUrl: null // Will be lazy-loaded on demand
+                }))
+              };
+              
+              // Update state with this tab's data - THIS TAB IS NOW USABLE
+              setChildTabs(prev => prev.map((t, idx) => 
+                idx === i ? loadedTab : t
+              ));
+              
+              loadedCount++;
+              console.log(`✅ Tab ${i + 1}/${validRestoredTabs.length} ready: ${tab.name} (${tab.results?.length || 0} files)`);
+              
+              // Set active to first completed folder
+              if (i === 0 && tab.status === 'done') {
+                setActiveChild(tab.path);
+                console.log(`📂 Set active to first tab: ${tab.name}`);
+              }
+              
+            } catch (error) {
+              errorCount++;
+              console.error(`❌ Error loading tab ${i + 1}: ${tab.name}`, error);
+              
+              // Mark tab as error but continue with others
+              setChildTabs(prev => prev.map((t, idx) => 
+                idx === i ? { ...t, status: 'error', error: error.message } : t
+              ));
+            }
           }
-        }
+          
+          // Loading complete
+          setIsLoadingTabs(false);
+          setTabLoadProgress({ current: 0, total: 0 });
+          
+          console.log(`✅ Background loading complete: ${loadedCount}/${validRestoredTabs.length} tabs loaded${errorCount > 0 ? `, ${errorCount} errors` : ''}`);
+        })(); // IIFE - runs in background
         
-        // Loading complete
-        setIsLoadingTabs(false);
-        setTabLoadProgress({ current: 0, total: 0 });
+        // Function returns immediately, dialog closes, UI is responsive
         
         // Count completed folders and total files
         const completedFolders = validRestoredTabs.filter(t => t.status === 'done');

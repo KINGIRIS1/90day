@@ -2160,7 +2160,9 @@ function BatchScanner({ onSwitchTab }) {
                               newFiles[idx] = { ...newFiles[idx], short_code: newCode };
                               return { ...t, files: newFiles };
                             }));
-                          }} 
+                          }}
+                          onEditStart={() => setIsEditingFileId(`${activeFolder}-${idx}`)}
+                          onEditEnd={() => setIsEditingFileId(null)}
                         />
                       </div>
 

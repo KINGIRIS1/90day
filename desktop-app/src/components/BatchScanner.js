@@ -899,9 +899,9 @@ function BatchScanner({ onSwitchTab }) {
   };
 
   // Handle resume scan from saved state
-  const handleResumeScan = async (scan) => {
+  const handleResumeScan = async (scan, previewMode = 'gcn-only') => {
     try {
-      console.log(`🔄 Resuming batch scan: ${scan.scanId}`);
+      console.log(`🔄 Resuming batch scan: ${scan.scanId} (preview mode: ${previewMode})`);
       
       // Auto-switch to batch tab if needed
       if (onSwitchTab) {
@@ -916,50 +916,27 @@ function BatchScanner({ onSwitchTab }) {
       
       const scanData = loadResult.data;
       
-      // Reload preview URLs for completed folders (previewUrl was stripped on save)
-      const foldersWithPreviews = await Promise.all((scanData.folderTabs || []).map(async (folder) => {
-        if (folder.status === 'done' && folder.files && folder.files.length > 0) {
-          const filesWithPreviews = await Promise.all(folder.files.map(async (file) => {
-            if (file.filePath) {
-              try {
-                console.log(`📸 Loading preview for: ${file.fileName}`);
-                const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
-                console.log(`✅ Preview loaded: ${file.fileName}`);
-                return { ...file, previewUrl };
-              } catch (err) {
-                console.error(`❌ Failed to load preview for: ${file.fileName}`, err);
-                console.error(`   File path: ${file.filePath}`);
-                return file;
-              }
-            }
-            return file;
-          }));
-          return { ...folder, files: filesWithPreviews };
-        }
-        return folder;
+      // DO NOT load preview URLs on resume - set to null for lazy loading
+      // This prevents memory overflow and speeds up resume
+      const foldersWithoutPreviews = (scanData.folderTabs || []).map(folder => ({
+        ...folder,
+        files: (folder.files || []).map(file => ({
+          ...file,
+          previewUrl: null // Will be lazy-loaded if needed
+        }))
       }));
       
-      // Reload preview URLs for fileResults
-      const fileResultsWithPreviews = await Promise.all((scanData.fileResults || []).map(async (file) => {
-        if (file.filePath) {
-          try {
-            console.log(`📸 Loading preview for fileResult: ${file.fileName}`);
-            const previewUrl = await window.electronAPI.getBase64Image(file.filePath);
-            console.log(`✅ Preview loaded for fileResult: ${file.fileName}`);
-            return { ...file, previewUrl };
-          } catch (err) {
-            console.error(`❌ Failed to load preview for fileResult: ${file.fileName}`, err);
-            console.error(`   File path: ${file.filePath}`);
-            return file;
-          }
-        }
-        return file;
+      const fileResultsWithoutPreviews = (scanData.fileResults || []).map(file => ({
+        ...file,
+        previewUrl: null // Will be lazy-loaded if needed
       }));
+      
+      console.log(`🔄 Resume: Previews will NOT be loaded (lazy load on-demand)`);
       
       // Restore batch scan state
-      setFolderTabs(foldersWithPreviews);
+      setFolderTabs(foldersWithoutPreviews);
       setDiscoveredFolders(scanData.discoveredFolders || []);
-      setFileResults(fileResultsWithPreviews);
+      setFileResults(fileResultsWithoutPreviews);
       setTxtFilePath(scanData.txtFilePath || null);
       setCurrentScanId(scan.scanId);
       

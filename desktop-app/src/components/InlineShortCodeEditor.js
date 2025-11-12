@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { VALID_DOCUMENT_CODES, isValidDocumentCode, getCodeDescription } from '../constants/documentCodes';
+import { VALID_DOCUMENT_CODES, getCodeDescription } from '../constants/documentCodes';
 
 const InlineShortCodeEditor = ({ value, onChange }) => {
   const [editing, setEditing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [inputValue, setInputValue] = useState(value || '');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
 
-  // Filter codes based on search term
+  // Filter codes based on input
   const filteredCodes = VALID_DOCUMENT_CODES.filter(code => 
-    code.includes(searchTerm.toUpperCase()) ||
-    getCodeDescription(code).toLowerCase().includes(searchTerm.toLowerCase())
+    code.includes(inputValue.toUpperCase()) ||
+    getCodeDescription(code).toLowerCase().includes(inputValue.toLowerCase())
   );
 
   // Handle click outside to close dropdown
@@ -31,44 +32,59 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
   }, [showDropdown]);
 
   const handleSelect = (code) => {
-    onChange(code);
-    setEditing(false);
+    setInputValue(code);
     setShowDropdown(false);
-    setSearchTerm('');
     setSelectedIndex(0);
+    inputRef.current?.focus();
+  };
+
+  const handleSave = () => {
+    const cleaned = inputValue.trim().toUpperCase();
+    if (cleaned) {
+      onChange(cleaned);
+      setEditing(false);
+      setShowDropdown(false);
+    }
   };
 
   const handleCancel = () => {
+    setInputValue(value || '');
     setEditing(false);
     setShowDropdown(false);
-    setSearchTerm('');
     setSelectedIndex(0);
   };
 
   const handleKeyDown = (e) => {
-    if (!showDropdown) return;
-
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex(prev => Math.min(prev + 1, filteredCodes.length - 1));
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (filteredCodes[selectedIndex]) {
-          handleSelect(filteredCodes[selectedIndex]);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        handleCancel();
-        break;
-      default:
-        break;
+    if (showDropdown && filteredCodes.length > 0) {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex(prev => Math.min(prev + 1, filteredCodes.length - 1));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex(prev => Math.max(prev - 1, 0));
+          break;
+        case 'Tab':
+        case 'Enter':
+          if (filteredCodes[selectedIndex]) {
+            e.preventDefault();
+            handleSelect(filteredCodes[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          setShowDropdown(false);
+          break;
+        default:
+          break;
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancel();
     }
   };
 

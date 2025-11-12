@@ -2628,6 +2628,35 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               const t = activeTab;
               return (
                 <div key={t.path}>
+                  {/* UNKNOWN Files Counter */}
+                  {(() => {
+                    const unknownCount = (t.results || []).filter(r => r.short_code === 'UNKNOWN').length;
+                    if (unknownCount > 0) {
+                      return (
+                        <div className="mb-3 p-3 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border-2 border-red-300">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">⚠️</span>
+                              <div>
+                                <div className="text-sm text-red-900 font-bold">
+                                  {unknownCount} file{unknownCount > 1 ? 's' : ''} chưa phân loại (UNKNOWN)
+                                </div>
+                                <div className="text-xs text-red-700 mt-0.5">
+                                  Cần xem xét và đặt lại mã phân loại cho các file này
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-red-800 bg-red-100 px-3 py-1 rounded-full font-mono font-bold">
+                              <span>❌</span>
+                              <span>{unknownCount}/{(t.results || []).length}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
                   {/* Preview Mode Info */}
                   {previewLoadMode !== 'all' && (
                     <div className="mb-3 p-2 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200">

@@ -2470,10 +2470,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             ))}
           </div>
           
-          {/* Tab content */}
+          {/* Tab content - LAZY RENDER: Only render active tab */}
           <div className="mt-3">
-            {childTabs.map((t) => (
-              activeChild === t.path && (
+            {(() => {
+              const activeTab = childTabs.find(t => t.path === activeChild);
+              if (!activeTab) return null;
+              const t = activeTab;
+              return (
                 <div key={t.path}>
                   {/* Loading indicator for scanning tab */}
                   {t.status === 'scanning' && (

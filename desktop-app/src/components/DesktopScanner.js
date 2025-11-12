@@ -647,6 +647,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         setCurrentScanId(scan.scanId);
         setActiveTab('folders');
         setTabPreviewsLoaded(new Set());
+        setIsLoadingTabs(true); // Start loading indicator
+        setTabLoadProgress({ current: 0, total: validRestoredTabs.length });
         
         // Initialize with empty tabs first (just structure, no results)
         const initialTabs = validRestoredTabs.map(tab => ({
@@ -665,8 +667,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         for (let i = 0; i < validRestoredTabs.length; i++) {
           const tab = validRestoredTabs[i];
           
+          // Update progress
+          setTabLoadProgress({ current: i + 1, total: validRestoredTabs.length });
+          
           // Simulate async operation (give React time to update UI)
-          await new Promise(resolve => setTimeout(resolve, 50)); // Small delay for UI responsiveness
+          await new Promise(resolve => setTimeout(resolve, 100)); // Small delay for UI responsiveness
           
           console.log(`📥 Loading tab ${i + 1}/${validRestoredTabs.length}: ${tab.name} (${tab.results?.length || 0} files)...`);
           
@@ -693,6 +698,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             console.log(`📂 Set active to first tab: ${tab.name}`);
           }
         }
+        
+        // Loading complete
+        setIsLoadingTabs(false);
+        setTabLoadProgress({ current: 0, total: 0 });
         
         // Count completed folders and total files
         const completedFolders = validRestoredTabs.filter(t => t.status === 'done');

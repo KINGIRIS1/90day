@@ -557,14 +557,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   };
 
   // Handle resume scan from saved state
-  const handleResumeScan = async (scan) => {
+  const handleResumeScan = async (scan, previewMode = 'gcn-only') => {
     try {
       // Auto-switch to scanner tab if needed
       if (onSwitchTab) {
         onSwitchTab('scanner');
       }
       
-      console.log(`🔄 Resuming scan: ${scan.scanId}`);
+      console.log(`🔄 Resuming scan: ${scan.scanId} (preview mode: ${previewMode})`);
       
       // Load scan data
       const loadResult = await window.electronAPI.loadScanState(scan.scanId);

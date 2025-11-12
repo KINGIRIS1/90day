@@ -10,6 +10,24 @@ import base64
 from PIL import Image
 import io
 
+# Valid document codes - MUST match rule_classifier.py
+# Total: 97 valid codes (95 from classifier + GCNC + GCNM)
+VALID_DOCUMENT_CODES = {
+    'BBBDG', 'BBGD', 'BBHDDK', 'BBKTDC', 'BBKTHT', 'BBKTSS', 'BBNT',
+    'BKKDT', 'BLTT', 'BMT', 'BVHC', 'BVN', 'CCCD', 'CDLK', 'CHTGD',
+    'CKDC', 'CKTSR', 'DCK', 'DCQDGD', 'DDCTH', 'DDK', 'DDKBD', 'DGH',
+    'DICHUC', 'DKTC', 'DKTD', 'DKXTC', 'DMD', 'DMG', 'DSCG', 'DSCK',
+    'DXCD', 'DXCMD', 'DXGD', 'DXN', 'DXNTH', 'DXTHT', 'GCNC', 'GCNM',
+    'GKH', 'GKS', 'GNT', 'GPXD', 'GSND', 'GTLQ', 'GUQ', 'GXNDKLD',
+    'GXNNVTC', 'HCLK', 'HDBDG', 'HDCQ', 'HDTCO', 'HDTD', 'HDTHC', 'HDUQ',
+    'HSKT', 'HTBTH', 'HTNVTC', 'KTCKCG', 'KTCKMG', 'PCT', 'PCTSVC',
+    'PDPASDD', 'PKTHS', 'PLYKDC', 'PXNKQDD', 'QDCHTGD', 'QDCMD', 'QDDCGD',
+    'QDDCQH', 'QDDCTH', 'QDGH', 'QDGTD', 'QDHG', 'QDHTSD', 'QDPDBT',
+    'QDPDDG', 'QDTH', 'QDTHA', 'QDTT', 'QDXP', 'QR', 'SDTT', 'TBCKCG',
+    'TBCKMG', 'TBCNBD', 'TBMG', 'TBT', 'TKT', 'TTCG', 'TTHGD', 'UNKNOWN',
+    'VBCTCMD', 'VBDNCT', 'VBTC', 'VBTK', 'hoadon'  # hoadon is lowercase in classifier
+}
+
 
 def resize_image_smart(img, max_width=1500, max_height=2100):
     """

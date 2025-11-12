@@ -1768,11 +1768,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`📌 Updated lastKnown (folder): ${processedResult.short_code} (${formatConfidence(processedResult.confidence)}%)`);
       }
       
-      let previewUrl = null;
-      try {
-        if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(f.name)) previewUrl = await window.electronAPI.readImageDataUrl(f.path);
-      } catch {}
-      childResults.push({ fileName: f.name, filePath: f.path, previewUrl, isPdf: /\.pdf$/i.test(f.name), ...processedResult });
+      // DO NOT load preview immediately - will be lazy-loaded on-demand
+      // This prevents memory overflow when scanning folders with many images
+      childResults.push({ 
+        fileName: f.name, 
+        filePath: f.path, 
+        previewUrl: null, // Will be lazy-loaded when user switches to this tab
+        isPdf: /\.pdf$/i.test(f.name), 
+        ...processedResult 
+      });
       setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
     }
 

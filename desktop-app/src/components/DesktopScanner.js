@@ -599,7 +599,31 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        // Reload preview URLs for completed folders (previewUrl was stripped on save)
+        // DO NOT load preview URLs on resume - they will be lazy-loaded on-demand
+        // This prevents memory overflow when resuming scans with many tabs
+        const tabsWithPreviews = restoredTabs.map((tab) => {
+          if (!tab || !tab.path || !tab.name) {
+            console.warn('⚠️ Invalid tab structure, skipping:', tab);
+            return null;
+          }
+          
+          // Return tab as-is without loading previews
+          return {
+            ...tab,
+            results: (tab.results || []).map(r => ({
+              ...r,
+              previewUrl: null // Explicitly set to null, will be lazy-loaded
+            }))
+          };
+        }).filter(t => t !== null);
+        
+        // Reset preview tracking - all tabs need lazy loading
+        setTabPreviewsLoaded(new Set());
+        
+        console.log(`🔄 Resume: Previews will be lazy-loaded on-demand for ${tabsWithPreviews.length} tabs`);
+        
+        /*
+        // OLD CODE: Load ALL previews immediately (causes crash)
         let previewLoadErrors = 0;
         const tabsWithPreviews = await Promise.all(restoredTabs.map(async (tab) => {
           if (!tab || !tab.path || !tab.name) {

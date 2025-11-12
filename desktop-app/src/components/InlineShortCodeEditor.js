@@ -44,6 +44,7 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
       onChange(cleaned);
       setEditing(false);
       setShowDropdown(false);
+      if (onEditEnd) onEditEnd(); // Notify parent editing ended
     }
   };
 
@@ -52,6 +53,13 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
     setEditing(false);
     setShowDropdown(false);
     setSelectedIndex(0);
+    if (onEditEnd) onEditEnd(); // Notify parent editing ended
+  };
+
+  const handleStartEditing = () => {
+    setEditing(true);
+    setInputValue(value || '');
+    if (onEditStart) onEditStart(); // Notify parent editing started
   };
 
   const handleKeyDown = (e) => {

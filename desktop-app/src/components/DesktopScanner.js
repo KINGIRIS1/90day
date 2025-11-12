@@ -2602,8 +2602,24 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 key={t.path} 
                 onClick={() => setActiveChild(t.path)} 
                 title={`${t.name} (${t.count} files)`}
-                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] ${activeChild === t.path ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' : 'bg-white hover:bg-gray-50 border-gray-300'}`}
+                className={`px-3 py-2 text-xs rounded-xl border flex items-center gap-2 min-w-[120px] max-w-[180px] relative ${activeChild === t.path ? 'bg-blue-50 border-blue-300 text-blue-900 font-medium' : 'bg-white hover:bg-gray-50 border-gray-300'}`}
               >
+                {/* UNKNOWN badge */}
+                {(() => {
+                  const unknownCount = (t.results || []).filter(r => r.short_code === 'UNKNOWN').length;
+                  if (unknownCount > 0 && t.status === 'done') {
+                    return (
+                      <span 
+                        className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-white"
+                        title={`${unknownCount} file(s) UNKNOWN`}
+                      >
+                        {unknownCount}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <span className="truncate flex-1">{t.name} ({t.count})</span>
                 {t.status === 'error' ? (
                   <span className="text-red-600 flex-shrink-0" title={t.error}>⚠️</span>

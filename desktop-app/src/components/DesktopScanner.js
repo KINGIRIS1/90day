@@ -1844,7 +1844,15 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         isPdf: /\.pdf$/i.test(f.name), 
         ...processedResult 
       });
-      setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
+      
+      // IMPORTANT: Skip update if user is editing a result in this tab
+      // This prevents input from jumping/resetting while user is typing
+      const isEditingThisTab = isEditingResultId && isEditingResultId.startsWith(childTabs[idx]?.path);
+      if (!isEditingThisTab) {
+        setChildTabs(prev => prev.map((t, j) => j === idx ? { ...t, results: [...childResults] } : t));
+      } else {
+        console.log(`⏸️ Skipping tab update (user is editing)`);
+      }
     }
 
     // Post-process GCN documents for this child folder

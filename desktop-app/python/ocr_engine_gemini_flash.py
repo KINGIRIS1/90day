@@ -1914,6 +1914,18 @@ def parse_gemini_response(response_text):
                     if not short_code or len(short_code) < 2:
                         print(f"⚠️ Short_code too short after sanitization: '{short_code}', using UNKNOWN", file=sys.stderr)
                         short_code = 'UNKNOWN'
+                    else:
+                        # VALIDATE: Check if code is in allowed list (98 valid codes)
+                        short_code_upper = short_code.upper()
+                        if short_code_upper not in VALID_DOCUMENT_CODES and short_code not in VALID_DOCUMENT_CODES:
+                            print(f"❌ INVALID CODE: '{short_code}' không nằm trong 98 mã hợp lệ → UNKNOWN", file=sys.stderr)
+                            print(f"   Gemini trả về mã sai. Chỉ chấp nhận mã trong danh sách VALID_DOCUMENT_CODES", file=sys.stderr)
+                            short_code = 'UNKNOWN'
+                        else:
+                            # Normalize to match exact case in VALID_DOCUMENT_CODES
+                            if short_code_upper in VALID_DOCUMENT_CODES:
+                                short_code = short_code_upper
+                            print(f"✅ Valid code: '{short_code}'", file=sys.stderr)
                 
                 # Extract color, issue_date and issue_date_confidence if present (for GCN)
                 color = result.get('color', None)

@@ -116,10 +116,7 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-600">Short code:</span>
         <button
-          onClick={() => {
-            setEditing(true);
-            setInputValue(value || '');
-          }}
+          onClick={handleStartEditing}
           className={`text-xs px-2 py-0.5 rounded hover:opacity-80 ${getCodeColor(value)}`}
         >
           {value} ✏️

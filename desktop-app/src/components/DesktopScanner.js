@@ -259,6 +259,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     const loadPreviewsForActiveTab = async () => {
       if (!activeChild || !window.electronAPI) return;
       
+      // Skip if preview mode is 'none'
+      if (previewLoadMode === 'none') {
+        console.log(`🚫 Preview mode is 'none' - skipping preview load`);
+        setTabPreviewsLoaded(prev => new Set([...prev, activeChild]));
+        return;
+      }
+      
       // Check if previews for this tab are already loaded
       if (tabPreviewsLoaded.has(activeChild)) {
         console.log(`✅ Previews already loaded for tab: ${activeChild}`);
@@ -271,31 +278,47 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       const activeTabData = childTabs[activeTabIndex];
       if (!activeTabData.results || activeTabData.results.length === 0) return;
       
-      // Check if any result needs preview loading
-      const needsLoading = activeTabData.results.some(r => 
-        !r.previewUrl && r.filePath && /\.(png|jpg|jpeg|gif|bmp)$/i.test(r.fileName)
-      );
+      // Determine which results need preview loading based on mode
+      const shouldLoadPreview = (result) => {
+        if (!result.filePath || !/\.(png|jpg|jpeg|gif|bmp)$/i.test(result.fileName)) return false;
+        if (result.previewUrl) return false; // Already has preview
+        
+        // Mode: 'gcn-only' - only load GCN documents
+        if (previewLoadMode === 'gcn-only') {
+          const shortCode = result.short_code || result.classification || '';
+          return shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN';
+        }
+        
+        // Mode: 'all' - load all
+        return true;
+      };
+      
+      const needsLoading = activeTabData.results.some(shouldLoadPreview);
       
       if (!needsLoading) {
         // Mark as loaded even if no previews needed
         setTabPreviewsLoaded(prev => new Set([...prev, activeChild]));
+        console.log(`ℹ️ No previews to load for tab (mode: ${previewLoadMode})`);
         return;
       }
       
-      console.log(`🖼️ Loading previews for tab: ${activeTabData.name}...`);
+      const modeLabel = previewLoadMode === 'gcn-only' ? '(chỉ GCN)' : '(tất cả)';
+      console.log(`🖼️ Loading previews for tab: ${activeTabData.name} ${modeLabel}...`);
       setIsLoadingPreviews(true);
       
       try {
+        let loadedCount = 0;
         // Load previews for this tab's results
         const updatedResults = await Promise.all(
           activeTabData.results.map(async (result) => {
-            // Skip if preview already exists or file is not an image
-            if (result.previewUrl || !result.filePath || !/\.(png|jpg|jpeg|gif|bmp)$/i.test(result.fileName)) {
+            // Check if should load preview for this result
+            if (!shouldLoadPreview(result)) {
               return result;
             }
             
             try {
               const previewUrl = await window.electronAPI.readImageDataUrl(result.filePath);
+              if (previewUrl) loadedCount++;
               return { ...result, previewUrl: previewUrl || null };
             } catch (err) {
               console.warn(`⚠️ Failed to load preview for: ${result.fileName}`);
@@ -312,7 +335,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Mark this tab as having loaded previews
         setTabPreviewsLoaded(prev => new Set([...prev, activeChild]));
         
-        console.log(`✅ Previews loaded for tab: ${activeTabData.name}`);
+        console.log(`✅ Loaded ${loadedCount} previews for tab: ${activeTabData.name} ${modeLabel}`);
       } catch (error) {
         console.error(`❌ Error loading previews:`, error);
       } finally {
@@ -321,7 +344,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     };
     
     loadPreviewsForActiveTab();
-  }, [activeChild, childTabs]);
+  }, [activeChild, childTabs, previewLoadMode]);
 
   const analyzeAndLoadFolder = async (folderPath) => {
     // Analyze parent and create child tabs + show root files list

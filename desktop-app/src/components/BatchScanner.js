@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ResumeDialog from './ResumeDialog';
+import InlineShortCodeEditor from './InlineShortCodeEditor';
 
 function BatchScanner({ onSwitchTab }) {
   // State

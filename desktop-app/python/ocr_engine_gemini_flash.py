@@ -1919,7 +1919,7 @@ def parse_gemini_response(response_text):
                         short_code_upper = short_code.upper()
                         if short_code_upper not in VALID_DOCUMENT_CODES and short_code not in VALID_DOCUMENT_CODES:
                             print(f"❌ INVALID CODE: '{short_code}' không nằm trong 98 mã hợp lệ → UNKNOWN", file=sys.stderr)
-                            print(f"   Gemini trả về mã sai. Chỉ chấp nhận mã trong danh sách VALID_DOCUMENT_CODES", file=sys.stderr)
+                            print("   Gemini trả về mã sai. Chỉ chấp nhận mã trong danh sách VALID_DOCUMENT_CODES", file=sys.stderr)
                             short_code = 'UNKNOWN'
                         else:
                             # Normalize to match exact case in VALID_DOCUMENT_CODES

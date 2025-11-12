@@ -55,11 +55,18 @@ const InlineShortCodeEditor = ({ value, onChange }) => {
   };
 
   const handleKeyDown = (e) => {
+    // Ctrl+Enter always saves
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      handleSave();
+      return;
+    }
+
     if (showDropdown && filteredCodes.length > 0) {
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev => Math.min(prev + 1, filteredCodes.length - 1));
+          setSelectedIndex(prev => Math.min(prev + 1, Math.min(filteredCodes.length - 1, 9))); // Limit to 10 items
           break;
         case 'ArrowUp':
           e.preventDefault();

@@ -223,7 +223,7 @@ const InlineShortCodeEditor = ({ value, onChange, onEditStart, onEditEnd }) => {
       {/* Info hint */}
       <div className="text-xs text-gray-500 flex items-center gap-1">
         <span>💡</span>
-        <span>Gõ để tìm hoặc nhập mã bất kỳ • Tab/Enter để chọn gợi ý • Ctrl+Enter để lưu</span>
+        <span>↑↓: Di chuyển • Tab/Enter: Chọn gợi ý • Enter: Lưu • Esc: Hủy</span>
       </div>
     </div>
   );

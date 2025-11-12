@@ -622,39 +622,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         
         console.log(`🔄 Resume: Previews will be lazy-loaded on-demand for ${tabsWithPreviews.length} tabs`);
         
-        /*
-        // OLD CODE: Load ALL previews immediately (causes crash)
-        let previewLoadErrors = 0;
-        const tabsWithPreviews = await Promise.all(restoredTabs.map(async (tab) => {
-          if (!tab || !tab.path || !tab.name) {
-            console.warn('⚠️ Invalid tab structure, skipping:', tab);
-            return null;
-          }
-          
-          if (tab.status === 'done' && tab.results && tab.results.length > 0) {
-            const resultsWithPreviews = await Promise.all(tab.results.map(async (result) => {
-              if (!result || !result.filePath) {
-                return result;
-              }
-              
-              try {
-                const previewUrl = await window.electronAPI.getBase64Image(result.filePath);
-                return { ...result, previewUrl };
-              } catch (err) {
-                previewLoadErrors++;
-                console.warn(`⚠️ Failed to load preview for: ${result.fileName || 'unknown'}`);
-                return result;
-              }
-            }));
-            return { ...tab, results: resultsWithPreviews };
-          }
-          return tab;
-        }));
-        
-        // Filter out null tabs (invalid)
-        const validTabs = tabsWithPreviews.filter(t => t !== null);
-        
-        if (validTabs.length === 0) {
+        // Validate tabs
+        if (tabsWithPreviews.length === 0) {
           console.error('❌ No valid tabs after loading');
           alert('❌ Không có dữ liệu hợp lệ để khôi phục. Vui lòng xóa và quét lại.');
           await window.electronAPI.deleteScanState(scan.scanId);
@@ -662,11 +631,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           return;
         }
         
-        if (previewLoadErrors > 0) {
-          console.warn(`⚠️ Failed to load ${previewLoadErrors} preview images (files may have been moved/deleted)`);
-        }
-        
-        setChildTabs(validTabs);
+        setChildTabs(tabsWithPreviews);
         setParentFolder(scanData.parentFolder || null);
         setCurrentScanId(scan.scanId);
         setActiveTab('folders'); // Switch to folders tab

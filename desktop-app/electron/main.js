@@ -1308,6 +1308,25 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
       return { success: false, error: 'Gemini test thất bại' };
     }
 
+    if (provider === 'openai') {
+      const testUrl = 'https://api.openai.com/v1/chat/completions';
+      const response = await axios.post(testUrl, {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: 'Hello, this is a test.' }],
+        max_tokens: 10
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        timeout: 15000
+      });
+      if (response.status === 200 && response.data && response.data.choices) {
+        return { success: true, message: '✅ OpenAI GPT-4o mini API key hợp lệ' };
+      }
+      return { success: false, error: 'OpenAI test thất bại' };
+    }
+
     return { success: false, error: `Provider không hỗ trợ: ${provider}` };
   } catch (error) {
     let msg = error.message;

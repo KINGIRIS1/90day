@@ -61,7 +61,8 @@ function CloudSettings() {
         'gemini-flash': 'gemini-flash',
         'gemini-flash-hybrid': 'gemini-flash-hybrid',
         'gemini-flash-lite': 'gemini-flash-lite',
-        'gemini-flash-text': 'gemini-flash-text'
+        'gemini-flash-text': 'gemini-flash-text',
+        'openai-gpt4o-mini': 'openai-gpt4o-mini'
       };
       
       const backendEngine = engineMapping[ocrEngine] || 'tesseract';
@@ -75,6 +76,9 @@ function CloudSettings() {
       }
       if ((ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite' || ocrEngine === 'gemini-flash-text') && geminiKey.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'gemini', apiKey: geminiKey.trim() });
+      }
+      if (ocrEngine === 'openai-gpt4o-mini' && openaiKey.trim()) {
+        await window.electronAPI.saveApiKey({ provider: 'openai', apiKey: openaiKey.trim() });
       }
       if (ocrEngine === 'azure' && azureKey.trim() && azureEndpoint.trim()) {
         await window.electronAPI.saveApiKey({ provider: 'azure', apiKey: azureKey.trim() });

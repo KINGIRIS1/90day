@@ -2414,7 +2414,6 @@ function BatchScanner({ onSwitchTab }) {
                     const currentIndex = folderTabs.findIndex(tab => tab.path === activeFolder);
                     if (currentIndex > 0) {
                       setActiveFolder(folderTabs[currentIndex - 1].path);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                   }}
                   disabled={folderTabs.findIndex(tab => tab.path === activeFolder) === 0}
@@ -2433,7 +2432,6 @@ function BatchScanner({ onSwitchTab }) {
                     const currentIndex = folderTabs.findIndex(tab => tab.path === activeFolder);
                     if (currentIndex < folderTabs.length - 1) {
                       setActiveFolder(folderTabs[currentIndex + 1].path);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                   }}
                   disabled={folderTabs.findIndex(tab => tab.path === activeFolder) === folderTabs.length - 1}

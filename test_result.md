@@ -213,6 +213,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🔧 SUPPORT GEMINI-FLASH-TEXT IN SEQUENTIAL MODE: Updated process_document.py to handle gemini-flash-text in sequential processing (when < 3 files). Added if-else logic: if engine=gemini-flash-text, call tesseract_text_classifier; else, use standard Gemini Vision. Also added gemini-flash-hybrid to engine check. File: process_document.py."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✂️ REMOVE 32 RARE DOCUMENT CODES: Removed 32 rarely-used document codes from prompts to reduce tokens and improve accuracy for main types. Codes removed: BVHC, BVN, BKKDT, DSCG, BBNT, BBKTSS, BBKTDC, BLTT, DS15, DSCK, CHTGD, DMD, DDCTH, DXNTH, GSND, BBGD, BBHDDK, HDTCO, HDTD, DKTC, DKTD, DKXTC, QR, QDTT, QDPDBT, QDDCQH, QDPDDG, QDTHA, QDHTSD, QDXP, VBDNCT, PDPASDD. Document types: 98 → 66. Files: ocr_engine_gemini_flash.py, tesseract_text_classifier.py, batch_processor.py."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

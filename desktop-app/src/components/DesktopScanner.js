@@ -1519,8 +1519,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Post-process GCN documents
         const processedResults = postProcessGCNBatch(batchResults);
         
-        // Sort results: GCN (GCNC, GCNM) on top for easy review
-        const finalResults = sortResultsWithGCNOnTop(processedResults);
+        // Sort results: GCN (GCNC, GCNM) on top for easy review (if enabled)
+        const finalResults = sortGCNToTop ? sortResultsWithGCNOnTop(processedResults) : processedResults;
+        if (sortGCNToTop) {
+          console.log(`📊 Sorted results: ${finalResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+        }
         
         // Update results
         setResults(finalResults);

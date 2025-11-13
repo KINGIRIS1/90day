@@ -930,23 +930,19 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
     try {
       console.log(`\n📦 Batch Process: mode=${mode}, images=${imagePaths.length}, engine=${ocrEngine}`);
       
-      // Check OCR Mode setting (vision vs tesseract_text)
-      const ocrMode = store.get('ocrMode', 'vision');
-      console.log(`⚡ OCR Mode: ${ocrMode}`);
-      
-      // Override batch mode if using tesseract_text
+      // Check if engine is gemini-flash-text (Tesseract + Gemini Text)
       let finalMode = mode;
-      if (ocrMode === 'tesseract_text') {
+      if (ocrEngine === 'gemini-flash-text') {
         finalMode = 'tesseract_text';
-        console.log(`🔄 [OCR MODE] Overriding: ${mode} → tesseract_text`);
-        console.log(`   Reason: User selected Tesseract+Text mode in Settings`);
+        console.log(`🔬 [ENGINE] Using Tesseract + Gemini Text mode`);
+        console.log(`   Overriding: ${mode} → tesseract_text`);
       } else {
-        console.log(`   Using original mode: ${mode} (ocrMode=${ocrMode})`);
+        console.log(`   Using standard mode: ${mode}, engine: ${ocrEngine}`);
       }
       
       // Get API key for cloud engines
       let cloudApiKey = null;
-      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite' || ocrMode === 'tesseract_text') {
+      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite' || ocrEngine === 'gemini-flash-text') {
         cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
         if (!cloudApiKey) {
           resolve({ success: false, error: 'Google API key not configured', results: [] });

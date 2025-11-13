@@ -180,6 +180,12 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ DUPLICATE FOLDER DETECTION (Batch Scan): Added duplicate folder name detection when loading TXT file. If 2+ paths have same folder name (e.g., C:/ABC and D:/ABC), only the first one is scanned, others are skipped. Features: (1) Warning during folder discovery, (2) Visual indicator in folder list showing which paths are kept/skipped, (3) Summary notification after scan completion. Prevents merging files from different locations into one tab. File: BatchScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ DUPLICATE FOLDER DETECTION (Folder Scan): Added duplicate subfolder name detection when selecting parent folder. If parent has 2+ subfolders with same name, only first is scanned. Alert shown immediately after folder selection with list of duplicates. Files: DesktopScanner.js (analyzeAndLoadFolder function)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ AUTO-SAVE TOGGLE: Added user-configurable toggle in Settings to enable/disable auto-save feature. When disabled, scan results are NOT automatically saved (suitable for low-RAM machines). Setting: 'autoSaveEnabled' (default: true). Applied to both DesktopScanner and BatchScanner. Files: Settings.js (new AutoSaveSetting component), DesktopScanner.js, BatchScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

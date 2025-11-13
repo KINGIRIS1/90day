@@ -3125,7 +3125,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                         const currentIndex = childTabs.findIndex(tab => tab.path === activeChild);
                         if (currentIndex > 0) {
                           setActiveChild(childTabs[currentIndex - 1].path);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
                       disabled={childTabs.findIndex(tab => tab.path === activeChild) === 0}
@@ -3144,7 +3143,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                         const currentIndex = childTabs.findIndex(tab => tab.path === activeChild);
                         if (currentIndex < childTabs.length - 1) {
                           setActiveChild(childTabs[currentIndex + 1].path);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
                       disabled={childTabs.findIndex(tab => tab.path === activeChild) === childTabs.length - 1}

@@ -207,6 +207,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "♻️ MOVE TESSERACT+TEXT TO CLOUD SETTINGS: Moved 'Tesseract + Gemini Text' from Settings to CloudSettings as engine option 'gemini-flash-text'. Now it's alongside other Gemini engines (Flash, Hybrid, Lite). Removed separate OcrModeSetting component. Logic: When ocrEngine='gemini-flash-text', override mode to 'tesseract_text'. Files: CloudSettings.js (added option), Settings.js (removed OcrModeSetting), main.js (updated logic)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🐛 FIX BATCH CHECK FOR GEMINI-FLASH-TEXT: Added 'gemini-flash-text' to isGeminiEngine array check in 3 places. Without this, app would fallback to sequential offline processing instead of batch. Files: DesktopScanner.js (2 places - File Scan & Folder Scan), BatchScanner.js (1 place)."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

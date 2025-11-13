@@ -212,8 +212,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 "estimated_cost_usd": 0  # Could be calculated based on tier_used
             }
 
-        # Handle Gemini Flash (AI classification) - POSITION-AWARE APPROACH
-        elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite']:
+        # Handle Gemini Flash & Tesseract+Text (AI classification) - POSITION-AWARE APPROACH
+        elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text']:
             if not cloud_api_key:
                 return {
                     "success": False,

@@ -960,7 +960,7 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
       // Build args (use finalMode instead of mode)
       const args = [scriptPath, finalMode, ocrEngine, cloudApiKey, ...imagePaths];
       
-      console.log(`🐍 Calling Python batch processor: mode=${mode}, engine=${ocrEngine}`);
+      console.log(`🐍 Calling Python batch processor: mode=${finalMode}, engine=${ocrEngine}`);
       
       // Discover Python executable
       const pyInfo = discoverPython();

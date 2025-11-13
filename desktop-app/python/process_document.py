@@ -221,8 +221,33 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     "method": "config_error"
                 }
 
-            model_type = 'Lite' if ocr_engine_type == 'gemini-flash-lite' else 'Flash'
-            print(f"🤖 Using Gemini {model_type} AI with POSITION-AWARE classification", file=sys.stderr)
+            # Check if Tesseract+Text mode
+            if ocr_engine_type == 'gemini-flash-text':
+                print(f"🔬 Using Tesseract + Gemini Text mode (sequential)", file=sys.stderr)
+                from tesseract_text_classifier import process_image as tesseract_text_process
+                import time
+                
+                start_time = time.time()
+                result = tesseract_text_process(file_path, cloud_api_key)
+                scan_time = time.time() - start_time
+                
+                print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, time: {scan_time:.1f}s)", file=sys.stderr)
+                
+                if result.get("short_code") == "ERROR":
+                    return {
+                        "success": False,
+                        "error": result.get("reasoning", "Tesseract+Text error"),
+                        "method": "tesseract_text_failed"
+                    }
+                
+                method_used = "tesseract_text"
+                short_code = result.get("short_code", "UNKNOWN")
+            else:
+                # Standard Gemini Vision mode
+                model_type = 'Lite' if ocr_engine_type == 'gemini-flash-lite' else 'Flash'
+                if ocr_engine_type == 'gemini-flash-hybrid':
+                    model_type = 'Hybrid'
+                print(f"🤖 Using Gemini {model_type} AI with POSITION-AWARE classification", file=sys.stderr)
 
             from ocr_engine_gemini_flash import classify_document_gemini_flash
             from rule_classifier import classify_document_name_from_code

@@ -37,6 +37,7 @@ function BatchScanner({ onSwitchTab }) {
   const [activeFolder, setActiveFolder] = useState(null);
   const [isMergeAll, setIsMergeAll] = useState(false); // Track if merging all folders
   const [lastKnownType, setLastKnownType] = useState(null); // For sequential naming (UNKNOWN fallback)
+  const [duplicateFolders, setDuplicateFolders] = useState([]); // Track duplicate folder names: [{name, paths: [path1, path2]}]
   
   // Batch processing mode
   const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'

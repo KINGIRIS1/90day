@@ -24,7 +24,8 @@ function CloudSettings() {
         'tesseract': 'offline-tesseract',
         'gemini-flash': 'gemini-flash',
         'gemini-flash-hybrid': 'gemini-flash-hybrid',
-        'gemini-flash-lite': 'gemini-flash-lite'
+        'gemini-flash-lite': 'gemini-flash-lite',
+        'gemini-flash-text': 'gemini-flash-text'
       };
       
       const uiEngine = uiEngineMapping[backendEngine] || 'offline-tesseract';

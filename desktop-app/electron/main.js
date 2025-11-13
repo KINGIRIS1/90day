@@ -954,6 +954,12 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
           resolve({ success: false, error: 'Google API key not configured', results: [] });
           return;
         }
+      } else if (ocrEngine === 'openai-gpt4o-mini') {
+        cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'OpenAI API key not configured', results: [] });
+          return;
+        }
       }
       
       // Determine Python script path

@@ -337,6 +337,17 @@ const Settings = () => {
         <RequestDelaySetting />
       </div>
 
+      {/* Auto-save Setting */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          💾 Cài đặt Tự động lưu
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          <strong>Lưu ý:</strong> Tắt tự động lưu phù hợp với máy RAM yếu, tránh ảnh hưởng hiệu suất.
+        </p>
+        <AutoSaveSetting />
+      </div>
+
       {/* App Information */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">

@@ -67,6 +67,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [activeChild, setActiveChild] = useState(null);
   const [childScanImagesOnly, setChildScanImagesOnly] = useState(false);
   const [isFolderPaused, setIsFolderPaused] = useState(false); // Track folder pause state
+  const [duplicateChildFolders, setDuplicateChildFolders] = useState([]); // Track duplicate folder names: [{name, paths: [path1, path2]}]
   const [remainingTabs, setRemainingTabs] = useState([]); // Tabs left to scan
   const [tabPreviewsLoaded, setTabPreviewsLoaded] = useState(new Set()); // Track which tabs have previews loaded
   const [isLoadingPreviews, setIsLoadingPreviews] = useState(false); // Track preview loading state

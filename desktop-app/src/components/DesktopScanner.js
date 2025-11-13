@@ -89,6 +89,9 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
   const [activeBatchMode, setActiveBatchMode] = useState(null); // Track active batch mode during scan
   
+  // GCN sorting preference
+  const [sortGCNToTop, setSortGCNToTop] = useState(true); // User preference: sort GCN to top after scan
+  
   // Auto-save & Resume
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [incompleteScans, setIncompleteScans] = useState([]);

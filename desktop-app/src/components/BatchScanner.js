@@ -120,6 +120,12 @@ function BatchScanner({ onSwitchTab }) {
   // Auto-save when folderTabs change (folders complete) - IMMEDIATE SAVE
   useEffect(() => {
     const autoSave = async () => {
+      // Skip if auto-save is disabled
+      if (!autoSaveEnabled) {
+        console.log('💾 Auto-save disabled, skipping...');
+        return;
+      }
+      
       const doneFolders = folderTabs.filter(t => t.status === 'done');
       const allDone = folderTabs.length > 0 && folderTabs.every(t => t.status === 'done');
       

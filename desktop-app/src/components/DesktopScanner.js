@@ -238,6 +238,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`📊 Loaded GCN sort preference: ${savedSortGCN}`);
       }
       
+      // Load auto-save preference from config
+      const savedAutoSave = await api.getConfig('autoSaveEnabled');
+      if (savedAutoSave !== undefined && savedAutoSave !== null) {
+        setAutoSaveEnabled(savedAutoSave);
+        console.log(`💾 Loaded auto-save preference: ${savedAutoSave}`);
+      }
+      
       console.log('🔍 Current OCR Engine:', engine);
       
       // Check for incomplete scans (only for main scanner tab, not folder tabs)

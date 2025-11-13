@@ -177,6 +177,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🐛 FIX GCN CLASSIFICATION FALLBACK: Fixed issue where all GCN documents were classified as GCNM when no date/color available. Added fallback logic: When no dates → First group = GCNC, rest = GCNM (by file order). When only 1 group → GCNC (assume oldest). This prevents 'GCNM GCNM GCNM GCNM' issue. Files: DesktopScanner.js, BatchScanner.js (postProcessGCNBatch functions)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ DUPLICATE FOLDER DETECTION (Batch Scan): Added duplicate folder name detection when loading TXT file. If 2+ paths have same folder name (e.g., C:/ABC and D:/ABC), only the first one is scanned, others are skipped. Features: (1) Warning during folder discovery, (2) Visual indicator in folder list showing which paths are kept/skipped, (3) Summary notification after scan completion. Prevents merging files from different locations into one tab. File: BatchScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

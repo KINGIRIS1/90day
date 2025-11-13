@@ -15,22 +15,22 @@ import io
 # NOTE: "GCN" is a TEMPORARY code used during batch processing
 #       It will be post-processed to GCNC (old) or GCNM (new) based on issue date
 VALID_DOCUMENT_CODES = {
-    'BBBDG', 'BBGD', 'BBHDDK', 'BBKTDC', 'BBKTHT', 'BBKTSS', 'BBNT',
-    'BKKDT', 'BLTT', 'BMT', 'BVHC', 'BVN', 'CCCD', 'CDLK', 'CHTGD',
-    'CKDC', 'CKTSR', 'DCK', 'DCQDGD', 'DDCTH', 'DDK', 'DDKBD', 'DGH',
-    'DICHUC', 'DKTC', 'DKTD', 'DKXTC', 'DMD', 'DMG', 'DSCG', 'DSCK',
-    'DXCD', 'DXCMD', 'DXGD', 'DXN', 'DXNTH', 'DXTHT',
+    'BBBDG', 'BBKTHT', 'BBNT',
+    'BMT', 'CCCD', 'CDLK', 'CHTGD',
+    'CKDC', 'CKTSR', 'DCK', 'DCQDGD', 'DDK', 'DDKBD', 'DGH',
+    'DICHUC', 'DMG', 'DSCK',
+    'DXCD', 'DXCMD', 'DXGD', 'DXN', 'DXTHT',
     'GCN',   # TEMPORARY - will be post-processed to GCNC or GCNM
     'GCNC',  # GCN old (red/brown certificate)
     'GCNM',  # GCN new (pink certificate)
-    'GKH', 'GKS', 'GNT', 'GPXD', 'GSND', 'GTLQ', 'GUQ', 'GXNDKLD',
-    'GXNNVTC', 'HCLK', 'HDBDG', 'HDCQ', 'HDTCO', 'HDTD', 'HDTHC', 'HDUQ',
+    'GKH', 'GKS', 'GNT', 'GPXD', 'GTLQ', 'GUQ', 'GXNDKLD',
+    'GXNNVTC', 'HCLK', 'HDBDG', 'HDCQ', 'HDTHC', 'HDUQ',
     'HSKT', 'HTBTH', 'HTNVTC', 'KTCKCG', 'KTCKMG', 'PCT', 'PCTSVC',
-    'PDPASDD', 'PKTHS', 'PLYKDC', 'PXNKQDD', 'QDCHTGD', 'QDCMD', 'QDDCGD',
-    'QDDCQH', 'QDDCTH', 'QDGH', 'QDGTD', 'QDHG', 'QDHTSD', 'QDPDBT',
-    'QDPDDG', 'QDTH', 'QDTHA', 'QDTT', 'QDXP', 'QR', 'SDTT', 'TBCKCG',
+    'PKTHS', 'PLYKDC', 'PXNKQDD', 'QDCHTGD', 'QDCMD', 'QDDCGD',
+    'QDDCTH', 'QDGH', 'QDGTD', 'QDHG', 'QDPDBT',
+    'QDTH', 'SDTT', 'TBCKCG',
     'TBCKMG', 'TBCNBD', 'TBMG', 'TBT', 'TKT', 'TTCG', 'TTHGD', 'UNKNOWN',
-    'VBCTCMD', 'VBDNCT', 'VBTC', 'VBTK', 'hoadon'  # hoadon is lowercase in classifier
+    'VBCTCMD', 'VBTC', 'VBTK', 'hoadon'  # hoadon is lowercase in classifier
 }
 
 

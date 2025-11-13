@@ -521,9 +521,9 @@ function BatchScanner({ onSwitchTab }) {
           const folderResults = [];
           
           // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED
-          const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(ocrEngine);
+          const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text'].includes(ocrEngine);
           const shouldUseBatch = (
-            isGeminiEngine &&
+            isGeminiEngine && // Gemini engine (including Tesseract+Text)
             (batchMode === 'fixed' || batchMode === 'smart') &&
             validImages.length >= 3
           );

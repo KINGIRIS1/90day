@@ -34,37 +34,40 @@ VALID_DOCUMENT_CODES = {
 
 def resize_image_smart(img, max_width=512, max_height=512):
     """
-    Aggressive resize for OpenAI "low" detail mode
-    OpenAI "low" detail only works with images ≤512x512
-    Larger images still consume many tokens even with "low"
+    ULTRA aggressive resize for OpenAI token optimization
+    Force to EXACT 512x512 square to minimize tokens
+    OpenAI charges based on actual pixels, not just "detail" setting
     """
     width, height = img.size
     
-    # ALWAYS resize for OpenAI to ensure low token usage
-    # Calculate resize ratio (maintain aspect ratio)
-    ratio_w = max_width / width
-    ratio_h = max_height / height
-    ratio = min(ratio_w, ratio_h)
+    # Force to 512x512 SQUARE (pad with white if needed)
+    # This ensures consistent ~85 tokens per image
+    target_size = 512
     
+    # Calculate resize to fit within square
+    ratio = min(target_size / width, target_size / height)
     new_width = int(width * ratio)
     new_height = int(height * ratio)
     
-    # Ensure minimum size for text readability
-    if new_width < 400:
-        new_width = 400
-        new_height = int(height * (400 / width))
-    
-    # Use LANCZOS for high quality resize
+    # Resize image
     resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
     
-    reduction = (1 - (new_width * new_height) / (width * height)) * 100
+    # Create white square canvas
+    square_img = Image.new('RGB', (target_size, target_size), (255, 255, 255))
     
-    print(f"🔽 Aggressive resize for low tokens: {width}x{height} → {new_width}x{new_height} (-{reduction:.1f}% pixels)", file=sys.stderr)
+    # Paste resized image in center
+    offset_x = (target_size - new_width) // 2
+    offset_y = (target_size - new_height) // 2
+    square_img.paste(resized_img, (offset_x, offset_y))
     
-    return resized_img, {
+    reduction = (1 - (target_size * target_size) / (width * height)) * 100
+    
+    print(f"🔽 ULTRA resize to 512x512 square: {width}x{height} → {target_size}x{target_size} (-{reduction:.1f}% pixels)", file=sys.stderr)
+    
+    return square_img, {
         "resized": True,
         "original_size": f"{width}x{height}",
-        "final_size": f"{new_width}x{new_height}",
+        "final_size": f"{target_size}x{target_size}",
         "reduction_percent": round(reduction, 1)
     }
 

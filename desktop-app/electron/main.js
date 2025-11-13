@@ -938,7 +938,10 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
       let finalMode = mode;
       if (ocrMode === 'tesseract_text') {
         finalMode = 'tesseract_text';
-        console.log(`🔄 Overriding mode: ${mode} → tesseract_text (OCR Mode setting)`);
+        console.log(`🔄 [OCR MODE] Overriding: ${mode} → tesseract_text`);
+        console.log(`   Reason: User selected Tesseract+Text mode in Settings`);
+      } else {
+        console.log(`   Using original mode: ${mode} (ocrMode=${ocrMode})`);
       }
       
       // Get API key for cloud engines

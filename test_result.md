@@ -218,7 +218,7 @@ frontend:
         comment: "✂️ REMOVE 32 RARE DOCUMENT CODES: Removed 32 rarely-used document codes from prompts to reduce tokens and improve accuracy for main types. Codes removed: BVHC, BVN, BKKDT, DSCG, BBNT, BBKTSS, BBKTDC, BLTT, DS15, DSCK, CHTGD, DMD, DDCTH, DXNTH, GSND, BBGD, BBHDDK, HDTCO, HDTD, DKTC, DKTD, DKXTC, QR, QDTT, QDPDBT, QDDCQH, QDPDDG, QDTHA, QDHTSD, QDXP, VBDNCT, PDPASDD. Document types: 98 → 66. Files: ocr_engine_gemini_flash.py, tesseract_text_classifier.py, batch_processor.py."
       - working: "needs_testing"
         agent: "main"
-        comment: "🧹 REMOVE DUPLICATE PROMPT SECTIONS: Found and removed duplicate section in ocr_engine_gemini_flash.py (lines 1656-1714) that was exact copy of lines 1217-1250. Section about '⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY' and title classification rules. Saves ~60 lines / ~400 tokens. File: ocr_engine_gemini_flash.py."
+        comment: "🧹 REMOVE DUPLICATE PROMPT SECTIONS: Found and removed 2 duplicate sections in ocr_engine_gemini_flash.py: (1) lines 1656-1714 duplicate of 1217-1250 ('⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ'), (2) lines 1765-1780 duplicate of 1553-1568 ('🚨 KHÔNG TỰ TẠO MÃ MỚI'). Total removed: ~76 lines / ~500 tokens. Also updated '98 mã' → '66 mã' in remaining section. File: ocr_engine_gemini_flash.py."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

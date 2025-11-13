@@ -1563,7 +1563,7 @@ TRẢ VỀ JSON (BẮT BUỘC):
 ✅ "GIẤY ỦY QUYỀN" → "GUQ" (ĐÚNG!)
 
 VÍ DỤ SAI:
-❌ "LCHO" (Lời chứng) → KHÔNG CÓ trong 98 mã → Phải trả về "UNKNOWN"
+❌ "LCHO" (Lời chứng) → KHÔNG CÓ trong 66 mã → Phải trả về "UNKNOWN"
 ❌ "VBCC" (Văn bản công chứng) → KHÔNG CÓ → Phải trả về "UNKNOWN"
 ❌ "PKDT" (Phiếu kiểm tra đất) → KHÔNG CÓ → Phải trả về "UNKNOWN"
 

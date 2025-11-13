@@ -1365,16 +1365,10 @@ SƠ ĐỒ DỰ KIẾN TÁCH THỬA → SDTT
 
 📋 NHÓM 2: BIÊN BẢN (10 loại)
 BIÊN BẢN BÁN ĐẤU GIÁ TÀI SẢN → BBBDG
-BIÊN BẢN BÀN GIAO ĐẤT TRÊN THỰC ĐỊA → BBGD
-BIÊN BẢN CỦA HỘI ĐỒNG ĐĂNG KÝ ĐẤT ĐAI LẦN ĐẦU → BBHDDK
-BIÊN BẢN KIỂM TRA NGHIỆM THU CÔNG TRÌNH XÂY DỰNG → BBNT
-BIÊN BẢN KIỂM TRA SAI SÓT TRÊN GIẤY CHỨNG NHẬN → BBKTSS
 BIÊN BẢN KIỂM TRA, XÁC MINH HIỆN TRẠNG SỬ DỤNG ĐẤT → BBKTHT
   (Variants: "BIÊN BẢN\nXác minh thực địa...", "BIÊN BẢN\nKiểm tra xác minh hiện trạng...")
-BIÊN BẢN VỀ VIỆC KẾT THÚC CÔNG KHAI CÔNG BỐ DI CHÚC → BBKTDC
 BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI KẾT QUẢ KIỂM TRA HỒ SƠ ĐĂNG KÝ CẤP GCNQSD ĐẤT → KTCKCG
 BIÊN BẢN VỀ VIỆC KẾT THÚC THÔNG BÁO NIÊM YẾT CÔNG KHAI VỀ VIỆC MẤT GCNQSD ĐẤT → KTCKMG
-BIÊN LAI THU THUẾ SỬ DỤNG ĐẤT PHI NÔNG NGHIỆP → BLTT
 
 📋 NHÓM 4: GIẤY TỜ CÁ NHÂN (4 loại)
 CĂN CƯỚC CÔNG DÂN → CCCD
@@ -1392,7 +1386,6 @@ DI CHÚC → DICHUC
   ⚠️ Frontend xử lý batch để phân loại cũ/mới dựa trên ngày cấp
 GIẤY ĐỀ NGHỊ XÁC NHẬN CÁC KHOẢN NỘP VÀO NGÂN SÁCH → GXNNVTC
 GIẤY NỘP TIỀN VÀO NGÂN SÁCH NHÀ NƯỚC → GNT
-GIẤY SANG NHƯỢNG ĐẤT → GSND
 GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO) → GTLQ
   (Variants: "TÀI LIỆU LIÊN QUAN", "HỒ SƠ LIÊN QUAN", "GIẤY TỜ KHÁC", "TÀI LIỆU KHÁC", "VĂN BẢN KHAI NHẬN DI SẢN", "PHIẾU BÁO")
 GIẤY TIẾP NHẬN, GIẤY BIÊN NHẬN (HỒ SƠ) → GTLQ
@@ -1409,8 +1402,6 @@ GIẤY XIN PHÉP XÂY DỰNG → GPXD
 HỢP ĐỒNG CHUYỂN NHƯỢNG, TẶNG CHO QUYỀN SỬ DỤNG ĐẤT → HDCQ
 HỢP ĐỒNG ỦY QUYỀN → HDUQ
 HỢP ĐỒNG THẾ CHẤP QUYỀN SỬ DỤNG ĐẤT → HDTHC
-HỢP ĐỒNG THUÊ ĐẤT, ĐIỀU HỈNH HỢP ĐỒNG THUÊ ĐẤT → HDTD
-HỢP ĐỒNG THI CÔNG → HDTCO
 HỢP ĐỒNG MUA BÁN TÀI SẢN BÁN ĐẤU GIÁ → HDBDG
 HOÁ ĐƠN GIÁ TRỊ GIA TĂNG → hoadon
 
@@ -1419,35 +1410,24 @@ HOÁ ĐƠN GIÁ TRỊ GIA TĂNG → hoadon
 ĐƠN ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DDK (không có "BIẾN ĐỘNG")
 ĐƠN CAM KẾT, GIẤY CAM KẾT → DCK
   (Variants: "GIẤY CAM KẾT\n(V/v chọn thửa đất...)", "ĐƠN CAM KẾT")
-ĐƠN ĐỀ NGHỊ CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → CHTGD
 ĐƠN ĐỀ NGHỊ ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → DCQDGD
 ĐƠN ĐỀ NGHỊ MIỄN GIẢM LỆ PHÍ TRƯỚC BẠ, THUẾ THU NHẬP CÁ NHÂN → DMG
-ĐƠN ĐỀ NGHỊ SỬ DỤNG ĐẤT KẾT HỢP ĐA MỤC ĐÍCH → DMD
 ĐƠN XÁC NHẬN, GIẤY XÁC NHẬN → DXN
 ĐƠN XIN (ĐỀ NGHỊ) CHUYỂN MỤC ĐÍCH SỬ DỤNG ĐẤT → DXCMD
 ĐƠN XIN (ĐỀ NGHỊ) GIA HẠN SỬ DỤNG ĐẤT → DGH
 ĐƠN XIN (ĐỀ NGHỊ) GIAO ĐẤT, CHO THUÊ ĐẤT → DXGD
 ĐƠN XIN (ĐỀ NGHỊ) TÁCH THỬA ĐẤT, HỢP THỬA ĐẤT → DXTHT
 ĐƠN XIN CẤP ĐỔI GIẤY CHỨNG NHẬN → DXCD
-ĐƠN XIN ĐIỀU CHỈNH THỜI HẠN SỬ DỤNG ĐẤT CỦA DỰ ÁN ĐẦU TƯ → DDCTH
-ĐƠN XIN XÁC NHẬN LẠI THỜI HẠN SỬ DỤNG ĐẤT NÔNG NGHIỆP → DXNTH
 
 📋 NHÓM 8: QUYẾT ĐỊNH (15 loại) ⚠️ DỄ NHẦM
 QUYẾT ĐỊNH GIAO ĐẤT, CHO THUÊ ĐẤT → QDGTD
 QUYẾT ĐỊNH CHO PHÉP CHUYỂN MỤC ĐÍCH → QDCMD
 QUYẾT ĐỊNH THU HỒI ĐẤT → QDTH
 QUYẾT ĐỊNH GIA HẠN SỬ DỤNG ĐẤT KHI HẾT THỜI HẠN SDĐ → QDGH
-QUYẾT ĐỊNH CHO PHÉP TÁCH, HỢP THỬA ĐẤT → QDTT
 QUYẾT ĐỊNH CHUYỂN HÌNH THỨC GIAO ĐẤT (CHO THUÊ ĐẤT) → QDCHTGD
 QUYẾT ĐỊNH ĐIỀU CHỈNH QUYẾT ĐỊNH GIAO ĐẤT (CHO THUÊ ĐẤT, CHO PHÉP CHUYỂN MỤC ĐÍCH) → QDDCGD
 QUYẾT ĐỊNH ĐIỀU CHỈNH THỜI HẠN SDĐ CỦA DỰ ÁN ĐẦU TƯ → QDDCTH
 QUYẾT ĐỊNH HỦY GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT → QDHG
-QUYẾT ĐỊNH PHÊ DUYỆT PHƯƠNG ÁN BỒI THƯỜNG, HỖ TRỢ, TÁI ĐỊNH CƯ → QDPDBT
-QUYẾT ĐỊNH PHÊ QUYỆT ĐIỀU CHỈNH QUY HOẠCH → QDDCQH
-QUYẾT ĐỊNH PHÊ QUYỆT ĐƠN GIÁ → QDPDDG
-QUYẾT ĐỊNH THI HÀNH ÁN THEO ĐƠN YÊU CẦU → QDTHA
-QUYẾT ĐỊNH VỀ HÌNH THỨC SỬ DỤNG ĐẤT → QDHTSD
-QUYẾT ĐỊNH XỬ PHẠT → QDXP
 
 📋 NHÓM 9: PHIẾU (8 loại)
 PHIẾU CHUYỂN THÔNG TIN NGHĨA VỤ TÀI CHÍNH → PCT
@@ -1459,10 +1439,6 @@ PHIẾU TRÌNH KÝ HỒ SƠ CẤP GIẤY CHỨNG NHẬN → PKTHS
   (Variants: "PHIẾU TRÌNH KÝ HỒ SƠ")
 PHIẾU LẤY Ý KIẾN KHU DÂN CƯ → PLYKDC
 PHIẾU XÁC NHẬN KẾT QUẢ ĐO ĐẠC → PXNKQDD
-PHIẾU YÊU CẦU ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTC
-PHIẾU YÊU CẦU ĐĂNG KÝ THAY ĐỔI NỘI DUNG BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SDĐ, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKTD
-PHIẾU YÊU CẦU XÓA ĐĂNG KÝ BIỆN PHÁP BẢO ĐẢM BẰNG QUYỀN SỬ DỤNG ĐẤT, TÀI SẢN GẮN LIỀN VỚI ĐẤT → DKXTC
-QUÉT MÃ QR → QR
 
 📋 NHÓM 10: THÔNG BÁO (8 loại)
 THÔNG BÁO THUẾ (TRƯỚC BẠ, THUẾ TNCN, TIỀN SỬ DỤNG ĐẤT) → TBT
@@ -1483,8 +1459,6 @@ TỜ TRÌNH VỀ VIỆC ĐĂNG KÝ ĐẤT ĐAI, TÀI SẢN GẮN LIỀN VỚI Đ
 📋 NHÓM 12: VĂN BẢN (10 loại)
 VĂN BẢN CAM KẾT TÀI SẢN RIÊNG → CKTSR
 VĂN BẢN CHẤP THUẬN CHO PHÉP CHUYỂN MỤC ĐÍCH → VBCTCMD
-VĂN BẢN ĐỀ NGHỊ CHẤP THUẬN NHẬN CHUYỂN NHƯỢNG, THUÊ, GÓP VỐN QUYỀN SDĐ → VBDNCT
-VĂN BẢN ĐỀ NGHỊ THẨM ĐỊNH, PHÊ DUYỆT PHƯƠNG ÁN SDĐ → PDPASDD
 VĂN BẢN THỎA THUẬN PHÂN CHIA DI SẢN THỪA KẾ → VBTK
 VĂN BẢN THỎA THUẬN QUYỀN SỬ DỤNG ĐẤT CỦA HỘ GIA ĐÌNH → TTHGD
   (Variants: "THỎA THUẬN QSDĐ HỘ GIA ĐÌNH", "THỎA THUẬN SỬ DỤNG ĐẤT HỘ GIA ĐÌNH", "PHÂN CHIA TÀI SẢN CHUNG HỘ GIA ĐÌNH", "VĂN BẢN THỎA THUẬN PHÂN CHIA TÀI SẢN...HỘ GIA ĐÌNH")

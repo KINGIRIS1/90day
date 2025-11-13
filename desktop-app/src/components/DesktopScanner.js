@@ -205,7 +205,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       }
     };
     autoSave(); // Execute immediately (no debounce)
-  }, [childTabs, currentScanId, parentFolder, activeChild, currentOcrEngine, batchMode]);
+  }, [childTabs, currentScanId, parentFolder, activeChild, currentOcrEngine, batchMode, autoSaveEnabled]);
   
   // Load config (guard electron)
   useEffect(() => {

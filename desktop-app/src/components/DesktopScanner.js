@@ -1630,10 +1630,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     stopRef.current = false;
 
     // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED
-    const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid'].includes(currentOcrEngine);
+    const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text'].includes(currentOcrEngine);
     const shouldUseBatch = (
       !isResume && // Not resuming
-      isGeminiEngine && // Gemini engine
+      isGeminiEngine && // Gemini engine (including Tesseract+Text)
       (batchMode === 'fixed' || batchMode === 'smart') && // Batch mode enabled
       filesToProcess.length >= 3 // At least 3 files (batch makes sense)
     );

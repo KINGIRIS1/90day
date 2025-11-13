@@ -1697,29 +1697,6 @@ CÁC CẶP DỄ NHẦM - PHẢI KHỚP CHÍNH XÁC:
    PHẢI phân biệt rõ!
 
 
-
-QUY TRÌNH KIỂM TRA:
-1. Phân tích VỊ TRÍ của các text trong ảnh (TOP/MIDDLE/BOTTOM)
-2. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
-3. Đọc tiêu đề Ở TOP 30% (bỏ qua mentions ở MIDDLE/BOTTOM)
-4. Tìm trong danh sách có tên CHÍNH XÁC 100% với tiêu đề ở TOP?
-5. NẾU CÓ → Trả về mã chính xác, confidence: 0.9, title_position: "top"
-6. NẾU KHÔNG CÓ TIÊU ĐỀ Ở TOP → Kiểm tra GCNM continuation patterns
-7. NẾU VẪN KHÔNG → Trả về "UNKNOWN", confidence: 0.1
-
-TRẢ VỀ JSON (BẮT BUỘC):
-{
-  "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
-  "confidence": 0.9 hoặc 0.1,
-  "title_position": "top" hoặc "middle" hoặc "bottom" hoặc "none",
-  "reasoning": "Giải thích ngắn gọn, bao gồm vị trí của tiêu đề"
-}
-
-❗ NHẮC LẠI:
-- CHỈ phân loại dựa vào tiêu đề Ở TOP 30% của trang
-- BỎ QUA mentions hoặc text Ở MIDDLE/BOTTOM
-- NẾU thấy text khớp nhưng KHÔNG ở TOP → title_position: "middle"/"bottom", short_code: "UNKNOWN"
-- NẾU thấy text khớp VÀ ở TOP → title_position: "top", short_code: [MÃ CHÍNH XÁC]
 - LUÔN trả về JSON format với fields: short_code, confidence, title_position, reasoning, issue_date, issue_date_confidence
 
 📋 ISSUE_DATE (BẮT BUỘC CHO GCN):

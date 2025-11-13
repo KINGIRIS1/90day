@@ -371,8 +371,56 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         const analysis = await window.electronAPI.analyzeParentFolder(folderPath);
         if (analysis && analysis.success) {
           setParentSummary(analysis.summary);
-          setChildTabs(analysis.subfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
-          setActiveChild(analysis.subfolders[0]?.path || null);
+          
+          // Detect duplicate folder names
+          const folderNameMap = new Map();
+          const duplicates = [];
+          
+          analysis.subfolders.forEach(sf => {
+            if (!folderNameMap.has(sf.name)) {
+              folderNameMap.set(sf.name, []);
+            }
+            folderNameMap.get(sf.name).push(sf.path);
+          });
+          
+          // Find duplicates
+          folderNameMap.forEach((paths, name) => {
+            if (paths.length > 1) {
+              duplicates.push({ name, paths });
+              console.warn(`⚠️ Duplicate subfolder name: "${name}" at ${paths.length} locations`);
+            }
+          });
+          
+          // Filter: Keep only first occurrence of each folder name
+          const seenNames = new Set();
+          const filteredSubfolders = analysis.subfolders.filter(sf => {
+            if (seenNames.has(sf.name)) {
+              console.log(`🚫 Skipping duplicate subfolder: ${sf.path} (name: "${sf.name}")`);
+              return false;
+            }
+            seenNames.add(sf.name);
+            return true;
+          });
+          
+          setChildTabs(filteredSubfolders.map(sf => ({ name: sf.name, path: sf.path, count: sf.fileCount, status: 'pending', results: [] })));
+          setActiveChild(filteredSubfolders[0]?.path || null);
+          setDuplicateChildFolders(duplicates);
+          
+          // Show warning if duplicates found
+          if (duplicates.length > 0) {
+            let warnMsg = `⚠️ Phát hiện ${duplicates.length} thư mục con trùng tên!\n\n`;
+            duplicates.forEach(dup => {
+              warnMsg += `📁 "${dup.name}":\n`;
+              warnMsg += `  ✅ Sẽ quét: ${dup.paths[0]}\n`;
+              dup.paths.slice(1).forEach(p => {
+                warnMsg += `  ❌ Bỏ qua: ${p}\n`;
+              });
+              warnMsg += `\n`;
+            });
+            warnMsg += `💡 Chỉ thư mục đầu tiên sẽ được quét.`;
+            alert(warnMsg);
+          }
+          
           analyzed = true;
         }
       }

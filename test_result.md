@@ -171,6 +171,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ JPEG QUALITY OPTIMIZATION (Fix 503 errors): Reduced JPEG quality from 95 → 85 in batch_processor.py. Expected results: ~60% smaller request size (5.34 MB → ~2.1 MB for 5 files), 98-99% OCR accuracy maintained. Should resolve 503 Server Error during batch processing. File: /app/desktop-app/python/batch_processor.py line 422."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ GCN SORT TOGGLE: Added user-configurable toggle to enable/disable GCN sorting to top after scan completion. Toggle appears in all scan UIs (File Scan, Folder Scan, Batch Scan). Setting saved to electron-store as 'sortGCNToTop' (default: true). When enabled, GCNC and GCNM documents are moved to the top of results for easy review. Files modified: DesktopScanner.js, BatchScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

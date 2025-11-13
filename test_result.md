@@ -198,6 +198,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🐛 FIX TAB NAVIGATION AUTO-SCROLL: Removed auto-scroll to top when clicking Next/Back buttons. Users can now stay at their current scroll position when navigating between tabs. Makes the navigation buttons truly useful for staying in preview area. Files: DesktopScanner.js, BatchScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "⚡ NEW OCR MODE - TESSERACT + GEMINI TEXT (TEST): Added experimental mode using Tesseract for local OCR, then Gemini Text API for classification. Benefits: 3-5x faster, 10-20x cheaper, less 503 errors, larger batches (20-30 files). Settings: 'ocrMode' = 'vision' (default) or 'tesseract_text' (new). Files: tesseract_text_classifier.py (new), batch_processor.py (updated), Settings.js (new OcrModeSetting). UI marked as TEST/experimental."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

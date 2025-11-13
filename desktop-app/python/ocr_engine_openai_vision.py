@@ -89,7 +89,7 @@ def get_classification_prompt():
             return """Phân loại tài liệu đất đai Việt Nam. Trả về JSON với short_code, confidence, reasoning."""
 
 
-def classify_document_openai_vision(image_path, api_key, enable_resize=True, max_width=1200, max_height=1800):
+def classify_document_openai_vision(image_path, api_key, enable_resize=True, max_width=512, max_height=512):
     """
     Classify Vietnamese land document using OpenAI GPT-4o mini Vision
     

@@ -55,7 +55,7 @@ const ResizeSetting = () => {
             enableResize ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'
           }`}
         >
-          {enableResize ? 'Đang BẬT' : 'Đang TẮT'}
+          {enableResize ? '✅ Đang BẬT' : '❌ Đang TẮT'}
         </button>
       </div>
 

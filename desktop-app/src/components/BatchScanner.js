@@ -167,6 +167,13 @@ function BatchScanner({ onSwitchTab }) {
           console.log(`📦 Loaded batch mode: ${savedBatchMode}`);
         }
         
+        // Load GCN sort preference
+        const savedSortGCN = await window.electronAPI.getConfig('sortGCNToTop');
+        if (savedSortGCN !== undefined && savedSortGCN !== null) {
+          setSortGCNToTop(savedSortGCN);
+          console.log(`📊 Loaded GCN sort preference: ${savedSortGCN}`);
+        }
+        
         // Check for incomplete scans
         const incompleteResult = await window.electronAPI.getIncompleteScans();
         if (incompleteResult.success && incompleteResult.scans.length > 0) {

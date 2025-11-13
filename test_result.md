@@ -195,6 +195,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ TOGGLE BUTTON TEXT FIX: Updated all toggle buttons to show current state more clearly. Changed from '✅ BẬT' / '❌ TẮT' to '✅ Đang BẬT' / '❌ Đang TẮT'. Prevents confusion between action vs. state. Applied to: AutoSaveSetting, ResizeSetting (Settings.js), GCN Sort Toggle (DesktopScanner.js, BatchScanner.js)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🐛 FIX TAB NAVIGATION AUTO-SCROLL: Removed auto-scroll to top when clicking Next/Back buttons. Users can now stay at their current scroll position when navigating between tabs. Makes the navigation buttons truly useful for staying in preview area. Files: DesktopScanner.js, BatchScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

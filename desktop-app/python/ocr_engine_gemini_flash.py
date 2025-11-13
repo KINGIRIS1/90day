@@ -372,11 +372,18 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
 
 def get_classification_prompt_lite():
     """
-    OPTIMIZED prompt for Flash Lite with critical special cases
+    OPTIMIZED prompt for Flash Lite - synchronized with full version
     Balances simplicity with accuracy for edge cases
-    Target: ~1500-2000 tokens (60-65% reduction from full)
+    Loads from external file for easier maintenance
     """
-    return """🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
+    import os
+    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_lite.txt')
+    try:
+        with open(prompt_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"⚠️ Prompt file not found: {prompt_path}, using fallback", file=sys.stderr)
+        return """🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
 
 📋 QUY TẮC PHÂN LOẠI (QUAN TRỌNG):
 

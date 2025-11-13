@@ -210,6 +210,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🐛 FIX BATCH CHECK FOR GEMINI-FLASH-TEXT: Added 'gemini-flash-text' to isGeminiEngine array check in 3 places. Without this, app would fallback to sequential offline processing instead of batch. Files: DesktopScanner.js (2 places - File Scan & Folder Scan), BatchScanner.js (1 place)."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🔧 SUPPORT GEMINI-FLASH-TEXT IN SEQUENTIAL MODE: Updated process_document.py to handle gemini-flash-text in sequential processing (when < 3 files). Added if-else logic: if engine=gemini-flash-text, call tesseract_text_classifier; else, use standard Gemini Vision. Also added gemini-flash-hybrid to engine check. File: process_document.py."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

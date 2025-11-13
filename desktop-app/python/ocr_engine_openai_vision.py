@@ -124,8 +124,8 @@ def classify_document_openai_vision(image_path, api_key, enable_resize=True, max
             # Convert to RGB if needed
             if img.mode in ('RGBA', 'LA', 'P'):
                 img = img.convert('RGB')
-            # Quality 80 is sweet spot for 512x512 images
-            img.save(img_byte_arr, format='JPEG', quality=80, optimize=True)
+            # Quality 60 for 512x512 - still readable, much smaller file
+            img.save(img_byte_arr, format='JPEG', quality=60, optimize=True)
             image_content = img_byte_arr.getvalue()
         
         # Encode to base64

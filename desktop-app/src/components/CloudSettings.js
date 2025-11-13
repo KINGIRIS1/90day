@@ -291,6 +291,32 @@ function CloudSettings() {
               </div>
             </div>
           </label>
+
+          {/* OpenAI GPT-4o mini Vision */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-purple-50 transition border-purple-300 bg-white">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="openai-gpt4o-mini"
+              checked={ocrEngine === 'openai-gpt4o-mini'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium flex items-center gap-2">
+                <span>🟣 OpenAI GPT-4o mini</span>
+                <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded">VISION API</span>
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                • <strong>Model: GPT-4o mini (vision)</strong><br />
+                • Accuracy: 90-95% (rất tốt)<br />
+                • Tốc độ: 2-4s/image<br />
+                • Chi phí: Input $0.15/1M tokens, Output $0.60/1M tokens<br />
+                • Giống Gemini Flash (gửi ảnh trực tiếp)<br />
+                • ⚠️ Cần OpenAI API key (BYOK)
+              </div>
+            </div>
+          </label>
         </div>
       </div>
 

@@ -691,9 +691,11 @@ function BatchScanner({ onSwitchTab }) {
             // Post-process GCN documents (date-based classification)
             const processedFolderResults = postProcessGCNBatch(folderResults);
             
-            // Sort results: GCN (GCNC, GCNM) on top for easy review
-            const sortedResults = sortResultsWithGCNOnTop(processedFolderResults);
-            console.log(`📊 Sorted results: ${sortedResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+            // Sort results: GCN (GCNC, GCNM) on top for easy review (if enabled)
+            const sortedResults = sortGCNToTop ? sortResultsWithGCNOnTop(processedFolderResults) : processedFolderResults;
+            if (sortGCNToTop) {
+              console.log(`📊 Sorted results: ${sortedResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+            }
             
             // Update allResults with post-processed results
             const startIndex = allResults.length - folderResults.length;

@@ -174,6 +174,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ GCN SORT TOGGLE: Added user-configurable toggle to enable/disable GCN sorting to top after scan completion. Toggle appears in all scan UIs (File Scan, Folder Scan, Batch Scan). Setting saved to electron-store as 'sortGCNToTop' (default: true). When enabled, GCNC and GCNM documents are moved to the top of results for easy review. Files modified: DesktopScanner.js, BatchScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "🐛 FIX GCN CLASSIFICATION FALLBACK: Fixed issue where all GCN documents were classified as GCNM when no date/color available. Added fallback logic: When no dates → First group = GCNC, rest = GCNM (by file order). When only 1 group → GCNC (assume oldest). This prevents 'GCNM GCNM GCNM GCNM' issue. Files: DesktopScanner.js, BatchScanner.js (postProcessGCNBatch functions)."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

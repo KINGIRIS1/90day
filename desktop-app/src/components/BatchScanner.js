@@ -1906,7 +1906,7 @@ function BatchScanner({ onSwitchTab }) {
                   : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
               }`}
             >
-              {sortGCNToTop ? '✅ BẬT' : '❌ TẮT'}
+              {sortGCNToTop ? '✅ Đang BẬT' : '❌ Đang TẮT'}
             </button>
           </div>
         </div>

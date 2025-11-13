@@ -42,6 +42,7 @@ function CloudSettings() {
       
       setOcrEngine(uiEngine);
       setGeminiKey(gemini);
+      setOpenaiKey(openai);
       
       // Set batch mode with default
       setBatchMode(batchModeConfig || 'sequential');

@@ -74,19 +74,20 @@ def resize_image_smart(img, max_width=512, max_height=512):
 
 def get_classification_prompt():
     """
-    Load classification prompt - LITE version for cost optimization
-    OpenAI charges per token, so we use lite prompt to reduce costs
+    Load ULTRA LITE prompt for maximum cost optimization
+    Vietnamese text + emoji consume MORE tokens than estimated
+    Ultra lite: ~1,500 tokens (vs lite 7,000, full 8,000)
     """
-    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_lite.txt')
+    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_ultra_lite.txt')
     try:
         with open(prompt_path, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
-        print(f"⚠️ Prompt file not found: {prompt_path}, using fallback", file=sys.stderr)
-        # Fallback to full if lite not found
-        prompt_path_full = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_full.txt')
+        print(f"⚠️ Ultra lite prompt not found, trying lite...", file=sys.stderr)
+        # Fallback to lite
+        prompt_path_lite = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_lite.txt')
         try:
-            with open(prompt_path_full, 'r', encoding='utf-8') as f:
+            with open(prompt_path_lite, 'r', encoding='utf-8') as f:
                 return f.read()
         except:
             return """Phân loại tài liệu đất đai Việt Nam. Trả về JSON với short_code, confidence, reasoning."""

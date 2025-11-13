@@ -735,6 +735,126 @@ function CloudSettings() {
         </div>
       )}
 
+      {/* OpenAI GPT-4o mini Setup */}
+      {ocrEngine === 'openai-gpt4o-mini' && (
+        <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <span>🔑</span> OpenAI GPT-4o mini API Key
+            <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded">VISION API</span>
+          </h2>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">OpenAI API Key:</label>
+            <input
+              type="password"
+              value={openaiKey}
+              onChange={(e) => setOpenaiKey(e.target.value)}
+              placeholder="sk-proj-...your_openai_api_key_here..."
+              className="w-full border rounded px-3 py-2 font-mono text-sm"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Lấy API key tại: <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">platform.openai.com/api-keys</a>
+            </p>
+          </div>
+
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => handleTestKey('openai')}
+              disabled={testingKey === 'openai'}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition"
+            >
+              {testingKey === 'openai' ? '⏳ Đang test...' : '🧪 Test API Key'}
+            </button>
+            {openaiKey && (
+              <button
+                onClick={() => handleDeleteKey('openai')}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+              >
+                🗑️ Xóa Key
+              </button>
+            )}
+            <button
+              onClick={() => setShowOpenAIGuide(!showOpenAIGuide)}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 transition"
+            >
+              {showOpenAIGuide ? '▲ Ẩn hướng dẫn' : '▼ Xem hướng dẫn'}
+            </button>
+          </div>
+
+          {showOpenAIGuide && (
+            <div className="bg-white rounded p-4 text-sm">
+              <h3 className="font-semibold mb-2">📖 Hướng dẫn lấy OpenAI API Key:</h3>
+              <ol className="list-decimal ml-5 space-y-2">
+                <li>Truy cập <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">OpenAI Platform</a></li>
+                <li>Đăng nhập (hoặc tạo tài khoản mới)</li>
+                <li>Vào <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">API Keys</a></li>
+                <li>Click "Create new secret key"</li>
+                <li>Đặt tên (ví dụ: "OCR Desktop App")</li>
+                <li>Copy key (bắt đầu với sk-proj-...)</li>
+                <li>⚠️ <strong>Lưu lại ngay</strong> vì không xem lại được sau này!</li>
+                <li>Paste vào ô trên</li>
+                <li>Click "Test API Key" để verify</li>
+              </ol>
+              
+              <div className="mt-4 p-3 bg-purple-100 rounded">
+                <p className="font-semibold mb-2">💰 Chi phí GPT-4o mini (Vision):</p>
+                <ul className="space-y-1 text-sm">
+                  <li>💵 <strong>Input: $0.15 per 1M tokens</strong></li>
+                  <li>💵 <strong>Output: $0.60 per 1M tokens</strong></li>
+                  <li>📊 <strong>~300-500 tokens/image</strong> (tùy resolution)</li>
+                  <li>💰 <strong>Chi phí: ~$0.0002-0.0004/image</strong></li>
+                  <li>⚡ Tốc độ: 2-4s/image</li>
+                  <li>✅ Accuracy: 90-95%</li>
+                </ul>
+              </div>
+
+              <div className="mt-3 p-3 bg-blue-50 rounded text-xs">
+                <p className="font-semibold mb-2">📊 So sánh chi phí (1,000 images):</p>
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-blue-200">
+                      <th className="py-1">Engine</th>
+                      <th className="text-right py-1">Chi phí</th>
+                      <th className="text-right py-1">Tốc độ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-blue-100">
+                      <td className="py-1">Gemini Flash</td>
+                      <td className="text-right">~$4.10</td>
+                      <td className="text-right">1-2s</td>
+                    </tr>
+                    <tr className="border-b border-blue-100">
+                      <td className="py-1">Gemini Flash Lite</td>
+                      <td className="text-right">~$0.96</td>
+                      <td className="text-right">0.5-1s</td>
+                    </tr>
+                    <tr className="bg-purple-100">
+                      <td className="py-1 font-semibold">OpenAI GPT-4o mini</td>
+                      <td className="text-right font-semibold">~$0.30</td>
+                      <td className="text-right">2-4s</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p className="mt-2 text-gray-600">
+                  ⭐ GPT-4o mini: Cân bằng tốt giữa chi phí và accuracy
+                </p>
+              </div>
+
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                <p className="font-semibold mb-1">⚠️ Lưu ý quan trọng:</p>
+                <ul className="space-y-1 ml-3">
+                  <li>• <strong>Cần nạp tiền trước</strong> (minimum $5)</li>
+                  <li>• <strong>Rate limits:</strong> 500 requests/phút (free tier)</li>
+                  <li>• <strong>Tự động resize ảnh</strong> để tiết kiệm chi phí</li>
+                  <li>• <strong>Kiểm tra usage tại:</strong> <a href="https://platform.openai.com/usage" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">platform.openai.com/usage</a></li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Batch Processing Mode - For all Gemini engines */}
       {(ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') && (
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg p-6 mb-6">

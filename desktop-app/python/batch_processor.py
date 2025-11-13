@@ -1027,6 +1027,10 @@ if __name__ == "__main__":
         max_batch_size = int(env_value)
         print(f"📊 Smart mode max_batch_size: {max_batch_size}", file=sys.stderr)
         batch_data = batch_classify_smart(image_paths, api_key, engine_type=engine_type, last_known_type=None, max_batch_size=max_batch_size)
+    elif mode == 'tesseract_text':
+        # NEW MODE: Tesseract OCR + Gemini Text Classification
+        print(f"⚡ [NEW MODE] Using Tesseract + Gemini Text approach", file=sys.stderr)
+        batch_data = batch_classify_tesseract_text(image_paths, api_key, last_known_type=None)
     else:
         print(f"❌ Unknown mode: {mode}", file=sys.stderr)
         sys.exit(1)

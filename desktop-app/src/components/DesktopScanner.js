@@ -1800,8 +1800,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Post-process GCN documents
         const processedResults = postProcessGCNBatch(batchResults);
         
-        // Sort results: GCN (GCNC, GCNM) on top for easy review
-        const finalChildResults = sortResultsWithGCNOnTop(processedResults);
+        // Sort results: GCN (GCNC, GCNM) on top for easy review (if enabled)
+        const finalChildResults = sortGCNToTop ? sortResultsWithGCNOnTop(processedResults) : processedResults;
+        if (sortGCNToTop) {
+          console.log(`📊 Sorted folder results: ${finalChildResults.filter(r => r.short_code === 'GCNC' || r.short_code === 'GCNM').length} GCN documents moved to top`);
+        }
         
         setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: finalChildResults } : t));
         return;

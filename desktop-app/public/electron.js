@@ -677,10 +677,16 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         resolve({ success: false, error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.', method: 'config_error' });
         return;
       }
-    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite' || ocrEngineType === 'gemini-flash-text') {
       cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       if (!cloudApiKey) {
         resolve({ success: false, error: 'Google API key not configured for Gemini. Please add it in Cloud OCR settings.', method: 'config_error' });
+        return;
+      }
+    } else if (ocrEngineType === 'openai-gpt4o-mini') {
+      cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({ success: false, error: 'OpenAI API key not configured. Please add it in Cloud OCR settings.', method: 'config_error' });
         return;
       }
     }
@@ -930,12 +936,28 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
     try {
       console.log(`\n📦 Batch Process: mode=${mode}, images=${imagePaths.length}, engine=${ocrEngine}`);
       
+      // Check if engine is gemini-flash-text (Tesseract + Gemini Text)
+      let finalMode = mode;
+      if (ocrEngine === 'gemini-flash-text') {
+        finalMode = 'tesseract_text';
+        console.log(`🔬 [ENGINE] Using Tesseract + Gemini Text mode`);
+        console.log(`   Overriding: ${mode} → tesseract_text`);
+      } else {
+        console.log(`   Using standard mode: ${mode}, engine: ${ocrEngine}`);
+      }
+      
       // Get API key for cloud engines
       let cloudApiKey = null;
-      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') {
+      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite' || ocrEngine === 'gemini-flash-text') {
         cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
         if (!cloudApiKey) {
           resolve({ success: false, error: 'Google API key not configured', results: [] });
+          return;
+        }
+      } else if (ocrEngine === 'openai-gpt4o-mini') {
+        cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'OpenAI API key not configured', results: [] });
           return;
         }
       }
@@ -946,10 +968,14 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
         : path.join(process.resourcesPath, 'python');
       const scriptPath = path.join(pythonDir, 'batch_processor.py');
       
-      // Build args
-      const args = [scriptPath, mode, ocrEngine, cloudApiKey, ...imagePaths];
+      // Build args (use finalMode instead of mode)
+      const args = [scriptPath, finalMode, ocrEngine, cloudApiKey, ...imagePaths];
       
-      console.log(`🐍 Calling Python batch processor: mode=${mode}, engine=${ocrEngine}`);
+      console.log(`🐍 Calling Python batch processor:`);
+      console.log(`   Script: ${scriptPath}`);
+      console.log(`   Mode: ${finalMode}`);
+      console.log(`   Engine: ${ocrEngine}`);
+      console.log(`   Images: ${imagePaths.length}`);
       
       // Discover Python executable
       const pyInfo = discoverPython();
@@ -1292,6 +1318,25 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
         return { success: true, message: '✅ Gemini Flash API key hợp lệ' };
       }
       return { success: false, error: 'Gemini test thất bại' };
+    }
+
+    if (provider === 'openai') {
+      const testUrl = 'https://api.openai.com/v1/chat/completions';
+      const response = await axios.post(testUrl, {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: 'Hello, this is a test.' }],
+        max_tokens: 10
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        timeout: 15000
+      });
+      if (response.status === 200 && response.data && response.data.choices) {
+        return { success: true, message: '✅ OpenAI GPT-4o mini API key hợp lệ' };
+      }
+      return { success: false, error: 'OpenAI test thất bại' };
     }
 
     return { success: false, error: `Provider không hỗ trợ: ${provider}` };

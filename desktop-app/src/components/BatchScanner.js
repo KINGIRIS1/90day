@@ -178,6 +178,13 @@ function BatchScanner({ onSwitchTab }) {
           console.log(`📊 Loaded GCN sort preference: ${savedSortGCN}`);
         }
         
+        // Load auto-save preference
+        const savedAutoSave = await window.electronAPI.getConfig('autoSaveEnabled');
+        if (savedAutoSave !== undefined && savedAutoSave !== null) {
+          setAutoSaveEnabled(savedAutoSave);
+          console.log(`💾 Loaded auto-save preference: ${savedAutoSave}`);
+        }
+        
         // Check for incomplete scans
         const incompleteResult = await window.electronAPI.getIncompleteScans();
         if (incompleteResult.success && incompleteResult.scans.length > 0) {

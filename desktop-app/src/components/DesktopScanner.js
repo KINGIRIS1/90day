@@ -2147,6 +2147,35 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               </div>
             </div>
             
+            {/* GCN Sort Toggle */}
+            <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    📊 Sắp xếp GCN lên đầu sau khi quét
+                  </label>
+                  <div className="text-xs text-gray-600 mt-1">
+                    💡 GCN (GCNC, GCNM) sẽ được hiển thị đầu tiên để dễ kiểm tra
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    const newValue = !sortGCNToTop;
+                    setSortGCNToTop(newValue);
+                    await window.electronAPI.setConfig('sortGCNToTop', newValue);
+                    console.log(`📊 GCN sort preference updated: ${newValue}`);
+                  }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    sortGCNToTop 
+                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                  }`}
+                >
+                  {sortGCNToTop ? '✅ BẬT' : '❌ TẮT'}
+                </button>
+              </div>
+            </div>
+            
             <div className="flex flex-wrap gap-2">
               <button onClick={handleSelectFiles} disabled={processing} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md text-sm font-medium">
                 <span>📁</span><span>Chọn file</span>

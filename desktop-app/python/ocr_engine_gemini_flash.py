@@ -436,7 +436,7 @@ NẾU THẤY các section SAU (đứng riêng, không có tiêu đề chính):
 - "V. THÔNG TIN VỀ HẠN CHẾ VỀ QUYỀN" + bảng
 → Trả về GCNM (trang tiếp theo của GCN)
 
-✅ 98 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
+✅ 66 LOẠI TÀI LIỆU (CHỈ DÙNG CÁC MÃ SAU):
 
 NHÓM 1 - GIẤY CHỨNG NHẬN:
 🚨 GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT) 🚨
@@ -773,7 +773,7 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 1. Kiểm tra vị trí: Text ở TOP 30%?
 2. Kiểm tra độc lập: NẰM RIÊNG hay chung với text khác?
 3. Kiểm tra reference: Có "căn cứ/theo/số" không?
-4. NẾU pass 3 bước → Khớp với 98 loại
+4. NẾU pass 3 bước → Khớp với 66 loại
 5. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
 6. NẾU vẫn không → Trả về "UNKNOWN"
 
@@ -901,7 +901,7 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
   "short_code": "UNKNOWN",
   "confidence": 0.3,
   "title_position": "middle",
-  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
+  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 66 loại",
   "issue_date": null,
   "issue_date_confidence": null
 }"""
@@ -1356,7 +1356,7 @@ CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
    ⚠️ Từ khóa: "XÁC MINH" + ("THỰC ĐỊA" hoặc "HIỆN TRẠNG") → BBKTHT
 
 
-DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (KHỚP ~85-90%):
+DANH SÁCH ĐẦY ĐỦ 66 LOẠI TÀI LIỆU (KHỚP ~85-90%):
 
 📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (3 loại)
 BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
@@ -1526,7 +1526,7 @@ TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 
 ❌ NẾU KHÔNG RÕ RÀNG → UNKNOWN (đừng đoán!)
 
-⚠️ TỔNG CỘNG: 98 LOẠI TÀI LIỆU
+⚠️ TỔNG CỘNG: 66 LOẠI TÀI LIỆU
 
 
 QUY TRÌNH KIỂM TRA:
@@ -1544,7 +1544,7 @@ TRẢ VỀ JSON (BẮT BUỘC):
 }
 
 ❗ NHẮC LẠI:
-- CHỈ trả về mã khi khớp ~85-90% với 1 trong 98 loại
+- CHỈ trả về mã khi khớp ~85-90% với 1 trong 66 loại
 - CHO PHÉP lỗi chính tả nhỏ, viết tắt, dấu câu
 - KHÔNG khớp nếu thiếu từ khóa phân biệt quan trọng
 - Frontend sẽ tự xử lý việc gán trang tiếp theo (sequential naming)
@@ -1552,7 +1552,7 @@ TRẢ VỀ JSON (BẮT BUỘC):
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", "HDQUYEN", ...)
-✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
+✅ CHỈ được dùng CHÍNH XÁC 1 trong 66 mã đã liệt kê ở trên
 ✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
 ✅ KHÔNG đoán, KHÔNG sáng tạo, KHÔNG viết tắt tự do
 
@@ -1612,7 +1612,7 @@ VÍ DỤ SAI:
   "short_code": "UNKNOWN",
   "confidence": 0.3,
   "title_position": "middle",
-  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 98 loại",
+  "reasoning": "Không khớp với bất kỳ mã nào trong danh sách 66 loại",
   "issue_date": null,
   "issue_date_confidence": null
 }"""
@@ -1823,7 +1823,7 @@ VÍ DỤ CHO GCN (format "Ngày...tháng...năm"):
 
 🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
 ❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", "HDQUYEN", ...)
-✅ CHỈ được dùng CHÍNH XÁC 1 trong 98 mã đã liệt kê ở trên
+✅ CHỈ được dùng CHÍNH XÁC 1 trong 66 mã đã liệt kê ở trên
 ✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
 ✅ KHÔNG đoán, KHÔNG sáng tạo, KHÔNG viết tắt tự do
 

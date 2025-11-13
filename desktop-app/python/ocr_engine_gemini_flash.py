@@ -1653,65 +1653,6 @@ NẾU KHÔNG KHỚP CHÍNH XÁC 100% → Trả về:
   "reasoning": "Không thấy tiêu đề khớp chính xác với danh sách"
 }
 
-⚠️ CỰC KỲ QUAN TRỌNG: PHÂN BIỆT TIÊU ĐỀ vs NỘI DUNG BODY
-
-🎯 TIÊU ĐỀ CHÍNH (Main Title):
-- Nằm Ở ĐẦU trang, TRÊN CÙNG
-- Cỡ chữ LỚN, IN HOA, căn giữa
-- VD: "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG ĐẤT ĐAI..."
-- → CHỈ TIÊU ĐỀ CHÍNH mới dùng để phân loại!
-
-❌ KHÔNG PHÂN LOẠI DỰA VÀO:
-- Section headers (III. THÔNG TIN VỀ...)
-- Mentions trong body text
-- Danh sách đính kèm
-- Ghi chú cuối trang
-
-🎯 NGOẠI LỆ QUAN TRỌNG - NHẬN DIỆN GCNM (Continuation):
-
-⚠️ ĐẶC BIỆT: Trang GCN continuation có thể đứng RIÊNG hoặc sau giấy tờ khác!
-
-✅ NẾU THẤY CÁC SECTION SAU (KẾT HỢP) → TRẢ VỀ GCNM:
-
-1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN"
-   → Đây là trang 2 của GCNM
-2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
-3️⃣ "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" (section II về thay đổi)
-4️⃣ "III. XÁC NHẬN CỦA CƠ QUAN" (PHẢI có từ "CƠ QUAN", KHÔNG phải "ỦY BAN NHÂN DÂN")
-⚠️ CỰC KỲ QUAN TRỌNG - PHÂN BIỆT GCNM vs DDKBD:
-
-❌ KHÔNG NHẦM LẪN:
-
-GCNM (Giấy chứng nhận):
-  ✅ "III. XÁC NHẬN CỦA CƠ QUAN"
-DDKBD (Đơn đăng ký biến động) - KHÔNG PHẢI GCN:
-  ❌ "II. XÁC NHẬN CỦA ỦY BAN NHÂN DÂN CẤP XÃ"
-  ❌ "XÁC NHẬN CỦA ỦY BAN NHÂN DÂN"
-  → Keyword: "ỦY BAN NHÂN DÂN" (People's Committee)
-  → Thường là section II
-  → TRẢ VỀ: UNKNOWN (không phải GCNM!)
-
-QUY TẮC:
-- NẾU thấy "ỦY BAN NHÂN DÂN" → KHÔNG phải GCNM
-- CHỈ KHI thấy "CƠ QUAN" (agency) → Mới xét GCNM
-
-VÍ DỤ THỰC TẾ:
-
-✅ ĐÚNG: Trang có "Thửa đất, nhà ở và tài sản khác gắn liền với đất"
-   → Đặc trưng của GCN trang 2
-   → Trả về: GCNM (confidence: 0.85)
-
-✅ ĐÚNG: Trang có "II. NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ"
-   → Format chuẩn của GCN trang 2
-   → Trả về: GCNM (confidence: 0.8)
-
-❌ SAI: Trang có "II. XÁC NHẬN CỦA ỦY BAN NHÂN DÂN CẤP XÃ"
-   → Đây là DDKBD, KHÔNG phải GCN!
-   → Keyword: "ỦY BAN NHÂN DÂN"
-   → Trả về: UNKNOWN
-
-❌ SAI: Trang có "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG"
-   → Đây là PCT hoặc document khác
    → Trả về: UNKNOWN
 
 🔍 CÁC DẤU HIỆU NHẬN BIẾT GCN CONTINUATION:

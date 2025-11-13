@@ -1934,6 +1934,36 @@ function BatchScanner({ onSwitchTab }) {
         </div>
       </div>
 
+      {/* Duplicate Folders Warning */}
+      {duplicateFolders.length > 0 && !isScanning && (
+        <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div className="flex-1">
+              <div className="font-semibold text-yellow-900 mb-2">
+                Phát hiện {duplicateFolders.length} thư mục trùng tên
+              </div>
+              <div className="text-sm text-yellow-800 space-y-2">
+                {duplicateFolders.map((dup, idx) => (
+                  <div key={idx} className="bg-yellow-100 rounded p-2">
+                    <div className="font-medium">📁 "{dup.name}"</div>
+                    <div className="text-xs mt-1 space-y-1">
+                      <div className="text-green-700">✅ Sẽ quét: {dup.paths[0]}</div>
+                      {dup.paths.slice(1).map((path, i) => (
+                        <div key={i} className="text-red-700">❌ Bỏ qua: {path}</div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs text-yellow-700 mt-2">
+                💡 Chỉ thư mục đầu tiên sẽ được quét. Các thư mục trùng tên khác sẽ bị bỏ qua.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DISCOVERED FOLDERS - Compact Table Style */}
       {discoveredFolders.length > 0 && !isScanning && (
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">

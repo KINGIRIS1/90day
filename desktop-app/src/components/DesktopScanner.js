@@ -441,9 +441,55 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             const count = (lf && lf.success && lf.files) ? lf.files.length : 0;
             childWithCounts.push({ name: sp.split(/[\\\/]/).pop(), path: sp, count, status: 'pending', results: [] });
           }
-          setParentSummary({ subfolderCount: childWithCounts.length, rootFileCount: rootFiles.files.length });
-          setChildTabs(childWithCounts);
-          setActiveChild(childWithCounts[0]?.path || null);
+          
+          // Detect duplicate folder names
+          const folderNameMap = new Map();
+          const duplicates = [];
+          
+          childWithCounts.forEach(folder => {
+            if (!folderNameMap.has(folder.name)) {
+              folderNameMap.set(folder.name, []);
+            }
+            folderNameMap.get(folder.name).push(folder.path);
+          });
+          
+          folderNameMap.forEach((paths, name) => {
+            if (paths.length > 1) {
+              duplicates.push({ name, paths });
+              console.warn(`⚠️ Duplicate subfolder name: "${name}" at ${paths.length} locations`);
+            }
+          });
+          
+          // Filter duplicates
+          const seenNames = new Set();
+          const filteredChildren = childWithCounts.filter(folder => {
+            if (seenNames.has(folder.name)) {
+              console.log(`🚫 Skipping duplicate subfolder: ${folder.path}`);
+              return false;
+            }
+            seenNames.add(folder.name);
+            return true;
+          });
+          
+          setParentSummary({ subfolderCount: filteredChildren.length, rootFileCount: rootFiles.files.length });
+          setChildTabs(filteredChildren);
+          setActiveChild(filteredChildren[0]?.path || null);
+          setDuplicateChildFolders(duplicates);
+          
+          // Show warning
+          if (duplicates.length > 0) {
+            let warnMsg = `⚠️ Phát hiện ${duplicates.length} thư mục con trùng tên!\n\n`;
+            duplicates.forEach(dup => {
+              warnMsg += `📁 "${dup.name}":\n`;
+              warnMsg += `  ✅ Sẽ quét: ${dup.paths[0]}\n`;
+              dup.paths.slice(1).forEach(p => {
+                warnMsg += `  ❌ Bỏ qua: ${p}\n`;
+              });
+              warnMsg += `\n`;
+            });
+            warnMsg += `💡 Chỉ thư mục đầu tiên sẽ được quét.`;
+            alert(warnMsg);
+          }
         } else {
           setParentSummary(null);
           setChildTabs([]);

@@ -189,6 +189,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ REMOVE PAGINATION (Folder Scan): Removed pagination controls from Folder Scan results view. All documents in a folder now display at once without page limits. Makes it easier to see documents of similar types together. File Scan still retains pagination for safety. File: DesktopScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ TAB NAVIGATION BUTTONS (Folder & Batch Scan): Added Next/Back navigation buttons at the bottom of preview area. Users can now navigate between tabs without scrolling to top. Features: Previous/Next buttons, current tab indicator (e.g., 'Tab 2/5'), smooth scroll to top on tab change, disabled state for first/last tabs. Files: DesktopScanner.js, BatchScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

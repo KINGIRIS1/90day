@@ -155,7 +155,7 @@ def classify_document_openai_vision(image_path, api_key, enable_resize=True, max
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{encoded_image}",
-                                "detail": "high"
+                                "detail": "low"  # Low detail = fewer tokens (~85 tokens vs ~765 tokens)
                             }
                         }
                     ]

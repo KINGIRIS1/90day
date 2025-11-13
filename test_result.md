@@ -186,6 +186,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ AUTO-SAVE TOGGLE: Added user-configurable toggle in Settings to enable/disable auto-save feature. When disabled, scan results are NOT automatically saved (suitable for low-RAM machines). Setting: 'autoSaveEnabled' (default: true). Applied to both DesktopScanner and BatchScanner. Files: Settings.js (new AutoSaveSetting component), DesktopScanner.js, BatchScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ REMOVE PAGINATION (Folder Scan): Removed pagination controls from Folder Scan results view. All documents in a folder now display at once without page limits. Makes it easier to see documents of similar types together. File Scan still retains pagination for safety. File: DesktopScanner.js."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

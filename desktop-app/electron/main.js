@@ -677,10 +677,16 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         resolve({ success: false, error: 'Azure Computer Vision API key and endpoint not configured. Please add them in Cloud OCR settings.', method: 'config_error' });
         return;
       }
-    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite' || ocrEngineType === 'gemini-flash-text') {
       cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
       if (!cloudApiKey) {
         resolve({ success: false, error: 'Google API key not configured for Gemini. Please add it in Cloud OCR settings.', method: 'config_error' });
+        return;
+      }
+    } else if (ocrEngineType === 'openai-gpt4o-mini') {
+      cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({ success: false, error: 'OpenAI API key not configured. Please add it in Cloud OCR settings.', method: 'config_error' });
         return;
       }
     }

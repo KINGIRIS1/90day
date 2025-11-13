@@ -1529,23 +1529,26 @@ TTHGD vs PCTSVC - PHẢI PHÂN BIỆT RÕ:
 ⚠️ TỔNG CỘNG: 66 LOẠI TÀI LIỆU
 
 
-QUY TRÌNH KIỂM TRA:
-1. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
-2. Đọc tiêu đề đầy đủ
-3. Tìm trong danh sách có tên TƯƠNG TỰ ~85-90%?
-4. NẾU CÓ → Trả về mã chính xác, confidence: 0.85-0.95
-5. NẾU KHÔNG → Trả về "UNKNOWN", confidence: 0.1-0.3
+QUY TRÌNH KIỂM TRA (HỢP NHẤT):
+1. Phân tích VỊ TRÍ của các text trong ảnh (TOP 30% / MIDDLE / BOTTOM)
+2. Tìm quốc huy Việt Nam (nếu có → tài liệu chính thức)
+3. Đọc tiêu đề Ở TOP 30% (bỏ qua mentions ở MIDDLE/BOTTOM)
+4. Tìm trong danh sách có tên TƯƠNG TỰ ~85-90% với tiêu đề ở TOP?
+5. NẾU CÓ TIÊU ĐỀ Ở TOP KHỚP → Trả về mã chính xác, confidence: 0.85-0.95, title_position: "top"
+6. NẾU KHÔNG CÓ TIÊU ĐỀ Ở TOP → Kiểm tra GCNM continuation patterns
+7. NẾU VẪN KHÔNG KHỚP → Trả về "UNKNOWN", confidence: 0.1-0.3
 
 TRẢ VỀ JSON (BẮT BUỘC):
 {
   "short_code": "MÃ CHÍNH XÁC HOẶC 'UNKNOWN'",
-  "confidence": 0.85-0.95 (nếu khớp) hoặc 0.1-0.3 (nếu không),
-  "reasoning": "Giải thích ngắn gọn (1-2 câu)"
+  "confidence": 0.85-0.95 (nếu khớp tốt) hoặc 0.1-0.3 (nếu không khớp),
+  "title_position": "top" hoặc "middle" hoặc "bottom" hoặc "none",
+  "reasoning": "Giải thích ngắn gọn (1-2 câu), bao gồm vị trí của tiêu đề"
 }
 
 ❗ NHẮC LẠI:
-- CHỈ trả về mã khi khớp ~85-90% với 1 trong 66 loại
-- CHO PHÉP lỗi chính tả nhỏ, viết tắt, dấu câu
+- CHỈ phân loại dựa vào tiêu đề Ở TOP 30% của trang
+- CHO PHÉP lỗi chính tả nhỏ, viết tắt, dấu câu (~85-90% khớp)
 - KHÔNG khớp nếu thiếu từ khóa phân biệt quan trọng
 - Frontend sẽ tự xử lý việc gán trang tiếp theo (sequential naming)
 - LUÔN trả về JSON format

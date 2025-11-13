@@ -123,7 +123,8 @@ def classify_document_openai_vision(image_path, api_key, enable_resize=True, max
             # Convert to RGB if needed
             if img.mode in ('RGBA', 'LA', 'P'):
                 img = img.convert('RGB')
-            img.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
+            # Use lower quality (70) to reduce tokens - OpenAI charges per pixel
+            img.save(img_byte_arr, format='JPEG', quality=70, optimize=True)
             image_content = img_byte_arr.getvalue()
         
         # Encode to base64

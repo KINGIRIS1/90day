@@ -73,16 +73,22 @@ def resize_image_smart(img, max_width=1500, max_height=2100):
 
 def get_classification_prompt():
     """
-    Load classification prompt from shared file
-    Uses the same prompt as Gemini for consistency
+    Load classification prompt - LITE version for cost optimization
+    OpenAI charges per token, so we use lite prompt to reduce costs
     """
-    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_full.txt')
+    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_lite.txt')
     try:
         with open(prompt_path, 'r', encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
         print(f"⚠️ Prompt file not found: {prompt_path}, using fallback", file=sys.stderr)
-        return """Phân loại tài liệu đất đai Việt Nam. Trả về JSON với short_code, confidence, reasoning."""
+        # Fallback to full if lite not found
+        prompt_path_full = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_full.txt')
+        try:
+            with open(prompt_path_full, 'r', encoding='utf-8') as f:
+                return f.read()
+        except:
+            return """Phân loại tài liệu đất đai Việt Nam. Trả về JSON với short_code, confidence, reasoning."""
 
 
 def classify_document_openai_vision(image_path, api_key, enable_resize=True, max_width=1500, max_height=2100):

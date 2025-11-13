@@ -1337,16 +1337,31 @@ function BatchScanner({ onSwitchTab }) {
               });
             });
           } else {
-            console.log(`  ⚠️ Not enough dates → Default GCNM`);
-            groupsArray.forEach(group => {
-              group.files.forEach(file => {
+            // Fallback: Not enough dates → Use file order
+            console.log(`  ⚠️ Not enough dates → Fallback to file order`);
+            
+            if (groupsArray.length === 1) {
+              console.log(`  📄 Only 1 GCN group → GCNC (default oldest)`);
+              groupsArray[0].files.forEach(file => {
                 const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
                 if (idx >= 0) {
-                  normalizedResults[idx].short_code = 'GCNM';
-                  normalizedResults[idx].doc_type = 'GCNM';
+                  normalizedResults[idx].short_code = 'GCNC';
+                  normalizedResults[idx].doc_type = 'GCNC';
                 }
               });
-            });
+            } else {
+              console.log(`  📊 Multiple groups → First GCNC, rest GCNM (by file order)`);
+              groupsArray.forEach((group, groupIdx) => {
+                const classification = (groupIdx === 0) ? 'GCNC' : 'GCNM';
+                group.files.forEach(file => {
+                  const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                  if (idx >= 0) {
+                    normalizedResults[idx].short_code = classification;
+                    normalizedResults[idx].doc_type = classification;
+                  }
+                });
+              });
+            }
           }
         }
         

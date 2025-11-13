@@ -141,6 +141,8 @@ function CloudSettings() {
           setGoogleKey('');
         } else if (provider === 'gemini') {
           setGeminiKey('');
+        } else if (provider === 'openai') {
+          setOpenaiKey('');
         } else if (provider === 'azure') {
           setAzureKey('');
           setAzureEndpoint('');

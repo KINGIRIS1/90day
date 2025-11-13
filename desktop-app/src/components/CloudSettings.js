@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 function CloudSettings() {
   const [ocrEngine, setOcrEngine] = useState('offline-tesseract');
   const [geminiKey, setGeminiKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [testingKey, setTestingKey] = useState(null);
   const [showGeminiGuide, setShowGeminiGuide] = useState(false);
+  const [showOpenAIGuide, setShowOpenAIGuide] = useState(false);
   
   // Batch processing mode
   const [batchMode, setBatchMode] = useState('sequential');

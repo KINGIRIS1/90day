@@ -8,7 +8,7 @@ from PIL import Image
 import base64
 
 class DocumentScannerAPITester:
-    def __init__(self, base_url="https://ocr-memory-fix.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://smart-ocr-5.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

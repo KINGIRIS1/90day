@@ -13,7 +13,7 @@ def test_llm_health():
     
     try:
         # Use the URL from frontend .env
-        url = "https://ocr-memory-fix.preview.emergentagent.com/api/llm/health"
+        url = "https://smart-ocr-5.preview.emergentagent.com/api/llm/health"
         print(f"Calling: {url}")
         
         response = requests.get(url, timeout=30)

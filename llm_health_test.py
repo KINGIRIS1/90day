@@ -17,7 +17,7 @@ import sys
 class LLMHealthTester:
     def __init__(self):
         # Get backend URL from frontend .env
-        self.base_url = "https://ocr-memory-fix.preview.emergentagent.com/api"
+        self.base_url = "https://smart-ocr-5.preview.emergentagent.com/api"
         self.token = None
         self.test_results = []
         

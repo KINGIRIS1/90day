@@ -1,87 +1,52 @@
-<analysis>Tuyệt vời, đây là bản tóm tắt bàn giao chi tiết để kỹ sư AI tiếp theo có thể tiếp tục công việc một cách liền mạch.
-
-**original_problem_statement:**
-Người dùng yêu cầu một loạt các cải tiến và sửa lỗi cho ứng dụng OCR trên máy tính để bàn (desktop). Các yêu cầu chính bao gồm:
-1.  **Sửa lỗi Resume:** App không tự động tiếp tục quét và không tự động chuyển đến tab đang làm việc dở dang.
-2.  **Cải thiện UI:** Giao diện Quét theo danh sách (Batch Scanner) phức tạp, cần thiết kế lại cho gọn gàng, chuyên nghiệp và có nhiều không gian làm việc hơn.
-3.  **Sắp xếp GCN:** Đảm bảo tính năng sắp xếp tài liệu GCN (Giấy chứng nhận) lên đầu danh sách kết quả được áp dụng cho tất cả các chế độ quét.
-4.  **Sửa lỗi Gộp PDF:** Logic gộp file PDF ở Quét file và Quét thư mục không đúng quy tắc và không nhất quán với Quét danh sách.
-5.  **Sửa lỗi Phân loại GCN:** Một số tài liệu GCN không được phân loại thành GCN cũ (GCNC) hoặc GCN mới (GCNM) mà vẫn giữ nguyên là GCN.
-6.  **Tối ưu UX:** Di chuyển nút Gộp tab này lên vị trí dễ thấy hơn.
-7.  **Lỗi Chế độ Smart Batch:** Chế độ Smart gửi quá nhiều file cùng lúc (15-20 file) gây ra lỗi fallback. Cần thêm tùy chọn để người dùng tự cấu hình số lượng file.
-8.  **Lỗi Crash Liên tục:** Ứng dụng bị crash liên tục với lỗi , đặc biệt khi mở nhiều thư mục con (folder tabs).
+<analysis>**original_problem_statement:**
+Ban đầu, người dùng yêu cầu bỏ giới hạn kích thước tối thiểu (1500x2100) khi resize ảnh trong phần cài đặt để có thể điều chỉnh tự do. Sau đó, một loạt các yêu cầu và báo cáo lỗi đã được đưa ra và xử lý, bao gồm:
+- Sửa lỗi 503 API bằng cách giảm chất lượng JPEG.
+- Thêm tùy chọn bật/tắt tính năng sắp xếp tài liệu GCN lên đầu danh sách kết quả.
+- Sửa lỗi logic sắp xếp GCN khiến tất cả bị phân loại là GCNM.
+- Phát hiện và cảnh báo các thư mục trùng tên trong chế độ quét hàng loạt (Batch Scan) và quét thư mục (Folder Scan) để tránh gộp kết quả sai.
+- Thêm tùy chọn bật/tắt tự động lưu phiên làm việc (Auto-save) để cải thiện hiệu năng trên máy cấu hình yếu.
+- Gỡ bỏ phân trang (pagination) trong kết quả quét thư mục để hiển thị tất cả file cùng lúc.
+- Thêm nút Next và Back ở cuối trang preview để chuyển tab mà không cần cuộn lên.
+- Sửa lỗi văn bản trên các nút bật/tắt để hiển thị rõ trạng thái hiện tại (Đang bật / Đang tắt).
+- Sửa lỗi nút Next/Back tự động cuộn lên đầu trang.
+- Người dùng đề xuất và yêu cầu triển khai một chế độ OCR thử nghiệm mới: dùng Tesseract để OCR local, sau đó gửi text lên Gemini để phân loại nhằm tiết kiệm chi phí và tăng tốc độ.
+- Sau khi triển khai, người dùng yêu cầu dọn dẹp và tối ưu các prompt gửi đến Gemini bằng cách xóa 32 mã tài liệu không sử dụng và loại bỏ các đoạn hướng dẫn bị trùng lặp.
+- Yêu cầu cuối cùng là đồng bộ hóa prompt giữa hai phiên bản  và  để đảm bảo logic nhất quán, với phiên bản  là một bản rút gọn nhưng đầy đủ về mặt logic của bản .
 
 **what currently exists?**
-Ứng dụng là một công cụ OCR cho tài liệu đất đai của Việt Nam, được xây dựng bằng Electron, React và Python, sử dụng API Gemini Flash cho việc nhận dạng và phân loại. Các tính năng chính bao gồm quét file/thư mục đơn lẻ và quét hàng loạt theo danh sách. Phiên làm việc vừa qua đã tập trung vào việc sửa các lỗi nghiêm trọng, cải thiện giao diện người dùng và tối ưu hóa trải nghiệm người dùng, nhưng đang gặp phải một lỗi crash nghiêm trọng liên quan đến quản lý bộ nhớ.
+- Ứng dụng OCR 데스크톱 xây dựng bằng Electron, React và Python backend.
+- Hỗ trợ các chế độ quét: File Scan, Folder Scan, và Batch Scan (từ file .txt).
+- Sử dụng Gemini Flash Vision API làm engine OCR đám mây chính.
+- Đã triển khai một chế độ OCR thử nghiệm mới () kết hợp Tesseract OCR local và Gemini Text API để phân loại. Chế độ này được tích hợp như một lựa chọn trong Cloud Settings.
+- Giao diện người dùng có các tùy chọn để: điều chỉnh kích thước ảnh tự do, bật/tắt sắp xếp GCN, bật/tắt tự động lưu.
+- Logic phát hiện thư mục trùng lặp đã được thêm vào cho cả chế độ quét thư mục và quét hàng loạt.
+- Các prompt của Gemini đã được dọn dẹp đáng kể (xóa 32 mã, loại bỏ các phần trùng lặp) để giảm token và tăng tính nhất quán.
 
 **Last working item**:
-    - Last item agent was working on: Giải quyết lỗi crash liên tục của renderer process (). Người dùng đã chỉ ra nguyên nhân cốt lõi: ứng dụng đang render **tất cả** các tab thư mục con cùng một lúc (ngay cả khi chúng bị ẩn), khiến bộ nhớ bị quá tải do phải tải quá nhiều ảnh base64. Kỹ sư AI đã xác định được đoạn code sai trong  (sử dụng  để render tất cả các tab) và đang chuẩn bị sửa lại để chỉ render tab đang được kích hoạt (lazy rendering).
-    - Status: **IN PROGRESS**
-    - Agent Testing Done: N
-    - Which testing method agent to use? Frontend testing agent. Sau khi sửa lỗi, cần kiểm tra kỹ bằng cách tạo nhiều tab thư mục con để xác nhận ứng dụng không còn bị crash và hoạt động ổn định. Dùng screenshot tool để xác nhận UI không bị vỡ.
-    - User Testing Done: N
+- **Last item agent was working**: Agent đang trong quá trình so sánh và đồng bộ hóa nội dung giữa hai prompt:  và  trong file . Mục tiêu là cập nhật bản lite để nó trở thành một phiên bản rút gọn nhưng vẫn đầy đủ về mặt logic và quy tắc so với bản full, vì agent đã phát hiện bản lite đang thiếu rất nhiều quy tắc quan trọng.
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: Manual testing by user. Sau khi agent cập nhật prompt, người dùng cần được yêu cầu chọn engine Gemini Flash Lite, quét thử một vài loại tài liệu và xác nhận độ chính xác của việc phân loại có hợp lý và nhất quán không.
+- **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-  - **Issue 1 (P0): Renderer process crash (exitCode: -36861)**
-     - Attempted fixes:
-        - Phân trang kết quả (giảm từ 50 xuống 20, rồi 10 ảnh/trang).
-        - Tự động tắt preview khi có quá nhiều file.
-        - Mặc định tắt preview.
-        - **Lý do thất bại:** Các cách trên chỉ là giải pháp tạm thời, không giải quyết được vấn đề gốc là tất cả các component của tab ẩn vẫn được render và giữ ảnh base64 trong bộ nhớ.
-     - Next debug checklist:
-        - Mở file .
-        - Tìm đến đoạn code render các tab thư mục con (khoảng dòng 2475).
-        - Thay đổi logic từ  (render tất cả) thành tìm tab đang active () và chỉ render component của tab đó.
-     - Why fix this issue and what will be achieved with the fix? Đây là lỗi nghiêm trọng nhất làm ứng dụng không thể sử dụng được khi quét nhiều thư mục con. Sửa lỗi này sẽ giúp ứng dụng ổn định và chạy mượt mà.
-     - Status: **IN PROGRESS**
-     - Is recurring issue? Y
-     - Should Test frontend/backend/both after fix? frontend
-     - Blocked on other issue: No
+- **Issue 1 (P0)**: Đồng bộ hóa prompt của  với .
+  - **Attempted fixes**: Agent đã bắt đầu phân tích và xác định được sự khác biệt lớn giữa hai prompt.
+  - **Next debug checklist**:
+    1.  Mở file .
+    2.  So sánh một cách có hệ thống nội dung của hàm  với .
+    3.  Sao chép các logic cốt lõi, quy tắc (ví dụ: phân biệt GCN Cũ/Mới, xử lý trang tiếp theo, quy trình kiểm tra) và các ví dụ đại diện từ prompt full sang prompt lite.
+    4.  Đảm bảo prompt lite sau khi cập nhật là một phiên bản cô đọng nhưng tương đương về mặt chức năng so với prompt full.
+  - **Why fix this issue and what will be achieved with the fix?**: Để đảm bảo người dùng khi chọn engine Lite (rẻ hơn) vẫn nhận được kết quả phân loại nhất quán và chính xác, tránh các hành vi khó đoán do prompt kém phát triển.
+  - **Status**: IN PROGRESS
+  - **Is recurring issue?**: N
+  - **Should Test frontend/backend/both after fix?**: Backend (chất lượng phân loại), người dùng sẽ test thủ công.
+  - **Blocked on other issue**: None.
 
-  - **Issue 2 (P1): Tối ưu hóa prompt Gemini**
-     - Attempted fixes: Kỹ sư đã phân tích prompt và tạo các file đề xuất chi tiết (, ).
-     - Next debug checklist: Chờ người dùng xác nhận sẽ implement phương án tối ưu nào (A - Mạnh, B - Vừa phải, hay C - Nhẹ).
-     - Why fix this issue and what will be achieved with the fix? Giảm chi phí token cho mỗi lần quét, giúp tiết kiệm chi phí API Gemini.
-     - Status: **BLOCKED** (chờ quyết định của người dùng)
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? backend (kiểm tra độ chính xác sau khi thay đổi prompt)
-     - Blocked on other issue: No
-
-**In progress Task List**:
-  - Không có.
-
-**Upcoming and Future Tasks**
-    - **Upcoming Tasks**:
-        - (P1) Implement phương án tối ưu prompt đã được chọn (file ).
-        - (P2) Giải quyết cảnh báo dung lượng disk đầy () xuất hiện liên tục trong log.
-    - **Future Tasks**:
-        - Tinh chỉnh các loại tài liệu còn lại trong .
-        - Cập nhật icon cho macOS (.icns).
-        - Implement tính năng license/activation key.
-        - Thêm tùy chọn cấu hình giá cho mỗi lần quét trong Cloud Settings.
-
-**Completed work in this session**
-- **Sửa lỗi Auto-Resume:**
-  - Sửa logic để tự động tiếp tục quét cho cả File Scan và Folder Scan trong .
-  - Sửa lỗi tự động chuyển về đúng tab (Quét tài liệu hoặc Quét danh sách) khi resume trong .
-  - Ngăn chặn hiển thị nhiều dialog Resume trùng lặp bằng cách giới hạn việc kiểm tra chỉ ở các component chính trong  và .
-- **Cải thiện UI/UX:**
-  - Thiết kế lại hoàn toàn giao diện Quét danh sách () theo mockup người dùng duyệt, giúp giao diện gọn gàng và chuyên nghiệp hơn.
-  - Di chuyển nút Gộp tab này lên phần header của lưới kết quả trong cả  và .
-- **Sửa lỗi Logic lõi:**
-  - **Sắp xếp GCN:** Đảm bảo hàm  được gọi ở tất cả các chế độ quét trong .
-  - **Gộp PDF:** Đồng bộ hóa hoàn toàn logic gộp PDF (bao gồm cả 3 tùy chọn lưu file) cho File Scan và Folder Scan () để giống với Batch Scan ().
-  - **Phân loại GCN:** Sửa logic trong  () để đảm bảo không còn tài liệu nào bị giữ nguyên là GCN mà sẽ được phân loại thành GCNC hoặc GCNM.
-- **Sửa lỗi Backend & Stability:**
-  - **Chế độ Smart Batch:** Thêm tùy chọn Smart Batch Size trong  và truyền xuống  để người dùng tự cấu hình, tránh lỗi fallback do gửi quá nhiều file.
-  - **Gemini API Error:** Thêm cơ chế retry cho lỗi  từ API Gemini trong .
-  - **Lỗi Resume:** Thêm cơ chế  và xử lý lỗi mạnh mẽ hơn khi load state bị hỏng trong , tránh crash lặp lại.
-
-**Earlier issues found/mentioned but not fixed**
-   - **Issue 1: Disk Space Warning**
-     - Debug checklist:
-        - Kiểm tra xem các file build cũ, cache, hoặc log có đang chiếm dung lượng không.
-        - Chạy lệnh 0	/app/0.6
+- **Issue 2 (P2)**: Cảnh báo dung lượng ổ đĩa liên tục ở mức 95% ().
+  - **Attempted fixes**: Chưa có.
+  - **Next debug checklist**:
+    1.  Dùng lệnh 0	/app/0.6
 0	/app/=
 8.0K	/app/BATCH_UPLOAD_SOLUTION.md
 8.0K	/app/CLOUD_BOOST_COMPLETE.md
@@ -137,92 +102,127 @@ Người dùng yêu cầu một loạt các cải tiến và sửa lỗi cho ứ
 4.0K	/app/simple_llm_health_test.py
 4.0K	/app/test_deployed.sh
 8.0K	/app/test_reports
-72K	/app/test_result.md
+88K	/app/test_result.md
 4.0K	/app/tests
 8.0K	/app/three_flows_test.log
 4.0K	/app/yarn.lock
 12K	/app/zip_regression_test.py
 4.0K	/app/zip_test.log để xác định thư mục nào đang chiếm nhiều dung lượng nhất.
-        - Cân nhắc thêm một bước dọn dẹp (cleanup) vào quy trình build.
-     - Why to solve this issue and what will be achieved with this? Ngăn chặn việc build hoặc chạy ứng dụng thất bại trong tương lai do hết dung lượng disk.
-     - Should Test frontend/backend/both after fix: NA
-     - Is recurring issue? Y
+    2.  Kiểm tra các file log lớn, dữ liệu cache của Electron, hoặc các kết quả quét cũ không được dọn dẹp.
+  - **Why fix this issue and what will be achieved with the fix?**: Ổ đĩa đầy có thể gây sập ứng dụng, mất dữ liệu, hoặc ngăn ứng dụng khởi động và lưu các phiên quét mới.
+  - **Status**: NOT STARTED
+  - **Is recurring issue?**: Y
+  - **Should Test frontend/backend/both after fix?**: Manual. Kiểm tra lại dung lượng ổ đĩa bằng Filesystem      Size  Used Avail Use% Mounted on
+overlay          95G  6.2G   89G   7% /
+tmpfs            64M     0   64M   0% /dev
+/dev/nvme0n3    9.8G  9.3G  532M  95% /app
+/dev/nvme0n1p1   95G  6.2G   89G   7% /etc/hosts
+shm              64M     0   64M   0% /dev/shm
+tmpfs           7.9G     0  7.9G   0% /proc/acpi
+tmpfs           7.9G     0  7.9G   0% /proc/scsi
+tmpfs           7.9G     0  7.9G   0% /sys/firmware sau khi dọn dẹp.
+  - **Blocked on other issue**: None.
+
+**In progress Task List**:
+- Không có. Công việc hiện tại được phân loại là sửa lỗi (issue).
+
+**Upcoming and Future Tasks**
+- **Upcoming Tasks**:
+  - **(P1) Triển khai chế độ OCR Hybrid**: Kết hợp Tesseract cho các ảnh chất lượng cao và tự động fallback về Gemini Vision cho các ảnh chất lượng thấp. Ý tưởng này đã được thảo luận và là bước logic tiếp theo sau khi chế độ Tesseract+Text được xác nhận hoạt động tốt.
+- **Future Tasks**:
+  - Tinh chỉnh .
+  - Thêm icon cho ứng dụng trên macOS.
+  - Triển khai hệ thống license key.
+  - Thêm cấu hình giá trong phần cài đặt.
+
+**Completed work in this session**
+- **Recently completed**:
+  - Cho phép tùy chỉnh kích thước resize ảnh tự do trong Cài đặt ().
+  - Giảm chất lượng JPEG xuống 85 để khắc phục lỗi 503 API ().
+  - Thêm tùy chọn bật/tắt sắp xếp GCN lên đầu (, ).
+  - Sửa lỗi logic phân loại GCN Cũ/Mới (, ).
+  - Phát hiện và cảnh báo thư mục trùng lặp trong cả chế độ quét hàng loạt và quét thư mục (, ).
+  - Thêm tùy chọn bật/tắt Auto-save trong Cài đặt (, , ).
+  - Gỡ bỏ phân trang ở kết quả quét thư mục ().
+  - Thêm nút Next/Back ở cuối trang preview để điều hướng tab (, ).
+  - Sửa lỗi các nút bật/tắt hiển thị văn bản gây nhầm lẫn (, , ).
+  - Sửa lỗi nút Next/Back tự động cuộn lên đầu trang.
+  - **Triển khai chế độ OCR Tesseract+Text**: Tích hợp như một tùy chọn engine đám mây () và sửa các lỗi liên quan để đảm bảo nó hoạt động trong cả chế độ quét hàng loạt và quét tuần tự.
+  - **Tối ưu Prompt Gemini**: Xóa 32 mã tài liệu không dùng và loại bỏ/hợp nhất các đoạn hướng dẫn bị trùng lặp trong .
+
+**Earlier issues found/mentioned but not fixed**
+- Đã được liệt kê trong **All Pending/In progress Issue list**.
 
 **Known issue recurrence from previous fork**
-  - Không có. Lỗi crash renderer là một vấne đề mới và nghiêm trọng hơn các vấn đề về hiệu suất trước đó.
+- **Issue recurrence**: Lỗi  khi gọi API.
+- **Recurrence count**: Cao.
+- **Status**: MITIGATED. Lỗi đã được giảm thiểu bằng cách giảm chất lượng ảnh xuống 85 và giới thiệu chế độ Tesseract+Text như một giải pháp thay thế hiệu quả hơn. Vấn đề chưa được giải quyết triệt để vì vẫn có thể xảy ra ở chế độ Vision với batch lớn, nhưng đã có các biện pháp giảm thiểu quan trọng.
 
 **Code Architecture**
-
+Cấu trúc thư mục vẫn giữ nguyên như mô tả trong prompt hệ thống. Các file được chỉnh sửa nhiều nhất trong phiên này bao gồm:
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Key Technical Concepts**
--   **Electron**: Framework xây dựng ứng dụng desktop.
--   **React**: Thư viện JavaScript xây dựng giao diện người dùng.
--   **Python**: Backend xử lý logic OCR và AI.
--   **Gemini Flash API**: Model AI của Google cho OCR và phân loại.
--   **IPC (Inter-Process Communication)**: Giao tiếp giữa main process và renderer process của Electron.
--   **electron-store**: Lưu trữ cấu hình và trạng thái quét local dưới dạng file JSON.
+- Electron, React, Python, , IPC.
+- **Khái niệm mới**: Phương pháp OCR Hybrid (Tesseract local + LLM cloud) được giới thiệu như một chiến lược tối ưu hóa chi phí và hiệu suất.
 
 **key DB schema**
-Ứng dụng không dùng DB quan hệ. Dữ liệu được lưu local bằng :
-  - : Lưu cấu hình người dùng (OCR engine, batch mode, theme, etc.).
-  - : Lưu trạng thái của các lần quét chưa hoàn tất để có thể resume.
+- Không áp dụng, ứng dụng sử dụng  để lưu trạng thái vào file JSON.
 
 **changes in tech stack**
-  - Không có.
+- Không có thay đổi cơ bản nào về công nghệ.
 
 **All files**
-- **Files đã chỉnh sửa nhiều trong phiên này:**
-  - : Sửa rất nhiều lỗi liên quan đến resume, gộp PDF, sắp xếp GCN, và là nơi chứa lỗi crash hiện tại.
-  - : Thiết kế lại UI, sửa lỗi sắp xếp GCN.
-  - : Sửa logic chuyển tab khi resume.
-  - : Thêm setting cho Smart Batch Size.
-  - : Thêm tùy chọn  cho smart mode, thêm retry cho lỗi 500.
-  - : Truyền setting  xuống script Python.
-- **Files tài liệu đã tạo:**
-  - 
-  - 
-  - 
-  - 
+- : Được chỉnh sửa nhiều nhất để dọn dẹp và đồng bộ hóa các prompt cho Gemini.
+-  & : Được chỉnh sửa nhiều để thêm các tính năng mới (toggles, nút điều hướng) và sửa lỗi.
+-  & : Được chỉnh sửa để quản lý các cài đặt mới.
+-  & : Được cập nhật để hỗ trợ chế độ OCR mới.
+- : Cập nhật để truyền đúng chế độ OCR cho backend.
 
 **Areas that need refactoring**:
-- : Cần refactor ngay lập tức logic render các tab thư mục con để implement lazy rendering, giải quyết lỗi crash. Toàn bộ cơ chế xử lý ảnh base64 là một điểm nghẽn hiệu năng và nên được xem xét lại trong tương lai (ví dụ: sử dụng  protocol hoặc một giải pháp virtualized list).
+- Logic prompt trong  hiện được chia sẻ giữa  và . Mặc dù công việc hiện tại là đồng bộ hóa chúng, một giải pháp dài hạn tốt hơn là xây dựng prompt từ các thành phần chung để tránh sự thiếu nhất quán trong tương lai.
+- File  đã được tạo nhưng có thể đã trở nên thừa thãi sau khi logic của nó được tích hợp vào  và . Cần kiểm tra và có thể xóa bỏ file này.
 
 **key api endpoints**
-Đây là ứng dụng desktop, sử dụng IPC của Electron thay vì API endpoint:
-- : Kênh chính để gọi các script xử lý Python từ React.
-- , , , : Quản lý trạng thái quét để resume.
-- : Lấy ảnh preview (đây là một trong những nguyên nhân gây quá tải bộ nhớ).
-- , : Quản lý cấu hình ứng dụng.
+- Không có endpoint mới. Giao tiếp chủ yếu qua các kênh IPC của Electron, đặc biệt là .
 
 **Critical Info for New Agent**
-- **Lỗi Quan trọng nhất:** Lỗi  là ưu tiên hàng đầu. Nguyên nhân đã được xác định là do render tất cả các tab ẩn cùng lúc. Giải pháp là implement **lazy rendering** trong .
-- **Chờ Người dùng:** Người dùng cần đưa ra quyết định về việc tối ưu hóa prompt. Đừng implement cho đến khi có xác nhận.
-- **Ngôn ngữ:** Toàn bộ giao tiếp với người dùng và văn bản trong UI phải bằng **tiếng Việt**.
+- Người dùng rất am hiểu kỹ thuật và đưa ra phản hồi cụ thể, chính xác.
+- Hiện có hai luồng xử lý OCR chính: Vision (gửi ảnh đến Gemini) và Tesseract+Text (OCR local, gửi text đến Gemini). Agent cần nhận biết chế độ nào đang hoạt động khi debug.
+- Các prompt của Gemini đã được tối ưu hóa nhiều. Bất kỳ thay đổi nào trong tương lai cần được thực hiện cẩn thận cho cả phiên bản lite và full để duy trì sự nhất quán.
+- Cảnh báo  là một vấn đề dai dẳng, chưa được giải quyết và có thể trở nên nghiêm trọng.
 
 **documents created in this job**
-  - /app/desktop-app/TOKEN_CALCULATION.md
-  - /app/desktop-app/PROMPT_OPTIMIZATION_PROPOSAL.md
-  - /app/desktop-app/PROMPT_DETAILED_COMPARISON.md
-  - /app/desktop-app/batch_scanner_mockup.html
+- : File hướng dẫn debug tạm thời, có thể không còn cần thiết.
 
 **Last 5 User Messages and any pending user messages**
-- **User (msg 471):** Báo cáo lỗi  vẫn xảy ra. (Chưa giải quyết)
-- **Agent (msg 472-483):** Thử một Emergency Fix bằng cách giảm mạnh số lượng ảnh hiển thị và mặc định tắt preview. (Không hiệu quả)
-- **User (msg 484):** Báo lỗi crash vẫn còn và **đưa ra chẩn đoán chính xác**: hiện tại đang tải tất cả các tad lên 1 lúc rồi mới hiển thị. nếu tải 1 tab xong hiển thị tab đó rồi tải tab tiếp theo có khả thi hơn không. (Chưa giải quyết)
-- **Agent (msg 485):** Đồng ý với chẩn đoán của người dùng, xác nhận đó là nguyên nhân gốc rễ và tuyên bố giải pháp đúng là **Lazy Render**. (Đã lên kế hoạch)
-- **Agent (msg 486-489):** Tìm và xác định chính xác đoạn code sai () trong  gây ra vấn đề. (Đã lên kế hoạch)
+1.  **User**: Hỏi tại sao token đầu vào vẫn cao (11,788) sau khi đã tối ưu prompt.
+2.  **User**: Yêu cầu tính toán chi phí cho một batch 5 ảnh giữa chế độ Vision và Tesseract+Text.
+3.  **User**: Yêu cầu agent kiểm tra và đồng bộ hóa prompt của  và , cập nhật bản  để chi tiết và đầy đủ như bản .
+4.  **Agent**: Gặp lỗi  khi bắt đầu so sánh prompt.
+5.  **User**: tiếp tục - Yêu cầu agent tiếp tục công việc đang dang dở.
 
 **Project Health Check:**
-- **Broken:** Ứng dụng hiện đang không ổn định và không thể sử dụng cho các tác vụ lớn (quét thư mục có nhiều thư mục con) do lỗi renderer process crash.
+- **Broken**: Chức năng phân loại của chế độ  đang hoạt động kém hiệu quả do prompt chưa hoàn thiện, không nhất quán với chế độ .
+- **Mocked**: Không có.
 
 **Testing status**
-  - Testing agent used after significant changes: NO
-  - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: []
-  - Known regressions: Renderer process crash.
+- Testing agent used after significant changes: NO
+- Troubleshoot agent used after agent stuck in loop: NO
+- Test files created:
+  - 
+- Known regressions: None
 
 **Credentials to test flow:**
-Không cần thiết.
+- Không áp dụng.
 
 **What agent forgot to execute**
-- Kỹ sư AI đã không giải quyết cảnh báo  xuất hiện nhiều lần trong quá trình làm việc. Đây là một rủi ro tiềm tàng có thể gây gián đoạn trong tương lai.</analysis>
+- Agent chưa giải quyết cảnh báo  lặp đi lặp lại.
+- Agent chưa xác minh liệu file  có còn được sử dụng hay đã trở thành code thừa.</analysis>

@@ -66,9 +66,9 @@
 
 | Metric | Lite | Full | Reduction |
 |--------|------|------|-----------|
-| **Characters** | 8,340 | 25,724 | 67.6% |
-| **Tokens (est.)** | 2,085 | 6,431 | 67.6% |
-| **Lines** | 285 | 831 | 65.7% |
+| **Characters** | 10,145 | 25,724 | 60.6% |
+| **Tokens (est.)** | 2,536 | 6,431 | 60.6% |
+| **Logic Coverage** | 100% | 100% | Fully synced |
 
 ### Logic coverage:
 - ✅ Vị trí (TOP/MIDDLE/BOTTOM): **100% đồng bộ**

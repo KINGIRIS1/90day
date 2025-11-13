@@ -1358,11 +1358,9 @@ CÁC CẶP DỄ NHẦM - PHẢI CÓ TỪ KHÓA PHÂN BIỆT:
 
 DANH SÁCH ĐẦY ĐỦ 98 LOẠI TÀI LIỆU (KHỚP ~85-90%):
 
-📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (5 loại)
+📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (3 loại)
 BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT → BMT
 BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ) → HSKT
-BẢN VẼ HOÀN CÔNG → BVHC
-BẢN VẼ NHÀ → BVN
 SƠ ĐỒ DỰ KIẾN TÁCH THỬA → SDTT
 
 📋 NHÓM 2: BẢNG KÊ / DANH SÁCH (4 loại)

@@ -446,6 +446,20 @@ const Settings = () => {
         <AutoSaveSetting />
       </div>
 
+      {/* OCR Mode Setting - TEST */}
+      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg shadow-sm p-6 border-2 border-orange-300">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+          ⚡ Chế độ OCR (TEST)
+          <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded font-normal">
+            Thử nghiệm
+          </span>
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          <strong>Mới:</strong> Thử chế độ Tesseract + Gemini Text (nhanh hơn, rẻ hơn, ít lỗi 503).
+        </p>
+        <OcrModeSetting />
+      </div>
+
       {/* App Information */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b">

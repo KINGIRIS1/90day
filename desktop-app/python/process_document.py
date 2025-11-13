@@ -249,53 +249,53 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     model_type = 'Hybrid'
                 print(f"🤖 Using Gemini {model_type} AI with POSITION-AWARE classification", file=sys.stderr)
 
-            from ocr_engine_gemini_flash import classify_document_gemini_flash
-            from rule_classifier import classify_document_name_from_code
-            import time
+                from ocr_engine_gemini_flash import classify_document_gemini_flash
+                from rule_classifier import classify_document_name_from_code
+                import time
 
-            # Get resize settings from environment (set by Electron)
-            enable_resize = os.environ.get('ENABLE_RESIZE', 'true').lower() == 'true'
-            max_width = int(os.environ.get('MAX_WIDTH', '2000'))
-            max_height = int(os.environ.get('MAX_HEIGHT', '2800'))
+                # Get resize settings from environment (set by Electron)
+                enable_resize = os.environ.get('ENABLE_RESIZE', 'true').lower() == 'true'
+                max_width = int(os.environ.get('MAX_WIDTH', '2000'))
+                max_height = int(os.environ.get('MAX_HEIGHT', '2800'))
 
-            print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
-            if enable_resize:
-                print(f"💰 Smart resize enabled: max {max_width}x{max_height}px", file=sys.stderr)
-            start_time = time.time()
+                print("📸 Scanning FULL IMAGE with position-aware analysis...", file=sys.stderr)
+                if enable_resize:
+                    print(f"💰 Smart resize enabled: max {max_width}x{max_height}px", file=sys.stderr)
+                start_time = time.time()
 
-            # Pass model type and resize settings to classifier
-            result = classify_document_gemini_flash(
-                file_path, 
-                cloud_api_key, 
-                crop_top_percent=1.0, 
-                model_type=ocr_engine_type,
-                enable_resize=enable_resize,
-                max_width=max_width,
-                max_height=max_height
-            )
+                # Pass model type and resize settings to classifier
+                result = classify_document_gemini_flash(
+                    file_path, 
+                    cloud_api_key, 
+                    crop_top_percent=1.0, 
+                    model_type=ocr_engine_type,
+                    enable_resize=enable_resize,
+                    max_width=max_width,
+                    max_height=max_height
+                )
 
-            scan_time = time.time() - start_time
-            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)
+                scan_time = time.time() - start_time
+                print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, position: {result.get('title_position', 'unknown')}, time: {scan_time:.1f}s)", file=sys.stderr)
 
-            if result.get("short_code") == "ERROR":
-                return {
-                    "success": False,
-                    "error": result.get("reasoning", "Gemini Flash error"),
-                    "method": "gemini_flash_failed"
-                }
+                if result.get("short_code") == "ERROR":
+                    return {
+                        "success": False,
+                        "error": result.get("reasoning", "Gemini Flash error"),
+                        "method": "gemini_flash_failed"
+                    }
 
-            title_position = result.get("title_position", "unknown")
-            short_code = result.get("short_code", "UNKNOWN")
-            if title_position in ["middle", "bottom"] and short_code != "UNKNOWN":
-                print(f"⚠️ Title found at {title_position} (not top), treating as mention", file=sys.stderr)
-                result["short_code"] = "UNKNOWN"
-                result["confidence"] = 0.1
-                result["reasoning"] = f"Text pattern found at {title_position}, not a main title"
+                title_position = result.get("title_position", "unknown")
+                short_code = result.get("short_code", "UNKNOWN")
+                if title_position in ["middle", "bottom"] and short_code != "UNKNOWN":
+                    print(f"⚠️ Title found at {title_position} (not top), treating as mention", file=sys.stderr)
+                    result["short_code"] = "UNKNOWN"
+                    result["confidence"] = 0.1
+                    result["reasoning"] = f"Text pattern found at {title_position}, not a main title"
 
-            method_used = "gemini_position_aware"
+                method_used = "gemini_position_aware"
 
-            # Map Gemini result to rule_classifier format
-            short_code = result.get("short_code", "UNKNOWN")
+                # Map Gemini result to rule_classifier format
+                short_code = result.get("short_code", "UNKNOWN")
             
             # ✅ CODE ALIAS MAPPING: Map alternate codes to standard codes
             CODE_ALIASES = {

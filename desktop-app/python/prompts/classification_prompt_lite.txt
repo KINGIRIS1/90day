@@ -1,0 +1,286 @@
+🎯 NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
+
+⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
+Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
+Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
+
+📍 QUY TẮC VỊ TRÍ (CỰC KỲ QUAN TRỌNG):
+
+1️⃣ **PHẦN ĐẦU TRANG (TOP 20%)**
+   - Đây là vùng TIÊU ĐỀ CHÍNH
+   - CHỈ text ở đây MỚI được dùng để phân loại
+   - Cỡ chữ LỚN, IN HOA, căn giữa
+   - VD: "HỢP ĐỒNG CHUYỂN NHƯỢNG", "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
+
+2️⃣ **PHẦN GIỮA TRANG (MIDDLE 30-70%)**
+   - Đây là BODY CONTENT
+   - ❌ KHÔNG được phân loại dựa vào text ở đây
+   - VD: "...theo hợp đồng chuyển nhượng..." → CHỈ LÀ MENTION!
+
+3️⃣ **PHẦN CUỐI TRANG (BOTTOM 70-100%)**
+   - Đây là CHỮ KÝ, CON DẤU
+   - ❌ KHÔNG được phân loại dựa vào text ở đây
+
+🚨 SECTION HEADERS - KHÔNG BAO GIỜ LÀ TITLE (REJECT):
+Nếu text có SECTION NUMBER ở đầu → KHÔNG PHẢI title → UNKNOWN:
+- "I. ...", "II. ...", "III. ...", "IV. ..."
+- "1. ...", "2. ...", "ĐIỀU 1:", "ĐIỀU 2:", "PHẦN I:"
+- VD SAI: "III. THÔNG TIN VỀ ĐĂNG KÝ..." → Section header, NOT title!
+
+🚨 BLACKLIST - KHÔNG BAO GIỜ LÀ TITLE (REJECT):
+Nếu text BẮT ĐẦU với các từ sau → KHÔNG PHẢI title → UNKNOWN:
+- "Căn cứ...", "Theo...", "Kèm theo...", "Về việc..."
+- Text có "theo", "số...", "ngày...", "do...cấp"
+- VD: "Căn cứ Giấy chứng nhận..." → REFERENCE, không phải TITLE
+
+🎯 TITLE phải NẰM ĐỘC LẬP (CỰC KỲ QUAN TRỌNG):
+✅ TITLE:
+- Mỗi dòng CHỈ có text của title, KHÔNG có text khác
+- VD: "HỢP ĐỒNG CHUYỂN NHƯỢNG" (một dòng, độc lập)
+
+❌ KHÔNG PHẢI TITLE:
+- "...theo Giấy chứng nhận số..." (NẰM CHUNG với nhiều từ khác)
+- "...đã từ chối theo văn bản..." (NẰM CHUNG, lowercase)
+
+👁️ VISUAL INDICATORS:
+
+✅ QUỐC HUY (National Emblem):
+- Có QUỐC HUY ở top center → Giấy tờ chính thức
+- "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM" + quốc huy
+
+🚨 GCN - QUY TẮC CỨNG (CỰC KỲ QUAN TRỌNG):
+
+❌ TUYỆT ĐỐI KHÔNG BAO GIỜ TRẢ VỀ "GCNM" HOẶC "GCNC" ❌
+✅ CHỈ trả về "GCN" (generic)
+
+🔒 PHẢI CÓ ÍT NHẤT MỘT TRONG HAI:
+1. **QUỐC HUY** ở top center (ngôi sao, búa liềm)
+2. **CÁC DÒNG ĐẶC TRƯNG** (PHẢI có đủ 3 dòng):
+   - "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"
+   - "Độc lập - Tự do - Hạnh phúc"
+   - "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..."
+
+⚠️ NẾU THIẾU → TUYỆT ĐỐI KHÔNG PHẢI GCN!
+
+⚠️ BẮT BUỘC 1: XÁC ĐỊNH MÀU SẮC
+- Màu ĐỎ/CAM → color: "red"
+- Màu HỒNG → color: "pink"
+- Không xác định → color: "unknown"
+
+⚠️ BẮT BUỘC 2: TÌM NGÀY CẤP
+- Vị trí: A3 (2 trang) → trang 2; A4 (1 trang) → trang 1
+- Format: "DD/MM/YYYY", "Ngày DD tháng MM năm YYYY"
+- Nếu mờ: MM/YYYY hoặc YYYY
+- Text gần: "Ngày cấp", "Cấp ngày", "TM. UBND"
+
+✅ VÍ DỤ ĐÚNG (GCN):
+{
+  "short_code": "GCN",
+  "color": "pink",
+  "issue_date": "14/04/2025",
+  "issue_date_confidence": "full",
+  "confidence": 0.95,
+  "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 14/04/2025"
+}
+
+⚠️ NGOẠI LỆ - GCNM CONTINUATION:
+NẾU THẤY (PHẢI CÓ CẢ HAI hoặc standalone):
+1️⃣ "NỘI DUNG THAY ĐỔI VÀ CƠ SỞ PHÁP LÝ" + "XÁC NHẬN CỦA CƠ QUAN CÓ THẨM QUYỀN"
+2️⃣ "THỬA ĐẤT, NHÀ Ở VÀ TÀI SẢN KHÁC GẮN LIỀN VỚI ĐẤT"
+→ Trả về: GCNM (confidence: 0.85)
+
+✅ 66 LOẠI TÀI LIỆU:
+
+NHÓM 1 - GIẤY CHỨNG NHẬN:
+GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT)
+
+NHÓM 2 - HỢP ĐỒNG (PHÂN BIỆT RÕ):
+HDCQ = Hợp đồng chuyển nhượng, tặng cho QSDĐ
+  • PHẢI có "CHUYỂN NHƯỢNG" hoặc "TẶNG CHO"
+HDUQ = Hợp đồng ủy quyền
+  • PHẢI có "ỦY QUYỀN" (KHÔNG có "chuyển nhượng")
+  • 🚨 QUAN TRỌNG: "ỦY QUYỀN" ≠ "CHUYỂN NHƯỢNG" → HDUQ
+HDTHC = Hợp đồng thế chấp
+HDBDG = Hợp đồng mua bán
+
+NHÓM 3 - ĐƠN:
+DDKBD = Đơn đăng ký biến động đất đai
+  • PHẢI có "BIẾN ĐỘNG"
+DDK = Đơn đăng ký đất đai (KHÔNG có "biến động")
+DCK = Đơn cam kết, Giấy cam kết
+  • Title: "GIẤY CAM KẾT" (IN HOA toàn bộ)
+  • ❌ REJECT: "Giấy cam kết" (chữ hoa đầu dòng)
+DXTHT = Đơn xin tách thửa, hợp thửa
+DXGCN = Đơn xin cấp GCN
+DXCMD = Đơn xin chuyển mục đích
+DXGD = Đơn xin giao đất
+
+NHÓM 4 - QUYẾT ĐỊNH:
+QDGTD = Quyết định giao đất
+QDCMD = Quyết định cho phép chuyển mục đích
+QDTH = Quyết định thu hồi đất
+QDGH = Quyết định gia hạn
+
+NHÓM 5 - GIẤY:
+GUQ = Giấy ủy quyền
+GTLQ = Giấy tiếp nhận hồ sơ và hẹn trả KQ
+  • "GIẤY TIẾP NHẬN HỒ SƠ"
+  • "PHIẾU KIỂM SOÁT QUÁ TRÌNH"
+GNT = Giấy nộp tiền vào NSNN
+GXN = Giấy xác nhận
+
+NHÓM 6 - BIÊN BẢN:
+BBKTHT = Biên bản kiểm tra, xác minh hiện trạng
+  • "BIÊN BẢN\nXác minh thực địa..."
+  • "BIÊN BẢN\nKiểm tra xác minh hiện trạng..."
+BBBDG = Biên bản bán đấu giá
+BBDG = Biên bản đo đạc
+KTCKCG = BB kết thúc TB niêm yết công khai cấp GCN
+KTCKMG = BB kết thúc TB niêm yết công khai mất GCN
+
+NHÓM 7 - BẢN VẼ:
+HSKT = Bản vẽ (Trích lục, đo tách, chỉnh lý)
+  • "BẢN VẼ", "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH"
+  • Map với scale (TỈ LỆ 1:500)
+BMT = Bản mô tả ranh giới
+SDTT = Sơ đồ dự kiến tách thửa
+
+NHÓM 8 - PHIẾU:
+PKTHS = Phiếu kiểm tra hồ sơ
+  • "PHIẾU KIỂM **TRA** HỒ SƠ" (check/inspect)
+  • ≠ "Phiếu kiểm **soát**" (→ GTLQ)
+PXNKQDD = Phiếu xác nhận KQ đo đạc
+  • PHẢI có quốc huy + nội dung về đo đạc/tọa độ
+PCT = Phiếu chuyển TT nghĩa vụ tài chính
+PLYKDC = Phiếu lấy ý kiến dân cư
+
+NHÓM 9 - THÔNG BÁO:
+TBT = Thông báo thuế
+  • "THÔNG BÁO THUẾ", "THÔNG BÁO NỘP TIỀN"
+  • Về thuế trước bạ, TNCN, tiền sử dụng đất
+TBMG = Thông báo mất giấy
+TBCKCG = Thông báo công khai cấp giấy
+TBCKMG = Thông báo công khai mất giấy
+HTNVTC = TB xác nhận hoàn thành NVTC
+TBCNBD = Thông báo cập nhật biến động
+CKDC = Thông báo công bố công khai di chúc
+
+NHÓM 10 - TỜ:
+TKT = Tờ khai thuế
+TTr = Tờ trình về giao đất (⚠️ "r" viết thường)
+TTCG = Tờ trình về đăng ký đất đai
+
+NHÓM 11 - VĂN BẢN:
+TTHGD = VB thỏa thuận QSDĐ hộ gia đình
+  • Keywords: "HỘ GIA ĐÌNH" (KHÔNG có "vợ chồng")
+PCTSVC = VB phân chia tài sản vợ chồng
+  • Keywords: "VỢ CHỒNG" (KHÔNG có "hộ gia đình")
+VBTK = VB thỏa thuận phân chia di sản thừa kế
+  • Keywords: "DI SẢN THỪA KẾ" (về inheritance)
+CKTSR = VB cam kết tài sản riêng
+VBCTCMD = VB chấp thuận chuyển mục đích
+CDLK = VB chấm dứt quyền hạn chế đất liền kề
+HCLK = VB xác lập quyền hạn chế đất liền kề
+VBTC = VB từ chối nhận di sản
+
+NHÓM 12 - KHÁC:
+CCCD = Căn cước công dân
+GKS = Giấy khai sinh
+GKH = Giấy chứng nhận kết hôn
+DICHUC = Di chúc
+hoadon = Hóa đơn GTGT
+
+⚠️ DỄ NHẦM (QUAN TRỌNG):
+
+1. DDKBD vs GCNM:
+   DDKBD: Form có blank fields, "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
+   GCNM: Certificate đã fill, có quốc huy
+
+2. HSKT vs GCNM:
+   HSKT: Bản vẽ, map, có sơ đồ/tọa độ
+   GCNM: Text document, không phải map
+
+3. HDCQ vs HDUQ:
+   HDCQ: "CHUYỂN NHƯỢNG" (chuyển quyền sở hữu)
+   HDUQ: "ỦY QUYỀN" (ủy quyền làm thủ tục, KHÔNG chuyển quyền)
+
+4. TTHGD vs PCTSVC vs VBTK:
+   TTHGD: "HỘ GIA ĐÌNH" (family members)
+   PCTSVC: "VỢ CHỒNG" (couple)
+   VBTK: "DI SẢN THỪA KẾ" (inheritance)
+
+5. GTLQ vs PKTHS:
+   GTLQ: "KIỂM **SOÁT** QUÁ TRÌNH" (monitor)
+   PKTHS: "KIỂM **TRA** HỒ SƠ" (check/inspect)
+
+6. PXNKQDD vs PKTHS:
+   PXNKQDD: CÓ quốc huy + nội dung đo đạc/tọa độ
+   PKTHS: KHÔNG có quốc huy
+
+7. REFERENCE vs TITLE:
+   ❌ REFERENCE: "Căn cứ Giấy chứng nhận...", "theo hợp đồng..."
+   ✅ TITLE: "GIẤY CHỨNG NHẬN" (ở đầu trang, độc lập, IN HOA)
+
+🔍 QUY TRÌNH:
+1. Kiểm tra vị trí: Text ở TOP 20%?
+2. Kiểm tra độc lập: NẰM RIÊNG hay chung với text khác?
+3. Kiểm tra reference: Có "căn cứ/theo/số" không?
+4. Kiểm tra section number: Có "I./II./ĐIỀU" không?
+5. NẾU pass 4 bước → Khớp với 66 loại
+6. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
+7. NẾU vẫn không → "UNKNOWN"
+
+📤 TRẢ VỀ JSON:
+{
+  "short_code": "MÃ_CHÍNH_XÁC",
+  "confidence": 0.9,
+  "title_position": "top",
+  "reasoning": "Giải thích ngắn gọn",
+  "issue_date": "DD/MM/YYYY hoặc null",
+  "issue_date_confidence": "full/partial/not_found/null"
+}
+
+🎯 VÍ DỤ:
+
+✅ ĐÚNG - GCN:
+{
+  "short_code": "GCN",
+  "color": "pink",
+  "issue_date": "14/04/2025",
+  "issue_date_confidence": "full",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Giấy chứng nhận màu hồng, ngày cấp 14/04/2025"
+}
+
+✅ ĐÚNG - HDCQ:
+{
+  "short_code": "HDCQ",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Hợp đồng chuyển nhượng quyền sử dụng đất"
+}
+
+✅ ĐÚNG - HDUQ:
+{
+  "short_code": "HDUQ",
+  "confidence": 0.98,
+  "title_position": "top",
+  "reasoning": "Hợp đồng ủy quyền - title rõ ràng"
+}
+
+❌ SAI - Reference:
+Title: "...theo hợp đồng chuyển nhượng..."
+→ {
+  "short_code": "UNKNOWN",
+  "reasoning": "Reference only, not title"
+}
+
+❌ SAI - Section header:
+Title: "III. THÔNG TIN VỀ ĐĂNG KÝ..."
+→ {
+  "short_code": "UNKNOWN",
+  "reasoning": "Section header, not main title"
+}
+
+❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 66 MÃ TRÊN!

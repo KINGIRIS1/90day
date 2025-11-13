@@ -2406,6 +2406,43 @@ function BatchScanner({ onSwitchTab }) {
                 );
                 })}
               </div>
+              
+              {/* Tab Navigation Buttons at bottom */}
+              <div className="mt-6 pt-4 border-t flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    const currentIndex = folderTabs.findIndex(tab => tab.path === activeFolder);
+                    if (currentIndex > 0) {
+                      setActiveFolder(folderTabs[currentIndex - 1].path);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  disabled={folderTabs.findIndex(tab => tab.path === activeFolder) === 0}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  <span>←</span>
+                  <span>Tab trước</span>
+                </button>
+                
+                <div className="text-sm text-gray-600">
+                  Tab {folderTabs.findIndex(tab => tab.path === activeFolder) + 1} / {folderTabs.length}
+                </div>
+                
+                <button
+                  onClick={() => {
+                    const currentIndex = folderTabs.findIndex(tab => tab.path === activeFolder);
+                    if (currentIndex < folderTabs.length - 1) {
+                      setActiveFolder(folderTabs[currentIndex + 1].path);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  disabled={folderTabs.findIndex(tab => tab.path === activeFolder) === folderTabs.length - 1}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  <span>Tab tiếp theo</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

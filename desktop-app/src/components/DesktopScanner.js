@@ -165,6 +165,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
   // Auto-save when childTabs change (folders complete) - IMMEDIATE SAVE
   useEffect(() => {
     const autoSave = async () => {
+      // Skip if auto-save is disabled
+      if (!autoSaveEnabled) {
+        console.log('💾 Auto-save disabled, skipping...');
+        return;
+      }
+      
       const doneFolders = childTabs.filter(t => t.status === 'done');
       const allDone = childTabs.length > 0 && childTabs.every(t => t.status === 'done');
       

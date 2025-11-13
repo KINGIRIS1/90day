@@ -437,6 +437,72 @@ def encode_image_base64(image_path, max_width=1500, max_height=2100):
         return None, None
 
 
+def batch_classify_tesseract_text(image_paths, api_key, last_known_type=None):
+    """
+    NEW MODE: Tesseract OCR + Gemini Text Classification
+    
+    Approach:
+    1. Extract text from each image using Tesseract (local, fast)
+    2. Send only text to Gemini Text API for classification
+    
+    Benefits:
+    - Faster: No need to upload large base64 images
+    - Cheaper: Text API is 10-20x cheaper than Vision API
+    - Less 503 errors: Smaller requests
+    - Can handle larger batches: 20-30 files instead of 5
+    
+    Args:
+        image_paths: List of image file paths
+        api_key: Gemini API key
+        last_known_type: Not used in this mode (each file processed independently)
+    
+    Returns:
+        List of classification results
+    """
+    if not TESSERACT_TEXT_AVAILABLE:
+        print("[ERROR] Tesseract+Text mode not available. Install pytesseract.", file=sys.stderr)
+        return [{
+            'type': 'UNKNOWN',
+            'short_code': 'UNKNOWN',
+            'confidence': 0.0,
+            'error': 'Tesseract not available',
+            'method': 'error'
+        } for _ in image_paths]
+    
+    print(f"\n[Tesseract+Text Mode] Processing {len(image_paths)} images...", file=sys.stderr)
+    
+    results = []
+    
+    for i, img_path in enumerate(image_paths):
+        try:
+            print(f"[{i+1}/{len(image_paths)}] Processing: {os.path.basename(img_path)}", file=sys.stderr)
+            
+            # Process with Tesseract + Gemini Text
+            result = tesseract_text_process(img_path, api_key)
+            
+            # Add pages info (each image is a separate "document" in this mode)
+            result['pages'] = [i]
+            
+            results.append(result)
+            
+            print(f"  ✅ Result: {result['short_code']} (confidence: {result['confidence']*100:.1f}%)", file=sys.stderr)
+            
+        except Exception as e:
+            print(f"  ❌ Error: {e}", file=sys.stderr)
+            results.append({
+                'type': 'UNKNOWN',
+                'short_code': 'UNKNOWN',
+                'confidence': 0.0,
+                'pages': [i],
+                'error': str(e),
+                'method': 'tesseract_text'
+            })
+    
+    print(f"\n[Tesseract+Text Mode] Completed {len(results)}/{len(image_paths)} classifications", file=sys.stderr)
+    
+    return results
+
+
 
 
 def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=5, last_known_type=None):

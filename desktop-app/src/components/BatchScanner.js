@@ -45,6 +45,9 @@ function BatchScanner({ onSwitchTab }) {
   // GCN sorting preference
   const [sortGCNToTop, setSortGCNToTop] = useState(true); // User preference: sort GCN to top after scan
   
+  // Auto-save preference
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true); // User preference: auto-save scan state
+  
   // Auto-save & Resume
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [incompleteScans, setIncompleteScans] = useState([]);

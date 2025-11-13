@@ -1,0 +1,83 @@
+=== OPENAI INTEGRATION PATCH ===
+Thêm các đoạn code sau vào file electron/main.js trên máy Windows của bạn:
+
+=== 1. TEST API KEY HANDLER ===
+Tìm dòng: if (provider === 'gemini') {
+Sau block gemini, TRƯỚC dòng: return { success: false, error: `Provider không hỗ trợ: ${provider}` };
+
+Thêm vào:
+
+    if (provider === 'openai') {
+      const testUrl = 'https://api.openai.com/v1/chat/completions';
+      const response = await axios.post(testUrl, {
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: 'Hello, this is a test.' }],
+        max_tokens: 10
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        timeout: 15000
+      });
+      if (response.status === 200 && response.data && response.data.choices) {
+        return { success: true, message: '✅ OpenAI GPT-4o mini API key hợp lệ' };
+      }
+      return { success: false, error: 'OpenAI test thất bại' };
+    }
+
+=== 2. PROCESS-DOCUMENT-OFFLINE HANDLER ===
+Tìm dòng có: } else if (ocrEngineType === 'gemini-flash' || ...
+Thêm 'gemini-flash-text' vào điều kiện:
+
+Sửa từ:
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite') {
+
+Thành:
+    } else if (ocrEngineType === 'gemini-flash' || ocrEngineType === 'gemini-flash-hybrid' || ocrEngineType === 'gemini-flash-lite' || ocrEngineType === 'gemini-flash-text') {
+
+Sau block đó, thêm:
+
+    } else if (ocrEngineType === 'openai-gpt4o-mini') {
+      cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+      if (!cloudApiKey) {
+        resolve({ success: false, error: 'OpenAI API key not configured. Please add it in Cloud OCR settings.', method: 'config_error' });
+        return;
+      }
+    }
+
+=== 3. BATCH-PROCESS-DOCUMENTS HANDLER ===
+Tìm phần: // Get API key for cloud engines
+Trong block if của gemini, thêm return statement nếu thiếu:
+
+Sửa từ:
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'Google API key not configured', results: [] });
+
+Thành:
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'Google API key not configured', results: [] });
+          return;
+        }
+
+Sau block gemini đó, thêm:
+
+      } else if (ocrEngine === 'openai-gpt4o-mini') {
+        cloudApiKey = store.get('cloudOCR.openai.apiKey', '');
+        if (!cloudApiKey) {
+          resolve({ success: false, error: 'OpenAI API key not configured', results: [] });
+          return;
+        }
+      }
+
+=== DONE ===
+Sau khi thêm 3 đoạn code trên vào electron/main.js trên máy Windows:
+1. Lưu file
+2. Stop yarn electron-dev-win (Ctrl+C)
+3. Chạy lại: yarn electron-dev-win
+4. Test lại "Test API Key" cho OpenAI
+
+Nếu vẫn lỗi, hãy kiểm tra:
+- File main.js có đúng là trong thư mục electron/ không
+- Đã lưu file chưa
+- Đã restart Electron chưa

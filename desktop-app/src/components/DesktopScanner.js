@@ -2025,7 +2025,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     setChildTabs(prev => prev.map((t, i) => i === idx ? { ...t, status: 'done', results: sortedResults } : t));
     
     // 💾 MANUAL SAVE after folder complete (before next folder starts)
-    if (window.electronAPI?.saveScanState) {
+    if (autoSaveEnabled && window.electronAPI?.saveScanState) {
       // Get current state for save
       const currentChildTabs = childTabs.map((t, i) => 
         i === idx ? { ...t, status: 'done', results: finalChildResults } : t

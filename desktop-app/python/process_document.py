@@ -212,6 +212,113 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 "estimated_cost_usd": 0  # Could be calculated based on tier_used
             }
 
+        # Handle OpenAI GPT-4o mini Vision (AI classification)
+        elif ocr_engine_type == 'openai-gpt4o-mini':
+            if not cloud_api_key:
+                return {
+                    "success": False,
+                    "error": "OpenAI API key is required for GPT-4o mini",
+                    "method": "config_error"
+                }
+
+            print(f"🤖 Using OpenAI GPT-4o mini Vision AI classification", file=sys.stderr)
+
+            from ocr_engine_openai_vision import classify_document_openai_vision
+            from rule_classifier import classify_document_name_from_code
+            import time
+
+            # Get resize settings from environment (set by Electron)
+            enable_resize = os.environ.get('ENABLE_RESIZE', 'true').lower() == 'true'
+            max_width = int(os.environ.get('MAX_WIDTH', '1500'))
+            max_height = int(os.environ.get('MAX_HEIGHT', '2100'))
+
+            if enable_resize:
+                print(f"💰 Smart resize enabled: max {max_width}x{max_height}px", file=sys.stderr)
+            start_time = time.time()
+
+            # Call OpenAI Vision classifier
+            result = classify_document_openai_vision(
+                file_path, 
+                cloud_api_key,
+                enable_resize=enable_resize,
+                max_width=max_width,
+                max_height=max_height
+            )
+
+            scan_time = time.time() - start_time
+            print(f"⏱️ Result: {result.get('short_code')} (confidence: {result.get('confidence'):.2f}, time: {scan_time:.1f}s)", file=sys.stderr)
+
+            if result.get("short_code") == "ERROR":
+                return {
+                    "success": False,
+                    "error": result.get("reasoning", "OpenAI Vision error"),
+                    "method": "openai_vision_failed"
+                }
+
+            method_used = "openai_gpt4o_mini_vision"
+            short_code = result.get("short_code", "UNKNOWN")
+
+            # Code alias mapping (same as Gemini)
+            from rule_classifier import EXACT_TITLE_MAPPING, DOCUMENT_RULES
+            CODE_ALIASES = {
+                "HDTG": "HDCQ",
+                "BVDS": "HSKT",
+            }
+            
+            if short_code in CODE_ALIASES:
+                original_code = short_code
+                short_code = CODE_ALIASES[short_code]
+                result["short_code"] = short_code
+                print(f"🔄 Mapped code '{original_code}' → '{short_code}'", file=sys.stderr)
+            
+            # Validate code
+            VALID_CODES = set(EXACT_TITLE_MAPPING.values())
+            VALID_CODES.update(DOCUMENT_RULES.keys())
+            
+            if short_code not in VALID_CODES and short_code != "UNKNOWN":
+                print(f"⚠️ OpenAI returned INVALID code '{short_code}'. Forcing to UNKNOWN.", file=sys.stderr)
+                result["short_code"] = "UNKNOWN"
+                result["confidence"] = 0.1
+                result["reasoning"] = f"AI returned invalid code '{short_code}'. Original: {result.get('reasoning', '')}"
+                short_code = "UNKNOWN"
+            
+            doc_name = classify_document_name_from_code(short_code)
+
+            # Extract GCN metadata
+            color = result.get("color", None)
+            issue_date = result.get("issue_date", None)
+            issue_date_confidence = result.get("issue_date_confidence", None)
+            
+            # Calculate cost (OpenAI pricing)
+            usage = result.get('usage', {})
+            input_tokens = usage.get('input_tokens', 0)
+            output_tokens = usage.get('output_tokens', 0)
+            
+            # GPT-4o mini pricing (as of Jan 2025)
+            # Input: $0.15 per 1M tokens, Output: $0.60 per 1M tokens
+            cost_usd = (input_tokens * 0.15 / 1_000_000) + (output_tokens * 0.60 / 1_000_000)
+            
+            return {
+                "success": True,
+                "type": short_code,
+                "doc_type": doc_name,
+                "short_code": short_code,
+                "confidence": result.get("confidence", 0.5),
+                "matched_keywords": [result.get("reasoning", "OpenAI AI classification")],
+                "title_boost_applied": True if short_code != "UNKNOWN" else False,
+                "title_extracted_via_pattern": True if short_code != "UNKNOWN" else False,
+                "reasoning": result.get("reasoning", ""),
+                "color": color,
+                "issue_date": issue_date,
+                "issue_date_confidence": issue_date_confidence,
+                "method": method_used,
+                "accuracy_estimate": f"{int(result.get('confidence', 0.5) * 100)}%",
+                "recommend_cloud_boost": False,
+                "avg_font_height": 0,
+                "usage": usage,
+                "estimated_cost_usd": cost_usd
+            }
+
         # Handle Gemini Flash & Tesseract+Text (AI classification) - POSITION-AWARE APPROACH
         elif ocr_engine_type in ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text']:
             if not cloud_api_key:

@@ -930,9 +930,20 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
     try {
       console.log(`\n📦 Batch Process: mode=${mode}, images=${imagePaths.length}, engine=${ocrEngine}`);
       
+      // Check OCR Mode setting (vision vs tesseract_text)
+      const ocrMode = store.get('ocrMode', 'vision');
+      console.log(`⚡ OCR Mode: ${ocrMode}`);
+      
+      // Override batch mode if using tesseract_text
+      let finalMode = mode;
+      if (ocrMode === 'tesseract_text') {
+        finalMode = 'tesseract_text';
+        console.log(`🔄 Overriding mode: ${mode} → tesseract_text (OCR Mode setting)`);
+      }
+      
       // Get API key for cloud engines
       let cloudApiKey = null;
-      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite') {
+      if (ocrEngine === 'gemini-flash' || ocrEngine === 'gemini-flash-hybrid' || ocrEngine === 'gemini-flash-lite' || ocrMode === 'tesseract_text') {
         cloudApiKey = store.get('cloudOCR.gemini.apiKey', '') || process.env.GOOGLE_API_KEY || '';
         if (!cloudApiKey) {
           resolve({ success: false, error: 'Google API key not configured', results: [] });
@@ -946,8 +957,8 @@ ipcMain.handle('batch-process-documents', async (event, { mode, imagePaths, ocrE
         : path.join(process.resourcesPath, 'python');
       const scriptPath = path.join(pythonDir, 'batch_processor.py');
       
-      // Build args
-      const args = [scriptPath, mode, ocrEngine, cloudApiKey, ...imagePaths];
+      // Build args (use finalMode instead of mode)
+      const args = [scriptPath, finalMode, ocrEngine, cloudApiKey, ...imagePaths];
       
       console.log(`🐍 Calling Python batch processor: mode=${mode}, engine=${ocrEngine}`);
       

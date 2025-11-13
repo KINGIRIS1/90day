@@ -316,10 +316,52 @@ function BatchScanner({ onSwitchTab }) {
       }
 
       console.log('✅ Discovered folders:', result.folders);
-      setDiscoveredFolders(result.folders);
       
-      const validCount = result.folders.filter(f => f.valid).length;
-      alert(`✅ Tìm thấy ${result.folders.length} thư mục\n\n- Hợp lệ: ${validCount}\n- Không hợp lệ: ${result.folders.length - validCount}\n\nVui lòng xem danh sách và bấm "Quét tất cả" để bắt đầu.`);
+      // Detect duplicate folder names
+      const folderNameMap = new Map();
+      const duplicates = [];
+      
+      result.folders.forEach(folder => {
+        if (!folderNameMap.has(folder.name)) {
+          folderNameMap.set(folder.name, []);
+        }
+        folderNameMap.get(folder.name).push(folder.path);
+      });
+      
+      // Find duplicates
+      folderNameMap.forEach((paths, name) => {
+        if (paths.length > 1) {
+          duplicates.push({ name, paths });
+          console.warn(`⚠️ Duplicate folder name detected: "${name}" at ${paths.length} locations`);
+        }
+      });
+      
+      // Filter: Keep only first occurrence of each folder name
+      const seenNames = new Set();
+      const filteredFolders = result.folders.filter(folder => {
+        if (seenNames.has(folder.name)) {
+          console.log(`🚫 Skipping duplicate folder: ${folder.path} (name: "${folder.name}")`);
+          return false;
+        }
+        seenNames.add(folder.name);
+        return true;
+      });
+      
+      setDiscoveredFolders(filteredFolders);
+      setDuplicateFolders(duplicates);
+      
+      const validCount = filteredFolders.filter(f => f.valid).length;
+      
+      let alertMsg = `✅ Tìm thấy ${result.folders.length} thư mục\n\n- Hợp lệ: ${validCount}\n- Không hợp lệ: ${filteredFolders.length - validCount}`;
+      
+      if (duplicates.length > 0) {
+        alertMsg += `\n\n⚠️ CẢNH BÁO: Phát hiện ${duplicates.length} thư mục trùng tên!`;
+        alertMsg += `\n(Chỉ thư mục đầu tiên sẽ được quét)`;
+      }
+      
+      alertMsg += `\n\nVui lòng xem danh sách và bấm "Quét tất cả" để bắt đầu.`;
+      
+      alert(alertMsg);
     } catch (err) {
       console.error('Load folders error:', err);
       alert(`❌ Lỗi đọc file TXT: ${err.message}`);

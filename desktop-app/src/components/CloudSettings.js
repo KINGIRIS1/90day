@@ -27,12 +27,14 @@ function CloudSettings() {
         'gemini-flash': 'gemini-flash',
         'gemini-flash-hybrid': 'gemini-flash-hybrid',
         'gemini-flash-lite': 'gemini-flash-lite',
-        'gemini-flash-text': 'gemini-flash-text'
+        'gemini-flash-text': 'gemini-flash-text',
+        'openai-gpt4o-mini': 'openai-gpt4o-mini'
       };
       
       const uiEngine = uiEngineMapping[backendEngine] || 'offline-tesseract';
       
       const gemini = await window.electronAPI.getApiKey('gemini') || '';
+      const openai = await window.electronAPI.getApiKey('openai') || '';
       
       // Load batch mode settings
       const batchModeConfig = await window.electronAPI.getConfig('batchMode');

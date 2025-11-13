@@ -24,6 +24,14 @@ from ocr_engine_gemini_flash import (
     get_classification_prompt_lite
 )
 
+# Import Tesseract+Text classifier
+try:
+    from tesseract_text_classifier import process_image as tesseract_text_process
+    TESSERACT_TEXT_AVAILABLE = True
+except ImportError:
+    TESSERACT_TEXT_AVAILABLE = False
+    print("[WARNING] tesseract_text_classifier not available", file=sys.stderr)
+
 
 def adapt_prompt_for_multi_image(single_image_prompt, batch_size):
     """

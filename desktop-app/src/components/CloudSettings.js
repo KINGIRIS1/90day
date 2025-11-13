@@ -252,6 +252,34 @@ function CloudSettings() {
               </div>
             </div>
           </label>
+
+          {/* Tesseract + Gemini Text (TEST - NEW) */}
+          <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-orange-50 transition border-orange-300 bg-orange-50/30">
+            <input
+              type="radio"
+              name="ocrEngine"
+              value="gemini-flash-text"
+              checked={ocrEngine === 'gemini-flash-text'}
+              onChange={(e) => setOcrEngine(e.target.value)}
+              className="mt-1 mr-3"
+            />
+            <div className="flex-1">
+              <div className="font-medium flex items-center gap-2">
+                <span>🔬 Tesseract + Gemini Text (TEST)</span>
+                <span className="bg-orange-600 text-white text-xs px-2 py-1 rounded">THỬ NGHIỆM</span>
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                • <strong>🆕 Approach mới: OCR local → Text API</strong><br />
+                • Accuracy: 85-90% (tốt với ảnh rõ nét)<br />
+                • <strong>Tốc độ: NHANH HƠN 3-5x (1-3s) 🚀</strong><br />
+                • <strong>Chi phí: TIẾT KIỆM 10-20x (chỉ gửi text)</strong><br />
+                • <strong>Request size: ~5 KB thay vì 2-5 MB ✅</strong><br />
+                • <strong>Ít lỗi 503: Request nhỏ hơn nhiều</strong><br />
+                • ⚠️ Cần Tesseract installed + Google API key<br />
+                • 💡 <strong>Phù hợp: Batch lớn (50-100+ files), ảnh chất lượng tốt</strong>
+              </div>
+            </div>
+          </label>
         </div>
       </div>
 

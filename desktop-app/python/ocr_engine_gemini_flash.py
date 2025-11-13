@@ -1762,22 +1762,6 @@ VÍ DỤ CHO GCN (format "Ngày...tháng...năm"):
   "issue_date_confidence": "not_found"
 }
 
-🚨 CỰC KỲ QUAN TRỌNG - KHÔNG TỰ TẠO MÃ MỚI:
-❌ TUYỆT ĐỐI KHÔNG được tự tạo mã mới (ví dụ: "LCHO", "VBCC", "PKDT", "HDQUYEN", ...)
-✅ CHỈ được dùng CHÍNH XÁC 1 trong 66 mã đã liệt kê ở trên
-✅ Nếu không khớp với BẤT KỲ mã nào → Trả về "UNKNOWN"
-✅ KHÔNG đoán, KHÔNG sáng tạo, KHÔNG viết tắt tự do
-
-⚠️ VÍ DỤ SAI THƯỜNG GẶP:
-❌ "HỢP ĐỒNG ỦY QUYỀN" → "HDQUYEN" (SAI! Phải là "HDUQ")
-❌ "GIẤY ỦY QUYỀN" → "HDQUYEN" (SAI! Phải là "GUQ")
-✅ "HỢP ĐỒNG ỦY QUYỀN" → "HDUQ" (ĐÚNG!)
-✅ "GIẤY ỦY QUYỀN" → "GUQ" (ĐÚNG!)
-
-VÍ DỤ SAI:
-❌ "LCHO" (Lời chứng) → KHÔNG CÓ trong 98 mã → Phải trả về "UNKNOWN"
-❌ "VBCC" (Văn bản công chứng) → KHÔNG CÓ → Phải trả về "UNKNOWN"
-❌ "PKDT" (Phiếu kiểm tra đất) → KHÔNG CÓ → Phải trả về "UNKNOWN"
 
 → CHỈ DÙNG MÃ TRONG DANH SÁCH 98 LOẠI PHÍA TRÊN!"""
 

@@ -242,7 +242,7 @@ const AutoSaveSetting = () => {
               : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
           }`}
         >
-          {autoSaveEnabled ? '✅ BẬT' : '❌ TẮT'}
+          {autoSaveEnabled ? '✅ Đang BẬT' : '❌ Đang TẮT'}
         </button>
       </div>
 

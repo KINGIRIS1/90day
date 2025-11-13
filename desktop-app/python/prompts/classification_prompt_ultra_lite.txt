@@ -1,0 +1,49 @@
+NHIỆM VỤ: Phân loại tài liệu đất đai Việt Nam
+
+QUY TẮC:
+1. CHỈ dùng text ở TOP 30% ảnh để classify
+2. KHÔNG dùng text ở MIDDLE/BOTTOM (body/chữ ký)
+3. Title phải NẰM ĐỘC LẬP (không chung dòng với text khác)
+4. BỎ QUA: "Căn cứ", "Theo", "I.", "II.", "ĐIỀU"
+
+66 MÃ TÀI LIỆU:
+
+BẢN VẼ: BMT, HSKT, SDTT
+BIÊN BẢN: BBBDG, BBKTHT, KTCKCG, KTCKMG
+GIẤY: CCCD, GKS, GKH, DICHUC
+GCN (generic - luôn trả GCN, KHÔNG trả GCNM/GCNC)
+GIẤY: GXNNVTC, GNT, GTLQ, GUQ, GXNDKLD, GPXD
+HỢP ĐỒNG: HDCQ (chuyển nhượng), HDUQ (ủy quyền), HDTHC, HDBDG, hoadon
+ĐƠN: DDKBD (biến động), DDK, DCK, DCQDGD, DMG, DXN, DXCMD, DGH, DXGD, DXTHT, DXCD
+QUYẾT ĐỊNH: QDGTD (giao đất), QDCMD (chuyển mục đích), QDTH (thu hồi), QDGH, QDCHTGD, QDDCGD, QDDCTH, QDHG
+PHIẾU: PCT, PKTHS (kiểm tra), PLYKDC, PXNKQDD (có quốc huy)
+THÔNG BÁO: TBT (thuế), TBMG, TBCKCG, TBCKMG, HTNVTC, TBCNBD, CKDC
+TỜ: TKT, TTr, TTCG
+VĂN BẢN: CKTSR, VBCTCMD, VBTK (di sản thừa kế), TTHGD (hộ gia đình), CDLK, HCLK, VBTC, PCTSVC (vợ chồng)
+
+DỄ NHẦM:
+- HDCQ: "CHUYỂN NHƯỢNG" | HDUQ: "ỦY QUYỀN"
+- TTHGD: "HỘ GIA ĐÌNH" | PCTSVC: "VỢ CHỒNG" | VBTK: "DI SẢN"
+- GTLQ: "KIỂM SOÁT" | PKTHS: "KIỂM TRA"
+
+GCN ĐẶC BIỆT:
+- Phải có quốc huy HOẶC "CỘNG HÒA XÃ HỘI CHỦ NGHĨA..."
+- Tìm color: red/pink/unknown
+- Tìm issue_date: DD/MM/YYYY
+- Luôn trả "GCN" (KHÔNG trả GCNM/GCNC)
+
+GCNM (trang tiếp):
+Nếu thấy "NỘI DUNG THAY ĐỔI" + "XÁC NHẬN CƠ QUAN" → GCNM
+
+OUTPUT JSON:
+{
+  "short_code": "MÃ",
+  "confidence": 0.9,
+  "title_position": "top",
+  "reasoning": "ngắn gọn",
+  "color": "red/pink/unknown/null",
+  "issue_date": "DD/MM/YYYY hoặc null",
+  "issue_date_confidence": "full/partial/not_found/null"
+}
+
+CHỈ DÙNG 66 MÃ TRÊN. KHÔNG TỰ TẠO MÃ MỚI!

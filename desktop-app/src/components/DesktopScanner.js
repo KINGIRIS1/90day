@@ -227,6 +227,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`📦 Loaded batch mode: ${savedBatchMode}`);
       }
       
+      // Load GCN sort preference from config
+      const savedSortGCN = await api.getConfig('sortGCNToTop');
+      if (savedSortGCN !== undefined && savedSortGCN !== null) {
+        setSortGCNToTop(savedSortGCN);
+        console.log(`📊 Loaded GCN sort preference: ${savedSortGCN}`);
+      }
+      
       console.log('🔍 Current OCR Engine:', engine);
       
       // Check for incomplete scans (only for main scanner tab, not folder tabs)

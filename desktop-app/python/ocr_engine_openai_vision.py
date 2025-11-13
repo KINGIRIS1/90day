@@ -32,22 +32,15 @@ VALID_DOCUMENT_CODES = {
 }
 
 
-def resize_image_smart(img, max_width=1200, max_height=1800):
+def resize_image_smart(img, max_width=512, max_height=512):
     """
-    Smart resize: Only resize if image exceeds max dimensions
-    Maintains aspect ratio
+    Aggressive resize for OpenAI "low" detail mode
+    OpenAI "low" detail only works with images ≤512x512
+    Larger images still consume many tokens even with "low"
     """
     width, height = img.size
     
-    # Check if resize is needed
-    if width <= max_width and height <= max_height:
-        return img, {
-            "resized": False,
-            "original_size": f"{width}x{height}",
-            "final_size": f"{width}x{height}",
-            "reduction_percent": 0
-        }
-    
+    # ALWAYS resize for OpenAI to ensure low token usage
     # Calculate resize ratio (maintain aspect ratio)
     ratio_w = max_width / width
     ratio_h = max_height / height
@@ -56,12 +49,17 @@ def resize_image_smart(img, max_width=1200, max_height=1800):
     new_width = int(width * ratio)
     new_height = int(height * ratio)
     
+    # Ensure minimum size for text readability
+    if new_width < 400:
+        new_width = 400
+        new_height = int(height * (400 / width))
+    
     # Use LANCZOS for high quality resize
     resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
     
     reduction = (1 - (new_width * new_height) / (width * height)) * 100
     
-    print(f"🔽 Image resized: {width}x{height} → {new_width}x{new_height} (-{reduction:.1f}% pixels)", file=sys.stderr)
+    print(f"🔽 Aggressive resize for low tokens: {width}x{height} → {new_width}x{new_height} (-{reduction:.1f}% pixels)", file=sys.stderr)
     
     return resized_img, {
         "resized": True,

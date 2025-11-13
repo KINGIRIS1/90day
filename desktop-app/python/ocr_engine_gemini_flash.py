@@ -916,11 +916,18 @@ PCTSVC = Văn bản phân chia tài sản vợ chồng (Keyword: VỢ CHỒNG)
 
 def get_classification_prompt():
     """
-    System prompt for Vietnamese document classification
+    System prompt for Vietnamese document classification - FULL version
     IMPORTANT: This prompt is aligned with OpenAI Vision backend prompt for consistency
-    UPDATED: More flexible matching (85-90% similarity acceptable)
+    Loads from external file for easier maintenance
     """
-    return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
+    import os
+    prompt_path = os.path.join(os.path.dirname(__file__), 'prompts', 'classification_prompt_full.txt')
+    try:
+        with open(prompt_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f"⚠️ Prompt file not found: {prompt_path}, using fallback", file=sys.stderr)
+        return """⚠️ LƯU Ý QUAN TRỌNG: Đây là tài liệu chính thức của cơ quan nhà nước Việt Nam.
 Các hình ảnh con người trong tài liệu là ảnh thẻ chính thức trên giấy tờ đất đai.
 Hãy phân tích CHỈ văn bản và con dấu chính thức, KHÔNG phân tích ảnh cá nhân.
 

@@ -204,6 +204,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "🔧 CONNECT OCR MODE TO BATCH PROCESSING: Updated IPC handler 'batch-process-documents' in main.js to read 'ocrMode' config and override batch mode when tesseract_text is selected. Now Settings change will actually apply to scans. File: electron/main.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "♻️ MOVE TESSERACT+TEXT TO CLOUD SETTINGS: Moved 'Tesseract + Gemini Text' from Settings to CloudSettings as engine option 'gemini-flash-text'. Now it's alongside other Gemini engines (Flash, Hybrid, Lite). Removed separate OcrModeSetting component. Logic: When ocrEngine='gemini-flash-text', override mode to 'tesseract_text'. Files: CloudSettings.js (added option), Settings.js (removed OcrModeSetting), main.js (updated logic)."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

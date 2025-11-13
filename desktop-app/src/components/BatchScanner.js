@@ -914,7 +914,24 @@ function BatchScanner({ onSwitchTab }) {
           setFileResults(tabs[0].files);
         }
         
-        alert(`✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- Lỗi: ${result.error_count}\n\n💡 Bạn có thể xem kết quả chi tiết và gộp PDF bên dưới.`);
+        let completeMsg = `✅ Quét hoàn tất!\n\n📊 Thống kê:\n- Thư mục hợp lệ: ${result.valid_folders}/${result.total_folders}\n- Files xử lý: ${result.processed_files}/${result.total_files}\n- Lỗi: ${result.error_count}`;
+        
+        // Add duplicate folder warning
+        if (duplicateFolders.length > 0) {
+          completeMsg += `\n\n⚠️ CẢNH BÁO THƯ MỤC TRÙNG TÊN:`;
+          completeMsg += `\n${duplicateFolders.length} thư mục trùng tên đã BỊ BỎ QUA:`;
+          duplicateFolders.forEach(dup => {
+            completeMsg += `\n\n📁 "${dup.name}":`;
+            completeMsg += `\n  ✅ Đã quét: ${dup.paths[0]}`;
+            for (let i = 1; i < dup.paths.length; i++) {
+              completeMsg += `\n  ❌ Bỏ qua: ${dup.paths[i]}`;
+            }
+          });
+        }
+        
+        completeMsg += `\n\n💡 Bạn có thể xem kết quả chi tiết và gộp PDF bên dưới.`;
+        
+        alert(completeMsg);
       } else {
         alert(`❌ Lỗi: ${result.error}`);
       }

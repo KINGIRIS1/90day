@@ -192,6 +192,9 @@ frontend:
       - working: "needs_testing"
         agent: "main"
         comment: "✅ TAB NAVIGATION BUTTONS (Folder & Batch Scan): Added Next/Back navigation buttons at the bottom of preview area. Users can now navigate between tabs without scrolling to top. Features: Previous/Next buttons, current tab indicator (e.g., 'Tab 2/5'), smooth scroll to top on tab change, disabled state for first/last tabs. Files: DesktopScanner.js, BatchScanner.js."
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ TOGGLE BUTTON TEXT FIX: Updated all toggle buttons to show current state more clearly. Changed from '✅ BẬT' / '❌ TẮT' to '✅ Đang BẬT' / '❌ Đang TẮT'. Prevents confusion between action vs. state. Applied to: AutoSaveSetting, ResizeSetting (Settings.js), GCN Sort Toggle (DesktopScanner.js, BatchScanner.js)."
   
   - task: "BYOK Cloud OCR Settings"
     implemented: true

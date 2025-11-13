@@ -32,7 +32,7 @@ VALID_DOCUMENT_CODES = {
 }
 
 
-def resize_image_smart(img, max_width=1500, max_height=2100):
+def resize_image_smart(img, max_width=1200, max_height=1800):
     """
     Smart resize: Only resize if image exceeds max dimensions
     Maintains aspect ratio

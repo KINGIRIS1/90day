@@ -985,45 +985,72 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               });
             });
           }
-        } else if (groupsWithDate.length === 1) {
-          // Only 1 group with date → classify as GCNC (oldest available)
-          console.log(`  ⚠️ Only 1 group with date → GCNC (oldest available)`);
+        } else if (groupsWithDate.length === 1 && groupsWithoutDate.length === 0) {
+          // Only 1 group with date, no other groups → classify as GCNC
+          console.log(`  ⚠️ Only 1 GCN group with date → GCNC (only document)`);
           groupsWithDate[0].files.forEach(file => {
             const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
             if (idx >= 0) {
               normalizedResults[idx].short_code = 'GCNC';
               normalizedResults[idx].doc_type = 'GCNC';
-              console.log(`  ✅ ${file.fileName}: ${groupsWithDate[0].issueDate} → GCNC (only date available)`);
+              console.log(`  ✅ ${file.fileName}: ${groupsWithDate[0].issueDate} → GCNC (only)`);
+            }
+          });
+        } else if (groupsWithDate.length === 1 && groupsWithoutDate.length > 0) {
+          // 1 with date + others without date → First = GCNC, rest = GCNM
+          console.log(`  📊 Mixed: 1 with date, ${groupsWithoutDate.length} without → First GCNC, rest GCNM`);
+          
+          // Group with date = GCNC
+          groupsWithDate[0].files.forEach(file => {
+            const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+            if (idx >= 0) {
+              normalizedResults[idx].short_code = 'GCNC';
+              normalizedResults[idx].doc_type = 'GCNC';
+              console.log(`  ✅ ${file.fileName}: ${groupsWithDate[0].issueDate} → GCNC (has date)`);
             }
           });
           
           // Other groups without date → GCNM
-          if (groupsWithoutDate.length > 0) {
-            console.log(`  ⚠️ ${groupsWithoutDate.length} group(s) without date → GCNM`);
-            groupsWithoutDate.forEach(group => {
-              group.files.forEach(file => {
-                const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
-                if (idx >= 0) {
-                  normalizedResults[idx].short_code = 'GCNM';
-                  normalizedResults[idx].doc_type = 'GCNM';
-                  console.log(`  ✅ ${file.fileName}: No date → GCNM (default)`);
-                }
-              });
-            });
-          }
-        } else {
-          // No dates at all → default GCNM
-          console.log(`  ⚠️ No dates for comparison → Default GCNM for all`);
-          groupsArray.forEach(group => {
+          groupsWithoutDate.forEach(group => {
             group.files.forEach(file => {
               const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (idx >= 0) {
                 normalizedResults[idx].short_code = 'GCNM';
                 normalizedResults[idx].doc_type = 'GCNM';
-                console.log(`  ✅ ${file.fileName}: No date → GCNM (default)`);
+                console.log(`  ✅ ${file.fileName}: No date → GCNM`);
               }
             });
           });
+        } else {
+          // No dates at all → Fallback to file order (first group = GCNC, rest = GCNM)
+          console.log(`  ⚠️ No dates for comparison → Fallback to file order`);
+          
+          if (groupsArray.length === 1) {
+            // Only 1 group → GCNC (assume it's the older one)
+            console.log(`  📄 Only 1 GCN group → GCNC (default oldest)`);
+            groupsArray[0].files.forEach(file => {
+              const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+              if (idx >= 0) {
+                normalizedResults[idx].short_code = 'GCNC';
+                normalizedResults[idx].doc_type = 'GCNC';
+                console.log(`  ✅ ${file.fileName}: Single group → GCNC (default)`);
+              }
+            });
+          } else {
+            // Multiple groups → First = GCNC, rest = GCNM (based on file order)
+            console.log(`  📊 Multiple groups without dates → First GCNC, rest GCNM (by file order)`);
+            groupsArray.forEach((group, groupIdx) => {
+              const classification = (groupIdx === 0) ? 'GCNC' : 'GCNM';
+              group.files.forEach(file => {
+                const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
+                if (idx >= 0) {
+                  normalizedResults[idx].short_code = classification;
+                  normalizedResults[idx].doc_type = classification;
+                  console.log(`  ✅ ${file.fileName}: Group ${groupIdx + 1} → ${classification} (file order)`);
+                }
+              });
+            });
+          }
         }
       }
       

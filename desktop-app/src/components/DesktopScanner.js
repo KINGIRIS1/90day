@@ -3158,8 +3158,47 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                           </button>
                         </div>
                       </div>
-                    ))}
+                        );
+                      })}
                   </div>
+                  
+                  {/* Action buttons - BOTTOM */}
+                  {t.status === 'done' && (t.results || []).length > 0 && (
+                    <ActionButtonGroup
+                      onNext={() => {
+                        const idx = childTabs.findIndex(ct => ct.path === t.path);
+                        if (idx < childTabs.length - 1) {
+                          setActiveChild(childTabs[idx + 1]);
+                        }
+                      }}
+                      onBack={() => {
+                        const idx = childTabs.findIndex(ct => ct.path === t.path);
+                        if (idx > 0) {
+                          setActiveChild(childTabs[idx - 1]);
+                        }
+                      }}
+                      hasNext={childTabs.findIndex(ct => ct.path === t.path) < childTabs.length - 1}
+                      hasBack={childTabs.findIndex(ct => ct.path === t.path) > 0}
+                      onMerge={() => {
+                        setActiveChildForMerge(t);
+                        setShowMergeModal(true);
+                      }}
+                      showMerge={true}
+                      onRescan={async () => {
+                        if (window.confirm(`Quét lại thư mục "${t.name}"?\n\nTất cả kết quả cũ sẽ bị xóa và quét lại từ đầu.`)) {
+                          const idx = childTabs.findIndex(x => x.path === t.path);
+                          if (idx >= 0) {
+                            setChildTabs(prev => prev.map((ct, i) => 
+                              i === idx ? { ...ct, status: 'pending', results: [] } : ct
+                            ));
+                            await scanChildFolder(idx);
+                          }
+                        }
+                      }}
+                      showRescan={true}
+                      position="bottom"
+                    />
+                  )}
                   
                   {/* Tab Navigation Buttons at bottom */}
                   <div className="mt-6 pt-4 border-t flex items-center justify-between">

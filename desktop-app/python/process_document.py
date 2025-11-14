@@ -417,6 +417,16 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 result["short_code"] = short_code
                 print(f"🔄 Mapped code '{original_code}' → '{short_code}'", file=sys.stderr)
             
+            # ✅ POST-PROCESSING FIX: Gemini Flash Lite sometimes confuses PKTHS vs GTLQ
+            # If result is PKTHS but reasoning mentions "KIỂM SOÁT", it should be GTLQ
+            if short_code == "PKTHS":
+                reasoning_text = result.get("reasoning", "").upper()
+                if "KIỂM SOÁT" in reasoning_text or "KIEM SOAT" in reasoning_text:
+                    print(f"🔧 Post-processing fix: PKTHS → GTLQ (detected 'KIỂM SOÁT' in reasoning)", file=sys.stderr)
+                    short_code = "GTLQ"
+                    result["short_code"] = "GTLQ"
+                    result["reasoning"] = f"[AUTO-FIXED: PKTHS→GTLQ] {result.get('reasoning', '')}"
+            
             # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
             # Get all valid codes from rule_classifier
             from rule_classifier import EXACT_TITLE_MAPPING, DOCUMENT_RULES

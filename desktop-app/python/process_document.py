@@ -417,7 +417,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 result["short_code"] = short_code
                 print(f"🔄 Mapped code '{original_code}' → '{short_code}'", file=sys.stderr)
             
-            # ✅ POST-PROCESSING FIX: Gemini Flash Lite sometimes confuses PKTHS vs GTLQ
+            # ✅ POST-PROCESSING FIX #1: Gemini Flash Lite sometimes confuses PKTHS vs GTLQ
             # If result is PKTHS but reasoning mentions "KIỂM SOÁT", it should be GTLQ
             if short_code == "PKTHS":
                 reasoning_text = result.get("reasoning", "").upper()
@@ -426,6 +426,27 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     short_code = "GTLQ"
                     result["short_code"] = "GTLQ"
                     result["reasoning"] = f"[AUTO-FIXED: PKTHS→GTLQ] {result.get('reasoning', '')}"
+            
+            # ✅ POST-PROCESSING FIX #2: Gemini Flash Lite inconsistent with GTLQ variants
+            # Sometimes returns UNKNOWN for "PHIẾU XIN LỖI VÀ HẸN LẠI"
+            if short_code == "UNKNOWN":
+                reasoning_text = result.get("reasoning", "").upper()
+                # Check for GTLQ-specific keywords
+                gtlq_keywords = [
+                    "PHIẾU XIN LỖI",
+                    "HẸN LẠI NGÀY TRẢ KẾT QUẢ",
+                    "PHIẾU KIỂM SOÁT",
+                    "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ",
+                    "GIẤY TIẾP NHẬN HỒ SƠ"
+                ]
+                for keyword in gtlq_keywords:
+                    if keyword in reasoning_text:
+                        print(f"🔧 Post-processing fix: UNKNOWN → GTLQ (detected '{keyword}' in reasoning)", file=sys.stderr)
+                        short_code = "GTLQ"
+                        result["short_code"] = "GTLQ"
+                        result["confidence"] = 0.95
+                        result["reasoning"] = f"[AUTO-FIXED: UNKNOWN→GTLQ] {result.get('reasoning', '')}"
+                        break
             
             # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
             # Get all valid codes from rule_classifier

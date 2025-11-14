@@ -745,6 +745,13 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                         if response_text:
                             try:
                                 batch_result = json.loads(response_text)
+                                
+                                # Check if documents key exists
+                                if 'documents' not in batch_result or not isinstance(batch_result.get('documents'), list):
+                                    print(f"❌ Batch {batch_num} ERROR: No 'documents' array in response!", file=sys.stderr)
+                                    print(f"   Response keys: {list(batch_result.keys())}", file=sys.stderr)
+                                    print(f"   This batch will fallback to individual processing", file=sys.stderr)
+                                    raise ValueError("Missing 'documents' array in response")
                             
                                 print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
                                 

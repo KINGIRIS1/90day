@@ -219,11 +219,12 @@ QDHG = Quyết định hủy giấy chứng nhận
 📋 NHÓM 8: PHIẾU (8 loại)
 PCT = Phiếu chuyển thông tin nghĩa vụ tài chính
 PKTHS = Phiếu kiểm tra hồ sơ, Phiếu trình ký hồ sơ
-  • "PHIẾU KIỂM **TRA** HỒ SƠ" (check)
-  • "PHIẾU TRÌNH KÝ" (submit for signature)
+  • "PHIẾU KIỂM **TRA** HỒ SƠ" → PKTHS
+  • "PHIẾU TRÌNH KÝ" → PKTHS
   • ⚠️ "PHIẾU TRÌNH KÝ GIẤY CHỨNG NHẬN" → PKTHS (KHÔNG phải GCN!)
   • ⚠️ Đây là phiếu NỘI BỘ để trình ký, KHÔNG phải GCN thật
-  • ≠ "Phiếu kiểm **soát**" (→ GTLQ)
+  • ❌ "PHIẾU KIỂM **SOÁT** QUÁ TRÌNH" → GTLQ (KHÔNG phải PKTHS!)
+  • 🚨 CỰC KỲ QUAN TRỌNG: "KIỂM TRA" ≠ "KIỂM SOÁT"
 PLYKDC = Phiếu lấy ý kiến dân cư
 PXNKQDD = Phiếu xác nhận KQ đo đạc
   • PHẢI có quốc huy + nội dung về đo đạc/tọa độ

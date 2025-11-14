@@ -66,11 +66,13 @@ BƯỚC 3: Phân loại dựa vào tiêu đề TOP
 - NẰM CHUNG với text khác: "theo Giấy chứng nhận số..."
 - "văn bản từ chối" KHÔNG độc lập → REFERENCE
 
-⚠️ BỎ QUA SECTION HEADERS:
-- "ĐIỀU 1:", "ĐIỀU 2:", "I.", "II.", "III." = Section numbering
-- "PHẦN I:", "Chương 1:" = Part/Chapter headers
-- Đây KHÔNG phải main title
-- CHỈ classify dựa vào MAIN TITLE
+⚠️ CỰC KỲ QUAN TRỌNG - BỎ QUA SECTION HEADERS:
+- "ĐIỀU 1:", "ĐIỀU 2:", "I.", "II.", "III.", "IV." = Section numbering
+- "PHẦN I:", "Chương 1:", "Mục 1:" = Part/Chapter headers
+- "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG" → Section header, KHÔNG phải title
+- Đây KHÔNG phải main title → TRẢ VỀ "UNKNOWN"
+- CHỈ classify dựa vào MAIN TITLE Ở TOP 30%
+- NẾU KHÔNG CÓ MAIN TITLE Ở TOP 30% → TRẢ VỀ "UNKNOWN"
 
 🎯 ƯU TIÊN 1: NHẬN DIỆN QUỐC HUY VIỆT NAM
 ✅ Nếu thấy QUỐC HUY Việt Nam (ngôi sao vàng, búa liềm) → Tài liệu chính thức

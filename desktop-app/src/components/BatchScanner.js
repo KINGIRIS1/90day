@@ -2424,32 +2424,10 @@ function BatchScanner({ onSwitchTab }) {
                   showMerge={true}
                   onLoadPreview={async () => {
                     const currentTab = folderTabs.find(t => t.path === activeFolder);
-                    const filesToLoad = (currentTab?.files || []).filter(f => !f.previewUrl);
-                    if (filesToLoad.length === 0) {
-                      alert('Tất cả file đã có preview!');
-                      return;
-                    }
-                    if (window.confirm(`Load preview cho ${filesToLoad.length} files?`)) {
-                      for (let i = 0; i < filesToLoad.length; i++) {
-                        const file = filesToLoad[i];
-                        try {
-                          const previewUrl = await window.electronAPI.getFilePreview(file.filePath);
-                          setFolderTabs(prev => prev.map(tab => {
-                            if (tab.path !== activeFolder) return tab;
-                            return {
-                              ...tab,
-                              files: tab.files.map(f =>
-                                f.filePath === file.filePath ? { ...f, previewUrl } : f
-                              )
-                            };
-                          }));
-                        } catch (err) {
-                          console.error('Load preview error:', err);
-                        }
-                      }
-                    }
+                    if (!currentTab) return;
+                    await handleLoadPreviewsForFolder(currentTab.path);
                   }}
-                  showLoadPreview={(folderTabs.find(t => t.path === activeFolder)?.files || []).some(f => !f.previewUrl)}
+                  showLoadPreview={!foldersPreviewsLoaded.has(activeFolder)}
                   position="bottom"
                 />
               )}

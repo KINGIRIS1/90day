@@ -3114,7 +3114,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                           {getMethodBadge(r.method)}
                           <span className="ml-auto font-semibold">{formatConfidence(r.confidence)}%</span>
                         </div>
-                        <div className="mt-2 text-xs text-gray-600">Loại: {r.doc_type} | Mã: <span className="text-blue-600">{r.short_code}</span></div>
+                        <div className="mt-2 text-xs text-gray-600 flex items-center gap-2">
+                          <span>Loại: {r.doc_type} | Mã: <span className="text-blue-600 font-semibold">{r.short_code}</span></span>
+                          {getDocumentBadge(r.short_code, t.name)}
+                        </div>
                         <div className="mt-2 p-2 bg-gray-50 border rounded">
                           <InlineShortCodeEditor
                             value={r.short_code}

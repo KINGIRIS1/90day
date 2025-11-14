@@ -168,6 +168,7 @@ GTLQ = Giấy tiếp nhận, giấy biên nhận (hồ sơ)
   • "PHIẾU KIỂM SOÁT QUÁ TRÌNH GIẢI QUYẾT HỒ SƠ" → GTLQ
   • "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ" → GTLQ
   • "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ" → GTLQ
+  • "PHIẾU XIN LỖI VÀ HẸN LẠI NGÀY TRẢ KẾT QUẢ" → GTLQ
   • "GIẤY TIẾP NHẬN HỒ SƠ" → GTLQ
   • 🚨 Phân biệt: "KIỂM **SOÁT**" (monitoring/GTLQ) ≠ "KIỂM **TRA**" (inspection/PKTHS)
   • ⚠️ KHÔNG phải PKTHS (Phiếu trình ký nội bộ)

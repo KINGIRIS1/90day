@@ -278,6 +278,19 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
    ❌ "Căn cứ Giấy chứng nhận..." = REFERENCE
    ✅ "GIẤY CHỨNG NHẬN" (ở TOP, độc lập) = TITLE
 
+8. PHIẾU TRÌNH KÝ vs GCN:
+   ❌ "PHIẾU TRÌNH KÝ GIẤY CHỨNG NHẬN" = PKTHS (phiếu nội bộ)
+   ✅ "GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT..." = GCN (tài liệu thật)
+   
+9. THÔNG BÁO NỘP TIỀN vs UNKNOWN:
+   ✅ "THÔNG BÁO NỘP TIỀN" = TBT (về nghĩa vụ tài chính)
+   ❌ KHÔNG trả về UNKNOWN nếu thấy "THÔNG BÁO NỘP TIỀN"
+   
+10. GIẤY TIẾP NHẬN vs PKTHS:
+    ✅ "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ" = GTLQ
+    ✅ "GIẤY TIẾP NHẬN" (bất kỳ variant) = GTLQ
+    ❌ "PHIẾU TRÌNH KÝ" = PKTHS (khác hoàn toàn)
+
 QUY TRÌNH KIỂM TRA:
 1. Kiểm tra vị trí: Text ở TOP 30%?
 2. Kiểm tra độc lập: NẰM RIÊNG hay chung với text khác?

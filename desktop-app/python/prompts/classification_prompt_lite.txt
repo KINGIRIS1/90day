@@ -309,6 +309,12 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
     ✅ "BẢN MÔ TẢ RANH GIỚI" = BMT
     ⚠️ Keyword phân biệt: "TRÍCH LỤC" hoặc "BẢN ĐỒ" → HSKT
 
+12. GUQ vs HDUQ (Ủy quyền):
+    ✅ "GIẤY ỦY QUYỀN" = GUQ (chữ "GIẤY" ở đầu)
+    ✅ "HỢP ĐỒNG ỦY QUYỀN" = HDUQ (chữ "HỢP ĐỒNG" ở đầu)
+    ⚠️ Keyword phân biệt: "GIẤY" (GUQ) vs "HỢP ĐỒNG" (HDUQ)
+    ❌ KHÔNG trả về HDUQ nếu thấy "GIẤY ỦY QUYỀN"
+
 QUY TRÌNH KIỂM TRA:
 1. Kiểm tra vị trí: Text ở TOP 30%?
    ❌ NẾU KHÔNG → TRẢ VỀ "UNKNOWN"

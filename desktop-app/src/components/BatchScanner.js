@@ -1828,46 +1828,8 @@ function BatchScanner({ onSwitchTab }) {
     }
   };
 
-  // Inline short code editor component
-  const InlineShortCodeEditor = ({ value, onChange }) => {
-    const [editing, setEditing] = useState(false);
-    const [tempValue, setTempValue] = useState(value);
-
-    if (!editing) {
-      return (
-        <button
-          onClick={() => { setEditing(true); setTempValue(value); }}
-          className="text-xs text-blue-600 hover:underline"
-        >
-          ✏️ Sửa: {value}
-        </button>
-      );
-    }
-
-    return (
-      <div className="flex gap-1">
-        <input
-          type="text"
-          value={tempValue}
-          onChange={(e) => setTempValue(e.target.value.toUpperCase())}
-          className="flex-1 text-xs px-1 py-0.5 border rounded"
-          autoFocus
-        />
-        <button
-          onClick={() => { onChange(tempValue); setEditing(false); }}
-          className="text-xs px-2 bg-green-600 text-white rounded hover:bg-green-700"
-        >
-          ✓
-        </button>
-        <button
-          onClick={() => setEditing(false)}
-          className="text-xs px-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          ✕
-        </button>
-      </div>
-    );
-  };
+  // Inline editor component is imported from separate file (InlineShortCodeEditor.js)
+  // with full autocomplete support - no need to redefine here
 
   return (
     <div className="space-y-4">

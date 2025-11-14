@@ -2420,6 +2420,8 @@ function BatchScanner({ onSwitchTab }) {
                   }}
                   hasNext={folderTabs.findIndex(t => t.path === activeFolder) < folderTabs.length - 1}
                   hasBack={folderTabs.findIndex(t => t.path === activeFolder) > 0}
+                  onMerge={() => handleMerge(false)}
+                  showMerge={true}
                   onLoadPreview={async () => {
                     const currentTab = folderTabs.find(t => t.path === activeFolder);
                     const filesToLoad = (currentTab?.files || []).filter(f => !f.previewUrl);

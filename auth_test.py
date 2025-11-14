@@ -7,7 +7,7 @@ import requests
 import json
 
 def test_auth():
-    base_url = "https://smart-ocr-5.preview.emergentagent.com/api"
+    base_url = "https://ai-docs-scanner.preview.emergentagent.com/api"
     
     print("🔍 Testing setup-admin endpoint")
     

@@ -12,7 +12,7 @@ from PIL import Image
 import base64
 
 class FocusedDocumentScannerTester:
-    def __init__(self, base_url="https://smart-ocr-5.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://ai-docs-scanner.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.test_results = {}
         

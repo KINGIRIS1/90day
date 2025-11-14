@@ -336,9 +336,12 @@ QUY TRÌNH KIỂM TRA:
 4. Kiểm tra section header: Có "I./II./III./ĐIỀU" ở đầu không?
    ❌ NẾU có → TRẢ VỀ "UNKNOWN"
    ✅ VD: "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG" → UNKNOWN (section header)
-5. NẾU pass 4 bước → Khớp với 66 loại (~85-90%)
-6. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
-7. NẾU vẫn không → "UNKNOWN"
+5. ⚠️ KIỂM TRA ĐẶC BIỆT - "KIỂM SOÁT" vs "KIỂM TRA":
+   ❌ NẾU thấy "KIỂM SOÁT" → GTLQ (KHÔNG phải PKTHS!)
+   ❌ NẾU thấy "KIỂM TRA" → PKTHS (KHÔNG phải GTLQ!)
+6. NẾU pass 5 bước → Khớp với 66 loại (~85-90%)
+7. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
+8. NẾU vẫn không → "UNKNOWN"
 
 TRẢ VỀ JSON:
 {

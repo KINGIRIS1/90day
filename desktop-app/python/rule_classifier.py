@@ -63,6 +63,8 @@ EXACT_TITLE_MAPPING = {
     "GIẤY TỜ LIÊN QUAN (CÁC LOẠI GIẤY TỜ KÈM THEO)": "GTLQ",
     "GIẤY TỜ LIÊN QUAN": "GTLQ",
     "GIẤY TIẾP NHẬN": "GTLQ",
+    "GIẤY TIẾP NHẬN HỒ SƠ": "GTLQ",
+    "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ": "GTLQ",
     "GIẤY BIÊN NHẬN": "GTLQ",
     "GIẤY BIÊN NHẬN HỒ SƠ": "GTLQ",
     "PHIẾU KIỂM SOÁT QUÁ TRÌNH GIẢI QUYẾT HỒ SƠ": "GTLQ",

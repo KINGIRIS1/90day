@@ -2225,40 +2225,6 @@ function BatchScanner({ onSwitchTab }) {
             return null;
           })()}
 
-          {/* Manual Load Preview Button for active folder */}
-          {activeFolder && folderTabs.find(t => t.path === activeFolder && t.status === 'done') && !foldersPreviewsLoaded.has(activeFolder) && (
-            <div className="mb-3 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">🖼️</span>
-                  <div>
-                    <div className="text-sm text-green-900 font-medium">Preview chưa được load</div>
-                    <div className="text-xs text-green-700 mt-0.5">
-                      Nhấn nút để load preview images cho thư mục này
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleLoadPreviewsForFolder(activeFolder)}
-                  disabled={loadingPreviewFor === activeFolder}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg"
-                >
-                  {loadingPreviewFor === activeFolder ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      <span>Đang load...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>📥</span>
-                      <span>Load Preview</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* Files grid cho tab active */}
           {activeFolder && folderTabs.find(t => t.path === activeFolder && t.files.length > 0) && (
             <div>

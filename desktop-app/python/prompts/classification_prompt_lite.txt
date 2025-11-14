@@ -164,10 +164,12 @@ GCN = Giấy chứng nhận quyền sử dụng đất (BẤT KỲ VARIANT)
 GXNNVTC = Giấy đề nghị xác nhận các khoản nộp vào NSNN
 GNT = Giấy nộp tiền vào ngân sách nhà nước
 GTLQ = Giấy tiếp nhận, giấy biên nhận (hồ sơ)
-  • "PHIẾU KIỂM SOÁT QUÁ TRÌNH"
-  • "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ"
-  • "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ"
-  • "GIẤY TIẾP NHẬN HỒ SƠ"
+  • "PHIẾU KIỂM SOÁT QUÁ TRÌNH" → GTLQ
+  • "PHIẾU KIỂM SOÁT QUÁ TRÌNH GIẢI QUYẾT HỒ SƠ" → GTLQ
+  • "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ" → GTLQ
+  • "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ" → GTLQ
+  • "GIẤY TIẾP NHẬN HỒ SƠ" → GTLQ
+  • ⚠️ Phân biệt: "KIỂM SOÁT" (GTLQ) ≠ "KIỂM TRA" (PKTHS)
   • ⚠️ KHÔNG phải PKTHS (Phiếu trình ký nội bộ)
 GUQ = Giấy ủy quyền
   • ⚠️ "GIẤY ỦY QUYỀN" → GUQ (KHÔNG phải HDUQ!)

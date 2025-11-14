@@ -2345,8 +2345,9 @@ function BatchScanner({ onSwitchTab }) {
                   {getMethodBadge(result.method)}
                   <span className="ml-auto font-semibold">{formatConfidence(result.confidence)}%</span>
                 </div>
-                <div className="mt-2 text-xs text-gray-600">
-                  Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span>
+                <div className="mt-2 text-xs text-gray-600 flex items-center gap-2">
+                  <span>Loại: {result.doc_type || 'N/A'} | Mã: <span className="text-blue-600 font-semibold">{result.short_code}</span></span>
+                  {getDocumentBadge(result.short_code, currentTab.name)}
                 </div>
                 {/* Timing Info */}
                 {result.durationSeconds && (

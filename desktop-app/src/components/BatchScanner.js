@@ -1345,6 +1345,17 @@ function BatchScanner({ onSwitchTab }) {
       
       console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
       
+      // DEBUG: Log first GCN document structure
+      if (allGcnDocs.length > 0) {
+        console.log('🔍 DEBUG - First GCN document:', {
+          fileName: allGcnDocs[0].fileName,
+          method: allGcnDocs[0].method,
+          color: allGcnDocs[0].color || 'null',
+          issue_date: allGcnDocs[0].issue_date || 'null',
+          metadata: allGcnDocs[0].metadata || 'null'
+        });
+      }
+      
       // Check if results came from batch processing
       const isBatchMode = allGcnDocs.length > 0 && allGcnDocs[0].method && allGcnDocs[0].method.includes('batch');
       

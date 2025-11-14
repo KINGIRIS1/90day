@@ -1455,6 +1455,20 @@ function BatchScanner({ onSwitchTab }) {
         }
         
         console.log('✅ GCN post-processing complete (batch mode)');
+        
+        // DEBUG: Log classification results
+        const gcncCount = normalizedResults.filter(r => r.short_code === 'GCNC').length;
+        const gcnmCount = normalizedResults.filter(r => r.short_code === 'GCNM').length;
+        const gcnCount = normalizedResults.filter(r => r.short_code === 'GCN').length;
+        console.log(`📊 Classification results: GCNC=${gcncCount}, GCNM=${gcnmCount}, GCN (unclassified)=${gcnCount}`);
+        
+        if (gcnCount > 0) {
+          console.warn(`⚠️ WARNING: ${gcnCount} GCN documents were NOT classified!`);
+          normalizedResults.filter(r => r.short_code === 'GCN').forEach(doc => {
+            console.warn(`   - ${doc.fileName}: color=${doc.color || doc.metadata?.color || 'null'}, date=${doc.issue_date || doc.metadata?.issue_date || 'null'}`);
+          });
+        }
+        
         return normalizedResults;
         
       } else {

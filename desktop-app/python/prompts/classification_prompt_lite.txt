@@ -296,6 +296,12 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
     ✅ "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ" = GTLQ
     ✅ "GIẤY TIẾP NHẬN" (bất kỳ variant) = GTLQ
     ❌ "PHIẾU TRÌNH KÝ" = PKTHS (khác hoàn toàn)
+    
+11. BMT vs HSKT (Bản vẽ):
+    ❌ "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH" = HSKT (KHÔNG phải BMT!)
+    ❌ "BẢN ĐỒ ĐỊA CHÍNH THỬA ĐẤT" = HSKT (KHÔNG phải BMT!)
+    ✅ "BẢN MÔ TẢ RANH GIỚI" = BMT
+    ⚠️ Keyword phân biệt: "TRÍCH LỤC" hoặc "BẢN ĐỒ" → HSKT
 
 QUY TRÌNH KIỂM TRA:
 1. Kiểm tra vị trí: Text ở TOP 30%?

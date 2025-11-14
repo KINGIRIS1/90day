@@ -307,9 +307,14 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
 
 QUY TRÌNH KIỂM TRA:
 1. Kiểm tra vị trí: Text ở TOP 30%?
+   ❌ NẾU KHÔNG → TRẢ VỀ "UNKNOWN"
 2. Kiểm tra độc lập: NẰM RIÊNG hay chung với text khác?
+   ❌ NẾU chung với text khác → TRẢ VỀ "UNKNOWN"
 3. Kiểm tra reference: Có "căn cứ/theo/số" không?
-4. Kiểm tra section: Có "I./II./ĐIỀU" không?
+   ❌ NẾU có → TRẢ VỀ "UNKNOWN"
+4. Kiểm tra section header: Có "I./II./III./ĐIỀU" ở đầu không?
+   ❌ NẾU có → TRẢ VỀ "UNKNOWN"
+   ✅ VD: "III. THÔNG TIN VỀ ĐĂNG KÝ BIẾN ĐỘNG" → UNKNOWN (section header)
 5. NẾU pass 4 bước → Khớp với 66 loại (~85-90%)
 6. NẾU KHÔNG khớp → Kiểm tra GCNM continuation
 7. NẾU vẫn không → "UNKNOWN"

@@ -170,6 +170,9 @@ GTLQ = Giấy tiếp nhận, giấy biên nhận (hồ sơ)
   • "GIẤY TIẾP NHẬN HỒ SƠ"
   • ⚠️ KHÔNG phải PKTHS (Phiếu trình ký nội bộ)
 GUQ = Giấy ủy quyền
+  • ⚠️ "GIẤY ỦY QUYỀN" → GUQ (KHÔNG phải HDUQ!)
+  • Tiêu đề: "GIẤY ỦY QUYỀN" (chữ "GIẤY" ở đầu)
+  • Thường là giấy tờ đơn giản, 1 trang
 GXNDKLD = Giấy xác nhận đăng ký lần đầu
 GPXD = Giấy xin phép xây dựng
 
@@ -177,8 +180,9 @@ GPXD = Giấy xin phép xây dựng
 HDCQ = Hợp đồng chuyển nhượng, tặng cho QSDĐ
   • PHẢI có "CHUYỂN NHƯỢNG" hoặc "TẶNG CHO"
 HDUQ = Hợp đồng ủy quyền
-  • PHẢI có "ỦY QUYỀN" (KHÔNG có "chuyển nhượng")
-  • 🚨 "ỦY QUYỀN" ≠ "CHUYỂN NHƯỢNG" → HDUQ
+  • ⚠️ "HỢP ĐỒNG ỦY QUYỀN" → HDUQ (chữ "HỢP ĐỒNG" ở đầu)
+  • ⚠️ "GIẤY ỦY QUYỀN" → GUQ (KHÔNG phải HDUQ!)
+  • 🚨 Phân biệt: "GIẤY" (GUQ) vs "HỢP ĐỒNG" (HDUQ)
 HDTHC = Hợp đồng thế chấp QSDĐ
 HDBDG = Hợp đồng mua bán tài sản bán đấu giá
 hoadon = Hóa đơn GTGT

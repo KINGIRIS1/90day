@@ -2238,15 +2238,6 @@ function BatchScanner({ onSwitchTab }) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {folderTabs.find(t => t.path === activeFolder && t.status === 'done') && !isScanning && (
-                    <button
-                      onClick={() => handleMerge(false)}
-                      disabled={mergeInProgress}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg font-medium shadow-sm transition-colors disabled:bg-gray-300"
-                    >
-                      {mergeInProgress ? '⏳ Đang gộp...' : '📚 Gộp thư mục này'}
-                    </button>
-                  )}
                   <select 
                     value={density} 
                     onChange={(e) => setDensity(e.target.value)} 

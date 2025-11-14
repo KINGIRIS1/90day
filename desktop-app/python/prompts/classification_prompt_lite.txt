@@ -384,4 +384,28 @@ TRẢ VỀ JSON:
   "reasoning": "Section header, not main title"
 }
 
+⚠️ CRITICAL EXAMPLES - PHẢI NHỚ:
+
+✅ ĐÚNG - "PHIẾU KIỂM SOÁT":
+{
+  "short_code": "GTLQ",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Phiếu kiểm SOÁT (monitoring) → GTLQ"
+}
+
+❌ SAI - KHÔNG trả về PKTHS nếu thấy "KIỂM SOÁT":
+{
+  "short_code": "PKTHS",  ← SAI! Phải là GTLQ
+  "reasoning": "..."
+}
+
+✅ ĐÚNG - "PHIẾU KIỂM TRA":
+{
+  "short_code": "PKTHS",
+  "confidence": 0.95,
+  "title_position": "top",
+  "reasoning": "Phiếu kiểm TRA (inspection) → PKTHS"
+}
+
 ❌ KHÔNG TỰ TẠO MÃ MỚI - CHỈ DÙNG 66 MÃ TRÊN!

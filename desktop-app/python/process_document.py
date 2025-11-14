@@ -448,6 +448,25 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                         result["reasoning"] = f"[AUTO-FIXED: UNKNOWN→GTLQ] {result.get('reasoning', '')}"
                         break
             
+            # ✅ POST-PROCESSING FIX #3: Gemini Flash Lite confuses BMT vs HSKT
+            # "TRÍCH LỤC BẢN ĐỒ" should be HSKT, not BMT
+            if short_code == "BMT":
+                reasoning_text = result.get("reasoning", "").upper()
+                # Check for HSKT-specific keywords
+                hskt_keywords = [
+                    "TRÍCH LỤC",
+                    "BẢN ĐỒ ĐỊA CHÍNH",
+                    "ĐO TÁCH",
+                    "CHỈNH LÝ"
+                ]
+                for keyword in hskt_keywords:
+                    if keyword in reasoning_text:
+                        print(f"🔧 Post-processing fix: BMT → HSKT (detected '{keyword}' in reasoning)", file=sys.stderr)
+                        short_code = "HSKT"
+                        result["short_code"] = "HSKT"
+                        result["reasoning"] = f"[AUTO-FIXED: BMT→HSKT] {result.get('reasoning', '')}"
+                        break
+            
             # ✅ VALIDATE: Gemini sometimes creates invalid codes (e.g., "LCHO" not in our 98 valid codes)
             # Get all valid codes from rule_classifier
             from rule_classifier import EXACT_TITLE_MAPPING, DOCUMENT_RULES

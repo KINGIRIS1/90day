@@ -3078,6 +3078,34 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                         setShowMergeModal(true);
                       }}
                       showMerge={true}
+                      onLoadPreview={async () => {
+                        // Load preview for all files without preview
+                        const filesToLoad = (t.results || []).filter(r => !r.previewUrl);
+                        if (filesToLoad.length === 0) {
+                          alert('Tất cả file đã có preview!');
+                          return;
+                        }
+                        if (window.confirm(`Load preview cho ${filesToLoad.length} files?`)) {
+                          for (let i = 0; i < filesToLoad.length; i++) {
+                            const result = filesToLoad[i];
+                            try {
+                              const previewUrl = await window.electronAPI.getFilePreview(result.filePath);
+                              setChildTabs(prev => prev.map(ct => {
+                                if (ct.path !== t.path) return ct;
+                                return {
+                                  ...ct,
+                                  results: ct.results.map(r =>
+                                    r.filePath === result.filePath ? { ...r, previewUrl } : r
+                                  )
+                                };
+                              }));
+                            } catch (err) {
+                              console.error('Load preview error:', err);
+                            }
+                          }
+                        }
+                      }}
+                      showLoadPreview={(t.results || []).some(r => !r.previewUrl)}
                       onRescan={async () => {
                         if (window.confirm(`Quét lại thư mục "${t.name}"?\n\nTất cả kết quả cũ sẽ bị xóa và quét lại từ đầu.`)) {
                           const idx = childTabs.findIndex(x => x.path === t.path);

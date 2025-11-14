@@ -3079,31 +3079,31 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                       }}
                       showMerge={true}
                       onLoadPreview={async () => {
-                        // Load preview for all files without preview
+                        // Load preview using Promise.all for better performance
                         const filesToLoad = (t.results || []).filter(r => !r.previewUrl);
                         if (filesToLoad.length === 0) {
                           alert('Tất cả file đã có preview!');
                           return;
                         }
-                        if (window.confirm(`Load preview cho ${filesToLoad.length} files?`)) {
-                          for (let i = 0; i < filesToLoad.length; i++) {
-                            const result = filesToLoad[i];
+                        
+                        console.log(`🖼️ Loading ${filesToLoad.length} previews...`);
+                        const resultsWithPreviews = await Promise.all(
+                          (t.results || []).map(async (result) => {
+                            if (result.previewUrl) return result; // Already has preview
                             try {
-                              const previewUrl = await window.electronAPI.getFilePreview(result.filePath);
-                              setChildTabs(prev => prev.map(ct => {
-                                if (ct.path !== t.path) return ct;
-                                return {
-                                  ...ct,
-                                  results: ct.results.map(r =>
-                                    r.filePath === result.filePath ? { ...r, previewUrl } : r
-                                  )
-                                };
-                              }));
+                              const previewUrl = await window.electronAPI.readImageDataUrl(result.filePath);
+                              return { ...result, previewUrl };
                             } catch (err) {
-                              console.error('Load preview error:', err);
+                              console.warn(`Failed to load preview: ${result.fileName}`);
+                              return result;
                             }
-                          }
-                        }
+                          })
+                        );
+                        
+                        setChildTabs(prev => prev.map(ct => 
+                          ct.path === t.path ? { ...ct, results: resultsWithPreviews } : ct
+                        ));
+                        console.log(`✅ Loaded ${filesToLoad.length} previews`);
                       }}
                       showLoadPreview={(t.results || []).some(r => !r.previewUrl)}
                       onRescan={async () => {
@@ -3216,31 +3216,31 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                       }}
                       showMerge={true}
                       onLoadPreview={async () => {
-                        // Load preview for all files without preview
+                        // Load preview using Promise.all for better performance
                         const filesToLoad = (t.results || []).filter(r => !r.previewUrl);
                         if (filesToLoad.length === 0) {
                           alert('Tất cả file đã có preview!');
                           return;
                         }
-                        if (window.confirm(`Load preview cho ${filesToLoad.length} files?`)) {
-                          for (let i = 0; i < filesToLoad.length; i++) {
-                            const result = filesToLoad[i];
+                        
+                        console.log(`🖼️ Loading ${filesToLoad.length} previews...`);
+                        const resultsWithPreviews = await Promise.all(
+                          (t.results || []).map(async (result) => {
+                            if (result.previewUrl) return result; // Already has preview
                             try {
-                              const previewUrl = await window.electronAPI.getFilePreview(result.filePath);
-                              setChildTabs(prev => prev.map(ct => {
-                                if (ct.path !== t.path) return ct;
-                                return {
-                                  ...ct,
-                                  results: ct.results.map(r =>
-                                    r.filePath === result.filePath ? { ...r, previewUrl } : r
-                                  )
-                                };
-                              }));
+                              const previewUrl = await window.electronAPI.readImageDataUrl(result.filePath);
+                              return { ...result, previewUrl };
                             } catch (err) {
-                              console.error('Load preview error:', err);
+                              console.warn(`Failed to load preview: ${result.fileName}`);
+                              return result;
                             }
-                          }
-                        }
+                          })
+                        );
+                        
+                        setChildTabs(prev => prev.map(ct => 
+                          ct.path === t.path ? { ...ct, results: resultsWithPreviews } : ct
+                        ));
+                        console.log(`✅ Loaded ${filesToLoad.length} previews`);
                       }}
                       showLoadPreview={(t.results || []).some(r => !r.previewUrl)}
                       onRescan={async () => {

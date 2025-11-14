@@ -318,11 +318,13 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
     ⚠️ Keyword phân biệt: "GIẤY" (GUQ) vs "HỢP ĐỒNG" (HDUQ)
     ❌ KHÔNG trả về HDUQ nếu thấy "GIẤY ỦY QUYỀN"
 
-13. GTLQ vs PKTHS (Phiếu):
-    ✅ "PHIẾU KIỂM SOÁT QUÁ TRÌNH" = GTLQ (monitoring)
-    ✅ "PHIẾU KIỂM TRA HỒ SƠ" = PKTHS (inspection)
-    ⚠️ Keyword phân biệt: "KIỂM SOÁT" (GTLQ) vs "KIỂM TRA" (PKTHS)
-    ❌ KHÔNG trả về UNKNOWN nếu thấy "PHIẾU KIỂM SOÁT"
+13. GTLQ vs PKTHS (Phiếu) - CỰC KỲ DỄ NHẦM:
+    ✅ "PHIẾU KIỂM **SOÁT** QUÁ TRÌNH" = GTLQ (monitoring/theo dõi)
+    ✅ "PHIẾU KIỂM **TRA** HỒ SƠ" = PKTHS (inspection/kiểm tra)
+    ✅ "PHIẾU TRÌNH KÝ" = PKTHS (submit for signature)
+    ⚠️ Keyword phân biệt: "SOÁT" (GTLQ) ≠ "TRA" (PKTHS)
+    ❌ TUYỆT ĐỐI KHÔNG trả về PKTHS nếu thấy "KIỂM SOÁT"
+    ❌ TUYỆT ĐỐI KHÔNG trả về GTLQ nếu thấy "KIỂM TRA"
 
 QUY TRÌNH KIỂM TRA:
 1. Kiểm tra vị trí: Text ở TOP 30%?

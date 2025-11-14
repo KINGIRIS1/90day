@@ -914,6 +914,39 @@ def quick_scan_tier1(image_path, api_key):
             max_width=1500,
             max_height=2100
         )
+        
+        # ✅ POST-PROCESSING FIXES (same as process_document.py)
+        short_code = result.get('short_code', 'UNKNOWN')
+        reasoning_text = result.get('reasoning', '').upper()
+        
+        # Fix #1: PKTHS → GTLQ (when "KIỂM SOÁT" detected)
+        if short_code == "PKTHS" and ("KIỂM SOÁT" in reasoning_text or "KIEM SOAT" in reasoning_text):
+            print(f"🔧 Post-processing fix: PKTHS → GTLQ (detected 'KIỂM SOÁT')", file=sys.stderr)
+            result['short_code'] = "GTLQ"
+            result['reasoning'] = f"[AUTO-FIXED: PKTHS→GTLQ] {result.get('reasoning', '')}"
+        
+        # Fix #2: UNKNOWN → GTLQ (when GTLQ keywords detected)
+        elif short_code == "UNKNOWN":
+            gtlq_keywords = ["PHIẾU XIN LỖI", "HẸN LẠI NGÀY TRẢ KẾT QUẢ", "PHIẾU KIỂM SOÁT", 
+                            "BỘ PHẬN TIẾP NHẬN", "GIẤY TIẾP NHẬN HỒ SƠ"]
+            for keyword in gtlq_keywords:
+                if keyword in reasoning_text:
+                    print(f"🔧 Post-processing fix: UNKNOWN → GTLQ (detected '{keyword}')", file=sys.stderr)
+                    result['short_code'] = "GTLQ"
+                    result['confidence'] = 0.95
+                    result['reasoning'] = f"[AUTO-FIXED: UNKNOWN→GTLQ] {result.get('reasoning', '')}"
+                    break
+        
+        # Fix #3: BMT → HSKT (when "TRÍCH LỤC" or "BẢN ĐỒ" detected)
+        elif short_code == "BMT":
+            hskt_keywords = ["TRÍCH LỤC", "BẢN ĐỒ ĐỊA CHÍNH", "ĐO TÁCH", "CHỈNH LÝ"]
+            for keyword in hskt_keywords:
+                if keyword in reasoning_text:
+                    print(f"🔧 Post-processing fix: BMT → HSKT (detected '{keyword}')", file=sys.stderr)
+                    result['short_code'] = "HSKT"
+                    result['reasoning'] = f"[AUTO-FIXED: BMT→HSKT] {result.get('reasoning', '')}"
+                    break
+        
         return result
     except Exception as e:
         print(f"Quick scan error for {image_path}: {e}", file=sys.stderr)

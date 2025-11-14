@@ -505,7 +505,7 @@ def batch_classify_tesseract_text(image_paths, api_key, last_known_type=None):
 
 
 
-def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=5, last_known_type=None):
+def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=8, last_known_type=None):
     """
     Phương án 1: Fixed Batch Size với SEQUENTIAL METADATA
     

@@ -129,9 +129,15 @@ Nếu trang KHÔNG có tiêu đề chính:
 
 DANH SÁCH ĐẦY ĐỦ 66 LOẠI TÀI LIỆU:
 
-📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (3 loại)
+📋 NHÓM 1: BẢN VẼ / BẢN ĐỒ (3 loại) ⚠️ DỄ NHẦM
 BMT = Bản mô tả ranh giới, mốc giới thửa đất
+  • Nội dung: MÔ TẢ ranh giới, vị trí MỐC GIỚI
+  • Keyword: "MÔ TẢ", "MỐC GIỚI", "RANH GIỚI"
+  • ❌ KHÔNG có "TRÍCH LỤC" hoặc "BẢN ĐỒ"
 HSKT = Bản vẽ (trích lục, đo tách, chỉnh lý)
+  • Nội dung: BẢN ĐỒ địa chính với tọa độ, sơ đồ thửa
+  • Keyword: "TRÍCH LỤC", "BẢN ĐỒ ĐỊA CHÍNH", "ĐO TÁCH", "CHỈNH LÝ"
+  • ⚠️ "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH" → HSKT (KHÔNG phải BMT!)
 SDTT = Sơ đồ dự kiến tách thửa
 
 📋 NHÓM 2: BIÊN BẢN (10 loại)

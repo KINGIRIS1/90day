@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 import ActionButtonGroup from './ActionButtonGroup';
-import { getDocumentHighlight, getRowHighlight, countSpecialDocuments } from '../utils/documentHighlight';
+import { getDocumentHighlight, getRowHighlight, countSpecialDocuments, getDocumentBadge } from '../utils/documentHighlight';
 import QuotaWarning from './QuotaWarning';
 import ResumeDialog from './ResumeDialog';
 

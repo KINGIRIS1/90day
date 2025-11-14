@@ -19,6 +19,10 @@ from pathlib import Path
 EXACT_TITLE_MAPPING = {
     "BẢN MÔ TẢ RANH GIỚI, MỐC GIỚI THỬA ĐẤT": "BMT",
     "BẢN VẼ (TRÍCH LỤC, ĐO TÁCH, CHỈNH LÝ)": "HSKT",
+    "BẢN VẼ TRÍCH LỤC": "HSKT",
+    "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH": "HSKT",
+    "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH THỬA ĐẤT": "HSKT",
+    "BẢN ĐỒ ĐỊA CHÍNH THỬA ĐẤT": "HSKT",
     "ĐỒ ĐẠC CHÍNH LÝ BẢN ĐỒ ĐỊA CHÍNH": "HSKT",
     "BẢN VẼ HOÀN CÔNG": "BVHC",
     "BẢN VẼ NHÀ": "BVN",

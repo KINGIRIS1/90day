@@ -216,9 +216,11 @@ PXNKQDD = Phiếu xác nhận KQ đo đạc
   • ≠ PKTHS (không có quốc huy)
 
 📋 NHÓM 9: THÔNG BÁO (8 loại)
-TBT = Thông báo thuế
+TBT = Thông báo thuế, Thông báo nộp tiền
   • "THÔNG BÁO THUẾ", "THÔNG BÁO NỘP TIỀN"
+  • ⚠️ "THÔNG BÁO NỘP TIỀN" → TBT (về nghĩa vụ tài chính)
   • Về thuế trước bạ, TNCN, tiền sử dụng đất
+  • KHÔNG phải "Giấy nộp tiền" (→ GNT)
 TBMG = Thông báo về việc chuyển TT GCN bị mất
 TBCKCG = Thông báo công khai KQ thẩm tra cấp GCN
 TBCKMG = Thông báo niêm yết công khai mất GCN

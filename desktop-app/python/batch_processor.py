@@ -1008,7 +1008,7 @@ def group_by_document(quick_results, file_paths):
     return groups
 
 
-def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_known_type=None, max_batch_size=15):
+def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_known_type=None, max_batch_size=8):
     """
     Phương án 2: Smart Batching với SEQUENTIAL METADATA
     

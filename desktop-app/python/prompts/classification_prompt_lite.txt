@@ -158,6 +158,9 @@ GNT = Giấy nộp tiền vào ngân sách nhà nước
 GTLQ = Giấy tiếp nhận, giấy biên nhận (hồ sơ)
   • "PHIẾU KIỂM SOÁT QUÁ TRÌNH"
   • "BỘ PHẬN TIẾP NHẬN VÀ TRẢ KẾT QUẢ"
+  • "GIẤY TIẾP NHẬN HỒ SƠ VÀ HẸN TRẢ KẾT QUẢ"
+  • "GIẤY TIẾP NHẬN HỒ SƠ"
+  • ⚠️ KHÔNG phải PKTHS (Phiếu trình ký nội bộ)
 GUQ = Giấy ủy quyền
 GXNDKLD = Giấy xác nhận đăng ký lần đầu
 GPXD = Giấy xin phép xây dựng

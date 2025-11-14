@@ -3097,8 +3097,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   {/* Show all results without pagination for easier viewing */}
                   <div className={`grid gap-3 ${gridColsClass}`}>
                     {(t.results || [])
-                      .map((r, idx) => (
-                      <div key={idx} className="p-3 border rounded-lg bg-white">
+                      .map((r, idx) => {
+                        const highlight = getDocumentHighlight(r.short_code, t.name);
+                        const rowClass = getRowHighlight(r.short_code, t.name);
+                        return (
+                      <div key={idx} className={`p-3 rounded-lg ${highlight.bgClass} ${highlight.borderClass} ${rowClass}`}>
                         <div className="mb-2">
                           {r.previewUrl ? (
                             <img src={r.previewUrl} alt={r.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />

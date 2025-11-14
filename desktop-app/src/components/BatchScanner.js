@@ -2293,12 +2293,35 @@ function BatchScanner({ onSwitchTab }) {
                 </div>
               </div>
 
+              {/* Action buttons - TOP */}
+              {folderTabs.find(t => t.path === activeFolder)?.files?.length > 0 && (
+                <ActionButtonGroup
+                  onNext={() => {
+                    const idx = folderTabs.findIndex(t => t.path === activeFolder);
+                    if (idx < folderTabs.length - 1) {
+                      setActiveFolder(folderTabs[idx + 1].path);
+                    }
+                  }}
+                  onBack={() => {
+                    const idx = folderTabs.findIndex(t => t.path === activeFolder);
+                    if (idx > 0) {
+                      setActiveFolder(folderTabs[idx - 1].path);
+                    }
+                  }}
+                  hasNext={folderTabs.findIndex(t => t.path === activeFolder) < folderTabs.length - 1}
+                  hasBack={folderTabs.findIndex(t => t.path === activeFolder) > 0}
+                  position="top"
+                />
+              )}
+              
               {/* Grid */}
               <div className={`grid gap-4 ${gridColsClass}`}>
                 {folderTabs.find(t => t.path === activeFolder).files.map((result, idx) => {
                   const currentTab = folderTabs.find(t => t.path === activeFolder);
+                  const highlight = getDocumentHighlight(result.short_code, currentTab.name);
+                  const rowClass = getRowHighlight(result.short_code, currentTab.name);
                   return (
-              <div key={idx} className="p-3 border rounded-lg bg-white hover:shadow-md transition-shadow">
+              <div key={idx} className={`p-3 rounded-lg ${highlight.bgClass} ${highlight.borderClass} ${rowClass} hover:shadow-md transition-shadow`}>
                 {/* Preview Image */}
                 <div className="mb-3">
                   {result.previewUrl ? (

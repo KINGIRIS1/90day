@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import CompareResults from './CompareResults';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 import ActionButtonGroup from './ActionButtonGroup';
+import { handleError, isCriticalError } from '../utils/errorHandler';
 import { getDocumentHighlight, getRowHighlight, countSpecialDocuments, getDocumentBadge } from '../utils/documentHighlight';
 import QuotaWarning from './QuotaWarning';
 import ResumeDialog from './ResumeDialog';

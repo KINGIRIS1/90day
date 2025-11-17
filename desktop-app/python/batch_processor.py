@@ -834,10 +834,20 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                                 
                                 # Check if documents key exists
                                 if 'documents' not in batch_result or not isinstance(batch_result.get('documents'), list):
-                                    print(f"❌ Batch {batch_num} ERROR: No 'documents' array in response!", file=sys.stderr)
+                                    print(f"⚠️ Batch {batch_num} WARNING: No 'documents' array in response!", file=sys.stderr)
                                     print(f"   Response keys: {list(batch_result.keys())}", file=sys.stderr)
-                                    print(f"   This batch will fallback to individual processing", file=sys.stderr)
-                                    raise ValueError("Missing 'documents' array in response")
+                                    
+                                    # FALLBACK: Check if response is a single document (LLM returned wrong format)
+                                    if 'type' in batch_result and 'pages' in batch_result:
+                                        print(f"   🔄 Auto-fixing: LLM returned single document format instead of array", file=sys.stderr)
+                                        print(f"   Wrapping into documents array...", file=sys.stderr)
+                                        batch_result = {
+                                            'documents': [batch_result]
+                                        }
+                                    else:
+                                        print(f"   ❌ Cannot auto-fix: Response format unrecognized", file=sys.stderr)
+                                        print(f"   This batch will fallback to individual processing", file=sys.stderr)
+                                        raise ValueError("Missing 'documents' array in response")
                             
                                 print(f"✅ Batch {batch_num} complete:", file=sys.stderr)
                                 

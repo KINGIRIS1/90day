@@ -391,6 +391,16 @@ CORRECT FORMAT (REQUIRED):
   ]
 }}
 
+❌ WRONG FORMAT (DO NOT USE):
+{{
+  "type": "HDCQ",
+  "pages": [0, 1, 2],
+  "confidence": 0.95,
+  "reasoning": "...",
+  "metadata": {{}}
+}}
+This is WRONG! You must wrap it in "documents" array!
+
 🚨 CỰC KỲ QUAN TRỌNG - BẮT BUỘC RETURN TẤT CẢ {batch_size} PAGES:
 - Bạn PHẢI assign MỌI page (0 đến {batch_size-1}) vào 1 document
 - Nếu page không rõ → assign vào document type "UNKNOWN"

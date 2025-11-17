@@ -1998,6 +1998,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       } else {
         const errorMsg = batchResults?.error || 'Batch returned no results';
         console.error(`⚠️ FOLDER BATCH FAILED for ${childPath}:`, errorMsg);
+        
+        // Check for critical 503 error
+        if (batchResults?.error === 'CRITICAL_503_ERROR' || batchResults?.should_stop) {
+          setIsScanning(false);
+          alert('🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨\n\n' + 
+                (batchResults?.error_message || 'Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.') + 
+                '\n\nĐã tự động dừng quét.');
+          return;
+        }
+        
         console.warn('🔄 FALLBACK: Switching to sequential for this folder...');
         
         // Don't ask user for folder scan (too many prompts), just fallback silently with clear log

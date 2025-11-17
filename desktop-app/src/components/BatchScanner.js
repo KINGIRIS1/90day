@@ -527,7 +527,7 @@ function BatchScanner({ onSwitchTab }) {
           const shouldUseBatch = (
             isGeminiEngine && // Gemini engine (including Tesseract+Text)
             (batchMode === 'fixed' || batchMode === 'smart') &&
-            validImages.length >= 3
+            validImages.length >= 2
           );
           
           if (shouldUseBatch) {

@@ -1998,13 +1998,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         const errorMsg = batchResults?.error || 'Batch returned no results';
         console.error(`⚠️ FOLDER BATCH FAILED for ${childPath}:`, errorMsg);
         
-        // Check for critical 503 error
-        if (batchResults?.error === 'CRITICAL_503_ERROR' || batchResults?.should_stop) {
-          setIsScanning(false);
-          alert('🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨\n\n' + 
-                (batchResults?.error_message || 'Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.') + 
-                '\n\nĐã tự động dừng quét.');
-          return;
+        // Check for critical errors using centralized handler
+        if (isCriticalError(batchResults)) {
+          const shouldStop = handleError('DesktopScanner - Folder', batchResults, setIsScanning);
+          if (shouldStop) {
+            return;
+          }
         }
         
         console.warn('🔄 FALLBACK: Switching to sequential for this folder...');

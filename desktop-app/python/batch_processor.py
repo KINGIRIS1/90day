@@ -651,9 +651,9 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                 response.raise_for_status()
                 result_data = response.json()
                 
-                # Reset 503 error counter on success
-                global _503_ERROR_COUNT
-                _503_ERROR_COUNT = 0
+                # Reset all error counters on success
+                if ERROR_HANDLER_AVAILABLE:
+                    handle_success()
                 
                 break  # Success, exit retry loop
                 

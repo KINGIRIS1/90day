@@ -2394,35 +2394,6 @@ function BatchScanner({ onSwitchTab }) {
                 );
                 })}
               </div>
-              
-              {/* Action buttons - BOTTOM */}
-              {folderTabs.find(t => t.path === activeFolder)?.files?.length > 0 && (
-                <ActionButtonGroup
-                  onNext={() => {
-                    const idx = folderTabs.findIndex(t => t.path === activeFolder);
-                    if (idx < folderTabs.length - 1) {
-                      setActiveFolder(folderTabs[idx + 1].path);
-                    }
-                  }}
-                  onBack={() => {
-                    const idx = folderTabs.findIndex(t => t.path === activeFolder);
-                    if (idx > 0) {
-                      setActiveFolder(folderTabs[idx - 1].path);
-                    }
-                  }}
-                  hasNext={folderTabs.findIndex(t => t.path === activeFolder) < folderTabs.length - 1}
-                  hasBack={folderTabs.findIndex(t => t.path === activeFolder) > 0}
-                  onMerge={() => handleMerge(false)}
-                  showMerge={true}
-                  onLoadPreview={async () => {
-                    const currentTab = folderTabs.find(t => t.path === activeFolder);
-                    if (!currentTab) return;
-                    await handleLoadPreviewsForFolder(currentTab.path);
-                  }}
-                  showLoadPreview={!foldersPreviewsLoaded.has(activeFolder)}
-                  position="bottom"
-                />
-              )}
             </div>
           )}
         </div>

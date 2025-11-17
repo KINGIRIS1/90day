@@ -1556,13 +1556,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       if (!batchResult.success) {
         console.error('❌ Batch processing failed:', batchResult.error);
         
-        // Check for critical 503 error
-        if (batchResult.error === 'CRITICAL_503_ERROR' || batchResult.should_stop) {
-          setIsScanning(false);
-          alert('🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨\n\n' + 
-                (batchResult.error_message || 'Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.') + 
-                '\n\nĐã tự động dừng quét.');
-          throw new Error('CRITICAL_503_ERROR');
+        // Check for critical errors using centralized handler
+        if (isCriticalError(batchResult)) {
+          const shouldStop = handleError('DesktopScanner', batchResult, setIsScanning);
+          if (shouldStop) {
+            throw new Error(batchResult.error || 'CRITICAL_ERROR');
+          }
         }
         
         return null;

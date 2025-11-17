@@ -951,7 +951,7 @@ function CloudSettings() {
                   </label>
                   <input
                     type="range"
-                    min="3"
+                    min="2"
                     max="20"
                     step="1"
                     value={smartMaxBatchSize}
@@ -959,7 +959,7 @@ function CloudSettings() {
                     className="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer"
                   />
                   <div className="flex justify-between text-xs text-gray-600 mt-1">
-                    <span>3 (An toàn)</span>
+                    <span>2 (Tối thiểu)</span>
                     <span>10 (Đề xuất)</span>
                     <span>20 (Nhanh nhất)</span>
                   </div>

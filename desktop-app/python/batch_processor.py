@@ -645,6 +645,11 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                 
             except requests.exceptions.HTTPError as e:
                 if e.response.status_code in [500, 503]:
+                    # Track 503 errors
+                    global _503_ERROR_COUNT
+                    if e.response.status_code == 503:
+                        _503_ERROR_COUNT += 1
+                    
                     # 500 Internal Server Error or 503 Service Unavailable - retry
                     if attempt < max_retries - 1:
                         wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
@@ -652,6 +657,17 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                         print(f"   Possible causes: Request too large, API overload, temporary issue", file=sys.stderr)
                         if batch_size > 5:
                             print(f"   💡 Tip: Try reducing Smart batch size to 5-8 in Settings", file=sys.stderr)
+                        
+                        # Check if too many 503 errors
+                        if _503_ERROR_COUNT >= _503_ERROR_THRESHOLD:
+                            print(f"", file=sys.stderr)
+                            print(f"🚨🚨🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨🚨🚨", file=sys.stderr)
+                            print(f"Đã gặp {_503_ERROR_COUNT} lỗi 503 liên tiếp!", file=sys.stderr)
+                            print(f"Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key.", file=sys.stderr)
+                            print(f"Xin cảm ơn.", file=sys.stderr)
+                            print(f"🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨", file=sys.stderr)
+                            print(f"", file=sys.stderr)
+                        
                         import time
                         time.sleep(wait_time)
                         continue
@@ -659,6 +675,17 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                         print(f"❌ Max retries reached for batch {batch_num}", file=sys.stderr)
                         print(f"   Batch size: {batch_size} files", file=sys.stderr)
                         print(f"   💡 Recommendation: Reduce Smart batch size in Settings (⚙️ Cài đặt)", file=sys.stderr)
+                        
+                        # Check if too many 503 errors - return special error
+                        if _503_ERROR_COUNT >= _503_ERROR_THRESHOLD:
+                            error_response = {
+                                "error": "CRITICAL_503_ERROR",
+                                "error_message": "Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.",
+                                "error_count": _503_ERROR_COUNT,
+                                "should_stop": True
+                            }
+                            print(json.dumps(error_response))
+                            sys.exit(1)
                         raise
                 elif e.response.status_code == 429:
                     # Rate limit - longer wait

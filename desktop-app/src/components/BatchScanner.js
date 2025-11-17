@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ResumeDialog from './ResumeDialog';
 import InlineShortCodeEditor from './InlineShortCodeEditor';
 import ActionButtonGroup from './ActionButtonGroup';
+import { handleError, isCriticalError } from '../utils/errorHandler';
 import { getDocumentHighlight, getRowHighlight, getDocumentBadge } from '../utils/documentHighlight';
 
 function BatchScanner({ onSwitchTab }) {

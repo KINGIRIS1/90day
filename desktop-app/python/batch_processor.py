@@ -658,63 +658,64 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                 break  # Success, exit retry loop
                 
             except requests.exceptions.HTTPError as e:
-                if e.response.status_code in [500, 503]:
-                    # Track 503 errors
-                    global _503_ERROR_COUNT
-                    if e.response.status_code == 503:
-                        _503_ERROR_COUNT += 1
+                status_code = e.response.status_code
+                error_type = get_error_type_from_status(status_code) if ERROR_HANDLER_AVAILABLE else str(status_code)
+                
+                if ERROR_HANDLER_AVAILABLE:
+                    # Use centralized error handler
+                    context = {
+                        "batch_num": batch_num,
+                        "batch_size": batch_size,
+                        "attempt": attempt + 1,
+                        "max_retries": max_retries
+                    }
+                    error_info = handle_error(error_type, e, context)
                     
-                    # 500 Internal Server Error or 503 Service Unavailable - retry
-                    if attempt < max_retries - 1:
-                        wait_time = retry_delay * (2 ** attempt)  # Exponential backoff
-                        print(f"⚠️ {e.response.status_code} Server Error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
-                        print(f"   Possible causes: Request too large, API overload, temporary issue", file=sys.stderr)
-                        if batch_size > 5:
+                    # Check if should stop
+                    if error_info["should_stop"]:
+                        print(f"❌ Stopping due to critical error: {status_code}", file=sys.stderr)
+                        if error_info["error_response"]:
+                            print_error_response(error_info["error_response"])
+                        sys.exit(1)
+                    
+                    # Check if should retry
+                    if error_info["should_retry"] and attempt < max_retries - 1:
+                        wait_time = error_info["wait_time"]
+                        print(f"   Retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        if batch_size > 5 and status_code in [500, 503]:
                             print(f"   💡 Tip: Try reducing Smart batch size to 5-8 in Settings", file=sys.stderr)
-                        
-                        # Check if too many 503 errors
-                        if _503_ERROR_COUNT >= _503_ERROR_THRESHOLD:
-                            print(f"", file=sys.stderr)
-                            print(f"🚨🚨🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨🚨🚨", file=sys.stderr)
-                            print(f"Đã gặp {_503_ERROR_COUNT} lỗi 503 liên tiếp!", file=sys.stderr)
-                            print(f"Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key.", file=sys.stderr)
-                            print(f"Xin cảm ơn.", file=sys.stderr)
-                            print(f"🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨", file=sys.stderr)
-                            print(f"", file=sys.stderr)
-                        
                         import time
                         time.sleep(wait_time)
                         continue
                     else:
-                        print(f"❌ Max retries reached for batch {batch_num}", file=sys.stderr)
-                        print(f"   Batch size: {batch_size} files", file=sys.stderr)
-                        print(f"   💡 Recommendation: Reduce Smart batch size in Settings (⚙️ Cài đặt)", file=sys.stderr)
-                        
-                        # Check if too many 503 errors - return special error
-                        if _503_ERROR_COUNT >= _503_ERROR_THRESHOLD:
-                            error_response = {
-                                "error": "CRITICAL_503_ERROR",
-                                "error_message": "Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.",
-                                "error_count": _503_ERROR_COUNT,
-                                "should_stop": True
-                            }
-                            print(json.dumps(error_response))
+                        # Max retries reached or should not retry
+                        if error_info["is_critical"] and error_info["error_response"]:
+                            print_error_response(error_info["error_response"])
                             sys.exit(1)
                         raise
-                elif e.response.status_code == 429:
-                    # Rate limit - longer wait
-                    if attempt < max_retries - 1:
-                        wait_time = 60 * (2 ** attempt)  # Start with 60s
-                        print(f"⚠️ 429 Rate Limit, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
-                        import time
-                        time.sleep(wait_time)
-                        continue
-                    else:
-                        raise
                 else:
-                    # Other HTTP errors (400, 401, 404, etc.) - don't retry
-                    print(f"❌ HTTP {e.response.status_code} Error: {e}", file=sys.stderr)
-                    raise
+                    # Legacy error handling (fallback)
+                    if status_code in [500, 503]:
+                        if attempt < max_retries - 1:
+                            wait_time = retry_delay * (2 ** attempt)
+                            print(f"⚠️ {status_code} Server Error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                            import time
+                            time.sleep(wait_time)
+                            continue
+                        else:
+                            raise
+                    elif status_code == 429:
+                        if attempt < max_retries - 1:
+                            wait_time = 60 * (2 ** attempt)
+                            print(f"⚠️ 429 Rate Limit, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                            import time
+                            time.sleep(wait_time)
+                            continue
+                        else:
+                            raise
+                    else:
+                        print(f"❌ HTTP {status_code} Error: {e}", file=sys.stderr)
+                        raise
             except requests.exceptions.RequestException as e:
                 # Network errors - retry
                 if attempt < max_retries - 1:

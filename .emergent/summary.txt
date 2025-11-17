@@ -1,52 +1,77 @@
 <analysis>**original_problem_statement:**
-Ban đầu, người dùng yêu cầu bỏ giới hạn kích thước tối thiểu (1500x2100) khi resize ảnh trong phần cài đặt để có thể điều chỉnh tự do. Sau đó, một loạt các yêu cầu và báo cáo lỗi đã được đưa ra và xử lý, bao gồm:
-- Sửa lỗi 503 API bằng cách giảm chất lượng JPEG.
-- Thêm tùy chọn bật/tắt tính năng sắp xếp tài liệu GCN lên đầu danh sách kết quả.
-- Sửa lỗi logic sắp xếp GCN khiến tất cả bị phân loại là GCNM.
-- Phát hiện và cảnh báo các thư mục trùng tên trong chế độ quét hàng loạt (Batch Scan) và quét thư mục (Folder Scan) để tránh gộp kết quả sai.
-- Thêm tùy chọn bật/tắt tự động lưu phiên làm việc (Auto-save) để cải thiện hiệu năng trên máy cấu hình yếu.
-- Gỡ bỏ phân trang (pagination) trong kết quả quét thư mục để hiển thị tất cả file cùng lúc.
-- Thêm nút Next và Back ở cuối trang preview để chuyển tab mà không cần cuộn lên.
-- Sửa lỗi văn bản trên các nút bật/tắt để hiển thị rõ trạng thái hiện tại (Đang bật / Đang tắt).
-- Sửa lỗi nút Next/Back tự động cuộn lên đầu trang.
-- Người dùng đề xuất và yêu cầu triển khai một chế độ OCR thử nghiệm mới: dùng Tesseract để OCR local, sau đó gửi text lên Gemini để phân loại nhằm tiết kiệm chi phí và tăng tốc độ.
-- Sau khi triển khai, người dùng yêu cầu dọn dẹp và tối ưu các prompt gửi đến Gemini bằng cách xóa 32 mã tài liệu không sử dụng và loại bỏ các đoạn hướng dẫn bị trùng lặp.
-- Yêu cầu cuối cùng là đồng bộ hóa prompt giữa hai phiên bản  và  để đảm bảo logic nhất quán, với phiên bản  là một bản rút gọn nhưng đầy đủ về mặt logic của bản .
+Ban đầu, người dùng yêu cầu sửa lỗi phân loại tài liệu của các engine OCR (chủ yếu là Gemini Flash Lite), tối ưu hóa giao diện người dùng và cải thiện hiệu suất.
+
+Các yêu cầu chính trong suốt phiên làm việc bao gồm:
+1.  **Sửa lỗi phân loại tài liệu**:
+    *   GCN (Giấy chứng nhận) không được phân loại thành GCNC/GCNM.
+    *   GIẤY ỦY QUYỀN bị phân loại nhầm thành HDUQ.
+    *   PHIẾU KIỂM SOÁT... bị phân loại nhầm thành PKTHS hoặc UNKNOWN thay vì GTLQ.
+    *   TRÍCH LỤC BẢN ĐỒ... bị phân loại nhầm thành BMT thay vì HSKT.
+    *   Phân loại không nhất quán giữa các lần quét và giữa các chế độ (File mode vs Batch mode).
+2.  **Cải thiện giao diện người dùng (UI)**:
+    *   Thêm các nút hành động (Gộp thư mục, Load Preview) vào cả phía trên và dưới của danh sách kết quả.
+    *   Loại bỏ các nút bị trùng lặp sau khi refactor.
+3.  **Cải thiện xử lý hàng loạt (Batch Processing)**:
+    *   Giải quyết tình trạng fallback quá nhiều trong chế độ Smart Batch.
+    *   Yêu cầu thay đổi số lượng file tối thiểu cho Smart Batch từ 3 xuống 2.
+4.  **Tạo bản build**: Hướng dẫn người dùng cách tạo bản build one-click trên máy Windows của họ.
+5.  **Khám phá giải pháp tối ưu**:
+    *   Thảo luận về việc lọc tài liệu theo khổ giấy (A3/A4) và nhận diện màu sắc cục bộ để tiết kiệm chi phí API.
+    *   So sánh chi phí/hiệu suất giữa các chế độ quét khác nhau.
+
+**User's preferred language**: Vietnamese
 
 **what currently exists?**
-- Ứng dụng OCR 데스크톱 xây dựng bằng Electron, React và Python backend.
-- Hỗ trợ các chế độ quét: File Scan, Folder Scan, và Batch Scan (từ file .txt).
-- Sử dụng Gemini Flash Vision API làm engine OCR đám mây chính.
-- Đã triển khai một chế độ OCR thử nghiệm mới () kết hợp Tesseract OCR local và Gemini Text API để phân loại. Chế độ này được tích hợp như một lựa chọn trong Cloud Settings.
-- Giao diện người dùng có các tùy chọn để: điều chỉnh kích thước ảnh tự do, bật/tắt sắp xếp GCN, bật/tắt tự động lưu.
-- Logic phát hiện thư mục trùng lặp đã được thêm vào cho cả chế độ quét thư mục và quét hàng loạt.
-- Các prompt của Gemini đã được dọn dẹp đáng kể (xóa 32 mã, loại bỏ các phần trùng lặp) để giảm token và tăng tính nhất quán.
+- Một ứng dụng OCR desktop (Electron, React, Python) với các engine Gemini và OpenAI.
+- Giao diện người dùng đã được cập nhật để có các nút hành động nhất quán ở trên và dưới trong các chế độ quét. Các nút bị trùng lặp đã được gỡ bỏ.
+- Logic phân loại tài liệu đã được sửa lỗi nhiều lần thông qua việc tinh chỉnh prompt () và thêm các quy tắc hậu xử lý (post-processing) trực tiếp vào code Python (, ) để ép buộc sửa các lỗi phân loại phổ biến.
+- Kích thước batch tối đa cho Smart Mode đã được giảm từ 15 xuống 8 để giảm thiểu lỗi fallback.
+- Đã thêm logging chi tiết vào  để gỡ lỗi các vấn đề về fallback.
+- Các tài liệu hướng dẫn build và phân tích chi phí/giải pháp đã được tạo (, , ).
 
 **Last working item**:
-- **Last item agent was working**: Agent đang trong quá trình so sánh và đồng bộ hóa nội dung giữa hai prompt:  và  trong file . Mục tiêu là cập nhật bản lite để nó trở thành một phiên bản rút gọn nhưng vẫn đầy đủ về mặt logic và quy tắc so với bản full, vì agent đã phát hiện bản lite đang thiếu rất nhiều quy tắc quan trọng.
-- **Status**: IN PROGRESS
+- **Last item agent was working**: Người dùng yêu cầu thay đổi số lượng file tối thiểu cho Smart Mode (chế độ Gom Thông Minh) từ 3 xuống 2. Agent đã xác định rằng cần phải sửa đổi code nhưng chưa thực hiện.
+- **Status**: NOT STARTED
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Manual testing by user. Sau khi agent cập nhật prompt, người dùng cần được yêu cầu chọn engine Gemini Flash Lite, quét thử một vài loại tài liệu và xác nhận độ chính xác của việc phân loại có hợp lý và nhất quán không.
+- **Which testing method agent to use?**: Manual testing by user. Người dùng cần xác nhận rằng họ có thể chạy chế độ Gom Thông Minh với 2 tệp.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0)**: Đồng bộ hóa prompt của  với .
-  - **Attempted fixes**: Agent đã bắt đầu phân tích và xác định được sự khác biệt lớn giữa hai prompt.
+- **Issue 1 (P0)**: Lỗi phân loại không nhất quán và sai sót của engine .
+- **Issue 2 (P1)**: Cho phép sửa kết quả ngay khi quét xong từng file, không cần chờ hết batch (Yêu cầu từ fork trước).
+- **Issue 3 (P2)**: Cảnh báo dung lượng ổ đĩa liên tục ở mức 95%.
+
+**Issues Detail:**
+- **Issue 1: Lỗi phân loại không nhất quán của **
+  - **Attempted fixes**:
+    - Tinh chỉnh  nhiều lần với các quy tắc và ví dụ rõ ràng hơn.
+    - Cập nhật  với các ánh xạ tiêu đề chính xác.
+    - **Thêm logic hậu xử lý (post-processing)** vào  và  để tự động sửa các lỗi sai phổ biến (ví dụ: nếu kết quả là PKTHS nhưng  chứa KIỂM SOÁT, tự động đổi thành GTLQ).
   - **Next debug checklist**:
-    1.  Mở file .
-    2.  So sánh một cách có hệ thống nội dung của hàm  với .
-    3.  Sao chép các logic cốt lõi, quy tắc (ví dụ: phân biệt GCN Cũ/Mới, xử lý trang tiếp theo, quy trình kiểm tra) và các ví dụ đại diện từ prompt full sang prompt lite.
-    4.  Đảm bảo prompt lite sau khi cập nhật là một phiên bản cô đọng nhưng tương đương về mặt chức năng so với prompt full.
-  - **Why fix this issue and what will be achieved with the fix?**: Để đảm bảo người dùng khi chọn engine Lite (rẻ hơn) vẫn nhận được kết quả phân loại nhất quán và chính xác, tránh các hành vi khó đoán do prompt kém phát triển.
+    1.  Hoàn thành yêu cầu cuối cùng của người dùng: thay đổi số lượng file tối thiểu cho Smart Mode thành 2.
+    2.  Tiếp tục theo dõi phản hồi của người dùng về các trường hợp phân loại sai mới.
+    3.  Xem xét lại giải pháp đã lưu trong . Việc lọc trước theo khổ giấy và màu sắc cục bộ có thể là một giải pháp bền vững hơn thay vì liên tục sửa lỗi LLM.
+  - **Why fix this issue and what will be achieved with the fix?**: Đây là chức năng cốt lõi của ứng dụng. Việc phân loại chính xác là cực kỳ quan trọng đối với người dùng.
   - **Status**: IN PROGRESS
-  - **Is recurring issue?**: N
-  - **Should Test frontend/backend/both after fix?**: Backend (chất lượng phân loại), người dùng sẽ test thủ công.
+  - **Is recurring issue?**: Y
+  - **Should Test frontend/backend/both after fix?**: Backend (logic Python).
   - **Blocked on other issue**: None.
 
-- **Issue 2 (P2)**: Cảnh báo dung lượng ổ đĩa liên tục ở mức 95% ().
+- **Issue 2: Cho phép sửa kết quả ngay khi quét xong file (edit-while-scanning)**
   - **Attempted fixes**: Chưa có.
   - **Next debug checklist**:
-    1.  Dùng lệnh 0	/app/0.6
+    1.  Trong  và , tìm các thành phần UI bị vô hiệu hóa bởi .
+    2.  Thay đổi điều kiện  từ một biến trạng thái chung thành kiểm tra trạng thái của từng mục riêng lẻ (ví dụ: ).
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện đáng kể trải nghiệm người dùng, cho phép họ xử lý kết quả song song với quá trình quét.
+  - **Status**: NOT STARTED
+  - **Is recurring issue?**: N
+  - **Should Test frontend/backend/both after fix?**: Frontend.
+  - **Blocked on other issue**: None.
+
+- **Issue 3: Cảnh báo dung lượng ổ đĩa 95%**
+  - **Attempted fixes**: Chưa có. Agent đã bỏ qua cảnh báo này trong suốt phiên làm việc.
+  - **Next debug checklist**:
+    1.  Chạy lệnh 0	/app/0.6
 0	/app/=
 8.0K	/app/BATCH_UPLOAD_SOLUTION.md
 8.0K	/app/CLOUD_BOOST_COMPLETE.md
@@ -58,8 +83,10 @@ Ban đầu, người dùng yêu cầu bỏ giới hạn kích thước tối thi
 12K	/app/DESKTOP_APP_TESTING_CHECKLIST.md
 4.0K	/app/EMERGENT_LLM_KEY_GUIDE.md
 4.0K	/app/FIX_PDF_IMAGE_ERROR.md
+12K	/app/OPENAI_INTEGRATION_SUMMARY.md
 8.0K	/app/PERFORMANCE_ANALYSIS.md
 8.0K	/app/PRICING_GUIDE.md
+8.0K	/app/PROMPT_SYNC_SUMMARY.md
 8.0K	/app/RAILWAY_DEBUG_FAILED_FETCH.md
 8.0K	/app/RAILWAY_DEBUG_INTERNAL_ERROR.md
 8.0K	/app/RAILWAY_DEPLOYMENT_CHECKLIST.md
@@ -97,9 +124,12 @@ Ban đầu, người dùng yêu cầu bỏ giới hạn kích thước tối thi
 16K	/app/llm_health_test.py
 16K	/app/llm_integration_test.py
 12K	/app/node_modules
+4.0K	/app/openai-integration-patch.txt
 4.0K	/app/package-lock.json
 12K	/app/review_test.py
+12K	/app/rules_integration_test.py
 4.0K	/app/simple_llm_health_test.py
+4.0K	/app/simple_test.py
 4.0K	/app/test_deployed.sh
 8.0K	/app/test_reports
 88K	/app/test_result.md
@@ -107,122 +137,129 @@ Ban đầu, người dùng yêu cầu bỏ giới hạn kích thước tối thi
 8.0K	/app/three_flows_test.log
 4.0K	/app/yarn.lock
 12K	/app/zip_regression_test.py
-4.0K	/app/zip_test.log để xác định thư mục nào đang chiếm nhiều dung lượng nhất.
-    2.  Kiểm tra các file log lớn, dữ liệu cache của Electron, hoặc các kết quả quét cũ không được dọn dẹp.
-  - **Why fix this issue and what will be achieved with the fix?**: Ổ đĩa đầy có thể gây sập ứng dụng, mất dữ liệu, hoặc ngăn ứng dụng khởi động và lưu các phiên quét mới.
+4.0K	/app/zip_test.log để xác định thư mục/tệp nào đang chiếm nhiều dung lượng nhất.
+    2.  Kiểm tra và xóa các tệp log cũ, bộ đệm (cache) của Electron, hoặc các kết quả build trước đó trong thư mục .
+  - **Why fix this issue and what will be achieved with the fix?**: Ngăn ngừa rủi ro sập môi trường làm việc, mất code và đảm bảo hoạt động ổn định.
   - **Status**: NOT STARTED
   - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Manual. Kiểm tra lại dung lượng ổ đĩa bằng Filesystem      Size  Used Avail Use% Mounted on
+  - **Should Test frontend/backend/both after fix?**: Manual check (dùng Filesystem      Size  Used Avail Use% Mounted on
 overlay          95G  6.2G   89G   7% /
 tmpfs            64M     0   64M   0% /dev
-/dev/nvme0n3    9.8G  9.3G  532M  95% /app
+/dev/nvme0n2    9.8G  9.3G  517M  95% /app
 /dev/nvme0n1p1   95G  6.2G   89G   7% /etc/hosts
 shm              64M     0   64M   0% /dev/shm
 tmpfs           7.9G     0  7.9G   0% /proc/acpi
 tmpfs           7.9G     0  7.9G   0% /proc/scsi
-tmpfs           7.9G     0  7.9G   0% /sys/firmware sau khi dọn dẹp.
+tmpfs           7.9G     0  7.9G   0% /sys/firmware).
   - **Blocked on other issue**: None.
 
 **In progress Task List**:
-- Không có. Công việc hiện tại được phân loại là sửa lỗi (issue).
+- **Task 1 (P0)**: Thay đổi số file tối thiểu cho Smart Mode (Gom Thông Minh) từ 3 xuống 2.
+  - **Where to resume**: Tìm logic kiểm tra số file tối thiểu trong  (nơi chế độ smart được kích hoạt) hoặc trong  và thay đổi giá trị.
+  - **What will be achieved with this?**: Đáp ứng yêu cầu trực tiếp của người dùng, tăng tính linh hoạt cho chế độ Smart.
+  - **Status**: NOT STARTED
+  - **Should Test frontend/backend/both after fix?**: Frontend/Backend.
+  - **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - **(P1) Triển khai chế độ OCR Hybrid**: Kết hợp Tesseract cho các ảnh chất lượng cao và tự động fallback về Gemini Vision cho các ảnh chất lượng thấp. Ý tưởng này đã được thảo luận và là bước logic tiếp theo sau khi chế độ Tesseract+Text được xác nhận hoạt động tốt.
+  - **(P1) Triển khai chế độ OCR Hybrid**: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API (OpenAI/Gemini) cho ảnh chất lượng thấp.
+  - **(P2) Triển khai giải pháp GCN Pre-filter**: Tích hợp giải pháp đã được lưu trong  để lọc GCN theo khổ giấy và màu sắc cục bộ trước khi gửi lên API.
 - **Future Tasks**:
   - Tinh chỉnh .
   - Thêm icon cho ứng dụng trên macOS.
   - Triển khai hệ thống license key.
-  - Thêm cấu hình giá trong phần cài đặt.
+  - Thêm cấu hình giá trong phần Cài đặt.
 
 **Completed work in this session**
-- **Recently completed**:
-  - Cho phép tùy chỉnh kích thước resize ảnh tự do trong Cài đặt ().
-  - Giảm chất lượng JPEG xuống 85 để khắc phục lỗi 503 API ().
-  - Thêm tùy chọn bật/tắt sắp xếp GCN lên đầu (, ).
-  - Sửa lỗi logic phân loại GCN Cũ/Mới (, ).
-  - Phát hiện và cảnh báo thư mục trùng lặp trong cả chế độ quét hàng loạt và quét thư mục (, ).
-  - Thêm tùy chọn bật/tắt Auto-save trong Cài đặt (, , ).
-  - Gỡ bỏ phân trang ở kết quả quét thư mục ().
-  - Thêm nút Next/Back ở cuối trang preview để điều hướng tab (, ).
-  - Sửa lỗi các nút bật/tắt hiển thị văn bản gây nhầm lẫn (, , ).
-  - Sửa lỗi nút Next/Back tự động cuộn lên đầu trang.
-  - **Triển khai chế độ OCR Tesseract+Text**: Tích hợp như một tùy chọn engine đám mây () và sửa các lỗi liên quan để đảm bảo nó hoạt động trong cả chế độ quét hàng loạt và quét tuần tự.
-  - **Tối ưu Prompt Gemini**: Xóa 32 mã tài liệu không dùng và loại bỏ/hợp nhất các đoạn hướng dẫn bị trùng lặp trong .
+- **UI Refactoring**:
+  - Hoàn thiện việc thêm các nút Gộp thư mục & Load Preview vào  cho cả  và .
+  - Dọn dẹp, xóa các nút inline bị trùng lặp, đảm bảo giao diện gọn gàng.
+- **Bug Fixing (Classification)**:
+  - Cập nhật liên tục prompt  và file  để sửa nhiều lỗi phân loại.
+  - **Triển khai Post-Processing Fixes**: Thêm logic cứng vào  và  để tự động sửa các lỗi sai mà LLM hay mắc phải, tăng độ chính xác.
+- **Bug Fixing (Batch Mode)**:
+  - Giảm  trong  để giảm tình trạng fallback.
+  - Đồng bộ hóa logic post-processing giữa  (File/Fixed mode) và  (Smart mode).
+- **Documentation & Analysis**:
+  - Tạo các file hướng dẫn build ứng dụng trên máy người dùng.
+  - Tạo các tài liệu phân tích chi phí và đề xuất giải pháp kỹ thuật ().
 
 **Earlier issues found/mentioned but not fixed**
-- Đã được liệt kê trong **All Pending/In progress Issue list**.
+- Đã được liệt kê trong **All Pending/In progress Issue list** (Issue 3: Disk space warning).
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence**: Lỗi  khi gọi API.
-- **Recurrence count**: Cao.
-- **Status**: MITIGATED. Lỗi đã được giảm thiểu bằng cách giảm chất lượng ảnh xuống 85 và giới thiệu chế độ Tesseract+Text như một giải pháp thay thế hiệu quả hơn. Vấn đề chưa được giải quyết triệt để vì vẫn có thể xảy ra ở chế độ Vision với batch lớn, nhưng đã có các biện pháp giảm thiểu quan trọng.
+- **Issue recurrence**: Lỗi phân loại tài liệu không chính xác và không nhất quán. Đây là vấn đề chính trong suốt phiên làm việc này.
+- **Recurrence count**: Rất cao.
+- **Status**: IN PROGRESS (đã có nhiều bản vá nhưng gốc rễ vấn đề vẫn còn).
 
 **Code Architecture**
-Cấu trúc thư mục vẫn giữ nguyên như mô tả trong prompt hệ thống. Các file được chỉnh sửa nhiều nhất trong phiên này bao gồm:
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- **Frontend**: React
+  - : Logic cho chế độ File/Folder.
+  - : Logic cho chế độ Batch (Fixed và Smart).
+  - : Component UI tái sử dụng cho các nút hành động.
+- **Backend**: Python
+  - : Script chính xử lý OCR cho một file, được gọi bởi chế độ File và Fixed Batch. **Đã thêm logic post-processing.**
+  - : Script xử lý OCR cho chế độ Smart Batch. **Đã thêm logic post-processing.**
+  - : Prompt chính cho Gemini Flash Lite, đã được chỉnh sửa rất nhiều.
+  - : Định nghĩa các quy tắc ánh xạ tiêu đề tài liệu.
+- **Main Process**: Electron
+  - : File chính của Electron, nơi gọi các script Python.
 
 **Key Technical Concepts**
-- Electron, React, Python, , IPC.
-- **Khái niệm mới**: Phương pháp OCR Hybrid (Tesseract local + LLM cloud) được giới thiệu như một chiến lược tối ưu hóa chi phí và hiệu suất.
+- **Post-Processing Logic**: Do LLM (Gemini Flash Lite) không đáng tin cậy, agent đã phải thêm logic Python để kiểm tra và sửa kết quả của LLM. Đây là một giải pháp tình thế quan trọng.
+- **Inconsistent AI Behavior**: Cùng một file, cùng một prompt nhưng có thể cho ra các kết quả khác nhau giữa các lần chạy hoặc giữa các chế độ (File vs. Batch).
+- **Local vs. Remote Development Workflow**: Xung đột chính trong quá trình làm việc là agent sửa code trên server, nhưng người dùng chạy code cũ trên máy local. Việc nhắc nhở người dùng Save to GitHub và pull code là rất quan trọng.
+- **Multiple Processing Paths**: Cần nhận thức rõ rằng các chế độ quét khác nhau (, , ) có thể gọi các script Python khác nhau ( vs ) hoặc đi theo các nhánh logic khác nhau, dẫn đến hành vi khác biệt.
 
 **key DB schema**
-- Không áp dụng, ứng dụng sử dụng  để lưu trạng thái vào file JSON.
-
-**changes in tech stack**
-- Không có thay đổi cơ bản nào về công nghệ.
+- Không có, ứng dụng sử dụng  để lưu trữ cài đặt.
 
 **All files**
-- : Được chỉnh sửa nhiều nhất để dọn dẹp và đồng bộ hóa các prompt cho Gemini.
--  & : Được chỉnh sửa nhiều để thêm các tính năng mới (toggles, nút điều hướng) và sửa lỗi.
--  & : Được chỉnh sửa để quản lý các cài đặt mới.
--  & : Được cập nhật để hỗ trợ chế độ OCR mới.
-- : Cập nhật để truyền đúng chế độ OCR cho backend.
+- : Cập nhật UI, thêm/bớt nút.
+- : Cập nhật UI, thêm/bớt nút.
+- : Thêm logic post-processing để sửa lỗi phân loại.
+- : Thêm logic post-processing và giảm .
+- : Tinh chỉnh rất nhiều để cải thiện độ chính xác của LLM.
+- : Thêm các quy tắc ánh xạ mới.
+- : (Mới) Tài liệu đề xuất giải pháp.
+- , : (Mới) Các tài liệu phân tích.
 
 **Areas that need refactoring**:
-- Logic prompt trong  hiện được chia sẻ giữa  và . Mặc dù công việc hiện tại là đồng bộ hóa chúng, một giải pháp dài hạn tốt hơn là xây dựng prompt từ các thành phần chung để tránh sự thiếu nhất quán trong tương lai.
-- File  đã được tạo nhưng có thể đã trở nên thừa thãi sau khi logic của nó được tích hợp vào  và . Cần kiểm tra và có thể xóa bỏ file này.
+- Logic phân loại tài liệu hiện tại rất manh mún (dựa vào prompt + post-processing). Cần một giải pháp kiến trúc lại bền vững hơn, ví dụ như triển khai .
 
 **key api endpoints**
-- Không có endpoint mới. Giao tiếp chủ yếu qua các kênh IPC của Electron, đặc biệt là .
+- Các kênh IPC của Electron: , .
 
 **Critical Info for New Agent**
-- Người dùng rất am hiểu kỹ thuật và đưa ra phản hồi cụ thể, chính xác.
-- Hiện có hai luồng xử lý OCR chính: Vision (gửi ảnh đến Gemini) và Tesseract+Text (OCR local, gửi text đến Gemini). Agent cần nhận biết chế độ nào đang hoạt động khi debug.
-- Các prompt của Gemini đã được tối ưu hóa nhiều. Bất kỳ thay đổi nào trong tương lai cần được thực hiện cẩn thận cho cả phiên bản lite và full để duy trì sự nhất quán.
-- Cảnh báo  là một vấn đề dai dẳng, chưa được giải quyết và có thể trở nên nghiêm trọng.
+- **Người dùng chạy app trên máy Windows local.** Mọi thay đổi bạn thực hiện trên server sẽ không có hiệu lực cho đến khi người dùng Save to GitHub và pull code mới về máy của họ. Hãy luôn nhắc nhở người dùng làm điều này sau mỗi lần sửa lỗi quan trọng.
+- **Lỗi phân loại của Gemini Flash Lite là vấn đề cốt lõi.** Đừng quá tin tưởng vào việc chỉ sửa prompt là đủ. Các bản vá post-processing trong Python hiện là cách hiệu quả nhất. Hãy sẵn sàng để mở rộng logic này cho các trường hợp lỗi mới.
+- **Dung lượng ổ đĩa đang ở mức báo động (95%)**. Hãy xử lý vấn đề này sớm để tránh sập môi trường.
+- **Hiểu rõ các chế độ quét**: Khi người dùng báo lỗi, hãy hỏi rõ họ đang dùng chế độ nào (File, Folder, Fixed Batch hay Smart Batch - Gom Thông Minh) vì chúng có các luồng xử lý khác nhau.
 
 **documents created in this job**
-- : File hướng dẫn debug tạm thời, có thể không còn cần thiết.
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Last 5 User Messages and any pending user messages**
-1.  **User**: Hỏi tại sao token đầu vào vẫn cao (11,788) sau khi đã tối ưu prompt.
-2.  **User**: Yêu cầu tính toán chi phí cho một batch 5 ảnh giữa chế độ Vision và Tesseract+Text.
-3.  **User**: Yêu cầu agent kiểm tra và đồng bộ hóa prompt của  và , cập nhật bản  để chi tiết và đầy đủ như bản .
-4.  **Agent**: Gặp lỗi  khi bắt đầu so sánh prompt.
-5.  **User**: tiếp tục - Yêu cầu agent tiếp tục công việc đang dang dở.
+1.  **User**: So sánh chi phí/tốc độ giữa các kích thước batch khác nhau. (COMPLETED - Agent đã tạo file )
+2.  **User**: Yêu cầu đổi số file tối thiểu cho Smart Mode từ 3 thành 2. (PENDING - Đây là last working item)
+3.  **User**: Đưa ra các ví dụ về Smart Mode bị fallback nhiều. (IN PROGRESS - Agent đã giảm max_batch_size và thêm log)
+4.  **User**: Hỏi về khả năng nhận diện khổ giấy A3/A4 và màu sắc mà không cần Gemini. (COMPLETED - Agent đã xác nhận khả năng và tạo file giải pháp )
+5.  **User**: Yêu cầu lưu lại phương án pre-filter để làm sau. (COMPLETED - Agent đã lưu thành file )
 
 **Project Health Check:**
-- **Broken**: Chức năng phân loại của chế độ  đang hoạt động kém hiệu quả do prompt chưa hoàn thiện, không nhất quán với chế độ .
+- **Broken**:
+  - Chức năng phân loại tài liệu của  không đáng tin cậy, liên tục phát sinh lỗi sai và không nhất quán, dù đã có nhiều bản vá.
+  - Chế độ Smart Batch dễ bị fallback, không xử lý được hết các file trong một lượt gọi API.
 - **Mocked**: Không có.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
-- Test files created:
-  - 
-- Known regressions: None
-
-**Credentials to test flow:**
-- Không áp dụng.
-
-**What agent forgot to execute**
-- Agent chưa giải quyết cảnh báo  lặp đi lặp lại.
-- Agent chưa xác minh liệu file  có còn được sử dụng hay đã trở thành code thừa.</analysis>
+- Test files created: None
+- Known regressions: Không có.</analysis>

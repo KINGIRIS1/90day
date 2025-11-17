@@ -16,6 +16,10 @@ import requests
 from PIL import Image
 import io
 
+# Global counter for 503 errors
+_503_ERROR_COUNT = 0
+_503_ERROR_THRESHOLD = 3  # Show warning after 3 consecutive 503 errors
+
 # Import existing engines and prompts
 from ocr_engine_gemini_flash import (
     resize_image_smart, 

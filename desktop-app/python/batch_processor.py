@@ -356,6 +356,11 @@ Khi classify bất kỳ page nào là "GCN", bạn PHẢI:
 
 🎯 OUTPUT FORMAT - BẮT BUỘC:
 
+🚨🚨🚨 CRITICAL - MUST USE "documents" ARRAY 🚨🚨🚨
+Your response MUST be a JSON object with a "documents" key containing an array.
+DO NOT return a single document object at the root level!
+
+CORRECT FORMAT (REQUIRED):
 {{
   "documents": [
     {{

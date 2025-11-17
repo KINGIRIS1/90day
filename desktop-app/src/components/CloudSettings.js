@@ -968,7 +968,7 @@ function CloudSettings() {
                       <strong>💡 Khuyến nghị:</strong>
                     </p>
                     <ul className="text-xs text-gray-600 mt-1 space-y-1">
-                      <li>• <strong>3-5:</strong> Nếu hay bị lỗi fallback (an toàn nhất)</li>
+                      <li>• <strong>2-5:</strong> Nếu hay bị lỗi fallback (an toàn nhất)</li>
                       <li>• <strong>8-12:</strong> Cân bằng giữa tốc độ và độ ổn định (đề xuất)</li>
                       <li>• <strong>15-20:</strong> Tối đa tốc độ (có thể bị lỗi với docs phức tạp)</li>
                     </ul>

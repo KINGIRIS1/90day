@@ -716,16 +716,56 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                     else:
                         print(f"❌ HTTP {status_code} Error: {e}", file=sys.stderr)
                         raise
-            except requests.exceptions.RequestException as e:
-                # Network errors - retry
-                if attempt < max_retries - 1:
-                    wait_time = retry_delay * (2 ** attempt)
-                    print(f"⚠️ Network error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
-                    import time
-                    time.sleep(wait_time)
-                    continue
+            except requests.exceptions.Timeout as e:
+                # Timeout error
+                if ERROR_HANDLER_AVAILABLE:
+                    context = {"batch_num": batch_num, "batch_size": batch_size, "attempt": attempt + 1}
+                    error_info = handle_error("timeout", e, context)
+                    
+                    if error_info["should_retry"] and attempt < max_retries - 1:
+                        wait_time = error_info["wait_time"]
+                        print(f"   Retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        if error_info["error_response"]:
+                            print_error_response(error_info["error_response"])
+                        raise
                 else:
-                    raise
+                    if attempt < max_retries - 1:
+                        wait_time = retry_delay * (2 ** attempt)
+                        print(f"⚠️ Timeout error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        raise
+            except requests.exceptions.RequestException as e:
+                # Network errors
+                if ERROR_HANDLER_AVAILABLE:
+                    context = {"batch_num": batch_num, "batch_size": batch_size, "attempt": attempt + 1}
+                    error_info = handle_error("network", e, context)
+                    
+                    if error_info["should_retry"] and attempt < max_retries - 1:
+                        wait_time = error_info["wait_time"]
+                        print(f"   Retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        if error_info["error_response"]:
+                            print_error_response(error_info["error_response"])
+                        raise
+                else:
+                    if attempt < max_retries - 1:
+                        wait_time = retry_delay * (2 ** attempt)
+                        print(f"⚠️ Network error, retry {attempt + 1}/{max_retries} in {wait_time}s...", file=sys.stderr)
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        raise
         
         # Add delay between batches to avoid rate limiting
         if batch_num < ((len(image_paths) + batch_size - 1) // batch_size):

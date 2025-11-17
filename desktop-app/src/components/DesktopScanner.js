@@ -1752,6 +1752,18 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         // Batch failed - show clear notification
         const errorMsg = batchResults?.error || 'Unknown error';
         console.error('⚠️ BATCH PROCESSING FAILED:', errorMsg);
+        
+        // Check for critical 503 error
+        if (batchResults?.error === 'CRITICAL_503_ERROR' || batchResults?.should_stop) {
+          setIsScanning(false);
+          setProcessing(false);
+          setActiveBatchMode(null);
+          alert('🚨 CẢNH BÁO NGHIÊM TRỌNG 🚨\n\n' + 
+                (batchResults?.error_message || 'Hiện tại sv không ổn định. Đề nghị tạm dừng quét để tránh hỏng Key. Xin cảm ơn.') + 
+                '\n\nĐã tự động dừng quét.');
+          return;
+        }
+        
         console.warn('🔄 FALLBACK: Switching to sequential processing...');
         
         // Show user notification about fallback

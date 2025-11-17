@@ -2918,31 +2918,6 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     return null;
                   })()}
                   
-                  {/* Preview Mode Info */}
-                  {previewLoadMode !== 'all' && (
-                    <div className="mb-3 p-2 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg border border-cyan-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm">
-                            {previewLoadMode === 'none' ? '🚫' : '⭐'}
-                          </span>
-                          <span className="text-xs font-medium text-cyan-900">
-                            {previewLoadMode === 'none' 
-                              ? 'Chế độ: Không hiển thị ảnh (tiết kiệm RAM)'
-                              : 'Chế độ: Chỉ hiển thị ảnh GCN (tiết kiệm RAM)'}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => setPreviewLoadMode(previewLoadMode === 'none' ? 'gcn-only' : previewLoadMode === 'gcn-only' ? 'all' : 'none')}
-                          className="text-xs bg-cyan-600 hover:bg-cyan-700 text-white px-2 py-1 rounded"
-                          title="Nhấn để thay đổi chế độ"
-                        >
-                          Đổi chế độ
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  
                   {/* Error indicator for failed tab */}
                   {t.status === 'error' && (
                     <div className="mb-3 p-3 bg-red-50 rounded-xl border border-red-200">

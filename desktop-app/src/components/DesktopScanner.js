@@ -1662,7 +1662,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       !isResume && // Not resuming
       isGeminiEngine && // Gemini engine (including Tesseract+Text)
       (batchMode === 'fixed' || batchMode === 'smart') && // Batch mode enabled
-      filesToProcess.length >= 3 // At least 3 files (batch makes sense)
+      filesToProcess.length >= 2 // At least 2 files (batch makes sense)
     );
     
     if (shouldUseBatch) {

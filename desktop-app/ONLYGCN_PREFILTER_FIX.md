@@ -9,9 +9,10 @@
 
 ## 🐛 Vấn đề phát hiện
 
+### Issue 1: Miss GCN (False Negative)
 User báo rằng trong thư mục có GCN nhưng pre-filter không nhận diện được, dẫn đến tất cả file bị đánh dấu là "GTLQ" thay vì "GCN".
 
-### Nguyên nhân:
+**Nguyên nhân:**
 1. **Ngưỡng màu sắc quá khắt khe**: 
    - `avg_r > 150` quá cao → Bỏ sót GCN có màu nhạt
    - `color_diff > 30` quá cao → Bỏ sót border có màu nhẹ
@@ -21,6 +22,20 @@ User báo rằng trong thư mục có GCN nhưng pre-filter không nhận diện
    - Script print nhiều debug info ra stdout
    - Electron.js chờ stdout chỉ chứa: 'red', 'pink', hoặc 'unknown'
    - Kết quả: IPC không parse được → pre-filter thất bại
+
+### Issue 2: False Positive (CRITICAL!)
+User báo: **"Hình như có lỗi nếu trên tờ giấy có dấu đỏ cũng đang hiểu là GCN"**
+
+**Nguyên nhân:**
+- Script chỉ kiểm tra màu sắc, KHÔNG kiểm tra kích thước giấy
+- File A4 có stamp/seal màu đỏ → Bị nhận diện nhầm là GCN
+- **2 quy tắc quan trọng cho GCN A3:**
+  1. ✅ Có màu đỏ/hồng
+  2. ✅ Phải là A3 (aspect ratio > 1.35)
+
+**Ví dụ false positive:**
+- Hồ sơ A4 có con dấu đỏ → Bị nhận diện là GCN ❌
+- Giấy tờ A4 có chữ ký đỏ → Bị nhận diện là GCN ❌
 
 ---
 

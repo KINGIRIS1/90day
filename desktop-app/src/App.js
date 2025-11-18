@@ -297,8 +297,8 @@ function App() {
           </div>
         )}
 
-        {/* Only GCN tab - temporarily disabled until electron APIs are updated */}
-        {false && visitedTabs.has('onlygcn') && (
+        {/* Only GCN tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('onlygcn') && (
           <div style={{ display: activeTab === 'onlygcn' ? 'block' : 'none' }}>
             <OnlyGCNScanner />
           </div>

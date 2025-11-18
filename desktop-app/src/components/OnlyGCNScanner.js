@@ -413,16 +413,21 @@ function OnlyGCNScanner() {
                 console.warn('Failed to load preview:', fileName);
               }
 
+              // Normalize: GCNM/GCNC → GCN temporarily (will be re-classified in post-process)
               let newShortCode = 'GTLQ';
               let newDocType = 'Giấy tờ liên quan';
               
               const shortCode = result.short_code || result.classification || '';
               if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-                newShortCode = shortCode;
-                newDocType = shortCode === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 
-                             shortCode === 'GCNM' ? 'Giấy chứng nhận (Mẫu)' : 
-                             'Giấy chứng nhận';
+                newShortCode = 'GCN'; // Normalize to GCN (will be post-processed)
+                newDocType = 'Giấy chứng nhận';
               }
+
+              // Extract GCN metadata for post-processing
+              const meta = result.metadata || {};
+              const color = meta.color || result.color || null;
+              const issueDate = meta.issue_date || result.issue_date || null;
+              const issueDateConf = meta.issue_date_confidence || result.issue_date_confidence || null;
 
               allResults.push({
                 fileName,
@@ -435,7 +440,11 @@ function OnlyGCNScanner() {
                 newDocType,
                 confidence: result.confidence || 0,
                 reasoning: result.reasoning || '',
-                metadata: result.metadata || {},
+                metadata: meta,
+                // GCN-specific fields for post-processing
+                color: color,
+                issue_date: issueDate,
+                issue_date_confidence: issueDateConf,
                 success: true,
                 preFiltered: false
               });

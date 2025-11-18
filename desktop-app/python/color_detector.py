@@ -60,16 +60,20 @@ def detect_gcn_border_color(image_path):
         # Red GCN: High R, Low G, Low B
         # Pink GCN: High R, High G, High B (but R > G,B)
         
-        if avg_r > 150:  # Red component is dominant
-            if avg_g > 130 and avg_b > 130:
-                # Pink: All channels high, but R is highest
-                color = 'pink'
-            elif avg_g < 100 and avg_b < 100:
-                # Red: Only R is high
+        # RELAXED THRESHOLDS - GCN có thể có màu nhạt
+        if avg_r > 100:  # Red component present (lowered from 150)
+            if avg_g > 100 and avg_b > 100:
+                # Pink: All channels relatively high, but R should be highest
+                if avg_r > avg_g and avg_r > avg_b:
+                    color = 'pink'
+                else:
+                    color = 'unknown'
+            elif avg_r > avg_g + 30 and avg_r > avg_b + 30:
+                # Red: R significantly higher than G and B
                 color = 'red'
             else:
-                # Ambiguous
-                color = 'unknown'
+                # Could be orange, light red, etc. - PASS to be safe
+                color = 'red'  # Conservative: consider as potential GCN
         else:
             color = 'unknown'
         

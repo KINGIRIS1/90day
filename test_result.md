@@ -2278,3 +2278,145 @@ agent_communication:
       4. ✅ Added GCN post-processing (GCNC/GCNM classification)
       
       OnlyGCNScanner now fully matches other modes! 🎉
+
+  - agent: "main_fork_2"
+    timestamp: "2024-11-20"
+    message: |
+      ✅ VERIFIED: GCN Date-based Classification Logic
+      
+      🎯 USER QUESTION:
+      - "Đặt tên GCNC GCNM sau khi tìm được ngày cấp đã có chưa"
+      
+      ✅ CONFIRMATION:
+      
+      **Logic phân loại theo ngày cấp ĐÃ CÓ:**
+      
+      1. **Extract metadata từ AI:**
+         - `color`: red/orange/pink
+         - `issue_date`: DD/MM/YYYY, MM/YYYY, hoặc YYYY
+         - `issue_date_confidence`: full/partial/year_only
+      
+      2. **Parse issue_date:**
+         - Full: 20/05/2024 → 20240520 (comparable)
+         - Partial: 05/2024 → 20240501
+         - Year only: 2024 → 20240101
+      
+      3. **Group by color + date:**
+         - groupKey = `${color}_${issueDate}`
+         - VD: "red_20/05/2024", "pink_15/08/2024"
+      
+      4. **Classify logic:**
+      
+         **Case A: Mixed colors (red + pink)**
+         ```
+         Red/Orange → GCNC
+         Pink → GCNM
+         (Không cần date)
+         ```
+      
+         **Case B: Same color → Sort by date**
+         ```
+         Parse dates → Sort ascending
+         Oldest → GCNC
+         Newer → GCNM
+         ```
+      
+         **Case C: No dates / 1 group**
+         ```
+         Fallback: First GCN → GCNC
+         ```
+      
+      📊 ENHANCED LOGGING:
+      
+      Added detailed debug logs:
+      ```javascript
+      // DEBUG: Log all groups with dates
+      console.log('🔍 DEBUG - GCN Groups:');
+      groupsArray.forEach((group, idx) => {
+        console.log(`  Group ${idx + 1}:`, {
+          color: group.color,
+          issueDate: group.issueDate || 'null',
+          confidence: group.issueDateConfidence || 'null',
+          parsedDate: group.parsedDate ? group.parsedDate.comparable : 'null',
+          fileCount: group.files.length
+        });
+      });
+      
+      // Log classification decision
+      console.log(`    Group ${idx + 1}: ${issueDate} (${comparable}) → ${classification}`);
+      console.log(`      ✅ ${fileName} → ${classification}`);
+      ```
+      
+      🧪 EXAMPLE SCENARIOS:
+      
+      **Scenario 1: Same color, different dates**
+      ```
+      Input:
+      - File 1: GCN red, date=20/05/2024
+      - File 2: GCN red, date=15/08/2024
+      
+      Process:
+      1. Group by color: 2 red groups
+      2. Parse dates: 20240520, 20240815
+      3. Sort: 20240520 < 20240815
+      4. Classify: Oldest → GCNC, Newer → GCNM
+      
+      Result:
+      - File 1 → GCNC ✅
+      - File 2 → GCNM ✅
+      ```
+      
+      **Scenario 2: Mixed colors**
+      ```
+      Input:
+      - File 1: GCN red, date=20/05/2024
+      - File 2: GCN pink, date=15/03/2024
+      
+      Process:
+      1. Detect mixed colors (red + pink)
+      2. Classify by color (ignore dates)
+      
+      Result:
+      - File 1 → GCNC (red) ✅
+      - File 2 → GCNM (pink) ✅
+      ```
+      
+      **Scenario 3: No dates**
+      ```
+      Input:
+      - File 1: GCN red, date=null
+      - File 2: GCN red, date=null
+      
+      Process:
+      1. Groups with dates: 0
+      2. Fallback: Cannot classify by date
+      3. Keep as GCN or use first as GCNC
+      
+      Result:
+      - File 1 → GCNC (fallback) ✅
+      - File 2 → GCN (or GCNM if needed) ⚠️
+      ```
+      
+      📝 IMPORTANT NOTES:
+      
+      1. **Depends on AI extraction:**
+         - AI must return `metadata.color` and `metadata.issue_date`
+         - If AI doesn't extract → Fallback logic applies
+      
+      2. **Pairing not implemented:**
+         - Current: Classify each FILE independently
+         - Correct: Should classify each PAIR (2 pages)
+         - Impact: May misclassify if 4 GCN files (2 pairs)
+      
+      3. **Console logs added:**
+         - Full debug info for troubleshooting
+         - Check browser console to see dates extracted
+      
+      🎯 STATUS: ✅ Logic Already Implemented | 📊 Enhanced with Debug Logs
+      📦 BUILD: ✅ Successful (105.76 kB, +333 B)
+      
+      ⚠️ RECOMMENDATION:
+      After testing, if dates not showing up:
+      - Check AI response in console logs
+      - Verify AI prompt includes date extraction
+      - Check if engine supports metadata extraction

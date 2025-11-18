@@ -190,21 +190,27 @@ function OnlyGCNScanner() {
         console.log(`\n📂 [${folderIdx + 1}/${folderPaths.length}] Processing folder: ${folderName}`);
         console.log(`   Files: ${folderFiles.length}`);
 
-        // Phase 1: Pre-filter THIS FOLDER
-        setCurrentPhase('prefilter');
-        setCurrentFile(`Đang phân tích màu sắc thư mục ${folderName}...`);
-        
-        const preFilterStart = Date.now();
-        const preFilterResults = hasPreFilter
-          ? await window.electronAPI.preFilterGCNFiles(folderFiles)
-          : { passed: folderFiles, skipped: [] };
-        
-        const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
-        
-        const gcnCandidates = preFilterResults.passed || [];
-        const skipped = preFilterResults.skipped || [];
-        
-        console.log(`   🎨 Pre-filter: ${gcnCandidates.length} GCN, ${skipped.length} skipped (${preFilterTime}s)`);
+        // Phase 1: Pre-filter THIS FOLDER (if enabled)
+        let gcnCandidates = folderFiles;
+        let skipped = [];
+
+        if (usePreFilter && hasPreFilter) {
+          setCurrentPhase('prefilter');
+          setCurrentFile(`Đang phân tích màu sắc thư mục ${folderName}...`);
+          
+          const preFilterStart = Date.now();
+          const preFilterResults = await window.electronAPI.preFilterGCNFiles(folderFiles);
+          const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
+          
+          gcnCandidates = preFilterResults.passed || [];
+          skipped = preFilterResults.skipped || [];
+          
+          console.log(`   🎨 Pre-filter: ${gcnCandidates.length} GCN, ${skipped.length} skipped (${preFilterTime}s)`);
+        } else {
+          console.log(`   ⚡ Pre-filter OFF: Scanning all ${folderFiles.length} files`);
+          gcnCandidates = folderFiles;
+          skipped = [];
+        }
         
         // Add skipped files as GTLQ
         for (const filePath of skipped) {

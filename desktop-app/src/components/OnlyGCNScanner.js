@@ -10,6 +10,7 @@ import { handleError, isCriticalError } from '../utils/errorHandler';
  */
 function OnlyGCNScanner() {
   const [scanMode, setScanMode] = useState('folder'); // 'folder' or 'batch'
+  const [usePreFilter, setUsePreFilter] = useState(false); // Pre-filter OFF by default
   const [files, setFiles] = useState([]);
   const [results, setResults] = useState([]);
   const [isScanning, setIsScanning] = useState(false);

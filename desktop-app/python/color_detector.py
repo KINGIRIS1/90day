@@ -12,6 +12,11 @@ def detect_gcn_border_color(image_path):
     """
     Detect GCN border color locally without AI
     Returns: 'red', 'pink', or 'unknown'
+    
+    GCN characteristics:
+    - Border color: Red (R>150, G<100, B<100) or Pink (R>150, G>130, B>130)
+    - A3 GCN: aspect ratio > 1.35 (landscape)
+    - A4 GCN: aspect ratio < 1.0 (portrait)
     """
     try:
         img = Image.open(image_path)
@@ -19,6 +24,9 @@ def detect_gcn_border_color(image_path):
         
         # Get image dimensions
         height, width = img_array.shape[:2]
+        aspect_ratio = width / height
+        
+        print(f"📏 Dimensions: {width}x{height}, Aspect ratio: {aspect_ratio:.2f}", file=sys.stderr)
         
         # Sample border regions (top, bottom, left, right)
         border_thickness = int(min(width, height) * 0.02)  # 2% of smaller dimension
@@ -43,10 +51,11 @@ def detect_gcn_border_color(image_path):
         min_vals = all_borders.min(axis=1)
         color_diff = max_vals - min_vals
         
-        colored_pixels = all_borders[color_diff > 30]  # Threshold for "colored"
+        # LOWERED threshold to catch more colored pixels
+        colored_pixels = all_borders[color_diff > 20]  # Lowered from 30 to 20
         
-        if len(colored_pixels) < 100:
-            print(f"⚠️ Not enough colored border pixels found", file=sys.stderr)
+        if len(colored_pixels) < 50:  # Lowered from 100 to 50
+            print(f"⚠️ Not enough colored border pixels found ({len(colored_pixels)})", file=sys.stderr)
             return 'unknown'
         
         # Calculate average RGB of colored pixels
@@ -60,24 +69,34 @@ def detect_gcn_border_color(image_path):
         # Red GCN: High R, Low G, Low B
         # Pink GCN: High R, High G, High B (but R > G,B)
         
-        # RELAXED THRESHOLDS - GCN có thể có màu nhạt
-        if avg_r > 100:  # Red component present (lowered from 150)
-            if avg_g > 100 and avg_b > 100:
-                # Pink: All channels relatively high, but R should be highest
-                if avg_r > avg_g and avg_r > avg_b:
+        # VERY RELAXED THRESHOLDS - Catch all potential GCN
+        # Better to have false positives than miss real GCN
+        if avg_r > 80:  # Red component present (lowered from 100)
+            if avg_g > 80 and avg_b > 80:
+                # Pink-ish: All channels relatively high
+                # Be more lenient with pink detection
+                if avg_r >= avg_g * 0.9:  # R should be at least 90% of G
                     color = 'pink'
                 else:
-                    color = 'unknown'
-            elif avg_r > avg_g + 30 and avg_r > avg_b + 30:
+                    # Still could be faded pink, be conservative
+                    color = 'pink'
+            elif avg_r > avg_g + 20 and avg_r > avg_b + 20:  # Lowered from 30
                 # Red: R significantly higher than G and B
                 color = 'red'
             else:
-                # Could be orange, light red, etc. - PASS to be safe
+                # Could be orange, light red, faded pink - PASS to be safe
                 color = 'red'  # Conservative: consider as potential GCN
         else:
             color = 'unknown'
         
         print(f"🎨 Detected color: {color}", file=sys.stderr)
+        
+        # Additional logging for debugging
+        if aspect_ratio > 1.35:
+            print(f"📐 A3 format detected (landscape)", file=sys.stderr)
+        elif aspect_ratio < 1.0:
+            print(f"📐 A4 format detected (portrait)", file=sys.stderr)
+        
         return color
         
     except Exception as e:

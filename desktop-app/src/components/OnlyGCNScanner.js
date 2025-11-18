@@ -511,7 +511,7 @@ function OnlyGCNScanner() {
 
             } catch (err) {
               console.error(`Error processing ${fileName}:`, err);
-              allResults.push({
+              folderResults.push({
                 fileName,
                 filePath,
                 folderName,
@@ -527,35 +527,41 @@ function OnlyGCNScanner() {
                 preFiltered: false
               });
             }
-
-            setResults([...allResults]);
           }
         }
 
-        console.log(`   ✅ Folder ${folderName} complete!`);
+        // Post-process GCN for THIS FOLDER immediately (giống BatchScanner)
+        console.log(`\n   🔄 Post-processing GCN for folder: ${folderName}...`);
+        const processedFolderResults = postProcessGCN(folderResults);
+
+        // Update folder tab with results
+        setFolderTabs(prev => prev.map(t => 
+          t.path === folderPath ? { 
+            ...t, 
+            files: processedFolderResults, 
+            processing: false, 
+            complete: true 
+          } : t
+        ));
+
+        // Add to allResults
+        allResults.push(...processedFolderResults);
+
+        const gcncCount = processedFolderResults.filter(r => r.newShortCode === 'GCNC').length;
+        const gcnmCount = processedFolderResults.filter(r => r.newShortCode === 'GCNM').length;
+        const gtlqCount = processedFolderResults.filter(r => r.newShortCode === 'GTLQ').length;
+        console.log(`   ✅ Folder ${folderName} complete: ${gcncCount} GCNC, ${gcnmCount} GCNM, ${gtlqCount} GTLQ`);
       }
 
-      // Sort results to maintain original file order
-      allResults.sort((a, b) => {
-        const aIndex = files.indexOf(a.filePath);
-        const bIndex = files.indexOf(b.filePath);
-        return aIndex - bIndex;
-      });
-
-      // Post-process GCN: Classify into GCNC/GCNM (giống BatchScanner)
-      console.log('\n🔄 Starting GCN post-processing...');
-      const processedResults = postProcessGCN(allResults);
-
-      setResults(processedResults);
       setCurrentPhase('complete');
       setCurrentFile('');
       setCurrentFolder('');
       console.log('\n✅ All folders complete!');
       
-      const finalGcncCount = processedResults.filter(r => r.newShortCode === 'GCNC').length;
-      const finalGcnmCount = processedResults.filter(r => r.newShortCode === 'GCNM').length;
-      const finalGtlqCount = processedResults.filter(r => r.newShortCode === 'GTLQ').length;
-      console.log(`📊 Final stats: ${finalGcncCount} GCNC, ${finalGcnmCount} GCNM, ${finalGtlqCount} GTLQ`);
+      const finalGcncCount = allResults.filter(r => r.newShortCode === 'GCNC').length;
+      const finalGcnmCount = allResults.filter(r => r.newShortCode === 'GCNM').length;
+      const finalGtlqCount = allResults.filter(r => r.newShortCode === 'GTLQ').length;
+      console.log(`📊 Total stats: ${finalGcncCount} GCNC, ${finalGcnmCount} GCNM, ${finalGtlqCount} GTLQ`);
     } catch (err) {
       console.error('Scan error:', err);
       alert('Lỗi quét: ' + err.message);

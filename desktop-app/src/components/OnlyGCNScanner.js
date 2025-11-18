@@ -16,7 +16,7 @@ const path = {
  */
 function OnlyGCNScanner() {
   const [scanMode, setScanMode] = useState('folder'); // 'folder' or 'batch'
-  const [usePreFilter, setUsePreFilter] = useState(false); // Pre-filter OFF by default
+  const usePreFilter = true; // ALWAYS ON - Only GCN mode always uses pre-filter
   const [files, setFiles] = useState([]);
   
   // Folder tabs (giống BatchScanner)

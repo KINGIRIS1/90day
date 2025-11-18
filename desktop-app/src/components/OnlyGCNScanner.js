@@ -985,7 +985,7 @@ function OnlyGCNScanner() {
       {fileResults.length > 0 && (
         <div className="mb-4 grid grid-cols-4 gap-3">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-gray-900">{results.length}</div>
+            <div className="text-2xl font-bold text-gray-900">{fileResults.length}</div>
             <div className="text-sm text-gray-600">Tổng số file</div>
           </div>
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -1004,7 +1004,7 @@ function OnlyGCNScanner() {
       )}
 
       {/* Results Table */}
-      {results.length > 0 && (
+      {fileResults.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">

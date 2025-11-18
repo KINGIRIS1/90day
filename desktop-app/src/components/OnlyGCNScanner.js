@@ -120,11 +120,21 @@ function OnlyGCNScanner() {
     const newResults = [];
 
     try {
+      // Check if pre-filter API is available
+      if (!window.electronAPI.preFilterGCNFiles) {
+        alert('⚠️ API chưa được cập nhật. Sẽ quét tất cả file (không có pre-filter).');
+        // Fallback: scan all files without pre-filter
+        const allFiles = files;
+        const preFilterResults = { passed: allFiles, skipped: [] };
+      }
+
       // Phase 1: Pre-filter by color (fast, free, local)
       console.log('🎨 Phase 1: Pre-filtering by color...');
       const preFilterStart = Date.now();
       
-      const preFilterResults = await window.electronAPI.preFilterGCNFiles(files);
+      const preFilterResults = window.electronAPI.preFilterGCNFiles 
+        ? await window.electronAPI.preFilterGCNFiles(files)
+        : { passed: files, skipped: [] }; // Fallback if API not available
       const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
       
       const gcnCandidates = preFilterResults.passed || [];

@@ -41,7 +41,43 @@ User báo: **"Hình như có lỗi nếu trên tờ giấy có dấu đỏ cũng
 
 ## ✅ Các thay đổi đã thực hiện
 
-### 1. Nới lỏng ngưỡng màu sắc (`color_detector.py`)
+### 1. ⚠️ THÊM KIỂM TRA KÍCH THƯỚC A3 (CRITICAL FIX!)
+
+**Vấn đề:** File A4 có dấu đỏ bị nhận diện nhầm là GCN
+
+**Giải pháp:** Kiểm tra aspect ratio TRƯỚC khi kiểm tra màu
+
+```python
+# BEFORE: Chỉ kiểm tra màu
+if avg_r > 80:
+    # ... classify color ...
+    return color
+
+# AFTER: Kiểm tra A3 TRƯỚC
+aspect_ratio = width / height
+
+# CRITICAL CHECK #1: Must be A3 size
+if aspect_ratio <= 1.35:
+    print(f"❌ NOT A3 format (aspect ratio {aspect_ratio:.2f} <= 1.35)")
+    print(f"   → Skipping (even if has red color, not GCN A3)")
+    return 'unknown'  # ← Reject ngay, không check màu nữa
+
+# CRITICAL CHECK #2: Check color (only for A3)
+# ... color detection logic ...
+```
+
+**Logic mới:**
+1. Đọc ảnh → Tính aspect ratio
+2. Nếu aspect ratio ≤ 1.35 → Return 'unknown' ngay (không phải A3)
+3. Nếu aspect ratio > 1.35 → Tiếp tục kiểm tra màu
+4. Return 'red'/'pink' chỉ khi CẢ HAI điều kiện thỏa mãn
+
+**Kết quả:**
+- ✅ GCN A3 (4443×3135, ratio 1.42) + màu đỏ → PASS
+- ❌ File A4 (2486×3516, ratio 0.71) + dấu đỏ → REJECT
+- ❌ File A4 landscape (3516×2486, ratio 1.41) + màu → PASS (nhưng hiếm)
+
+### 2. Nới lỏng ngưỡng màu sắc (`color_detector.py`)
 
 **Thay đổi ngưỡng:**
 ```python

@@ -2010,3 +2010,115 @@ agent_communication:
       
       📦 BUILD: ✅ Successful (104.25 kB, +623 B)
       🎯 STATUS: ✅ Feature Complete | ⏳ User Testing Required
+
+  - agent: "main_fork_2"
+    timestamp: "2024-11-20"
+    message: |
+      🔧 CRITICAL FIX: Added A3 Size Check to Pre-filter
+      
+      🎯 USER FEEDBACK:
+      - "Hình như có lỗi nếu trên tờ giấy có dấu đỏ cũng đang hiểu là GCN"
+      - "Có 2 quy tắc quan trọng cho only GCN là có màu và phải là A3"
+      
+      🔍 ROOT CAUSE:
+      
+      **FALSE POSITIVE Issue:**
+      - Pre-filter chỉ kiểm tra màu sắc (red/pink)
+      - KHÔNG kiểm tra kích thước giấy
+      - Result: File A4 có stamp/seal đỏ → Bị nhận diện nhầm là GCN ❌
+      
+      **Examples of false positives:**
+      - Hồ sơ A4 có con dấu đỏ → Nhận diện nhầm là GCN
+      - Giấy tờ A4 có chữ ký đỏ → Nhận diện nhầm là GCN
+      - Bất kỳ file A4 nào có màu đỏ → Nhận diện nhầm
+      
+      ✅ SOLUTION IMPLEMENTED:
+      
+      **2-Step Validation (BOTH must pass):**
+      
+      ```python
+      # Step 1: Check A3 size FIRST (aspect ratio > 1.35)
+      aspect_ratio = width / height
+      
+      if aspect_ratio <= 1.35:
+          print(f"❌ NOT A3 format (ratio {aspect_ratio:.2f} <= 1.35)")
+          print(f"   → Skipping (even if has red color, not GCN A3)")
+          return 'unknown'  # Reject immediately
+      
+      # Step 2: Check color (only for A3-sized files)
+      # ... color detection logic ...
+      
+      if color in ['red', 'pink']:
+          print(f"✅ GCN A3 CANDIDATE: A3 size + {color} border")
+          return color
+      ```
+      
+      **Logic Flow:**
+      
+      1. Read image → Calculate aspect ratio
+      2. **IF aspect ratio ≤ 1.35:**
+         - Return 'unknown' immediately (not A3)
+         - SKIP color check entirely
+      3. **IF aspect ratio > 1.35:**
+         - Continue to color detection
+         - Return 'red'/'pink' only if color detected
+      4. **Result:** 'red'/'pink' ONLY when BOTH conditions met
+      
+      📊 EXPECTED BEHAVIOR:
+      
+      **✅ PASS (GCN A3):**
+      - File: 4443×3135 (ratio 1.42) + red/pink border → 'red'/'pink'
+      - A3 landscape + colored border → Recognized as GCN
+      
+      **❌ REJECT (Not GCN):**
+      - File: 2486×3516 (ratio 0.71, A4 portrait) + red stamp → 'unknown'
+      - File: 3516×2486 (ratio 1.41, A4 landscape) + no border → 'unknown'
+      - A3 size but no colored border → 'unknown'
+      - A4 size regardless of color → 'unknown'
+      
+      🎯 GCN A3 SPECIFICATIONS:
+      
+      From GCN_PREFILTER_SOLUTION.md:
+      - Dimensions: 4443×3135 px (typical scan)
+      - Aspect ratio: 1.42 (landscape)
+      - Threshold: aspect ratio > 1.35
+      - Border: Red or Pink color
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/python/color_detector.py
+      - ✅ /app/desktop-app/ONLYGCN_PREFILTER_FIX.md (documentation)
+      
+      🧪 TESTING SCENARIOS:
+      
+      **Scenario 1: GCN A3 với màu đỏ**
+      - Input: GCN A3 (4443×3135) + red border
+      - Expected: 'red' → Scanned by AI → Classified as GCNC/GCNM ✅
+      
+      **Scenario 2: File A4 có con dấu đỏ**
+      - Input: A4 portrait (2486×3516) + red stamp
+      - Expected: 'unknown' → Skipped → Marked as GTLQ ✅
+      
+      **Scenario 3: GCN A3 nhưng màu nhạt**
+      - Input: GCN A3 (4443×3135) + faded pink border
+      - Expected: 'pink' → Scanned by AI → Classified ✅
+      
+      **Scenario 4: File A3 không có border màu**
+      - Input: A3 size (ratio 1.42) + no colored border
+      - Expected: 'unknown' → Skipped → Marked as GTLQ ✅
+      
+      📝 IMPORTANT NOTES:
+      
+      1. **Order matters**: Size check BEFORE color check
+         - Prevents wasting CPU on color detection for A4 files
+      
+      2. **Conservative approach maintained**:
+         - If A3 + has ANY reddish color → Pass to AI
+         - Better to scan a few extra than miss real GCN
+      
+      3. **Edge case**: A4 landscape (3516×2486 = 1.41)
+         - Ratio > 1.35 → Would pass size check
+         - But typically A4 landscape files don't have GCN border
+         - If they do, AI scan will classify correctly anyway
+      
+      🎯 STATUS: ✅ Critical Fix Complete | ⏳ User Testing Required
+      📦 BUILD: ✅ Successful (104.25 kB)

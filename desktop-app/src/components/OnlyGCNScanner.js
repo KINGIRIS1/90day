@@ -985,24 +985,24 @@ function OnlyGCNScanner() {
         </div>
       )}
 
-      {/* Stats */}
+      {/* Stats - Compact */}
       {fileResults.length > 0 && (
-        <div className="mb-4 grid grid-cols-4 gap-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-gray-900">{fileResults.length}</div>
-            <div className="text-sm text-gray-600">Tổng số file</div>
+        <div className="mb-3 flex gap-2 text-sm">
+          <div className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2">
+            <span className="font-bold text-gray-900">{fileResults.length}</span>
+            <span className="text-gray-600 ml-1">files</span>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-red-600">{gcncCount}</div>
-            <div className="text-sm text-red-700">GCNC (Chung)</div>
+          <div className="flex-1 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <span className="font-bold text-red-600">{gcncCount}</span>
+            <span className="text-red-700 ml-1">GCNC</span>
           </div>
-          <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-pink-600">{gcnmCount}</div>
-            <div className="text-sm text-pink-700">GCNM (Mẫu)</div>
+          <div className="flex-1 bg-pink-50 border border-pink-200 rounded-lg px-3 py-2">
+            <span className="font-bold text-pink-600">{gcnmCount}</span>
+            <span className="text-pink-700 ml-1">GCNM</span>
           </div>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-gray-600">{gtlqCount}</div>
-            <div className="text-sm text-gray-700">GTLQ</div>
+          <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+            <span className="font-bold text-gray-600">{gtlqCount}</span>
+            <span className="text-gray-700 ml-1">GTLQ</span>
           </div>
         </div>
       )}

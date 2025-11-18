@@ -14,6 +14,9 @@ function OnlyGCNScanner() {
   const [results, setResults] = useState([]);
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [currentPhase, setCurrentPhase] = useState(''); // 'prefilter', 'scanning', 'complete'
+  const [currentFile, setCurrentFile] = useState('');
+  const [phaseStats, setPhaseStats] = useState({ passed: 0, skipped: 0, scanned: 0 });
   const [txtFilePath, setTxtFilePath] = useState('');
   const [isLoadingFolders, setIsLoadingFolders] = useState(false);
   const [folderList, setFolderList] = useState([]);

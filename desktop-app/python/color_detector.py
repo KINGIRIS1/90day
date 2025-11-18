@@ -164,15 +164,16 @@ def get_dominant_color_simple(image_path, sample_region='center'):
 
 
 if __name__ == '__main__':
-    # Test
+    # CLI mode: Return only the color result to stdout
+    # All debug info goes to stderr
     if len(sys.argv) > 1:
         image_path = sys.argv[1]
-        print(f"Testing color detection on: {image_path}")
         
+        # Use border detection (primary method)
         border_color = detect_gcn_border_color(image_path)
-        print(f"Border color: {border_color}")
         
-        center_color = get_dominant_color_simple(image_path, 'center')
-        print(f"Center color: {center_color}")
+        # Output only the result to stdout (for IPC)
+        print(border_color)
     else:
-        print("Usage: python color_detector.py <image_path>")
+        print("Usage: python color_detector.py <image_path>", file=sys.stderr)
+        sys.exit(1)

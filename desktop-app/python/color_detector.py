@@ -10,13 +10,17 @@ import sys
 
 def detect_gcn_border_color(image_path):
     """
-    Detect GCN border color locally without AI
+    Detect GCN A3 based on TWO criteria:
+    1. Border color: Red or Pink
+    2. Paper size: A3 (aspect ratio > 1.35, landscape)
+    
     Returns: 'red', 'pink', or 'unknown'
     
-    GCN characteristics:
-    - Border color: Red (R>150, G<100, B<100) or Pink (R>150, G>130, B>130)
-    - A3 GCN: aspect ratio > 1.35 (landscape)
-    - A4 GCN: aspect ratio < 1.0 (portrait)
+    CRITICAL: Only returns 'red' or 'pink' if BOTH conditions met!
+    - Has red/pink border
+    - AND is A3 size (aspect ratio > 1.35)
+    
+    This prevents false positives from A4 documents with red stamps/seals.
     """
     try:
         img = Image.open(image_path)
@@ -28,6 +32,16 @@ def detect_gcn_border_color(image_path):
         
         print(f"📏 Dimensions: {width}x{height}, Aspect ratio: {aspect_ratio:.2f}", file=sys.stderr)
         
+        # ⚠️ CRITICAL CHECK #1: Must be A3 size (landscape)
+        # GCN A3 has aspect ratio > 1.35 (example: 4443×3135 = 1.42)
+        if aspect_ratio <= 1.35:
+            print(f"❌ NOT A3 format (aspect ratio {aspect_ratio:.2f} <= 1.35)", file=sys.stderr)
+            print(f"   → Skipping (even if has red color, not GCN A3)", file=sys.stderr)
+            return 'unknown'
+        
+        print(f"✅ A3 format detected (landscape, aspect ratio > 1.35)", file=sys.stderr)
+        
+        # ✅ CRITICAL CHECK #2: Must have red/pink border
         # Sample border regions (top, bottom, left, right)
         border_thickness = int(min(width, height) * 0.02)  # 2% of smaller dimension
         
@@ -56,6 +70,7 @@ def detect_gcn_border_color(image_path):
         
         if len(colored_pixels) < 50:  # Lowered from 100 to 50
             print(f"⚠️ Not enough colored border pixels found ({len(colored_pixels)})", file=sys.stderr)
+            print(f"   → Skipping (A3 size but no colored border)", file=sys.stderr)
             return 'unknown'
         
         # Calculate average RGB of colored pixels
@@ -88,14 +103,15 @@ def detect_gcn_border_color(image_path):
                 color = 'red'  # Conservative: consider as potential GCN
         else:
             color = 'unknown'
+            print(f"❌ No red/pink color detected (R={avg_r:.0f} too low)", file=sys.stderr)
         
         print(f"🎨 Detected color: {color}", file=sys.stderr)
         
-        # Additional logging for debugging
-        if aspect_ratio > 1.35:
-            print(f"📐 A3 format detected (landscape)", file=sys.stderr)
-        elif aspect_ratio < 1.0:
-            print(f"📐 A4 format detected (portrait)", file=sys.stderr)
+        # Final result
+        if color in ['red', 'pink']:
+            print(f"✅ GCN A3 CANDIDATE: A3 size + {color} border", file=sys.stderr)
+        else:
+            print(f"❌ NOT GCN: A3 size but no red/pink border", file=sys.stderr)
         
         return color
         

@@ -350,36 +350,99 @@ function OnlyGCNScanner() {
     stopRef.current = true;
   };
 
-  // Merge PDFs
-  const handleMerge = async () => {
+  // Show merge modal (giống BatchScanner)
+  const handleMerge = () => {
     if (results.length === 0) {
       alert('Chưa có kết quả nào để gộp!');
       return;
     }
+    setShowMergeModal(true);
+  };
+
+  // Execute merge with options (giống BatchScanner & DesktopScanner)
+  const executeMerge = async () => {
+    console.log('🚀 executeMerge called:', { outputOption, mergeSuffix, outputFolder });
+    
+    setShowMergeModal(false);
+    setMergeInProgress(true);
 
     try {
-      // Prepare merge data - keep original order
-      const mergeData = results.map(r => ({
-        filePath: r.filePath,
-        short_code: r.newShortCode,
-        doc_type: r.newDocType
-      }));
+      // Prepare data for mergeByShortCode API (chuẩn như các tab khác)
+      const payload = results
+        .filter(r => r.success && r.newShortCode)
+        .map(r => ({ 
+          filePath: r.filePath, 
+          short_code: r.newShortCode,
+          folder: r.folderName || path.dirname(r.filePath)
+        }));
+
+      if (payload.length === 0) {
+        alert('Không có file hợp lệ để gộp.');
+        setMergeInProgress(false);
+        return;
+      }
 
       console.log('📦 Merging PDFs with GCN filter...');
-      console.log(`   Total files: ${mergeData.length}`);
-      console.log(`   GCN files: ${mergeData.filter(f => f.short_code !== 'GTLQ').length}`);
-      console.log(`   GTLQ files: ${mergeData.filter(f => f.short_code === 'GTLQ').length}`);
+      console.log(`   Total files: ${payload.length}`);
+      console.log(`   GCN files: ${payload.filter(f => f.short_code !== 'GTLQ').length}`);
+      console.log(`   GTLQ files: ${payload.filter(f => f.short_code === 'GTLQ').length}`);
 
-      const result = await window.electronAPI.mergeFolderPdfs(mergeData);
+      // Group by folder
+      const folderGroups = {};
+      payload.forEach(item => {
+        const folder = path.dirname(item.filePath);
+        if (!folderGroups[folder]) {
+          folderGroups[folder] = [];
+        }
+        folderGroups[folder].push(item);
+      });
 
-      if (result.success) {
-        alert(`✅ Gộp PDF thành công!\n\nĐã tạo:\n${result.files.map(f => `- ${f}`).join('\n')}`);
-      } else {
-        alert('❌ Gộp PDF thất bại: ' + (result.error || 'Unknown error'));
+      let totalMerged = 0;
+      let totalSuccess = 0;
+
+      // Merge each folder separately (giống BatchScanner)
+      for (const [folder, items] of Object.entries(folderGroups)) {
+        const mergeOptions = {
+          autoSave: true,
+          mergeMode: outputOption === 'same_folder' ? 'root' : (outputOption === 'new_folder' ? 'new' : 'custom'),
+          mergeSuffix: mergeSuffix || '_merged',
+          parentFolder: folder,
+          customOutputFolder: outputOption === 'custom_folder' ? outputFolder : null
+        };
+        
+        console.log('Merge options:', mergeOptions);
+        console.log('Items to merge:', items.length, 'files');
+        
+        try {
+          const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);
+          console.log('Merge result:', merged);
+          const okCount = (merged || []).filter(m => m.success && !m.canceled).length;
+          totalMerged += (merged || []).length;
+          totalSuccess += okCount;
+        } catch (mergeErr) {
+          console.error('❌ Merge failed for folder:', folder, mergeErr);
+          alert(`❌ Lỗi merge folder ${folder}:\n${mergeErr.message}`);
+        }
       }
+
+      alert(`✅ Gộp PDF hoàn tất!\n\nThành công: ${totalSuccess}/${totalMerged} file PDF`);
     } catch (err) {
       console.error('Merge error:', err);
-      alert('Lỗi gộp PDF: ' + err.message);
+      alert(`❌ Lỗi khi gộp PDF: ${err.message}`);
+    } finally {
+      setMergeInProgress(false);
+    }
+  };
+
+  // Select custom output folder
+  const handleSelectOutputFolder = async () => {
+    try {
+      const folder = await window.electronAPI.selectFolder();
+      if (folder) {
+        setOutputFolder(folder);
+      }
+    } catch (err) {
+      console.error('Error selecting folder:', err);
     }
   };
 

@@ -453,6 +453,11 @@ function OnlyGCNScanner() {
               const issueDate = meta.issue_date || result.issue_date || null;
               const issueDateConf = meta.issue_date_confidence || result.issue_date_confidence || null;
 
+              // DEBUG: Log GCN metadata if found
+              if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                console.log(`      📊 GCN metadata: color=${color || 'null'}, date=${issueDate || 'null'}, confidence=${issueDateConf || 'null'}`);
+              }
+
               allResults.push({
                 fileName,
                 filePath,

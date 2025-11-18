@@ -188,10 +188,24 @@ function OnlyGCNScanner() {
       
       const groupsArray = Array.from(gcnGroups.values());
       
+      // DEBUG: Log all groups with dates
+      console.log('🔍 DEBUG - GCN Groups:');
+      groupsArray.forEach((group, idx) => {
+        console.log(`  Group ${idx + 1}:`, {
+          color: group.color,
+          issueDate: group.issueDate || 'null',
+          confidence: group.issueDateConfidence || 'null',
+          parsedDate: group.parsedDate ? group.parsedDate.comparable : 'null',
+          fileCount: group.files.length
+        });
+      });
+      
       // Step 3: Classify by color or date
       const colors = groupsArray.map(g => g.color).filter(c => c && c !== 'unknown');
       const uniqueColors = [...new Set(colors)];
       const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
+      
+      console.log(`🎨 Color analysis: ${uniqueColors.join(', ') || 'none'}, hasRedAndPink=${hasRedAndPink}`);
       
       const processedResults = [...results];
       

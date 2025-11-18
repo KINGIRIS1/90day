@@ -126,7 +126,7 @@ elif aspect_ratio < 1.0:
     print(f"📐 A4 format detected (portrait)", file=sys.stderr)
 ```
 
-### 2. Sửa CLI output format (`color_detector.py`)
+### 3. Sửa CLI output format (`color_detector.py`)
 
 **TRƯỚC:**
 ```python

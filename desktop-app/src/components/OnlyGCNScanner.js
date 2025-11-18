@@ -578,7 +578,8 @@ function OnlyGCNScanner() {
 
   // Show merge modal (giống BatchScanner)
   const handleMerge = () => {
-    if (results.length === 0) {
+    const allResults = folderTabs.flatMap(t => t.files);
+    if (allResults.length === 0) {
       alert('Chưa có kết quả nào để gộp!');
       return;
     }
@@ -593,8 +594,11 @@ function OnlyGCNScanner() {
     setMergeInProgress(true);
 
     try {
+      // Collect all results from all folder tabs
+      const allResults = folderTabs.flatMap(t => t.files);
+      
       // Prepare data for mergeByShortCode API (chuẩn như các tab khác)
-      const payload = results
+      const payload = allResults
         .filter(r => r.success && r.newShortCode)
         .map(r => ({ 
           filePath: r.filePath, 

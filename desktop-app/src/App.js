@@ -5,6 +5,7 @@ import Settings from './components/Settings';
 import RulesManager from './components/RulesManager';
 import CloudSettings from './components/CloudSettings';
 import BatchScanner from './components/BatchScanner';
+import OnlyGCNScanner from './components/OnlyGCNScanner';
 
 // Folder tree picker component
 const FolderPicker = ({ baseFolder, onConfirm }) => {

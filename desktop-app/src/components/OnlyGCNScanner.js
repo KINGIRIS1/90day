@@ -86,7 +86,8 @@ function OnlyGCNScanner() {
       }
 
       setFiles(imageFiles);
-      setResults([]);
+      setFolderTabs([]);
+      setActiveFolder(null);
       setTxtFilePath('');
       console.log(`📁 Selected folder: ${imageFiles.length} files`);
     } catch (err) {

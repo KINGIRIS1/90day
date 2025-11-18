@@ -111,7 +111,8 @@ function OnlyGCNScanner() {
       setTxtFilePath(txtPath);
       setFolderList([]);
       setFiles([]);
-      setResults([]);
+      setFolderTabs([]);
+      setActiveFolder(null);
       
       console.log(`📋 Selected txt file: ${txtPath}`);
     } catch (err) {

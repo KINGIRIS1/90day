@@ -651,6 +651,9 @@ function OnlyGCNScanner() {
                     #
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                    Thư mục
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                     File
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">

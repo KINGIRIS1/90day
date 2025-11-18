@@ -671,6 +671,7 @@ function OnlyGCNScanner() {
                 {results.map((result, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-3 text-sm text-gray-900">{idx + 1}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{result.folderName || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{result.fileName}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 text-xs font-medium rounded ${

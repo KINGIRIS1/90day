@@ -28,6 +28,13 @@ function OnlyGCNScanner() {
   // Load OCR engine config
   const [ocrEngine, setOcrEngine] = useState('gemini-flash-lite');
 
+  // Merge modal states (giống BatchScanner & DesktopScanner)
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [mergeInProgress, setMergeInProgress] = useState(false);
+  const [outputOption, setOutputOption] = useState('same_folder');
+  const [mergeSuffix, setMergeSuffix] = useState('_merged');
+  const [outputFolder, setOutputFolder] = useState('');
+
   React.useEffect(() => {
     loadConfig();
   }, []);

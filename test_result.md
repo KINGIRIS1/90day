@@ -1908,3 +1908,105 @@ agent_communication:
       
       🎯 STATUS: ✅ Fix Complete | ⏳ Awaiting User Testing
       📦 BUILD: ✅ Successful (103.63 kB)
+
+  - agent: "main_fork_2"
+    timestamp: "2024-11-20"
+    message: |
+      ✅ ONLY GCN MERGE MODE - UPGRADED TO MATCH OTHER TABS
+      
+      🎯 USER REQUEST:
+      - "Chế độ gộp của only gcn đã giống với các loại khác chưa"
+      
+      🔍 ANALYSIS:
+      
+      **BEFORE:**
+      OnlyGCNScanner used different merge API:
+      - API: `mergeFolderPdfs` (custom, simple)
+      - Output: Only same folder (no options)
+      - No UI modal for merge options
+      - Different implementation than other tabs
+      
+      **BatchScanner & DesktopScanner:**
+      - API: `mergeByShortCode` (standard, flexible)
+      - Options: 3 modes (same folder, new folder, custom folder)
+      - UI modal with merge options
+      - Configurable suffix for new folder
+      
+      ✅ CHANGES IMPLEMENTED:
+      
+      **1. Switched to standard API**
+      - Changed from `mergeFolderPdfs` → `mergeByShortCode`
+      - Now uses same API as BatchScanner & DesktopScanner
+      
+      **2. Added merge options UI (Modal)**
+      ```jsx
+      States added:
+      - showMergeModal: boolean
+      - mergeInProgress: boolean
+      - outputOption: 'same_folder' | 'new_folder' | 'custom_folder'
+      - mergeSuffix: string (default: '_merged')
+      - outputFolder: string (for custom mode)
+      ```
+      
+      **3. Implemented executeMerge function**
+      - Groups files by folder
+      - Applies merge options (mode, suffix, custom folder)
+      - Matches logic of BatchScanner & DesktopScanner
+      
+      **4. Added helper functions**
+      - `handleSelectOutputFolder()`: Choose custom output location
+      - Client-safe `path` helper for dirname/basename
+      
+      **5. UI Components added**
+      - Merge options modal (3 radio buttons)
+      - Suffix input (for new_folder mode)
+      - Custom folder selector
+      - Progress overlay during merge
+      
+      📦 MERGE OPTIONS NOW AVAILABLE:
+      
+      **Option 1: Cùng thư mục với file gốc**
+      - PDFs saved in same folder as source files
+      - Example: `/folder/GCNC.pdf`, `/folder/GTLQ.pdf`
+      
+      **Option 2: Tạo thư mục mới**
+      - Creates new folder with suffix
+      - Example: `/folder_merged/GCNC.pdf`
+      - Configurable suffix (default: `_merged`)
+      
+      **Option 3: Chọn thư mục tùy chỉnh**
+      - User selects any folder
+      - Creates subfolder named after source
+      - Example: `/custom/path/folder_name/GCNC.pdf`
+      
+      🎨 UI FLOW:
+      
+      1. User clicks "📚 Gộp PDF (giữ nguyên thứ tự)"
+      2. Modal appears with 3 options
+      3. User selects mode & configures (suffix/custom folder)
+      4. Clicks "✅ Gộp PDF"
+      5. Progress overlay shows "Đang gộp PDF..."
+      6. Alert shows success: "✅ Gộp PDF hoàn tất! Thành công: X/Y"
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/src/components/OnlyGCNScanner.js
+      
+      🎯 RESULT:
+      - ✅ OnlyGCNScanner now has SAME merge functionality as other tabs
+      - ✅ Consistent UX across all scanning modes
+      - ✅ Users can choose output location flexibly
+      
+      🧪 TESTING REQUIRED (BY USER):
+      
+      Test all 3 merge modes:
+      1. **Same folder**: Verify PDFs saved in source folder
+      2. **New folder**: Verify folder created with suffix
+      3. **Custom folder**: Verify subfolder created in custom location
+      
+      Test with:
+      - Single folder scan
+      - Multiple folders (batch mode)
+      - Mixed GCN + GTLQ results
+      
+      📦 BUILD: ✅ Successful (104.25 kB, +623 B)
+      🎯 STATUS: ✅ Feature Complete | ⏳ User Testing Required

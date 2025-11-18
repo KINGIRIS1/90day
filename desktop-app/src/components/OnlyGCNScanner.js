@@ -105,18 +105,17 @@ function OnlyGCNScanner() {
       console.log(`\n🤖 Phase 2: AI scanning ${gcnCandidates.length} GCN candidates...`);
       setProgress({ current: 0, total: gcnCandidates.length });
 
-    try {
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < gcnCandidates.length; i++) {
         if (stopRef.current) {
           console.log('⏹️ Scan stopped by user');
           break;
         }
 
-        const filePath = files[i];
+        const filePath = gcnCandidates[i];
         const fileName = filePath.split(/[/\\]/).pop();
 
-        setProgress({ current: i + 1, total: files.length });
-        console.log(`[${i + 1}/${files.length}] Processing: ${fileName}`);
+        setProgress({ current: i + 1, total: gcnCandidates.length });
+        console.log(`[${i + 1}/${gcnCandidates.length}] AI Scanning: ${fileName}`);
 
         try {
           // Scan file

@@ -810,12 +810,12 @@ function OnlyGCNScanner() {
             </button>
           )}
 
-          {results.length > 0 && !isScanning && (
+          {folderTabs.length > 0 && folderTabs.some(t => t.complete) && !isScanning && (
             <button
               onClick={handleMerge}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm transition-colors"
             >
-              📚 Gộp PDF (giữ nguyên thứ tự)
+              📚 Gộp PDF
             </button>
           )}
 

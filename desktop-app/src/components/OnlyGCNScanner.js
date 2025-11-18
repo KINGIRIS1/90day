@@ -393,7 +393,7 @@ function OnlyGCNScanner() {
 
       {/* Mode Selection */}
       <div className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center flex-wrap">
           <button
             onClick={() => {
               setScanMode('folder');
@@ -423,11 +423,34 @@ function OnlyGCNScanner() {
           >
             📋 Quét theo danh sách
           </button>
+
+          <div className="ml-auto flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-300">
+            <input
+              type="checkbox"
+              id="usePreFilter"
+              checked={usePreFilter}
+              onChange={(e) => setUsePreFilter(e.target.checked)}
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="usePreFilter" className="text-sm font-medium text-gray-700 cursor-pointer">
+              🎨 Pre-filter (lọc màu)
+            </label>
+          </div>
         </div>
         <p className="text-xs text-gray-600 mt-2">
           {scanMode === 'folder' 
             ? '💡 Quét tất cả file trong 1 thư mục' 
             : '💡 Quét nhiều thư mục từ file .txt (mỗi dòng 1 đường dẫn)'}
+          {usePreFilter && (
+            <span className="ml-2 text-green-600 font-medium">
+              • Pre-filter BẬT: Chỉ quét file có màu đỏ/hồng (tiết kiệm ~85% API)
+            </span>
+          )}
+          {!usePreFilter && (
+            <span className="ml-2 text-blue-600 font-medium">
+              • Pre-filter TẮT: Quét tất cả file (chính xác 100%, tốn API hơn)
+            </span>
+          )}
         </p>
       </div>
 

@@ -489,7 +489,7 @@ function OnlyGCNScanner() {
                 console.log(`      📊 GCN metadata: color=${color || 'null'}, date=${issueDate || 'null'}, confidence=${issueDateConf || 'null'}`);
               }
 
-              allResults.push({
+              folderResults.push({
                 fileName,
                 filePath,
                 folderName,

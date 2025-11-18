@@ -830,6 +830,133 @@ function OnlyGCNScanner() {
           </div>
         </div>
       )}
+
+      {/* Merge Options Modal (giống BatchScanner & DesktopScanner) */}
+      {showMergeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">⚙️ Tùy chọn gộp PDF</h3>
+            
+            <div className="space-y-4">
+              {/* Output location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  📁 Vị trí lưu file PDF
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="outputOption"
+                      value="same_folder"
+                      checked={outputOption === 'same_folder'}
+                      onChange={(e) => setOutputOption(e.target.value)}
+                      className="text-blue-600"
+                    />
+                    <span className="text-sm">Cùng thư mục với file gốc</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="outputOption"
+                      value="new_folder"
+                      checked={outputOption === 'new_folder'}
+                      onChange={(e) => setOutputOption(e.target.value)}
+                      className="text-blue-600"
+                    />
+                    <span className="text-sm">Tạo thư mục mới (tên + suffix)</span>
+                  </label>
+                  
+                  <label className="flex items-center space-x-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="outputOption"
+                      value="custom_folder"
+                      checked={outputOption === 'custom_folder'}
+                      onChange={(e) => setOutputOption(e.target.value)}
+                      className="text-blue-600"
+                    />
+                    <span className="text-sm">Chọn thư mục tùy chỉnh</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Suffix for new folder */}
+              {outputOption === 'new_folder' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    🏷️ Hậu tố tên thư mục
+                  </label>
+                  <input
+                    type="text"
+                    value={mergeSuffix}
+                    onChange={(e) => setMergeSuffix(e.target.value)}
+                    placeholder="_merged"
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <p className="text-xs text-gray-600 mt-1">
+                    VD: Thư mục "HSDT_001" → "HSDT_001{mergeSuffix}"
+                  </p>
+                </div>
+              )}
+
+              {/* Custom folder selection */}
+              {outputOption === 'custom_folder' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    📂 Thư mục tùy chỉnh
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={outputFolder}
+                      readOnly
+                      placeholder="Chọn thư mục..."
+                      className="flex-1 px-3 py-2 border rounded-lg bg-gray-50"
+                    />
+                    <button
+                      onClick={handleSelectOutputFolder}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Chọn
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowMergeModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={executeMerge}
+                disabled={outputOption === 'custom_folder' && !outputFolder}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✅ Gộp PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Merge in progress overlay */}
+      {mergeInProgress && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+              <span className="text-lg font-medium">Đang gộp PDF...</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

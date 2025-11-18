@@ -496,6 +496,27 @@ function OnlyGCNScanner() {
       {/* Progress - Detailed */}
       {isScanning && (
         <div className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-5 shadow-sm">
+          {/* Folder Progress */}
+          {folderProgress.total > 0 && (
+            <div className="mb-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className="text-purple-700 font-semibold">📁 Thư mục:</span>
+                  <span className="text-purple-900 font-bold">{folderProgress.current} / {folderProgress.total}</span>
+                </div>
+                {currentFolder && (
+                  <span className="text-sm text-purple-700 font-medium">{currentFolder}</span>
+                )}
+              </div>
+              <div className="mt-2 w-full bg-purple-200 rounded-full h-2">
+                <div
+                  className="bg-purple-600 h-2 rounded-full transition-all"
+                  style={{ width: `${(folderProgress.current / folderProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Phase indicator */}
           <div className="mb-4">
             <div className="flex items-center space-x-3">

@@ -43,6 +43,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   chooseSavePath: (defaultName) => ipcRenderer.invoke('choose-save-path', defaultName),
   readImageDataUrl: (filePath) => ipcRenderer.invoke('read-image-data-url', filePath),
+  
+  // Only GCN Scanner
+  getImagesInFolder: (folderPath) => ipcRenderer.invoke('get-images-in-folder', folderPath),
+  preFilterGCNFiles: (files) => ipcRenderer.invoke('pre-filter-gcn-files', files),
+  mergeFolderPdfs: (mergeData) => ipcRenderer.invoke('merge-folder-pdfs', mergeData),
 
   setBackendUrl: (url) => ipcRenderer.invoke('set-backend-url', url),
   

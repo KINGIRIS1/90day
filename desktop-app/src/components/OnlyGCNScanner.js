@@ -873,65 +873,20 @@ function OnlyGCNScanner() {
             </div>
           </div>
 
-          {/* Phase 1 Stats */}
-          {(currentPhase === 'prefilter' || currentPhase === 'scanning') && (
-            <div className="mb-3 p-3 bg-white rounded-lg border border-blue-200">
-              <div className="text-sm font-medium text-gray-700 mb-2">📊 Phase 1 - Kết quả lọc màu:</div>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex items-center">
-                  <span className="text-green-600 font-semibold">🟢 GCN candidates:</span>
-                  <span className="ml-2 font-bold text-green-700">{phaseStats.passed} files</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="text-gray-600 font-semibold">⏭️  Skipped:</span>
-                  <span className="ml-2 font-bold text-gray-700">{phaseStats.skipped} files</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Phase 2 Progress */}
+          {/* Compact Progress */}
           {currentPhase === 'scanning' && (
-            <>
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold text-gray-700">
-                    🔍 Đang quét AI: {progress.current} / {progress.total}
-                  </span>
-                  <span className="text-sm font-bold text-green-700">
-                    {progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-300 shadow-sm"
-                    style={{ width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%` }}
-                  />
-                </div>
+            <div className="mb-2 p-2 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="font-medium text-gray-700 truncate">
+                  {currentFile || 'Processing...'}
+                </span>
+                <span className="text-gray-600 ml-2">{progress.current}/{progress.total}</span>
               </div>
-
-              {/* Current file */}
-              {currentFile && (
-                <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                  <span className="text-yellow-800 font-medium">📄 File hiện tại:</span>
-                  <span className="ml-2 text-yellow-900 font-mono text-xs">{currentFile}</span>
-                </div>
-              )}
-
-              {/* Time estimate */}
-              {progress.current > 0 && progress.total > 0 && (
-                <div className="mt-2 text-xs text-gray-600">
-                  ⏱️ Ước tính: ~{Math.ceil((progress.total - progress.current) * 15)} giây còn lại
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Summary */}
-          {currentPhase === 'complete' && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="text-sm font-medium text-green-800">
-                🎉 Đã quét xong {progress.total} files!
+              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                <div
+                  className="bg-green-500 h-1.5 rounded-full transition-all"
+                  style={{ width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%` }}
+                />
               </div>
             </div>
           )}

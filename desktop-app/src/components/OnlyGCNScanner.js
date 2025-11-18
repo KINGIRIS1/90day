@@ -78,14 +78,37 @@ function OnlyGCNScanner() {
       if (!txtPath) return;
 
       setTxtFilePath(txtPath);
+      setFolderList([]);
+      setFiles([]);
+      setResults([]);
       
+      console.log(`📋 Selected txt file: ${txtPath}`);
+    } catch (err) {
+      console.error('Error selecting txt file:', err);
+      alert('Lỗi chọn file txt: ' + err.message);
+    }
+  };
+
+  // Load folders from txt file
+  const handleLoadFolders = async () => {
+    if (!txtFilePath) {
+      alert('Vui lòng chọn file txt trước!');
+      return;
+    }
+
+    setIsLoadingFolders(true);
+    
+    try {
       // Read and validate folders from txt
-      const validation = await window.electronAPI.validateBatchFolders(txtPath);
+      const validation = await window.electronAPI.validateBatchFolders(txtFilePath);
       
       if (!validation.success) {
         alert('Lỗi đọc file txt: ' + validation.error);
+        setIsLoadingFolders(false);
         return;
       }
+
+      setFolderList(validation.folders);
 
       // Collect all image files from all folders
       const allFiles = [];
@@ -96,15 +119,17 @@ function OnlyGCNScanner() {
 
       if (allFiles.length === 0) {
         alert('Không tìm thấy file ảnh nào trong các thư mục!');
+        setIsLoadingFolders(false);
         return;
       }
 
       setFiles(allFiles);
-      setResults([]);
-      console.log(`📋 Selected txt with ${validation.folders.length} folders: ${allFiles.length} total files`);
+      console.log(`✅ Loaded ${validation.folders.length} folders: ${allFiles.length} total files`);
     } catch (err) {
-      console.error('Error selecting txt file:', err);
-      alert('Lỗi chọn file txt: ' + err.message);
+      console.error('Error loading folders:', err);
+      alert('Lỗi tải thư mục: ' + err.message);
+    } finally {
+      setIsLoadingFolders(false);
     }
   };
 

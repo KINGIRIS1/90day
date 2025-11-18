@@ -108,6 +108,146 @@ function OnlyGCNScanner() {
     }
   };
 
+  // Helper: Parse issue date for GCN classification (giống BatchScanner)
+  const parseIssueDate = (issueDate, confidence) => {
+    if (!issueDate) return null;
+    
+    try {
+      let comparable = 0;
+      let parts;
+      
+      if (confidence === 'full') {
+        parts = issueDate.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10);
+          const year = parseInt(parts[2], 10);
+          comparable = year * 10000 + month * 100 + day;
+        }
+      } else if (confidence === 'partial') {
+        parts = issueDate.split('/');
+        if (parts.length === 2) {
+          const month = parseInt(parts[0], 10);
+          const year = parseInt(parts[1], 10);
+          comparable = year * 10000 + month * 100 + 1;
+        }
+      } else if (confidence === 'year_only') {
+        const year = parseInt(issueDate, 10);
+        comparable = year * 10000 + 1 * 100 + 1;
+      }
+      
+      return { comparable, original: issueDate };
+    } catch (e) {
+      console.error(`❌ Error parsing date: ${issueDate}`, e);
+      return null;
+    }
+  };
+
+  // Post-process GCN: Classify into GCNC/GCNM (giống BatchScanner)
+  const postProcessGCN = (results) => {
+    try {
+      console.log('🔄 Post-processing GCN (DATE-BASED classification)...');
+      
+      // Step 1: Find all GCN documents
+      const allGcnDocs = results.filter(r => 
+        r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM' || r.newShortCode === 'GCN'
+      );
+      
+      if (allGcnDocs.length === 0) {
+        console.log('✅ No GCN documents found');
+        return results;
+      }
+      
+      console.log(`📋 Found ${allGcnDocs.length} GCN document(s) to process`);
+      
+      // Step 2: Group by metadata (color + issue_date)
+      const gcnGroups = new Map();
+      
+      allGcnDocs.forEach(doc => {
+        const meta = doc.metadata || {};
+        const color = meta.color || doc.color || 'unknown';
+        const issueDate = meta.issue_date || doc.issue_date || null;
+        const issueDateConf = meta.issue_date_confidence || doc.issue_date_confidence || null;
+        
+        const groupKey = `${color}_${issueDate || 'null'}`;
+        
+        if (!gcnGroups.has(groupKey)) {
+          gcnGroups.set(groupKey, {
+            files: [],
+            color: color,
+            issueDate: issueDate,
+            issueDateConfidence: issueDateConf,
+            parsedDate: parseIssueDate(issueDate, issueDateConf)
+          });
+        }
+        
+        gcnGroups.get(groupKey).files.push(doc);
+      });
+      
+      console.log(`📋 Found ${gcnGroups.size} unique GCN group(s)`);
+      
+      const groupsArray = Array.from(gcnGroups.values());
+      
+      // Step 3: Classify by color or date
+      const colors = groupsArray.map(g => g.color).filter(c => c && c !== 'unknown');
+      const uniqueColors = [...new Set(colors)];
+      const hasRedAndPink = uniqueColors.includes('red') && uniqueColors.includes('pink');
+      
+      const processedResults = [...results];
+      
+      if (hasRedAndPink) {
+        console.log(`  🎨 Mixed colors → Classify by color`);
+        groupsArray.forEach(group => {
+          const classification = (group.color === 'red' || group.color === 'orange') ? 'GCNC' : 'GCNM';
+          group.files.forEach(file => {
+            const idx = processedResults.findIndex(r => r.fileName === file.fileName);
+            if (idx >= 0) {
+              processedResults[idx].newShortCode = classification;
+              processedResults[idx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
+            }
+          });
+        });
+      } else {
+        console.log(`  📅 Same color → Classify by date`);
+        const groupsWithDate = groupsArray.filter(g => g.parsedDate && g.parsedDate.comparable > 0);
+        
+        if (groupsWithDate.length >= 2) {
+          groupsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
+          console.log(`📊 Sorted: Oldest = GCNC, others = GCNM`);
+          
+          groupsWithDate.forEach((group, idx) => {
+            const classification = (idx === 0) ? 'GCNC' : 'GCNM';
+            group.files.forEach(file => {
+              const resIdx = processedResults.findIndex(r => r.fileName === file.fileName);
+              if (resIdx >= 0) {
+                processedResults[resIdx].newShortCode = classification;
+                processedResults[resIdx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
+              }
+            });
+          });
+        } else {
+          // Fallback: Not enough dates → Use first as GCNC
+          console.log(`  ⚠️ Not enough dates → First GCN = GCNC`);
+          if (groupsArray.length === 1) {
+            groupsArray[0].files.forEach(file => {
+              const idx = processedResults.findIndex(r => r.fileName === file.fileName);
+              if (idx >= 0) {
+                processedResults[idx].newShortCode = 'GCNC';
+                processedResults[idx].newDocType = 'Giấy chứng nhận (Chung)';
+              }
+            });
+          }
+        }
+      }
+      
+      console.log('✅ Post-processing complete');
+      return processedResults;
+    } catch (err) {
+      console.error('❌ Post-processing error:', err);
+      return results; // Return original on error
+    }
+  };
+
   // Load folders from txt file
   const handleLoadFolders = async () => {
     if (!txtFilePath) {

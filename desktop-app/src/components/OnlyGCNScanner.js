@@ -697,52 +697,41 @@ function OnlyGCNScanner() {
       </div>
 
       {/* Mode Selection - Compact */}
-      <div className="mb-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => {
-              setScanMode('folder');
-              setFiles([]);
-              setFolderTabs([]);
-              setActiveFolder(null);
-              setTxtFilePath('');
-            }}
-            className={`px-3 py-1.5 rounded text-sm transition-colors ${
-              scanMode === 'folder'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Thư mục
-          </button>
-          <button
-            onClick={() => {
-              setScanMode('batch');
-              setFiles([]);
-              setFolderTabs([]);
-              setActiveFolder(null);
-            }}
-            className={`px-3 py-1.5 rounded text-sm transition-colors ${
-              scanMode === 'batch'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            Danh sách
-          </button>
-
-          <div className="ml-auto flex items-center space-x-2 bg-white px-2 py-1 rounded border border-gray-300">
-            <input
-              type="checkbox"
-              id="usePreFilter"
-              checked={usePreFilter}
-              onChange={(e) => setUsePreFilter(e.target.checked)}
-              className="w-3.5 h-3.5 text-blue-600 rounded"
-            />
-            <label htmlFor="usePreFilter" className="text-xs text-gray-700 cursor-pointer">
-              Pre-filter
-            </label>
-          </div>
+      <div className="mb-2 bg-gray-50 rounded-lg p-2 border border-gray-200 flex gap-2 items-center">
+        <button
+          onClick={() => {
+            setScanMode('folder');
+            setFiles([]);
+            setFolderTabs([]);
+            setActiveFolder(null);
+            setTxtFilePath('');
+          }}
+          className={`px-3 py-1.5 rounded text-sm transition-colors ${
+            scanMode === 'folder'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+          }`}
+        >
+          Thư mục
+        </button>
+        <button
+          onClick={() => {
+            setScanMode('batch');
+            setFiles([]);
+            setFolderTabs([]);
+            setActiveFolder(null);
+          }}
+          className={`px-3 py-1.5 rounded text-sm transition-colors ${
+            scanMode === 'batch'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+          }`}
+        >
+          Danh sách
+        </button>
+        
+        <div className="ml-auto text-xs text-green-600 font-medium">
+          🎨 Pre-filter: LUÔN BẬT
         </div>
       </div>
 

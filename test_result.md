@@ -2122,3 +2122,159 @@ agent_communication:
       
       🎯 STATUS: ✅ Critical Fix Complete | ⏳ User Testing Required
       📦 BUILD: ✅ Successful (104.25 kB)
+
+  - agent: "main_fork_2"
+    timestamp: "2024-11-20"
+    message: |
+      ✅ ONLY GCN - ADDED POST-PROCESSING (GCNC/GCNM CLASSIFICATION)
+      
+      🎯 USER REQUEST:
+      - "Quy tắc đặt tên và đọc GCN chưa đúng"
+      - "Quy tắc đặt tên GCN phải giống bên các mode khác"
+      
+      🔍 ROOT CAUSE:
+      
+      **BEFORE:**
+      OnlyGCNScanner had different GCN classification logic:
+      - Directly used AI result (GCNC/GCNM/GCN)
+      - No post-processing
+      - No date-based or color-based classification
+      - Different from BatchScanner & DesktopScanner
+      
+      **BatchScanner & DesktopScanner:**
+      - Normalize: GCNM/GCNC → GCN first
+      - Post-process: Classify into GCNC/GCNM based on:
+        1. Color: red/orange = GCNC, pink = GCNM
+        2. Date: Oldest = GCNC, newer = GCNM
+      
+      ✅ SOLUTION IMPLEMENTED:
+      
+      **Added complete post-processing logic (same as other modes):**
+      
+      ```javascript
+      // 1. Helper: parseIssueDate (parse DD/MM/YYYY, MM/YYYY, YYYY)
+      const parseIssueDate = (issueDate, confidence) => {
+        // Parse date string → comparable number (YYYYMMDD)
+        // Supports: 'full', 'partial', 'year_only'
+      }
+      
+      // 2. Post-process GCN: Classify into GCNC/GCNM
+      const postProcessGCN = (results) => {
+        // Step 1: Find all GCN documents
+        // Step 2: Group by metadata (color + issue_date)
+        // Step 3: Classify by color OR date
+        
+        if (hasRedAndPink) {
+          // Mixed colors → Classify by color
+          red/orange → GCNC
+          pink → GCNM
+        } else {
+          // Same color → Classify by date
+          oldest → GCNC
+          newer → GCNM
+        }
+      }
+      ```
+      
+      **Workflow:**
+      
+      1. **AI Scan**: Returns GCNC/GCNM/GCN
+      2. **Normalize**: All → 'GCN' temporarily
+      3. **Extract metadata**: color, issue_date, issue_date_confidence
+      4. **Post-process**: Re-classify into GCNC or GCNM
+      5. **Result**: Consistent with other modes
+      
+      📊 CLASSIFICATION LOGIC:
+      
+      **Case 1: Mixed colors (red + pink)**
+      ```
+      Group 1: red/orange border → GCNC
+      Group 2: pink border → GCNM
+      ```
+      
+      **Case 2: Same color (all red OR all pink)**
+      ```
+      Parse dates:
+      - 20/05/2024 (full)
+      - 05/2024 (partial)
+      - 2024 (year_only)
+      
+      Sort by date:
+      - Oldest → GCNC
+      - Newer → GCNM
+      ```
+      
+      **Case 3: No dates / only 1 group**
+      ```
+      Fallback:
+      - First/only GCN → GCNC (default oldest)
+      ```
+      
+      📁 FILES MODIFIED:
+      
+      - ✅ /app/desktop-app/src/components/OnlyGCNScanner.js
+        - Added `parseIssueDate()` function
+        - Added `postProcessGCN()` function
+        - Updated scan results to store metadata (color, issue_date)
+        - Call post-processing after scan complete
+        - Updated stats UI (4 cards: Total, GCNC, GCNM, GTLQ)
+      
+      🎨 UI CHANGES:
+      
+      **BEFORE (3 cards):**
+      - Total | GCN A3 | GTLQ
+      
+      **AFTER (4 cards):**
+      - Total | GCNC (Chung) | GCNM (Mẫu) | GTLQ
+      - Color coded: Red for GCNC, Pink for GCNM
+      
+      📦 MERGE BEHAVIOR:
+      
+      Now creates separate PDFs:
+      - `GCNC.pdf` (red/orange GCN or oldest)
+      - `GCNM.pdf` (pink GCN or newer)
+      - `GTLQ.pdf` (non-GCN files)
+      
+      Same as BatchScanner & DesktopScanner! ✅
+      
+      🧪 TESTING SCENARIOS:
+      
+      **Scenario 1: Mixed colors**
+      - 2 GCN: 1 red, 1 pink
+      - Expected: Red → GCNC, Pink → GCNM
+      
+      **Scenario 2: Same color, different dates**
+      - 2 GCN pink: 20/05/2024, 15/08/2024
+      - Expected: 20/05/2024 → GCNC, 15/08/2024 → GCNM
+      
+      **Scenario 3: Same color, no dates**
+      - 1 GCN red: no date
+      - Expected: → GCNC (fallback)
+      
+      **Scenario 4: Only GTLQ (no GCN)**
+      - All files are A4 or no colored border
+      - Expected: All → GTLQ, no post-processing
+      
+      📝 IMPORTANT NOTES:
+      
+      1. **Metadata extraction**: Requires AI result to include:
+         - `metadata.color` or `color` field
+         - `metadata.issue_date` or `issue_date` field
+         - `metadata.issue_date_confidence` field
+      
+      2. **Consistent with other modes**: Logic 100% matches BatchScanner
+      
+      3. **Backward compatible**: If AI doesn't return metadata, fallback works
+      
+      4. **Console logging**: Full debug logs for troubleshooting
+      
+      🎯 STATUS: ✅ Feature Complete | ⏳ User Testing Required
+      📦 BUILD: ✅ Successful (105.43 kB, +1.18 kB)
+      
+      🔄 SUMMARY OF SESSION:
+      1. ✅ Fixed pre-filter miss GCN (relaxed color thresholds)
+      2. ✅ Added A3 size check (prevent false positives)
+      3. ✅ Upgraded merge mode (3 options like other tabs)
+      4. ✅ Added GCN post-processing (GCNC/GCNM classification)
+      
+      OnlyGCNScanner now fully matches other modes! 🎉

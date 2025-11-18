@@ -291,16 +291,73 @@ function OnlyGCNScanner() {
         </p>
       </div>
 
+      {/* Mode Selection */}
+      <div className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              setScanMode('folder');
+              setFiles([]);
+              setResults([]);
+              setTxtFilePath('');
+            }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              scanMode === 'folder'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+            }`}
+          >
+            📁 Quét thư mục
+          </button>
+          <button
+            onClick={() => {
+              setScanMode('batch');
+              setFiles([]);
+              setResults([]);
+            }}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              scanMode === 'batch'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+            }`}
+          >
+            📋 Quét theo danh sách
+          </button>
+        </div>
+        <p className="text-xs text-gray-600 mt-2">
+          {scanMode === 'folder' 
+            ? '💡 Quét tất cả file trong 1 thư mục' 
+            : '💡 Quét nhiều thư mục từ file .txt (mỗi dòng 1 đường dẫn)'}
+        </p>
+      </div>
+
       {/* Controls */}
       <div className="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
         <div className="flex flex-wrap gap-3 items-center">
-          <button
-            onClick={handleSelectFolder}
-            disabled={isScanning}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            📁 Chọn thư mục
-          </button>
+          {scanMode === 'folder' ? (
+            <button
+              onClick={handleSelectFolder}
+              disabled={isScanning}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              📁 Chọn thư mục
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleSelectTxtFile}
+                disabled={isScanning}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                📄 Chọn file .txt
+              </button>
+              {txtFilePath && (
+                <span className="text-sm text-gray-600">
+                  {txtFilePath.split(/[/\\]/).pop()}
+                </span>
+              )}
+            </>
+          )}
 
           <button
             onClick={handleStartScan}

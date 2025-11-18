@@ -337,7 +337,8 @@ function OnlyGCNScanner() {
     }
 
     setIsScanning(true);
-    setResults([]);
+    setFolderTabs([]);
+    setActiveFolder(null);
     setCurrentPhase('prefilter');
     setPhaseStats({ passed: 0, skipped: 0, scanned: 0 });
     stopRef.current = false;

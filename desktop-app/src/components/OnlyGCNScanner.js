@@ -225,31 +225,41 @@ function OnlyGCNScanner() {
         console.log(`  📅 Same color → Classify by date`);
         const groupsWithDate = groupsArray.filter(g => g.parsedDate && g.parsedDate.comparable > 0);
         
+        console.log(`  📊 Groups with valid dates: ${groupsWithDate.length}/${groupsArray.length}`);
+        
         if (groupsWithDate.length >= 2) {
           groupsWithDate.sort((a, b) => a.parsedDate.comparable - b.parsedDate.comparable);
-          console.log(`📊 Sorted: Oldest = GCNC, others = GCNM`);
+          console.log(`  📊 Sorted by date: Oldest = GCNC, others = GCNM`);
           
           groupsWithDate.forEach((group, idx) => {
             const classification = (idx === 0) ? 'GCNC' : 'GCNM';
+            console.log(`    Group ${idx + 1}: ${group.issueDate} (${group.parsedDate.comparable}) → ${classification}`);
+            
             group.files.forEach(file => {
               const resIdx = processedResults.findIndex(r => r.fileName === file.fileName);
               if (resIdx >= 0) {
                 processedResults[resIdx].newShortCode = classification;
                 processedResults[resIdx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
+                console.log(`      ✅ ${file.fileName} → ${classification}`);
               }
             });
           });
         } else {
           // Fallback: Not enough dates → Use first as GCNC
-          console.log(`  ⚠️ Not enough dates → First GCN = GCNC`);
+          console.log(`  ⚠️ Not enough dates (${groupsWithDate.length} groups with dates)`);
+          console.log(`  ⚠️ Fallback: First GCN = GCNC`);
+          
           if (groupsArray.length === 1) {
             groupsArray[0].files.forEach(file => {
               const idx = processedResults.findIndex(r => r.fileName === file.fileName);
               if (idx >= 0) {
                 processedResults[idx].newShortCode = 'GCNC';
                 processedResults[idx].newDocType = 'Giấy chứng nhận (Chung)';
+                console.log(`      ✅ ${file.fileName} → GCNC (fallback)`);
               }
             });
+          } else if (groupsArray.length > 1) {
+            console.log(`  ⚠️ Multiple groups but no dates → Cannot classify, keeping as GCN`);
           }
         }
       }

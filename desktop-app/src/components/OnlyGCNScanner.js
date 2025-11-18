@@ -9,10 +9,12 @@ import { handleError, isCriticalError } from '../utils/errorHandler';
  * - Giữ nguyên thứ tự file
  */
 function OnlyGCNScanner() {
+  const [scanMode, setScanMode] = useState('folder'); // 'folder' or 'batch'
   const [files, setFiles] = useState([]);
   const [results, setResults] = useState([]);
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [txtFilePath, setTxtFilePath] = useState('');
   const stopRef = useRef(false);
 
   // Load OCR engine config

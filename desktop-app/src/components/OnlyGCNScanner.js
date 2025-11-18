@@ -703,7 +703,8 @@ function OnlyGCNScanner() {
             onClick={() => {
               setScanMode('folder');
               setFiles([]);
-              setResults([]);
+              setFolderTabs([]);
+              setActiveFolder(null);
               setTxtFilePath('');
             }}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -718,7 +719,8 @@ function OnlyGCNScanner() {
             onClick={() => {
               setScanMode('batch');
               setFiles([]);
-              setResults([]);
+              setFolderTabs([]);
+              setActiveFolder(null);
             }}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               scanMode === 'batch'

@@ -155,7 +155,8 @@ function OnlyGCNScanner() {
             confidence: result.confidence || 0,
             reasoning: result.reasoning || '',
             metadata: result.metadata || {},
-            success: true
+            success: true,
+            preFiltered: false
           });
 
         } catch (err) {

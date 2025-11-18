@@ -943,73 +943,79 @@ function OnlyGCNScanner() {
         </div>
       )}
 
-      {/* Results Table */}
-      {fileResults.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    #
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    Thư mục
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    File
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    Phân loại gốc
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    → Tên mới
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-                    Preview
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {fileResults.map((result, idx) => (
-                  <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-3 text-sm text-gray-900">{idx + 1}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{result.folderName || '-'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{result.fileName}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${
-                        result.originalShortCode === 'GCNC' || result.originalShortCode === 'GCNM' || result.originalShortCode === 'GCN'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {result.originalShortCode}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${
-                        result.newShortCode !== 'GTLQ'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {result.newShortCode}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {result.previewUrl && (
-                        <img
-                          src={result.previewUrl}
-                          alt={result.fileName}
-                          className="w-16 h-20 object-cover rounded border border-gray-300"
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* GCN Grid View - Chỉ hiển thị A3 GCN */}
+      {fileResults.length > 0 && (() => {
+        const gcnOnly = fileResults.filter(r => r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM');
+        return gcnOnly.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {gcnOnly.map((result, idx) => (
+              <div key={idx} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                {/* Preview Image */}
+                <div className="relative aspect-[3/4] bg-gray-100">
+                  {result.previewUrl ? (
+                    <img
+                      src={result.previewUrl}
+                      alt={result.fileName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <span className="text-4xl">📄</span>
+                    </div>
+                  )}
+                  
+                  {/* Badge */}
+                  <div className="absolute top-1 right-1">
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      result.newShortCode === 'GCNC'
+                        ? 'bg-red-500 text-white'
+                        : 'bg-pink-500 text-white'
+                    }`}>
+                      {result.newShortCode}
+                    </span>
+                  </div>
+                  
+                  {/* Page number indicator */}
+                  <div className="absolute top-1 left-1">
+                    <span className="bg-black bg-opacity-60 text-white px-1.5 py-0.5 rounded text-xs">
+                      #{idx + 1}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Info */}
+                <div className="p-2">
+                  <div className="text-xs text-gray-900 truncate font-medium" title={result.fileName}>
+                    {result.fileName}
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-500">
+                      {result.issue_date || 'No date'}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {Math.round(result.confidence * 100)}%
+                    </span>
+                  </div>
+                  
+                  {/* Action buttons */}
+                  <div className="flex gap-1 mt-2">
+                    <button className="flex-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs">
+                      🔍
+                    </button>
+                    <button className="flex-1 px-2 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded text-xs">
+                      ✏️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            Không có GCN nào được tìm thấy
+          </div>
+        );
+      })()}
 
       {/* Empty state */}
       {files.length === 0 && !isScanning && (

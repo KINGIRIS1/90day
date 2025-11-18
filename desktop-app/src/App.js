@@ -294,6 +294,13 @@ function App() {
           </div>
         )}
 
+        {/* Only GCN tab - rendered after first visit, just hidden when not active */}
+        {visitedTabs.has('onlygcn') && (
+          <div style={{ display: activeTab === 'onlygcn' ? 'block' : 'none' }}>
+            <OnlyGCNScanner />
+          </div>
+        )}
+
         {/* Rules tab - rendered after first visit, just hidden when not active */}
         {visitedTabs.has('rules') && (
           <div style={{ display: activeTab === 'rules' ? 'block' : 'none' }}>

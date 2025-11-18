@@ -18,7 +18,11 @@ function OnlyGCNScanner() {
   const [scanMode, setScanMode] = useState('folder'); // 'folder' or 'batch'
   const [usePreFilter, setUsePreFilter] = useState(false); // Pre-filter OFF by default
   const [files, setFiles] = useState([]);
-  const [results, setResults] = useState([]);
+  
+  // Folder tabs (giống BatchScanner)
+  const [folderTabs, setFolderTabs] = useState([]);
+  const [activeFolder, setActiveFolder] = useState(null);
+  
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [currentPhase, setCurrentPhase] = useState(''); // 'prefilter', 'scanning', 'complete'
@@ -40,6 +44,13 @@ function OnlyGCNScanner() {
   const [outputOption, setOutputOption] = useState('same_folder');
   const [mergeSuffix, setMergeSuffix] = useState('_merged');
   const [outputFolder, setOutputFolder] = useState('');
+  
+  // Get results for active folder
+  const fileResults = React.useMemo(() => {
+    if (!activeFolder || folderTabs.length === 0) return [];
+    const tab = folderTabs.find(t => t.path === activeFolder);
+    return tab ? tab.files : [];
+  }, [folderTabs, activeFolder]);
 
   React.useEffect(() => {
     loadConfig();

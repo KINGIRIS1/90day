@@ -172,14 +172,24 @@ function OnlyGCNScanner() {
             confidence: 0,
             reasoning: `Lỗi: ${err.message}`,
             metadata: {},
-            success: false
+            success: false,
+            preFiltered: false
           });
         }
 
         setResults([...newResults]);
       }
 
+      // Sort results to maintain original file order
+      newResults.sort((a, b) => {
+        const aIndex = files.indexOf(a.filePath);
+        const bIndex = files.indexOf(b.filePath);
+        return aIndex - bIndex;
+      });
+
+      setResults(newResults);
       console.log('✅ Scan complete!');
+      console.log(`📊 Final stats: ${gcnCount} GCN, ${gtlqCount} GTLQ`);
     } catch (err) {
       console.error('Scan error:', err);
       alert('Lỗi quét: ' + err.message);

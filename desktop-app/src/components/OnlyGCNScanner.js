@@ -449,86 +449,177 @@ function OnlyGCNScanner() {
           console.log(`   🤖 AI scanning ${gcnCandidates.length} GCN candidates...`);
           setProgress({ current: 0, total: gcnCandidates.length });
 
-          for (let i = 0; i < gcnCandidates.length; i++) {
-            if (stopRef.current) break;
+          // Check if should use Smart Mode (batch processing)
+          const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text'].includes(ocrEngine);
+          const shouldUseBatch = isGeminiEngine && gcnCandidates.length >= 2;
 
-            const filePath = gcnCandidates[i];
-            const fileName = filePath.split(/[/\\]/).pop();
-
-            setProgress({ current: i + 1, total: gcnCandidates.length });
-            setCurrentFile(fileName);
-            console.log(`      [${i + 1}/${gcnCandidates.length}] Scanning: ${fileName}`);
-
+          if (shouldUseBatch) {
+            // SMART MODE: Batch processing with resize
+            console.log(`   🚀 SMART MODE: Batch processing ${gcnCandidates.length} files`);
+            console.log(`   📐 Auto-resize enabled for large images`);
+            
             try {
-              const result = await window.electronAPI.processDocumentOffline(filePath);
-              
-              let previewUrl = null;
-              try {
-                if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
-                  previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+              // Call batch processor (includes auto-resize)
+              const batchResult = await window.electronAPI.batchProcessDocuments({
+                mode: 'smart',
+                imagePaths: gcnCandidates,
+                ocrEngine: ocrEngine
+              });
+
+              if (batchResult.success && batchResult.results) {
+                console.log(`   ✅ Batch complete: ${batchResult.results.length} results`);
+
+                // Map batch results
+                for (const batchItem of batchResult.results) {
+                  const filePath = batchItem.file_path;
+                  const fileName = batchItem.file_name;
+
+                  // Generate preview
+                  let previewUrl = null;
+                  try {
+                    if (filePath && /\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
+                      previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+                    }
+                  } catch (e) {
+                    console.warn('Preview error:', fileName);
+                  }
+
+                  // Normalize
+                  let newShortCode = 'GTLQ';
+                  let newDocType = 'Giấy tờ liên quan';
+                  const shortCode = batchItem.short_code || '';
+                  
+                  if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                    newShortCode = 'GCN';
+                    newDocType = 'Giấy chứng nhận';
+                  }
+
+                  // Extract metadata
+                  const meta = batchItem.metadata || {};
+                  const color = meta.color || null;
+                  const issueDate = meta.issue_date || null;
+                  const issueDateConf = meta.issue_date_confidence || null;
+
+                  if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                    console.log(`      📊 ${fileName}: color=${color || 'null'}, date=${issueDate || 'null'}`);
+                  }
+
+                  folderResults.push({
+                    fileName,
+                    filePath,
+                    folderName,
+                    previewUrl,
+                    originalShortCode: shortCode,
+                    originalDocType: batchItem.doc_type || shortCode,
+                    newShortCode,
+                    newDocType,
+                    confidence: batchItem.confidence || 0,
+                    reasoning: batchItem.reasoning || '',
+                    metadata: meta,
+                    color: color,
+                    issue_date: issueDate,
+                    issue_date_confidence: issueDateConf,
+                    success: true,
+                    preFiltered: false,
+                    method: 'batch_smart'
+                  });
                 }
-              } catch (e) {
-                console.warn('Failed to load preview:', fileName);
+
+                setProgress({ current: gcnCandidates.length, total: gcnCandidates.length });
+              } else {
+                console.error('   ❌ Batch processing failed:', batchResult.error);
+                // Fallback to single-file processing if batch fails
+                throw new Error(batchResult.error || 'Batch processing failed');
               }
+            } catch (batchErr) {
+              console.error('   ❌ Batch error, falling back to single-file:', batchErr);
+              // Fall through to single-file processing
+            }
+          }
 
-              // Normalize: GCNM/GCNC → GCN temporarily (will be re-classified in post-process)
-              let newShortCode = 'GTLQ';
-              let newDocType = 'Giấy tờ liên quan';
-              
-              const shortCode = result.short_code || result.classification || '';
-              if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-                newShortCode = 'GCN'; // Normalize to GCN (will be post-processed)
-                newDocType = 'Giấy chứng nhận';
+          // FALLBACK: Single-file processing (if not batch or batch failed)
+          if (!shouldUseBatch || folderResults.length === 0) {
+            console.log(`   📄 Single-file mode (${gcnCandidates.length} files)`);
+            
+            for (let i = 0; i < gcnCandidates.length; i++) {
+              if (stopRef.current) break;
+
+              const filePath = gcnCandidates[i];
+              const fileName = filePath.split(/[/\\]/).pop();
+
+              setProgress({ current: i + 1, total: gcnCandidates.length });
+              setCurrentFile(fileName);
+              console.log(`      [${i + 1}/${gcnCandidates.length}] ${fileName}`);
+
+              try {
+                const result = await window.electronAPI.processDocumentOffline(filePath);
+                
+                let previewUrl = null;
+                try {
+                  if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
+                    previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+                  }
+                } catch (e) {
+                  console.warn('Preview error:', fileName);
+                }
+
+                let newShortCode = 'GTLQ';
+                let newDocType = 'Giấy tờ liên quan';
+                const shortCode = result.short_code || result.classification || '';
+                
+                if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                  newShortCode = 'GCN';
+                  newDocType = 'Giấy chứng nhận';
+                }
+
+                const meta = result.metadata || {};
+                const color = meta.color || result.color || null;
+                const issueDate = meta.issue_date || result.issue_date || null;
+                const issueDateConf = meta.issue_date_confidence || result.issue_date_confidence || null;
+
+                if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                  console.log(`      📊 color=${color || 'null'}, date=${issueDate || 'null'}`);
+                }
+
+                folderResults.push({
+                  fileName,
+                  filePath,
+                  folderName,
+                  previewUrl,
+                  originalShortCode: shortCode,
+                  originalDocType: result.doc_type || shortCode,
+                  newShortCode,
+                  newDocType,
+                  confidence: result.confidence || 0,
+                  reasoning: result.reasoning || '',
+                  metadata: meta,
+                  color: color,
+                  issue_date: issueDate,
+                  issue_date_confidence: issueDateConf,
+                  success: true,
+                  preFiltered: false,
+                  method: 'single'
+                });
+
+              } catch (err) {
+                console.error(`Error: ${fileName}:`, err);
+                folderResults.push({
+                  fileName,
+                  filePath,
+                  folderName,
+                  previewUrl: null,
+                  originalShortCode: 'ERROR',
+                  originalDocType: 'Lỗi',
+                  newShortCode: 'GTLQ',
+                  newDocType: 'Giấy tờ liên quan',
+                  confidence: 0,
+                  reasoning: `Lỗi: ${err.message}`,
+                  metadata: {},
+                  success: false,
+                  preFiltered: false,
+                  method: 'single_error'
+                });
               }
-
-              // Extract GCN metadata for post-processing
-              const meta = result.metadata || {};
-              const color = meta.color || result.color || null;
-              const issueDate = meta.issue_date || result.issue_date || null;
-              const issueDateConf = meta.issue_date_confidence || result.issue_date_confidence || null;
-
-              // DEBUG: Log GCN metadata if found
-              if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-                console.log(`      📊 GCN metadata: color=${color || 'null'}, date=${issueDate || 'null'}, confidence=${issueDateConf || 'null'}`);
-              }
-
-              folderResults.push({
-                fileName,
-                filePath,
-                folderName,
-                previewUrl,
-                originalShortCode: shortCode,
-                originalDocType: result.doc_type || shortCode,
-                newShortCode,
-                newDocType,
-                confidence: result.confidence || 0,
-                reasoning: result.reasoning || '',
-                metadata: meta,
-                // GCN-specific fields for post-processing
-                color: color,
-                issue_date: issueDate,
-                issue_date_confidence: issueDateConf,
-                success: true,
-                preFiltered: false
-              });
-
-            } catch (err) {
-              console.error(`Error processing ${fileName}:`, err);
-              folderResults.push({
-                fileName,
-                filePath,
-                folderName,
-                previewUrl: null,
-                originalShortCode: 'ERROR',
-                originalDocType: 'Lỗi',
-                newShortCode: 'GTLQ',
-                newDocType: 'Giấy tờ liên quan',
-                confidence: 0,
-                reasoning: `Lỗi: ${err.message}`,
-                metadata: {},
-                success: false,
-                preFiltered: false
-              });
             }
           }
         }

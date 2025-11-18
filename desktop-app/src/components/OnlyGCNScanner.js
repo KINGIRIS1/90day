@@ -469,6 +469,22 @@ function OnlyGCNScanner() {
         </div>
       )}
 
+      {/* Folder List */}
+      {folderList.length > 0 && files.length > 0 && !isScanning && (
+        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="font-semibold text-blue-900 mb-2">
+            📁 {folderList.length} thư mục - {files.length} files
+          </div>
+          <div className="text-sm text-blue-700 max-h-32 overflow-y-auto">
+            {folderList.map((folder, idx) => (
+              <div key={idx} className="py-1">
+                {idx + 1}. {folder.name} ({folder.path})
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
       {results.length > 0 && (
         <div className="mb-4 grid grid-cols-3 gap-4">

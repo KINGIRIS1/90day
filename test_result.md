@@ -2420,3 +2420,205 @@ agent_communication:
       - Check AI response in console logs
       - Verify AI prompt includes date extraction
       - Check if engine supports metadata extraction
+
+  - agent: "main_fork_2"
+    timestamp: "2024-11-20"
+    message: |
+      ✅ ONLY GCN - ADDED FOLDER TABS & PER-FOLDER POST-PROCESSING
+      
+      🎯 USER REQUEST:
+      - "Tạo thành tab đối với từng thư mục giống bên quét thư mục và batch mode"
+      - "GCN chưa đặt tên hình như đang để chờ đến cuối"
+      
+      🔍 ANALYSIS:
+      
+      **BEFORE:**
+      - All results shown in single list (no tabs)
+      - Post-processing at the end (after all folders scanned)
+      - Cannot see per-folder results during scan
+      - GCN classification delayed until completion
+      
+      **AFTER (Now matches BatchScanner):**
+      - Folder tabs for each folder
+      - Per-folder post-processing (immediate)
+      - See results as each folder completes
+      - GCN classified right after folder scan
+      
+      ✅ IMPLEMENTATION:
+      
+      **1. Added Folder Tabs State:**
+      ```javascript
+      const [folderTabs, setFolderTabs] = useState([]);
+      const [activeFolder, setActiveFolder] = useState(null);
+      
+      // Computed: Get results for active folder
+      const fileResults = React.useMemo(() => {
+        if (!activeFolder || folderTabs.length === 0) return [];
+        const tab = folderTabs.find(t => t.path === activeFolder);
+        return tab ? tab.files : [];
+      }, [folderTabs, activeFolder]);
+      ```
+      
+      **2. Initialize Tabs Before Scan:**
+      ```javascript
+      const tabs = folderPaths.map(fp => ({
+        path: fp,
+        name: fp.split(/[/\\]/).pop(),
+        files: [],
+        processing: false,
+        complete: false
+      }));
+      setFolderTabs(tabs);
+      if (tabs.length > 0) setActiveFolder(tabs[0].path);
+      ```
+      
+      **3. Per-Folder Processing:**
+      ```javascript
+      for (let folderIdx = 0; folderIdx < folderPaths.length; folderIdx++) {
+        const folderPath = folderPaths[folderIdx];
+        
+        // Update tab status: processing
+        setFolderTabs(prev => prev.map(t => 
+          t.path === folderPath ? { ...t, processing: true } : t
+        ));
+        setActiveFolder(folderPath);
+        
+        // Collect results for THIS FOLDER only
+        const folderResults = [];
+        
+        // ... scan files ...
+        
+        // POST-PROCESS IMMEDIATELY (không chờ đến cuối!)
+        console.log(`\n   🔄 Post-processing GCN for folder: ${folderName}...`);
+        const processedFolderResults = postProcessGCN(folderResults);
+        
+        // Update tab with results: complete
+        setFolderTabs(prev => prev.map(t => 
+          t.path === folderPath ? { 
+            ...t, 
+            files: processedFolderResults, 
+            processing: false, 
+            complete: true 
+          } : t
+        ));
+        
+        // Log per-folder stats
+        const gcncCount = processedFolderResults.filter(r => r.newShortCode === 'GCNC').length;
+        const gcnmCount = processedFolderResults.filter(r => r.newShortCode === 'GCNM').length;
+        console.log(`   ✅ Folder complete: ${gcncCount} GCNC, ${gcnmCount} GCNM`);
+      }
+      ```
+      
+      **4. Added Folder Tabs UI:**
+      ```jsx
+      {folderTabs.length > 0 && (
+        <div className="mb-4 border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            {folderTabs.map((tab) => (
+              <button
+                key={tab.path}
+                onClick={() => setActiveFolder(tab.path)}
+                className={`
+                  px-4 py-2 text-sm font-medium whitespace-nowrap
+                  ${activeFolder === tab.path ? 'border-blue-500 text-blue-600' : 'border-transparent'}
+                  ${tab.processing ? 'animate-pulse' : ''}
+                `}
+              >
+                {tab.processing && '⏳ '}
+                {tab.complete && '✅ '}
+                {tab.name}
+                <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+                  {tab.files.length}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      ```
+      
+      **5. Updated Stats & Table to use fileResults:**
+      ```javascript
+      // Stats for active folder only
+      const gcncCount = fileResults.filter(r => r.newShortCode === 'GCNC').length;
+      const gcnmCount = fileResults.filter(r => r.newShortCode === 'GCNM').length;
+      
+      // Table shows active folder results
+      {fileResults.map((result, idx) => (...))}
+      ```
+      
+      **6. Updated Merge to use all folders:**
+      ```javascript
+      const handleMerge = () => {
+        const allResults = folderTabs.flatMap(t => t.files);
+        if (allResults.length === 0) {
+          alert('Chưa có kết quả nào để gộp!');
+          return;
+        }
+        setShowMergeModal(true);
+      };
+      ```
+      
+      📊 USER EXPERIENCE IMPROVEMENTS:
+      
+      **Before:**
+      ```
+      [Scanning...]
+      ⏳ Đợi tất cả folders xong...
+      ⏳ Đợi post-processing cuối cùng...
+      ✅ Done! (GCN mới được đặt tên)
+      ```
+      
+      **After:**
+      ```
+      📂 Tab 1 ⏳ Processing...
+         🎨 Pre-filter...
+         🤖 AI scanning...
+         🔄 Post-processing... ✅ Done! (GCN đã có tên ngay)
+      📂 Tab 2 ⏳ Processing...
+         🎨 Pre-filter...
+         🤖 AI scanning...
+         🔄 Post-processing... ✅ Done! (GCN đã có tên ngay)
+      📂 Tab 3 ⏳ Processing...
+         ...
+      
+      → Click tab bất kỳ để xem results
+      ```
+      
+      🎯 CONSOLE LOGS EXAMPLE:
+      
+      ```
+      📂 [1/3] Processing folder: Folder1
+         🎨 Pre-filter: 7 GCN, 54 skipped
+         🤖 AI scanning 7 GCN candidates...
+         [1/7] Scanning: file1.jpg
+         📊 GCN metadata: color=pink, date=25/03/2021, confidence=full
+         [2/7] Scanning: file2.jpg
+         📊 GCN metadata: color=pink, date=11/10/2022, confidence=full
+         ...
+         🔄 Post-processing GCN for folder: Folder1...
+         🔍 DEBUG - GCN Groups:
+           Group 1: color=pink, date=25/03/2021, files=2
+           Group 2: color=pink, date=11/10/2022, files=2
+         📅 Same color → Classify by date
+           Group 1: 25/03/2021 → GCNC
+           Group 2: 11/10/2022 → GCNM
+         ✅ Folder Folder1 complete: 2 GCNC, 2 GCNM, 54 GTLQ
+      
+      📂 [2/3] Processing folder: Folder2
+         ...
+      ```
+      
+      📁 FILES MODIFIED:
+      - ✅ /app/desktop-app/src/components/OnlyGCNScanner.js
+      
+      🎯 KEY BENEFITS:
+      
+      1. **See progress per folder** (tabs show ⏳ → ✅)
+      2. **GCN classified immediately** (không chờ đến cuối)
+      3. **Debugging easier** (log per folder)
+      4. **UX consistent** (giống BatchScanner)
+      5. **Can review results** (click tabs) while other folders scanning
+      
+      📦 BUILD: ✅ Successful (106.06 kB, +293 B)
+      🎯 STATUS: ✅ Feature Complete | ⏳ User Testing Required

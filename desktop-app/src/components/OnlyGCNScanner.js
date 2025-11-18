@@ -145,30 +145,32 @@ function OnlyGCNScanner() {
 
     setIsScanning(true);
     setResults([]);
+    setCurrentPhase('prefilter');
+    setPhaseStats({ passed: 0, skipped: 0, scanned: 0 });
     stopRef.current = false;
 
     const newResults = [];
 
     try {
       // Check if pre-filter API is available
-      if (!window.electronAPI.preFilterGCNFiles) {
-        alert('⚠️ API chưa được cập nhật. Sẽ quét tất cả file (không có pre-filter).');
-        // Fallback: scan all files without pre-filter
-        const allFiles = files;
-        const preFilterResults = { passed: allFiles, skipped: [] };
-      }
+      const hasPreFilter = !!window.electronAPI.preFilterGCNFiles;
 
       // Phase 1: Pre-filter by color (fast, free, local)
+      setCurrentPhase('prefilter');
+      setCurrentFile('Đang phân tích màu sắc...');
       console.log('🎨 Phase 1: Pre-filtering by color...');
       const preFilterStart = Date.now();
       
-      const preFilterResults = window.electronAPI.preFilterGCNFiles 
+      const preFilterResults = hasPreFilter
         ? await window.electronAPI.preFilterGCNFiles(files)
         : { passed: files, skipped: [] }; // Fallback if API not available
+      
       const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
       
       const gcnCandidates = preFilterResults.passed || [];
       const skipped = preFilterResults.skipped || [];
+      
+      setPhaseStats({ passed: gcnCandidates.length, skipped: skipped.length, scanned: 0 });
       
       console.log(`✅ Pre-filter complete in ${preFilterTime}s:`);
       console.log(`   🟢 GCN candidates: ${gcnCandidates.length} files`);

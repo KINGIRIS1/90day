@@ -285,11 +285,17 @@ function OnlyGCNScanner() {
       });
 
       setResults(newResults);
+      setCurrentPhase('complete');
+      setCurrentFile('');
       console.log('✅ Scan complete!');
-      console.log(`📊 Final stats: ${gcnCount} GCN, ${gtlqCount} GTLQ`);
+      
+      const finalGcnCount = newResults.filter(r => r.newShortCode !== 'GTLQ').length;
+      const finalGtlqCount = newResults.filter(r => r.newShortCode === 'GTLQ').length;
+      console.log(`📊 Final stats: ${finalGcnCount} GCN, ${finalGtlqCount} GTLQ`);
     } catch (err) {
       console.error('Scan error:', err);
       alert('Lỗi quét: ' + err.message);
+      setCurrentPhase('');
     } finally {
       setIsScanning(false);
     }

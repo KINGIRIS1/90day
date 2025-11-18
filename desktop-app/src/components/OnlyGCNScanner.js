@@ -886,18 +886,22 @@ function OnlyGCNScanner() {
 
       {/* Stats */}
       {results.length > 0 && (
-        <div className="mb-4 grid grid-cols-3 gap-4">
+        <div className="mb-4 grid grid-cols-4 gap-3">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="text-2xl font-bold text-gray-900">{results.length}</div>
             <div className="text-sm text-gray-600">Tổng số file</div>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="text-2xl font-bold text-green-600">{gcnCount}</div>
-            <div className="text-sm text-green-700">File GCN A3</div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="text-2xl font-bold text-red-600">{gcncCount}</div>
+            <div className="text-sm text-red-700">GCNC (Chung)</div>
+          </div>
+          <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+            <div className="text-2xl font-bold text-pink-600">{gcnmCount}</div>
+            <div className="text-sm text-pink-700">GCNM (Mẫu)</div>
           </div>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="text-2xl font-bold text-gray-600">{gtlqCount}</div>
-            <div className="text-sm text-gray-700">File GTLQ</div>
+            <div className="text-sm text-gray-700">GTLQ</div>
           </div>
         </div>
       )}

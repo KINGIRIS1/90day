@@ -496,12 +496,16 @@ function OnlyGCNScanner() {
       {/* Empty state */}
       {files.length === 0 && !isScanning && (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <div className="text-6xl mb-4">📁</div>
+          <div className="text-6xl mb-4">
+            {scanMode === 'folder' ? '📁' : '📋'}
+          </div>
           <div className="text-xl font-medium text-gray-900 mb-2">
-            Chưa chọn thư mục
+            {scanMode === 'folder' ? 'Chưa chọn thư mục' : 'Chưa chọn file .txt'}
           </div>
           <div className="text-gray-600">
-            Nhấn "Chọn thư mục" để bắt đầu
+            {scanMode === 'folder' 
+              ? 'Nhấn "Chọn thư mục" để bắt đầu'
+              : 'Nhấn "Chọn file .txt" để bắt đầu'}
           </div>
         </div>
       )}

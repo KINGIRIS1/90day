@@ -423,7 +423,7 @@ function OnlyGCNScanner() {
         // Add skipped files as GTLQ
         for (const filePath of skipped) {
           const fileName = filePath.split(/[/\\]/).pop();
-          allResults.push({
+          folderResults.push({
             fileName,
             filePath,
             folderName,

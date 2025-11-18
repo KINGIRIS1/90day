@@ -359,6 +359,17 @@ function OnlyGCNScanner() {
       const folderPaths = Object.keys(folderGroups);
       console.log(`📁 Processing ${folderPaths.length} folders...`);
       
+      // Initialize folder tabs
+      const tabs = folderPaths.map(fp => ({
+        path: fp,
+        name: fp.split(/[/\\]/).pop(),
+        files: [],
+        processing: false,
+        complete: false
+      }));
+      setFolderTabs(tabs);
+      if (tabs.length > 0) setActiveFolder(tabs[0].path);
+      
       setFolderProgress({ current: 0, total: folderPaths.length });
 
       // Process each folder
@@ -372,11 +383,20 @@ function OnlyGCNScanner() {
         const folderFiles = folderGroups[folderPath];
         const folderName = folderPath.split(/[/\\]/).pop() || 'root';
 
+        // Update tab status
+        setFolderTabs(prev => prev.map(t => 
+          t.path === folderPath ? { ...t, processing: true } : t
+        ));
+        setActiveFolder(folderPath);
+
         setFolderProgress({ current: folderIdx + 1, total: folderPaths.length });
         setCurrentFolder(folderName);
 
         console.log(`\n📂 [${folderIdx + 1}/${folderPaths.length}] Processing folder: ${folderName}`);
         console.log(`   Files: ${folderFiles.length}`);
+
+        // Results for THIS FOLDER only
+        const folderResults = [];
 
         // Phase 1: Pre-filter THIS FOLDER (if enabled)
         let gcnCandidates = folderFiles;

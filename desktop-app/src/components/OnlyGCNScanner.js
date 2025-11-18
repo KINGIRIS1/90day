@@ -950,8 +950,39 @@ function OnlyGCNScanner() {
         </div>
       )}
 
+      {/* Folder Tabs (giống BatchScanner) */}
+      {folderTabs.length > 0 && (
+        <div className="mb-4 border-b border-gray-200">
+          <div className="flex overflow-x-auto">
+            {folderTabs.map((tab) => (
+              <button
+                key={tab.path}
+                onClick={() => setActiveFolder(tab.path)}
+                className={`
+                  px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors
+                  ${activeFolder === tab.path
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }
+                  ${tab.processing ? 'animate-pulse' : ''}
+                `}
+              >
+                {tab.processing && '⏳ '}
+                {tab.complete && '✅ '}
+                {tab.name}
+                {tab.files.length > 0 && (
+                  <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded-full">
+                    {tab.files.length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
-      {results.length > 0 && (
+      {fileResults.length > 0 && (
         <div className="mb-4 grid grid-cols-4 gap-3">
           <div className="bg-white border border-gray-200 rounded-lg p-4">
             <div className="text-2xl font-bold text-gray-900">{results.length}</div>

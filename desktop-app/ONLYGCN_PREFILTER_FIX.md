@@ -1,7 +1,8 @@
 # 🔧 Only GCN Pre-filter Fix
 
 **Ngày sửa:** 20/11/2024  
-**Vấn đề:** Pre-filter không nhận diện được GCN mặc dù file có màu đỏ/hồng  
+**Cập nhật:** 20/11/2024 (Added A3 size check)  
+**Vấn đề:** Pre-filter không nhận diện đúng GCN A3  
 **Trạng thái:** ✅ Đã sửa xong, chờ user test
 
 ---

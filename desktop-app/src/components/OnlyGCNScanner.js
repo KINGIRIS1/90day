@@ -482,15 +482,20 @@ function OnlyGCNScanner() {
         return aIndex - bIndex;
       });
 
-      setResults(allResults);
+      // Post-process GCN: Classify into GCNC/GCNM (giống BatchScanner)
+      console.log('\n🔄 Starting GCN post-processing...');
+      const processedResults = postProcessGCN(allResults);
+
+      setResults(processedResults);
       setCurrentPhase('complete');
       setCurrentFile('');
       setCurrentFolder('');
       console.log('\n✅ All folders complete!');
       
-      const finalGcnCount = allResults.filter(r => r.newShortCode !== 'GTLQ').length;
-      const finalGtlqCount = allResults.filter(r => r.newShortCode === 'GTLQ').length;
-      console.log(`📊 Final stats: ${finalGcnCount} GCN, ${finalGtlqCount} GTLQ`);
+      const finalGcncCount = processedResults.filter(r => r.newShortCode === 'GCNC').length;
+      const finalGcnmCount = processedResults.filter(r => r.newShortCode === 'GCNM').length;
+      const finalGtlqCount = processedResults.filter(r => r.newShortCode === 'GTLQ').length;
+      console.log(`📊 Final stats: ${finalGcncCount} GCNC, ${finalGcnmCount} GCNM, ${finalGtlqCount} GTLQ`);
     } catch (err) {
       console.error('Scan error:', err);
       alert('Lỗi quét: ' + err.message);

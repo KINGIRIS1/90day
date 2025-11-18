@@ -160,7 +160,7 @@ if __name__ == '__main__':
         sys.exit(1)
 ```
 
-### 3. Toggle Switch UI (Đã có sẵn từ trước)
+### 4. Toggle Switch UI (Đã có sẵn từ trước)
 
 Toggle switch đã được thêm vào `OnlyGCNScanner.js` (lines 427-438):
 ```jsx

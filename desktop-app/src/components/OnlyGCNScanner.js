@@ -746,72 +746,70 @@ function OnlyGCNScanner() {
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
-        <div className="flex flex-wrap gap-3 items-center">
-          {scanMode === 'folder' ? (
-            <button
-              onClick={handleSelectFolder}
-              disabled={isScanning}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              📁 Chọn thư mục
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={handleSelectTxtFile}
-                disabled={isScanning || isLoadingFolders}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                📄 Chọn file .txt
-              </button>
-              {txtFilePath && (
-                <>
-                  <span className="text-sm text-gray-600">
-                    {txtFilePath.split(/[/\\]/).pop()}
-                  </span>
-                  <button
-                    onClick={handleLoadFolders}
-                    disabled={isScanning || isLoadingFolders || !txtFilePath}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoadingFolders ? '⏳ Đang tìm...' : '🔍 Tìm kiếm thư mục'}
-                  </button>
-                </>
-              )}
-            </>
-          )}
-
+      {/* Controls - Compact */}
+      <div className="mb-2 bg-white rounded-lg p-2 border border-gray-200 flex flex-wrap gap-2 items-center">
+        {scanMode === 'folder' ? (
           <button
-            onClick={handleStartScan}
-            disabled={files.length === 0 || isScanning}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleSelectFolder}
+            disabled={isScanning}
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors disabled:opacity-50"
           >
-            {isScanning ? '⏳ Đang quét...' : '▶️ Bắt đầu quét'}
+            📁 Chọn
           </button>
-
-          {isScanning && (
+        ) : (
+          <>
             <button
-              onClick={handleStop}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium shadow-sm transition-colors"
+              onClick={handleSelectTxtFile}
+              disabled={isScanning || isLoadingFolders}
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors disabled:opacity-50"
             >
-              ⏹️ Dừng
+              📄 File
             </button>
-          )}
+            {txtFilePath && (
+              <>
+                <span className="text-xs text-gray-600 truncate max-w-xs">
+                  {txtFilePath.split(/[/\\]/).pop()}
+                </span>
+                <button
+                  onClick={handleLoadFolders}
+                  disabled={isScanning || isLoadingFolders || !txtFilePath}
+                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors disabled:opacity-50"
+                >
+                  {isLoadingFolders ? '⏳' : '🔍'}
+                </button>
+              </>
+            )}
+          </>
+        )}
 
-          {folderTabs.length > 0 && folderTabs.some(t => t.complete) && !isScanning && (
-            <button
-              onClick={handleMerge}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm transition-colors"
-            >
-              📚 Gộp PDF
-            </button>
-          )}
+        <button
+          onClick={handleStartScan}
+          disabled={files.length === 0 || isScanning}
+          className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors disabled:opacity-50"
+        >
+          {isScanning ? '⏳' : '▶️ Quét'}
+        </button>
 
-          <div className="ml-auto text-sm text-gray-600">
-            <span className="font-medium">Engine:</span> {ocrEngine}
-          </div>
+        {isScanning && (
+          <button
+            onClick={handleStop}
+            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors"
+          >
+            ⏹
+          </button>
+        )}
+
+        {folderTabs.length > 0 && folderTabs.some(t => t.complete) && !isScanning && (
+          <button
+            onClick={handleMerge}
+            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm transition-colors"
+          >
+            📚 Gộp
+          </button>
+        )}
+
+        <div className="ml-auto text-sm text-gray-600">
+          <span className="font-medium">Engine:</span> {ocrEngine}
         </div>
       </div>
 

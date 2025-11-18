@@ -36,6 +36,12 @@ function OnlyGCNScanner() {
   // Select folder
   const handleSelectFolder = async () => {
     try {
+      // Check if API is available
+      if (!window.electronAPI.getImagesInFolder) {
+        alert('⚠️ Chức năng này cần cập nhật app.\n\nVui lòng:\n1. Save to GitHub\n2. Pull code mới\n3. Đóng app hoàn toàn\n4. Xóa cache: %APPDATA%\\Electron\n5. Chạy: yarn install\n6. Restart app');
+        return;
+      }
+
       const folderPath = await window.electronAPI.selectFolder();
       if (!folderPath) return;
 

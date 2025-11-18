@@ -1,6 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { handleError, isCriticalError } from '../utils/errorHandler';
 
+// Helper for path operations (client-side safe)
+const path = {
+  dirname: (p) => p.substring(0, Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'))),
+  basename: (p) => p.split(/[/\\]/).pop()
+};
+
 /**
  * Only GCN Scanner - Chế độ đặc biệt
  * - Quét và phân loại tất cả file

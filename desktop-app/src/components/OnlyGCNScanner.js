@@ -606,8 +606,10 @@ function OnlyGCNScanner() {
     }
   };
 
-  const gcnCount = results.filter(r => r.newShortCode !== 'GTLQ').length;
+  const gcncCount = results.filter(r => r.newShortCode === 'GCNC').length;
+  const gcnmCount = results.filter(r => r.newShortCode === 'GCNM').length;
   const gtlqCount = results.filter(r => r.newShortCode === 'GTLQ').length;
+  const totalGcnCount = gcncCount + gcnmCount;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

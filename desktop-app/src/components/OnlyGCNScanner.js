@@ -138,7 +138,7 @@ function OnlyGCNScanner() {
     }
   };
 
-  // Start scanning with pre-filter
+  // Start scanning with pre-filter BY FOLDER
   const handleStartScan = async () => {
     if (files.length === 0) {
       alert('Vui lòng chọn thư mục trước!');
@@ -151,148 +151,176 @@ function OnlyGCNScanner() {
     setPhaseStats({ passed: 0, skipped: 0, scanned: 0 });
     stopRef.current = false;
 
-    const newResults = [];
+    const allResults = [];
 
     try {
       // Check if pre-filter API is available
       const hasPreFilter = !!window.electronAPI.preFilterGCNFiles;
 
-      // Phase 1: Pre-filter by color (fast, free, local)
-      setCurrentPhase('prefilter');
-      setCurrentFile('Đang phân tích màu sắc...');
-      console.log('🎨 Phase 1: Pre-filtering by color...');
-      const preFilterStart = Date.now();
-      
-      const preFilterResults = hasPreFilter
-        ? await window.electronAPI.preFilterGCNFiles(files)
-        : { passed: files, skipped: [] }; // Fallback if API not available
-      
-      const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
-      
-      const gcnCandidates = preFilterResults.passed || [];
-      const skipped = preFilterResults.skipped || [];
-      
-      setPhaseStats({ passed: gcnCandidates.length, skipped: skipped.length, scanned: 0 });
-      
-      console.log(`✅ Pre-filter complete in ${preFilterTime}s:`);
-      console.log(`   🟢 GCN candidates: ${gcnCandidates.length} files`);
-      console.log(`   ⏭️  Skipped: ${skipped.length} files`);
-      
-      // Add skipped files to results as GTLQ without scanning
-      for (const filePath of skipped) {
-        const fileName = filePath.split(/[/\\]/).pop();
-        newResults.push({
-          fileName,
-          filePath,
-          previewUrl: null,
-          originalShortCode: 'SKIPPED',
-          originalDocType: 'Bỏ qua (không phải GCN)',
-          newShortCode: 'GTLQ',
-          newDocType: 'Giấy tờ liên quan',
-          confidence: 0,
-          reasoning: 'Pre-filter: Không có màu GCN (red/pink)',
-          metadata: {},
-          success: true,
-          preFiltered: true
-        });
-      }
+      // Group files by folder
+      const folderGroups = {};
+      files.forEach(filePath => {
+        const folderPath = filePath.substring(0, filePath.lastIndexOf(/[/\\]/.exec(filePath)[0]));
+        if (!folderGroups[folderPath]) {
+          folderGroups[folderPath] = [];
+        }
+        folderGroups[folderPath].push(filePath);
+      });
 
-      // Phase 2: AI scan only GCN candidates
-      setCurrentPhase('scanning');
-      console.log(`\n🤖 Phase 2: AI scanning ${gcnCandidates.length} GCN candidates...`);
-      setProgress({ current: 0, total: gcnCandidates.length });
+      const folderPaths = Object.keys(folderGroups);
+      console.log(`📁 Processing ${folderPaths.length} folders...`);
+      
+      setFolderProgress({ current: 0, total: folderPaths.length });
 
-      for (let i = 0; i < gcnCandidates.length; i++) {
+      // Process each folder
+      for (let folderIdx = 0; folderIdx < folderPaths.length; folderIdx++) {
         if (stopRef.current) {
           console.log('⏹️ Scan stopped by user');
           break;
         }
 
-        const filePath = gcnCandidates[i];
-        const fileName = filePath.split(/[/\\]/).pop();
+        const folderPath = folderPaths[folderIdx];
+        const folderFiles = folderGroups[folderPath];
+        const folderName = folderPath.split(/[/\\]/).pop() || 'root';
 
-        setProgress({ current: i + 1, total: gcnCandidates.length });
-        setCurrentFile(fileName);
-        setPhaseStats(prev => ({ ...prev, scanned: i + 1 }));
-        console.log(`[${i + 1}/${gcnCandidates.length}] AI Scanning: ${fileName}`);
+        setFolderProgress({ current: folderIdx + 1, total: folderPaths.length });
+        setCurrentFolder(folderName);
 
-        try {
-          // Scan file
-          const result = await window.electronAPI.processDocumentOffline(filePath);
-          
-          // Generate preview
-          let previewUrl = null;
-          try {
-            if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
-              previewUrl = await window.electronAPI.readImageDataUrl(filePath);
-            }
-          } catch (e) {
-            console.warn('Failed to load preview:', fileName);
-          }
+        console.log(`\n📂 [${folderIdx + 1}/${folderPaths.length}] Processing folder: ${folderName}`);
+        console.log(`   Files: ${folderFiles.length}`);
 
-          // Determine new name based on classification
-          let newShortCode = 'GTLQ';
-          let newDocType = 'Giấy tờ liên quan';
-          
-          // Check if it's GCN A3 (GCNC or GCNM)
-          const shortCode = result.short_code || result.classification || '';
-          if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-            newShortCode = shortCode;
-            newDocType = shortCode === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 
-                         shortCode === 'GCNM' ? 'Giấy chứng nhận (Mẫu)' : 
-                         'Giấy chứng nhận';
-          }
-
-          newResults.push({
+        // Phase 1: Pre-filter THIS FOLDER
+        setCurrentPhase('prefilter');
+        setCurrentFile(`Đang phân tích màu sắc thư mục ${folderName}...`);
+        
+        const preFilterStart = Date.now();
+        const preFilterResults = hasPreFilter
+          ? await window.electronAPI.preFilterGCNFiles(folderFiles)
+          : { passed: folderFiles, skipped: [] };
+        
+        const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
+        
+        const gcnCandidates = preFilterResults.passed || [];
+        const skipped = preFilterResults.skipped || [];
+        
+        console.log(`   🎨 Pre-filter: ${gcnCandidates.length} GCN, ${skipped.length} skipped (${preFilterTime}s)`);
+        
+        // Add skipped files as GTLQ
+        for (const filePath of skipped) {
+          const fileName = filePath.split(/[/\\]/).pop();
+          allResults.push({
             fileName,
             filePath,
-            previewUrl,
-            originalShortCode: shortCode,
-            originalDocType: result.doc_type || shortCode,
-            newShortCode,
-            newDocType,
-            confidence: result.confidence || 0,
-            reasoning: result.reasoning || '',
-            metadata: result.metadata || {},
-            success: true,
-            preFiltered: false
-          });
-
-        } catch (err) {
-          console.error(`Error processing ${fileName}:`, err);
-          newResults.push({
-            fileName,
-            filePath,
+            folderName,
             previewUrl: null,
-            originalShortCode: 'ERROR',
-            originalDocType: 'Lỗi',
+            originalShortCode: 'SKIPPED',
+            originalDocType: 'Bỏ qua (không phải GCN)',
             newShortCode: 'GTLQ',
             newDocType: 'Giấy tờ liên quan',
             confidence: 0,
-            reasoning: `Lỗi: ${err.message}`,
+            reasoning: 'Pre-filter: Không có màu GCN (red/pink)',
             metadata: {},
-            success: false,
-            preFiltered: false
+            success: true,
+            preFiltered: true
           });
         }
 
-        setResults([...newResults]);
+        // Phase 2: AI scan GCN candidates OF THIS FOLDER
+        if (gcnCandidates.length > 0) {
+          setCurrentPhase('scanning');
+          console.log(`   🤖 AI scanning ${gcnCandidates.length} GCN candidates...`);
+          setProgress({ current: 0, total: gcnCandidates.length });
+
+          for (let i = 0; i < gcnCandidates.length; i++) {
+            if (stopRef.current) break;
+
+            const filePath = gcnCandidates[i];
+            const fileName = filePath.split(/[/\\]/).pop();
+
+            setProgress({ current: i + 1, total: gcnCandidates.length });
+            setCurrentFile(fileName);
+            console.log(`      [${i + 1}/${gcnCandidates.length}] Scanning: ${fileName}`);
+
+            try {
+              const result = await window.electronAPI.processDocumentOffline(filePath);
+              
+              let previewUrl = null;
+              try {
+                if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
+                  previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+                }
+              } catch (e) {
+                console.warn('Failed to load preview:', fileName);
+              }
+
+              let newShortCode = 'GTLQ';
+              let newDocType = 'Giấy tờ liên quan';
+              
+              const shortCode = result.short_code || result.classification || '';
+              if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+                newShortCode = shortCode;
+                newDocType = shortCode === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 
+                             shortCode === 'GCNM' ? 'Giấy chứng nhận (Mẫu)' : 
+                             'Giấy chứng nhận';
+              }
+
+              allResults.push({
+                fileName,
+                filePath,
+                folderName,
+                previewUrl,
+                originalShortCode: shortCode,
+                originalDocType: result.doc_type || shortCode,
+                newShortCode,
+                newDocType,
+                confidence: result.confidence || 0,
+                reasoning: result.reasoning || '',
+                metadata: result.metadata || {},
+                success: true,
+                preFiltered: false
+              });
+
+            } catch (err) {
+              console.error(`Error processing ${fileName}:`, err);
+              allResults.push({
+                fileName,
+                filePath,
+                folderName,
+                previewUrl: null,
+                originalShortCode: 'ERROR',
+                originalDocType: 'Lỗi',
+                newShortCode: 'GTLQ',
+                newDocType: 'Giấy tờ liên quan',
+                confidence: 0,
+                reasoning: `Lỗi: ${err.message}`,
+                metadata: {},
+                success: false,
+                preFiltered: false
+              });
+            }
+
+            setResults([...allResults]);
+          }
+        }
+
+        console.log(`   ✅ Folder ${folderName} complete!`);
       }
 
       // Sort results to maintain original file order
-      newResults.sort((a, b) => {
+      allResults.sort((a, b) => {
         const aIndex = files.indexOf(a.filePath);
         const bIndex = files.indexOf(b.filePath);
         return aIndex - bIndex;
       });
 
-      setResults(newResults);
+      setResults(allResults);
       setCurrentPhase('complete');
       setCurrentFile('');
-      console.log('✅ Scan complete!');
+      setCurrentFolder('');
+      console.log('\n✅ All folders complete!');
       
-      const finalGcnCount = newResults.filter(r => r.newShortCode !== 'GTLQ').length;
-      const finalGtlqCount = newResults.filter(r => r.newShortCode === 'GTLQ').length;
+      const finalGcnCount = allResults.filter(r => r.newShortCode !== 'GTLQ').length;
+      const finalGtlqCount = allResults.filter(r => r.newShortCode === 'GTLQ').length;
       console.log(`📊 Final stats: ${finalGcnCount} GCN, ${finalGtlqCount} GTLQ`);
     } catch (err) {
       console.error('Scan error:', err);

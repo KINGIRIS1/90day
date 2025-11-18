@@ -15,6 +15,8 @@ function OnlyGCNScanner() {
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [txtFilePath, setTxtFilePath] = useState('');
+  const [isLoadingFolders, setIsLoadingFolders] = useState(false);
+  const [folderList, setFolderList] = useState([]);
   const stopRef = useRef(false);
 
   // Load OCR engine config

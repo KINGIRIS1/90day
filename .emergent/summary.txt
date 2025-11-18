@@ -1,265 +1,234 @@
 <analysis>**original_problem_statement:**
-Ban đầu, người dùng yêu cầu sửa lỗi phân loại tài liệu của các engine OCR (chủ yếu là Gemini Flash Lite), tối ưu hóa giao diện người dùng và cải thiện hiệu suất.
+Ban đầu, người dùng yêu cầu sửa lỗi phân loại tài liệu của engine OCR, tối ưu hóa giao diện người dùng và cải thiện hiệu suất.
 
-Các yêu cầu chính trong suốt phiên làm việc bao gồm:
-1.  **Sửa lỗi phân loại tài liệu**:
-    *   GCN (Giấy chứng nhận) không được phân loại thành GCNC/GCNM.
-    *   GIẤY ỦY QUYỀN bị phân loại nhầm thành HDUQ.
-    *   PHIẾU KIỂM SOÁT... bị phân loại nhầm thành PKTHS hoặc UNKNOWN thay vì GTLQ.
-    *   TRÍCH LỤC BẢN ĐỒ... bị phân loại nhầm thành BMT thay vì HSKT.
-    *   Phân loại không nhất quán giữa các lần quét và giữa các chế độ (File mode vs Batch mode).
-2.  **Cải thiện giao diện người dùng (UI)**:
-    *   Thêm các nút hành động (Gộp thư mục, Load Preview) vào cả phía trên và dưới của danh sách kết quả.
-    *   Loại bỏ các nút bị trùng lặp sau khi refactor.
-3.  **Cải thiện xử lý hàng loạt (Batch Processing)**:
-    *   Giải quyết tình trạng fallback quá nhiều trong chế độ Smart Batch.
-    *   Yêu cầu thay đổi số lượng file tối thiểu cho Smart Batch từ 3 xuống 2.
-4.  **Tạo bản build**: Hướng dẫn người dùng cách tạo bản build one-click trên máy Windows của họ.
-5.  **Khám phá giải pháp tối ưu**:
-    *   Thảo luận về việc lọc tài liệu theo khổ giấy (A3/A4) và nhận diện màu sắc cục bộ để tiết kiệm chi phí API.
-    *   So sánh chi phí/hiệu suất giữa các chế độ quét khác nhau.
+Các yêu cầu mới trong phiên làm việc này bao gồm:
+1.  **Thay đổi logic Smart Mode**: Giảm số lượng file tối thiểu để kích hoạt từ 3 xuống 2.
+2.  **Cải thiện trải nghiệm người dùng (UX)**:
+    *   Khôi phục lại chức năng tự động hiển thị preview khi quét thư mục, loại bỏ nút Load Preview.
+    *   Thêm thông báo lỗi chi tiết và thân thiện hơn cho người dùng khi API gặp sự cố (503, 429, etc.).
+    *   Xóa các nút điều hướng (Prev, Next) bị trùng lặp ở cuối danh sách kết quả.
+    *   Hiển thị trạng thái chi tiết hơn trong quá trình quét để người dùng biết app đang làm gì.
+3.  **Thêm chức năng mới Only GCN**:
+    *   Tạo một tab mới chỉ để xử lý GCN.
+    *   Chức năng này sẽ quét các thư mục, sử dụng bộ lọc màu và khổ giấy () để xác định các file có khả năng là GCN.
+    *   Chỉ gửi các file ứng viên GCN này qua API OCR để tiết kiệm chi phí.
+    *   Các file còn lại sẽ được tự động đặt tên là GTLQ và giữ nguyên thứ tự ban đầu.
+    *   Xử lý các thư mục một cách tuần tự thay vì xử lý tất cả file cùng lúc.
+4.  **Sửa lỗi**:
+    *   Khắc phục lỗi format response của Gemini API trong chế độ batch.
+    *   Giải quyết các vấn đề môi trường cục bộ của người dùng (lỗi build, cache Electron, không pull code mới).
+    *   Sửa lỗi  không nhận diện được GCN.
 
 **User's preferred language**: Vietnamese
 
 **what currently exists?**
-- Một ứng dụng OCR desktop (Electron, React, Python) với các engine Gemini và OpenAI.
-- Giao diện người dùng đã được cập nhật để có các nút hành động nhất quán ở trên và dưới trong các chế độ quét. Các nút bị trùng lặp đã được gỡ bỏ.
-- Logic phân loại tài liệu đã được sửa lỗi nhiều lần thông qua việc tinh chỉnh prompt () và thêm các quy tắc hậu xử lý (post-processing) trực tiếp vào code Python (, ) để ép buộc sửa các lỗi phân loại phổ biến.
-- Kích thước batch tối đa cho Smart Mode đã được giảm từ 15 xuống 8 để giảm thiểu lỗi fallback.
-- Đã thêm logging chi tiết vào  để gỡ lỗi các vấn đề về fallback.
-- Các tài liệu hướng dẫn build và phân tích chi phí/giải pháp đã được tạo (, , ).
+- Một ứng dụng OCR desktop (Electron, React, Python) với nhiều chế độ quét.
+- Hệ thống xử lý lỗi tập trung đã được triển khai cho cả frontend và backend để hiển thị các thông báo lỗi API thân thiện hơn.
+- Vấn đề dung lượng ổ đĩa đã được giải quyết bằng cách xóa các file tạm.
+- Logic Smart Mode đã được cập nhật để cho phép xử lý với 2 file thay vì 3.
+- Giao diện người dùng đã được dọn dẹp (xóa các nút trùng lặp, khôi phục preview tự động).
+- Một tab chức năng mới, **Only GCN**, đã được tạo (). Tab này có giao diện để chọn thư mục hoặc danh sách file, xử lý tuần tự từng thư mục và hiển thị trạng thái chi tiết.
+- Logic pre-filter (bộ lọc sơ bộ) để nhận diện GCN dựa trên màu sắc () đã được tích hợp vào tab Only GCN.
+- Các file cấu hình và thực thi của Electron (, ) đã được cập nhật để thêm các API cần thiết cho tab Only GCN.
+- Đã tạo tài liệu  để ghi nhớ cấu trúc file quan trọng của Electron nhằm tránh lỗi trong tương lai.
 
 **Last working item**:
-- **Last item agent was working**: Người dùng yêu cầu thay đổi số lượng file tối thiểu cho Smart Mode (chế độ Gom Thông Minh) từ 3 xuống 2. Agent đã xác định rằng cần phải sửa đổi code nhưng chưa thực hiện.
-- **Status**: NOT STARTED
+- **Last item agent was working**: Người dùng báo cáo rằng tab Only GCN không nhận diện được các file GCN mặc dù chúng có tồn tại trong thư mục. Agent đã xác định nguyên nhân là do script  có các ngưỡng nhận diện màu sắc quá khắt khe. Agent đã bắt đầu sửa lỗi này bằng cách nới lỏng các ngưỡng trong  và thêm một tùy chọn (toggle switch) vào giao diện người dùng của  để cho phép người dùng bật/tắt chức năng pre-filter này.
+- **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Manual testing by user. Người dùng cần xác nhận rằng họ có thể chạy chế độ Gom Thông Minh với 2 tệp.
+- **Which testing method agent to use?**: Manual testing by user. Người dùng cần pull code mới, rebuild và kiểm tra xem: 1. Các file GCN có được nhận diện chính xác hơn không. 2. Nút bật/tắt pre-filter có hoạt động như mong đợi không.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0)**: Lỗi phân loại không nhất quán và sai sót của engine .
-- **Issue 2 (P1)**: Cho phép sửa kết quả ngay khi quét xong từng file, không cần chờ hết batch (Yêu cầu từ fork trước).
-- **Issue 3 (P2)**: Cảnh báo dung lượng ổ đĩa liên tục ở mức 95%.
+- **Issue 1 (P0)**:  nhận diện sai GCN.
+- **Issue 2 (P1)**: Lỗi phân loại không nhất quán của engine .
+- **Issue 3 (P2)**: Môi trường local của người dùng không đồng bộ, gây ra lỗi.
+- **Issue 4 (P3)**: Cho phép sửa kết quả ngay khi quét xong từng file.
 
 **Issues Detail:**
-- **Issue 1: Lỗi phân loại không nhất quán của **
-  - **Attempted fixes**:
-    - Tinh chỉnh  nhiều lần với các quy tắc và ví dụ rõ ràng hơn.
-    - Cập nhật  với các ánh xạ tiêu đề chính xác.
-    - **Thêm logic hậu xử lý (post-processing)** vào  và  để tự động sửa các lỗi sai phổ biến (ví dụ: nếu kết quả là PKTHS nhưng  chứa KIỂM SOÁT, tự động đổi thành GTLQ).
+- **Issue 1:  nhận diện sai GCN**
+  - **Attempted fixes**: Agent đã xác định rằng các ngưỡng  và các điều kiện màu sắc khác trong  là quá nghiêm ngặt, dẫn đến việc bỏ sót các file GCN có màu nhạt. Agent đã bắt đầu chỉnh sửa file này để nới lỏng các ngưỡng ( in message 488) và đồng thời thêm một state  và một toggle switch vào  để người dùng có thể tự quyết định sử dụng bộ lọc hay không ( in messages 481 & 483).
   - **Next debug checklist**:
-    1.  Hoàn thành yêu cầu cuối cùng của người dùng: thay đổi số lượng file tối thiểu cho Smart Mode thành 2.
-    2.  Tiếp tục theo dõi phản hồi của người dùng về các trường hợp phân loại sai mới.
-    3.  Xem xét lại giải pháp đã lưu trong . Việc lọc trước theo khổ giấy và màu sắc cục bộ có thể là một giải pháp bền vững hơn thay vì liên tục sửa lỗi LLM.
-  - **Why fix this issue and what will be achieved with the fix?**: Đây là chức năng cốt lõi của ứng dụng. Việc phân loại chính xác là cực kỳ quan trọng đối với người dùng.
+    1.  Hoàn thành việc thêm UI toggle switch vào .
+    2.  Xác nhận logic trong  sử dụng đúng state  để bỏ qua bước  khi toggle được tắt.
+    3.  Yêu cầu người dùng kiểm tra với cả hai chế độ (bật và tắt pre-filter) để xem GCN có được nhận diện đúng không.
+  - **Why fix this issue and what will be achieved with the fix?**: Đây là lỗi chặn (blocker) đối với chức năng cốt lõi của tab Only GCN. Sửa lỗi này sẽ làm cho tính năng hoạt động như mong đợi.
+  - **Status**: IN PROGRESS
+  - **Is recurring issue?**: N
+  - **Should Test frontend/backend/both after fix?**: Both.
+  - **Blocked on other issue**: None.
+
+- **Issue 2: Lỗi phân loại không nhất quán của **
+  - **Attempted fixes**: Agent đã thêm logic fallback vào  để xử lý trường hợp API trả về sai định dạng JSON. Tuy nhiên, vấn đề cốt lõi về độ chính xác của phân loại vẫn còn.
+  - **Next debug checklist**:
+    1.  Sau khi Issue 1 được giải quyết, tiếp tục theo dõi phản hồi của người dùng về các trường hợp phân loại sai.
+    2.  Xem xét lại việc triển khai đầy đủ giải pháp trong  như một giải pháp dài hạn.
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện độ tin cậy của chức năng cốt lõi của ứng dụng.
   - **Status**: IN PROGRESS
   - **Is recurring issue?**: Y
   - **Should Test frontend/backend/both after fix?**: Backend (logic Python).
+  - **Blocked on other issue**: Issue 1.
+
+- **Issue 3: Môi trường local của người dùng không đồng bộ**
+  - **Attempted fixes**: Agent đã mất rất nhiều thời gian để chẩn đoán các lỗi do người dùng chưa , chạy sai lệnh (yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. thay vì yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.), hoặc bị lỗi cache Electron. Agent đã tạo ra các file hướng dẫn (, ) và liên tục hướng dẫn người dùng quy trình đúng.
+  - **Next debug checklist**: Mỗi khi có thay đổi liên quan đến file Electron (, ), cần phải hướng dẫn người dùng một cách rõ ràng và chi tiết quy trình: , xóa cache Electron, và restart hoàn toàn app.
+  - **Why fix this issue and what will be achieved with the fix?**: Giảm thời gian gỡ lỗi các vấn đề không liên quan đến code và tăng tốc độ phát triển.
+  - **Status**: NOT STARTED (Đây là vấn đề về quy trình, không phải lỗi code để sửa).
+  - **Is recurring issue?**: Y
+  - **Should Test frontend/backend/both after fix?**: NA.
   - **Blocked on other issue**: None.
 
-- **Issue 2: Cho phép sửa kết quả ngay khi quét xong file (edit-while-scanning)**
-  - **Attempted fixes**: Chưa có.
+- **Issue 4: Cho phép sửa kết quả ngay khi quét xong file (edit-while-scanning)**
+  - **Attempted fixes**: Chưa có. Đây là yêu cầu từ fork trước.
   - **Next debug checklist**:
-    1.  Trong  và , tìm các thành phần UI bị vô hiệu hóa bởi .
-    2.  Thay đổi điều kiện  từ một biến trạng thái chung thành kiểm tra trạng thái của từng mục riêng lẻ (ví dụ: ).
-  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện đáng kể trải nghiệm người dùng, cho phép họ xử lý kết quả song song với quá trình quét.
+    1.  Xác định các thành phần UI bị vô hiệu hóa bởi  trong  và .
+    2.  Thay đổi điều kiện  từ một biến trạng thái chung thành kiểm tra trạng thái của từng mục riêng lẻ.
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện trải nghiệm người dùng, cho phép họ làm việc song song.
   - **Status**: NOT STARTED
   - **Is recurring issue?**: N
   - **Should Test frontend/backend/both after fix?**: Frontend.
   - **Blocked on other issue**: None.
 
-- **Issue 3: Cảnh báo dung lượng ổ đĩa 95%**
-  - **Attempted fixes**: Chưa có. Agent đã bỏ qua cảnh báo này trong suốt phiên làm việc.
-  - **Next debug checklist**:
-    1.  Chạy lệnh 0	/app/0.6
-0	/app/=
-8.0K	/app/BATCH_UPLOAD_SOLUTION.md
-8.0K	/app/CLOUD_BOOST_COMPLETE.md
-16K	/app/COST_OPTIMIZATION_ALTERNATIVES.md
-8.0K	/app/DEPLOYMENT_FIXES_APPLIED.md
-20K	/app/DESKTOP_APP_ARCHITECTURE.md
-8.0K	/app/DESKTOP_APP_IMPLEMENTATION.md
-8.0K	/app/DESKTOP_APP_PHASE1_COMPLETE.md
-12K	/app/DESKTOP_APP_TESTING_CHECKLIST.md
-4.0K	/app/EMERGENT_LLM_KEY_GUIDE.md
-4.0K	/app/FIX_PDF_IMAGE_ERROR.md
-12K	/app/OPENAI_INTEGRATION_SUMMARY.md
-8.0K	/app/PERFORMANCE_ANALYSIS.md
-8.0K	/app/PRICING_GUIDE.md
-8.0K	/app/PROMPT_SYNC_SUMMARY.md
-8.0K	/app/RAILWAY_DEBUG_FAILED_FETCH.md
-8.0K	/app/RAILWAY_DEBUG_INTERNAL_ERROR.md
-8.0K	/app/RAILWAY_DEPLOYMENT_CHECKLIST.md
-12K	/app/RAILWAY_DEPLOYMENT_GUIDE.md
-8.0K	/app/RAILWAY_FIX_INTERNAL_SERVER_ERROR.md
-4.0K	/app/RAILWAY_FIX_PIP_ERROR.md
-8.0K	/app/RAILWAY_FIX_SUMMARY.md
-8.0K	/app/RAILWAY_FRONTEND_VS_BACKEND_URL.md
-12K	/app/RAILWAY_HUONG_DAN_TIENG_VIET.md
-8.0K	/app/RAILWAY_NEXT_STEPS.md
-8.0K	/app/RAILWAY_QUICK_START.md
-24K	/app/RAILWAY_SO_DO.md
-8.0K	/app/RAILWAY_TOM_TAT.md
-8.0K	/app/RAILWAY_WRONG_LOGS.md
-4.0K	/app/README.md
-12K	/app/SEQUENTIAL_NAMING_COMPLETE.md
-12K	/app/additional_folder_tests.py
-4.0K	/app/auth_test.py
-2.6G	/app/backend
-12K	/app/backend_test.py
-16K	/app/comprehensive_rule_validation_results.json
-20K	/app/comprehensive_rule_validation_test.py
-1.6G	/app/desktop-app
-218M	/app/desktop-app.zip
-16K	/app/desktop_ocr_validation_test.py
-20K	/app/direct_folder_test.py
-12K	/app/easyocr_direct_test.py
-16K	/app/focused_backend_test.py
-4.0K	/app/focused_desktop_validation_results.json
-16K	/app/focused_desktop_validation_test.py
-20K	/app/focused_test_three_flows.py
-20K	/app/folder_scan_test.py
-704M	/app/frontend
-4.0K	/app/llm_health_output.log
-16K	/app/llm_health_test.py
-16K	/app/llm_integration_test.py
-12K	/app/node_modules
-4.0K	/app/openai-integration-patch.txt
-4.0K	/app/package-lock.json
-12K	/app/review_test.py
-12K	/app/rules_integration_test.py
-4.0K	/app/simple_llm_health_test.py
-4.0K	/app/simple_test.py
-4.0K	/app/test_deployed.sh
-8.0K	/app/test_reports
-88K	/app/test_result.md
-4.0K	/app/tests
-8.0K	/app/three_flows_test.log
-4.0K	/app/yarn.lock
-12K	/app/zip_regression_test.py
-4.0K	/app/zip_test.log để xác định thư mục/tệp nào đang chiếm nhiều dung lượng nhất.
-    2.  Kiểm tra và xóa các tệp log cũ, bộ đệm (cache) của Electron, hoặc các kết quả build trước đó trong thư mục .
-  - **Why fix this issue and what will be achieved with the fix?**: Ngăn ngừa rủi ro sập môi trường làm việc, mất code và đảm bảo hoạt động ổn định.
-  - **Status**: NOT STARTED
-  - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Manual check (dùng Filesystem      Size  Used Avail Use% Mounted on
-overlay          95G  6.2G   89G   7% /
-tmpfs            64M     0   64M   0% /dev
-/dev/nvme0n2    9.8G  9.3G  517M  95% /app
-/dev/nvme0n1p1   95G  6.2G   89G   7% /etc/hosts
-shm              64M     0   64M   0% /dev/shm
-tmpfs           7.9G     0  7.9G   0% /proc/acpi
-tmpfs           7.9G     0  7.9G   0% /proc/scsi
-tmpfs           7.9G     0  7.9G   0% /sys/firmware).
-  - **Blocked on other issue**: None.
-
 **In progress Task List**:
-- **Task 1 (P0)**: Thay đổi số file tối thiểu cho Smart Mode (Gom Thông Minh) từ 3 xuống 2.
-  - **Where to resume**: Tìm logic kiểm tra số file tối thiểu trong  (nơi chế độ smart được kích hoạt) hoặc trong  và thay đổi giá trị.
-  - **What will be achieved with this?**: Đáp ứng yêu cầu trực tiếp của người dùng, tăng tính linh hoạt cho chế độ Smart.
-  - **Status**: NOT STARTED
-  - **Should Test frontend/backend/both after fix?**: Frontend/Backend.
-  - **Blocked on something**: None.
+- **Task 1: Hoàn thiện chức năng tab Only GCN (P0)**
+  - **Where to resume**: Hoàn thành việc thêm toggle switch để bật/tắt pre-filter trong  và đảm bảo logic hoạt động đúng.
+  - **What will be achieved with this?**: Một chức năng hoàn chỉnh cho phép người dùng quét GCN một cách hiệu quả và tiết kiệm chi phí, giải quyết được blocker hiện tại.
+  - **Status**: IN PROGRESS
+  - **Should Test frontend/backend/both after fix?**: Both.
+  - **Blocked on something**: Issue 1.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - **(P1) Triển khai chế độ OCR Hybrid**: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API (OpenAI/Gemini) cho ảnh chất lượng thấp.
-  - **(P2) Triển khai giải pháp GCN Pre-filter**: Tích hợp giải pháp đã được lưu trong  để lọc GCN theo khổ giấy và màu sắc cục bộ trước khi gửi lên API.
+  - **(P1)** Triển khai chế độ OCR Hybrid: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API.
+  - **(P2)** Tinh chỉnh  dựa trên các lỗi phân loại mới.
 - **Future Tasks**:
-  - Tinh chỉnh .
   - Thêm icon cho ứng dụng trên macOS.
   - Triển khai hệ thống license key.
   - Thêm cấu hình giá trong phần Cài đặt.
 
 **Completed work in this session**
-- **UI Refactoring**:
-  - Hoàn thiện việc thêm các nút Gộp thư mục & Load Preview vào  cho cả  và .
-  - Dọn dẹp, xóa các nút inline bị trùng lặp, đảm bảo giao diện gọn gàng.
-- **Bug Fixing (Classification)**:
-  - Cập nhật liên tục prompt  và file  để sửa nhiều lỗi phân loại.
-  - **Triển khai Post-Processing Fixes**: Thêm logic cứng vào  và  để tự động sửa các lỗi sai mà LLM hay mắc phải, tăng độ chính xác.
-- **Bug Fixing (Batch Mode)**:
-  - Giảm  trong  để giảm tình trạng fallback.
-  - Đồng bộ hóa logic post-processing giữa  (File/Fixed mode) và  (Smart mode).
-- **Documentation & Analysis**:
-  - Tạo các file hướng dẫn build ứng dụng trên máy người dùng.
-  - Tạo các tài liệu phân tích chi phí và đề xuất giải pháp kỹ thuật ().
+- **System Maintenance**:
+  - Giải quyết cảnh báo ổ đĩa 95% bằng cách xóa thư mục .
+- **Feature Enhancement & UI/UX**:
+  - Giảm số file tối thiểu cho Smart Mode từ 3 xuống 2.
+  - Khôi phục chế độ xem trước tự động cho quét thư mục.
+  - Xóa các nút điều hướng (pagination) bị trùng lặp ở cuối trang.
+  - Thêm hiển thị trạng thái xử lý chi tiết (VD: Pre-filtering..., Scanning..., Merging...) trong tab Only GCN.
+- **Error Handling & Bug Fixing**:
+  - Triển khai hệ thống xử lý lỗi tập trung (, ) để hiển thị thông báo thân thiện cho các lỗi API (503, 429, etc).
+  - Sửa lỗi Gemini API trả về sai định dạng JSON trong chế độ batch.
+  - Phát hiện và sửa lỗi nghiêm trọng về cấu trúc file Electron: các thay đổi phải được thực hiện trong  và  thay vì .
+- **New Feature: Only GCN Tab**:
+  - Tạo component  và thêm tab mới vào .
+  - Triển khai luồng xử lý tuần tự cho từng thư mục.
+  - Thêm các IPC handler và API cần thiết (, , ) vào  và .
+- **Documentation**:
+  - Tạo file  để hướng dẫn bảo trì hệ thống lỗi.
+  - Tạo file  để ghi nhớ cấu trúc file Electron.
+  - Tạo file batch  để giúp người dùng sửa lỗi môi trường local.
 
 **Earlier issues found/mentioned but not fixed**
-- Đã được liệt kê trong **All Pending/In progress Issue list** (Issue 3: Disk space warning).
+- Toàn bộ đã được liệt kê trong **All Pending/In progress Issue list**.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence**: Lỗi phân loại tài liệu không chính xác và không nhất quán. Đây là vấn đề chính trong suốt phiên làm việc này.
+- **Issue recurrence**: Lỗi phân loại tài liệu không chính xác và không nhất quán.
 - **Recurrence count**: Rất cao.
-- **Status**: IN PROGRESS (đã có nhiều bản vá nhưng gốc rễ vấn đề vẫn còn).
+- **Status**: IN PROGRESS.
 
 **Code Architecture**
 - **Frontend**: React
+  - : Component chính, quản lý các tab.
+  - : (Mới) Logic cho tab Only GCN.
+  - : Logic cho chế độ Batch.
   - : Logic cho chế độ File/Folder.
-  - : Logic cho chế độ Batch (Fixed và Smart).
-  - : Component UI tái sử dụng cho các nút hành động.
+  - : (Mới) Cấu hình và xử lý lỗi phía frontend.
 - **Backend**: Python
-  - : Script chính xử lý OCR cho một file, được gọi bởi chế độ File và Fixed Batch. **Đã thêm logic post-processing.**
-  - : Script xử lý OCR cho chế độ Smart Batch. **Đã thêm logic post-processing.**
-  - : Prompt chính cho Gemini Flash Lite, đã được chỉnh sửa rất nhiều.
-  - : Định nghĩa các quy tắc ánh xạ tiêu đề tài liệu.
+  - : Xử lý OCR cho từng file.
+  - : Xử lý OCR cho chế độ Smart Batch.
+  - : Script pre-filter để nhận diện GCN.
+  - : (Mới) Cấu hình và xử lý lỗi phía backend.
 - **Main Process**: Electron
-  - : File chính của Electron, nơi gọi các script Python.
+  - : **File thực thi chính của Electron.** Nơi đăng ký IPC Handlers.
+  - : **File preload chính của Electron.** Nơi expose API cho renderer process.
+  - : Thư mục chứa code nguồn cho Electron, nhưng không phải là nơi được thực thi trực tiếp trong môi trường dev. **Đây là nguồn gây nhầm lẫn và lỗi.**
 
 **Key Technical Concepts**
-- **Post-Processing Logic**: Do LLM (Gemini Flash Lite) không đáng tin cậy, agent đã phải thêm logic Python để kiểm tra và sửa kết quả của LLM. Đây là một giải pháp tình thế quan trọng.
-- **Inconsistent AI Behavior**: Cùng một file, cùng một prompt nhưng có thể cho ra các kết quả khác nhau giữa các lần chạy hoặc giữa các chế độ (File vs. Batch).
-- **Local vs. Remote Development Workflow**: Xung đột chính trong quá trình làm việc là agent sửa code trên server, nhưng người dùng chạy code cũ trên máy local. Việc nhắc nhở người dùng Save to GitHub và pull code là rất quan trọng.
-- **Multiple Processing Paths**: Cần nhận thức rõ rằng các chế độ quét khác nhau (, , ) có thể gọi các script Python khác nhau ( vs ) hoặc đi theo các nhánh logic khác nhau, dẫn đến hành vi khác biệt.
+- **Electron Main vs Renderer Process**: Hiểu rõ  (main process) và  (bridge) là rất quan trọng. **Phát hiện quan trọng nhất của phiên này là app đang chạy các file trong  chứ không phải **.
+- **Local Environment Desync**: Vấn đề lặp đi lặp lại khi môi trường local của người dùng không đồng bộ với code trên server. Cần có quy trình hướng dẫn rõ ràng (pull code, xóa cache, restart) cho người dùng mỗi khi có thay đổi quan trọng.
+- **Defensive Programming**: Thêm các câu lệnh  trước khi gọi API để tránh crash app khi môi trường người dùng chưa được cập nhật.
+- **IPC (Inter-Process Communication)**: Giao tiếp giữa React (renderer) và Electron (main) thông qua  và .
 
 **key DB schema**
 - Không có, ứng dụng sử dụng  để lưu trữ cài đặt.
 
+**changes in tech stack**
+- Không có.
+
 **All files**
-- : Cập nhật UI, thêm/bớt nút.
-- : Cập nhật UI, thêm/bớt nút.
-- : Thêm logic post-processing để sửa lỗi phân loại.
-- : Thêm logic post-processing và giảm .
-- : Tinh chỉnh rất nhiều để cải thiện độ chính xác của LLM.
-- : Thêm các quy tắc ánh xạ mới.
-- : (Mới) Tài liệu đề xuất giải pháp.
-- , : (Mới) Các tài liệu phân tích.
+- : (Mới) Component chính cho chức năng mới.
+- : (Cập nhật) Thêm các IPC handlers cho chức năng Only GCN.
+- : (Cập nhật) Expose các API mới cho chức năng Only GCN.
+- : (Cập nhật) Nới lỏng ngưỡng nhận diện màu.
+- : (Mới) Module xử lý lỗi tập trung phía backend.
+- : (Mới) Module xử lý lỗi tập trung phía frontend.
+- : (Cập nhật) Thêm tab Only GCN.
+- : (Cập nhật) Tích hợp  và sửa lỗi JSON parsing.
+- : (Cập nhật) Dọn dẹp UI, tích hợp .
+- : (Cập nhật) Khôi phục preview, tích hợp .
+- : (Cập nhật) Sửa  value của slider.
+- : (Mới) Tài liệu ghi chú về cấu trúc file Electron.
+- : (Mới) Tài liệu hướng dẫn bảo trì hệ thống lỗi.
+- : (Mới) Script giúp người dùng sửa lỗi môi trường.
 
 **Areas that need refactoring**:
-- Logic phân loại tài liệu hiện tại rất manh mún (dựa vào prompt + post-processing). Cần một giải pháp kiến trúc lại bền vững hơn, ví dụ như triển khai .
+- Cấu trúc file của Electron đang gây nhầm lẫn. Có cả thư mục  và , . Cần thống nhất lại một nguồn code duy nhất (ví dụ: ) và có một bước build để sao chép các file cần thiết sang thư mục  để tránh lỗi code đã sửa nhưng không chạy.
 
 **key api endpoints**
-- Các kênh IPC của Electron: , .
+- **IPC Handlers (trong )**:
+  - 
+  - 
+  - 
 
 **Critical Info for New Agent**
-- **Người dùng chạy app trên máy Windows local.** Mọi thay đổi bạn thực hiện trên server sẽ không có hiệu lực cho đến khi người dùng Save to GitHub và pull code mới về máy của họ. Hãy luôn nhắc nhở người dùng làm điều này sau mỗi lần sửa lỗi quan trọng.
-- **Lỗi phân loại của Gemini Flash Lite là vấn đề cốt lõi.** Đừng quá tin tưởng vào việc chỉ sửa prompt là đủ. Các bản vá post-processing trong Python hiện là cách hiệu quả nhất. Hãy sẵn sàng để mở rộng logic này cho các trường hợp lỗi mới.
-- **Dung lượng ổ đĩa đang ở mức báo động (95%)**. Hãy xử lý vấn đề này sớm để tránh sập môi trường.
-- **Hiểu rõ các chế độ quét**: Khi người dùng báo lỗi, hãy hỏi rõ họ đang dùng chế độ nào (File, Folder, Fixed Batch hay Smart Batch - Gom Thông Minh) vì chúng có các luồng xử lý khác nhau.
+- **QUAN TRỌNG NHẤT**: Luồng phát triển bắt buộc phải tuân theo: **Code trên server -> Người dùng Save to GitHub -> Người dùng  trên máy -> Người dùng restart hoàn toàn app**. Rất nhiều lỗi phát sinh do người dùng không làm đúng quy trình này.
+- **CẤU TRÚC ELECTRON**: App đang thực thi các file trong thư mục  (, ). Mọi thay đổi liên quan đến Electron (thêm API, IPC handler) phải được áp dụng cho các file trong thư mục . Agent trước đã mắc sai lầm khi sửa file trong thư mục  và gây ra lỗi . Hãy đọc file .
+- **LỆNH START APP**: Người dùng chạy app trên Windows bằng lệnh yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command., không phải yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command..
+- **VẤN ĐỀ HIỆN TẠI**:  đang là blocker cho chức năng Only GCN. Cần hoàn thiện việc sửa lỗi và thêm toggle bật/tắt pre-filter.
+- **SẴN SÀNG HƯỚNG DẪN DEBUG MÔI TRƯỜNG**: Hãy chuẩn bị tinh thần hướng dẫn người dùng xóa cache Electron (), kill process (), và restart app khi họ báo lỗi không thấy thay đổi.
 
 **documents created in this job**
 - 
 - 
 - 
-- 
-- 
-- 
 
 **Last 5 User Messages and any pending user messages**
-1.  **User**: So sánh chi phí/tốc độ giữa các kích thước batch khác nhau. (COMPLETED - Agent đã tạo file )
-2.  **User**: Yêu cầu đổi số file tối thiểu cho Smart Mode từ 3 thành 2. (PENDING - Đây là last working item)
-3.  **User**: Đưa ra các ví dụ về Smart Mode bị fallback nhiều. (IN PROGRESS - Agent đã giảm max_batch_size và thêm log)
-4.  **User**: Hỏi về khả năng nhận diện khổ giấy A3/A4 và màu sắc mà không cần Gemini. (COMPLETED - Agent đã xác nhận khả năng và tạo file giải pháp )
-5.  **User**: Yêu cầu lưu lại phương án pre-filter để làm sau. (COMPLETED - Agent đã lưu thành file )
+1.  **User**: Thêm nút tìm kiếm thư mục giống bên batch mode. (COMPLETED)
+2.  **User**: Hiển thị rõ quy trình app đang làm việc để người dùng biết. (COMPLETED)
+3.  **User**: Hiện tại app đang pre-filter toàn bộ số file. Giờ chỉ pre-filter theo thư mục và xử lý tuần tự. (COMPLETED)
+4.  **User**: Kiểm tra lại. Rõ ràng trong thư mục có GCN nhưng không phân loại được. (PENDING - Đây là 
+wtmp begins Mon Nov 17 09:13:30 2025)
+5.  **User**: Ý tôi là app đang pre-filter GCN nhưng không nhận diện được các GCN. (PENDING - User làm rõ 
+wtmp begins Mon Nov 17 09:13:30 2025)
 
 **Project Health Check:**
 - **Broken**:
-  - Chức năng phân loại tài liệu của  không đáng tin cậy, liên tục phát sinh lỗi sai và không nhất quán, dù đã có nhiều bản vá.
-  - Chế độ Smart Batch dễ bị fallback, không xử lý được hết các file trong một lượt gọi API.
+  - Chức năng pre-filter của  không đáng tin cậy, đang chặn tính năng Only GCN.
+  - Quy trình làm việc giữa môi trường dev (server) và môi trường của người dùng (local Windows) rất mong manh và thường xuyên gây lỗi.
 - **Mocked**: Không có.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions: Không có.</analysis>
+- Known regressions: Không có.
+
+**Credentials to test flow:**
+N/A
+
+**What agent forgot to execute**
+- Agent đã phát hiện ra vấn đề cấu trúc file Electron ( vs ) nhưng chỉ sửa lỗi cục bộ (copy code sang ) mà chưa thực hiện refactor để thống nhất về một nguồn duy nhất. Điều này để lại rủi ro kỹ thuật cho agent tiếp theo.
+- Agent đã nới lỏng ngưỡng trong  nhưng chưa hoàn thành việc thêm toggle UI để người dùng có thể tắt hoàn toàn pre-filter, mặc dù đã bắt đầu làm.</analysis>

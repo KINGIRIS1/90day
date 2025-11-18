@@ -1031,7 +1031,7 @@ function OnlyGCNScanner() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {results.map((result, idx) => (
+                {fileResults.map((result, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="px-4 py-3 text-sm text-gray-900">{idx + 1}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">{result.folderName || '-'}</td>

@@ -49,10 +49,48 @@ function OnlyGCNScanner() {
 
       setFiles(imageFiles);
       setResults([]);
+      setTxtFilePath('');
       console.log(`📁 Selected folder: ${imageFiles.length} files`);
     } catch (err) {
       console.error('Error selecting folder:', err);
       alert('Lỗi chọn thư mục: ' + err.message);
+    }
+  };
+
+  // Select txt file for batch mode
+  const handleSelectTxtFile = async () => {
+    try {
+      const txtPath = await window.electronAPI.selectTxtFile();
+      if (!txtPath) return;
+
+      setTxtFilePath(txtPath);
+      
+      // Read and validate folders from txt
+      const validation = await window.electronAPI.validateBatchFolders(txtPath);
+      
+      if (!validation.success) {
+        alert('Lỗi đọc file txt: ' + validation.error);
+        return;
+      }
+
+      // Collect all image files from all folders
+      const allFiles = [];
+      for (const folder of validation.folders) {
+        const imageFiles = await window.electronAPI.getImagesInFolder(folder.path);
+        allFiles.push(...imageFiles);
+      }
+
+      if (allFiles.length === 0) {
+        alert('Không tìm thấy file ảnh nào trong các thư mục!');
+        return;
+      }
+
+      setFiles(allFiles);
+      setResults([]);
+      console.log(`📋 Selected txt with ${validation.folders.length} folders: ${allFiles.length} total files`);
+    } catch (err) {
+      console.error('Error selecting txt file:', err);
+      alert('Lỗi chọn file txt: ' + err.message);
     }
   };
 

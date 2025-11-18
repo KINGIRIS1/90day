@@ -696,9 +696,9 @@ function OnlyGCNScanner() {
         </p>
       </div>
 
-      {/* Mode Selection */}
-      <div className="mb-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <div className="flex gap-4 items-center flex-wrap">
+      {/* Mode Selection - Compact */}
+      <div className="mb-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
+        <div className="flex gap-2 items-center">
           <button
             onClick={() => {
               setScanMode('folder');
@@ -707,13 +707,13 @@ function OnlyGCNScanner() {
               setActiveFolder(null);
               setTxtFilePath('');
             }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded text-sm transition-colors ${
               scanMode === 'folder'
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
             }`}
           >
-            📁 Quét thư mục
+            Thư mục
           </button>
           <button
             onClick={() => {
@@ -722,43 +722,28 @@ function OnlyGCNScanner() {
               setFolderTabs([]);
               setActiveFolder(null);
             }}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded text-sm transition-colors ${
               scanMode === 'batch'
-                ? 'bg-blue-600 text-white shadow-sm'
+                ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
             }`}
           >
-            📋 Quét theo danh sách
+            Danh sách
           </button>
 
-          <div className="ml-auto flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-300">
+          <div className="ml-auto flex items-center space-x-2 bg-white px-2 py-1 rounded border border-gray-300">
             <input
               type="checkbox"
               id="usePreFilter"
               checked={usePreFilter}
               onChange={(e) => setUsePreFilter(e.target.checked)}
-              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              className="w-3.5 h-3.5 text-blue-600 rounded"
             />
-            <label htmlFor="usePreFilter" className="text-sm font-medium text-gray-700 cursor-pointer">
-              🎨 Pre-filter (lọc màu)
+            <label htmlFor="usePreFilter" className="text-xs text-gray-700 cursor-pointer">
+              Pre-filter
             </label>
           </div>
         </div>
-        <p className="text-xs text-gray-600 mt-2">
-          {scanMode === 'folder' 
-            ? '💡 Quét tất cả file trong 1 thư mục' 
-            : '💡 Quét nhiều thư mục từ file .txt (mỗi dòng 1 đường dẫn)'}
-          {usePreFilter && (
-            <span className="ml-2 text-green-600 font-medium">
-              • Pre-filter BẬT: Chỉ quét file có màu đỏ/hồng (tiết kiệm ~85% API)
-            </span>
-          )}
-          {!usePreFilter && (
-            <span className="ml-2 text-blue-600 font-medium">
-              • Pre-filter TẮT: Quét tất cả file (chính xác 100%, tốn API hơn)
-            </span>
-          )}
-        </p>
       </div>
 
       {/* Controls */}

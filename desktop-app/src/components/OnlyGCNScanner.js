@@ -196,6 +196,7 @@ function OnlyGCNScanner() {
       }
 
       // Phase 2: AI scan only GCN candidates
+      setCurrentPhase('scanning');
       console.log(`\n🤖 Phase 2: AI scanning ${gcnCandidates.length} GCN candidates...`);
       setProgress({ current: 0, total: gcnCandidates.length });
 
@@ -209,6 +210,8 @@ function OnlyGCNScanner() {
         const fileName = filePath.split(/[/\\]/).pop();
 
         setProgress({ current: i + 1, total: gcnCandidates.length });
+        setCurrentFile(fileName);
+        setPhaseStats(prev => ({ ...prev, scanned: i + 1 }));
         console.log(`[${i + 1}/${gcnCandidates.length}] AI Scanning: ${fileName}`);
 
         try {

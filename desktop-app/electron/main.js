@@ -1350,3 +1350,173 @@ ipcMain.handle('test-api-key', async (event, { provider, apiKey, endpoint }) => 
   }
 });
 
+// =============================================================================
+// Only GCN Scanner Handlers
+// =============================================================================
+
+// Get all image files in folder
+ipcMain.handle('get-images-in-folder', async (event, folderPath) => {
+  try {
+    const fs = require('fs');
+    const files = fs.readdirSync(folderPath);
+    const imageFiles = files
+      .filter(file => /\.(png|jpg|jpeg|gif|bmp|tiff)$/i.test(file))
+      .map(file => path.join(folderPath, file))
+      .sort(); // Sort to maintain order
+    
+    return imageFiles;
+  } catch (err) {
+    console.error('Error reading folder:', err);
+    throw err;
+  }
+});
+
+// Pre-filter GCN files by color (fast, local, free)
+ipcMain.handle('pre-filter-gcn-files', async (event, files) => {
+  try {
+    const pyInfo = discoverPython();
+    if (!pyInfo.ok) {
+      throw new Error('Python 3.10–3.12 not found');
+    }
+
+    const scriptPath = isDev 
+      ? path.join(__dirname, '../python/color_detector.py')
+      : getPythonScriptPath('color_detector.py');
+
+    console.log(`🎨 Pre-filtering ${files.length} files...`);
+
+    const passed = [];
+    const skipped = [];
+
+    for (const filePath of files) {
+      const args = [scriptPath, filePath];
+      
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const child = spawn(pyInfo.executable, args, {
+            cwd: path.dirname(scriptPath),
+            env: buildPythonEnv({})
+          });
+
+          let stdout = '';
+          let stderr = '';
+
+          child.stdout.on('data', (data) => { stdout += data.toString(); });
+          child.stderr.on('data', (data) => { stderr += data.toString(); });
+
+          child.on('close', (code) => {
+            if (code === 0) {
+              resolve(stdout.trim());
+            } else {
+              reject(new Error(`Color detection failed: ${stderr}`));
+            }
+          });
+        });
+
+        // Check result: 'red', 'pink', or 'unknown'
+        if (result === 'red' || result === 'pink') {
+          passed.push(filePath);
+        } else {
+          skipped.push(filePath);
+        }
+      } catch (err) {
+        console.warn(`Pre-filter error for ${filePath}:`, err.message);
+        // On error, include file (safer to scan than skip)
+        passed.push(filePath);
+      }
+    }
+
+    console.log(`✅ Pre-filter complete: ${passed.length} passed, ${skipped.length} skipped`);
+    return { passed, skipped };
+  } catch (err) {
+    console.error('Pre-filter error:', err);
+    // On critical error, return all files to be scanned
+    return { passed: files, skipped: [] };
+  }
+});
+
+// Merge PDFs for Only GCN scanner
+ipcMain.handle('merge-folder-pdfs', async (event, mergeData) => {
+  try {
+    if (!mergeData || mergeData.length === 0) {
+      throw new Error('No files to merge');
+    }
+
+    // Get output folder (same as first file's folder)
+    const firstFile = mergeData[0].filePath;
+    const outputFolder = path.dirname(firstFile);
+
+    // Group by short_code while preserving order
+    const groupedFiles = {};
+    const orderMap = {}; // Track first occurrence of each short_code
+
+    mergeData.forEach((item, index) => {
+      const shortCode = item.short_code || 'UNKNOWN';
+      
+      if (!groupedFiles[shortCode]) {
+        groupedFiles[shortCode] = [];
+        orderMap[shortCode] = index;
+      }
+      
+      groupedFiles[shortCode].push(item.filePath);
+    });
+
+    // Sort groups by order of first occurrence
+    const sortedGroups = Object.entries(groupedFiles).sort(
+      ([codeA], [codeB]) => orderMap[codeA] - orderMap[codeB]
+    );
+
+    const pyInfo = discoverPython();
+    if (!pyInfo.ok) {
+      throw new Error('Python 3.10–3.12 not found');
+    }
+
+    const mergeScript = isDev
+      ? path.join(__dirname, '../python/merge_pdfs.py')
+      : getPythonScriptPath('merge_pdfs.py');
+
+    const outputFiles = [];
+
+    for (const [shortCode, files] of sortedGroups) {
+      if (files.length === 0) continue;
+
+      const outputPdf = path.join(outputFolder, `${shortCode}.pdf`);
+      const args = [mergeScript, outputPdf, ...files];
+
+      console.log(`📦 Merging ${files.length} files into ${shortCode}.pdf...`);
+
+      await new Promise((resolve, reject) => {
+        const child = spawn(pyInfo.executable, args, {
+          cwd: path.dirname(mergeScript),
+          env: buildPythonEnv({})
+        });
+
+        let stderr = '';
+        child.stderr.on('data', (data) => { stderr += data.toString(); });
+
+        child.on('close', (code) => {
+          if (code === 0) {
+            outputFiles.push(shortCode + '.pdf');
+            resolve();
+          } else {
+            reject(new Error(`Merge failed: ${stderr}`));
+          }
+        });
+      });
+    }
+
+    return {
+      success: true,
+      files: outputFiles,
+      outputFolder
+    };
+  } catch (err) {
+    console.error('Merge error:', err);
+    return {
+      success: false,
+      error: err.message
+    };
+  }
+});
+
+

@@ -54,7 +54,7 @@ function OnlyGCNScanner() {
     }
   };
 
-  // Start scanning
+  // Start scanning with pre-filter
   const handleStartScan = async () => {
     if (files.length === 0) {
       alert('Vui lòng chọn thư mục trước!');
@@ -63,10 +63,47 @@ function OnlyGCNScanner() {
 
     setIsScanning(true);
     setResults([]);
-    setProgress({ current: 0, total: files.length });
     stopRef.current = false;
 
     const newResults = [];
+
+    try {
+      // Phase 1: Pre-filter by color (fast, free, local)
+      console.log('🎨 Phase 1: Pre-filtering by color...');
+      const preFilterStart = Date.now();
+      
+      const preFilterResults = await window.electronAPI.preFilterGCNFiles(files);
+      const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
+      
+      const gcnCandidates = preFilterResults.passed || [];
+      const skipped = preFilterResults.skipped || [];
+      
+      console.log(`✅ Pre-filter complete in ${preFilterTime}s:`);
+      console.log(`   🟢 GCN candidates: ${gcnCandidates.length} files`);
+      console.log(`   ⏭️  Skipped: ${skipped.length} files`);
+      
+      // Add skipped files to results as GTLQ without scanning
+      for (const filePath of skipped) {
+        const fileName = filePath.split(/[/\\]/).pop();
+        newResults.push({
+          fileName,
+          filePath,
+          previewUrl: null,
+          originalShortCode: 'SKIPPED',
+          originalDocType: 'Bỏ qua (không phải GCN)',
+          newShortCode: 'GTLQ',
+          newDocType: 'Giấy tờ liên quan',
+          confidence: 0,
+          reasoning: 'Pre-filter: Không có màu GCN (red/pink)',
+          metadata: {},
+          success: true,
+          preFiltered: true
+        });
+      }
+
+      // Phase 2: AI scan only GCN candidates
+      console.log(`\n🤖 Phase 2: AI scanning ${gcnCandidates.length} GCN candidates...`);
+      setProgress({ current: 0, total: gcnCandidates.length });
 
     try {
       for (let i = 0; i < files.length; i++) {

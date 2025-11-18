@@ -395,15 +395,24 @@ function OnlyGCNScanner() {
             <>
               <button
                 onClick={handleSelectTxtFile}
-                disabled={isScanning}
+                disabled={isScanning || isLoadingFolders}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 📄 Chọn file .txt
               </button>
               {txtFilePath && (
-                <span className="text-sm text-gray-600">
-                  {txtFilePath.split(/[/\\]/).pop()}
-                </span>
+                <>
+                  <span className="text-sm text-gray-600">
+                    {txtFilePath.split(/[/\\]/).pop()}
+                  </span>
+                  <button
+                    onClick={handleLoadFolders}
+                    disabled={isScanning || isLoadingFolders || !txtFilePath}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingFolders ? '⏳ Đang tìm...' : '🔍 Tìm kiếm thư mục'}
+                  </button>
+                </>
               )}
             </>
           )}

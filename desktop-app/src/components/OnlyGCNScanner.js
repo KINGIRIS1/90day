@@ -672,9 +672,9 @@ function OnlyGCNScanner() {
     }
   };
 
-  const gcncCount = results.filter(r => r.newShortCode === 'GCNC').length;
-  const gcnmCount = results.filter(r => r.newShortCode === 'GCNM').length;
-  const gtlqCount = results.filter(r => r.newShortCode === 'GTLQ').length;
+  const gcncCount = fileResults.filter(r => r.newShortCode === 'GCNC').length;
+  const gcnmCount = fileResults.filter(r => r.newShortCode === 'GCNM').length;
+  const gtlqCount = fileResults.filter(r => r.newShortCode === 'GTLQ').length;
   const totalGcnCount = gcncCount + gcnmCount;
 
   return (

@@ -1,89 +1,87 @@
 <analysis>**original_problem_statement:**
 Ban đầu, người dùng yêu cầu sửa lỗi phân loại tài liệu của engine OCR, tối ưu hóa giao diện người dùng và cải thiện hiệu suất.
 
-Các yêu cầu mới trong phiên làm việc này bao gồm:
-1.  **Thay đổi logic Smart Mode**: Giảm số lượng file tối thiểu để kích hoạt từ 3 xuống 2.
-2.  **Cải thiện trải nghiệm người dùng (UX)**:
-    *   Khôi phục lại chức năng tự động hiển thị preview khi quét thư mục, loại bỏ nút Load Preview.
-    *   Thêm thông báo lỗi chi tiết và thân thiện hơn cho người dùng khi API gặp sự cố (503, 429, etc.).
-    *   Xóa các nút điều hướng (Prev, Next) bị trùng lặp ở cuối danh sách kết quả.
-    *   Hiển thị trạng thái chi tiết hơn trong quá trình quét để người dùng biết app đang làm gì.
-3.  **Thêm chức năng mới Only GCN**:
-    *   Tạo một tab mới chỉ để xử lý GCN.
-    *   Chức năng này sẽ quét các thư mục, sử dụng bộ lọc màu và khổ giấy () để xác định các file có khả năng là GCN.
-    *   Chỉ gửi các file ứng viên GCN này qua API OCR để tiết kiệm chi phí.
-    *   Các file còn lại sẽ được tự động đặt tên là GTLQ và giữ nguyên thứ tự ban đầu.
-    *   Xử lý các thư mục một cách tuần tự thay vì xử lý tất cả file cùng lúc.
-4.  **Sửa lỗi**:
-    *   Khắc phục lỗi format response của Gemini API trong chế độ batch.
-    *   Giải quyết các vấn đề môi trường cục bộ của người dùng (lỗi build, cache Electron, không pull code mới).
-    *   Sửa lỗi  không nhận diện được GCN.
+Các yêu cầu được thêm vào trong phiên làm việc này bao gồm:
+1.  **Đồng bộ hóa Chức năng Gộp (Merge)**: Làm cho chức năng gộp PDF trong tab Only GCN hoạt động giống hệt các tab khác, bao gồm cả việc hiển thị modal tùy chọn.
+2.  **Sửa lỗi Pre-filter**:
+    *   Ban đầu,  quá khắt khe, bỏ sót GCN màu nhạt.
+    *   Sau đó, nó lại quá lỏng lẻo, nhận nhầm HSKT có dấu đỏ là GCN.
+    *   Cuối cùng, chiến lược được thay đổi hoàn toàn: chỉ lọc các file khổ A3, sau đó để AI phân loại, và logic frontend sẽ xử lý các trường hợp AI phân loại sai (ví dụ: đổi HSKT thành GTLQ).
+3.  **Đồng bộ hóa Quy tắc GCN**: Áp dụng các quy tắc phân loại GCNC/GCNM (dựa trên ngày cấp) và ghép cặp trang 1/trang 2 từ các tab khác vào tab Only GCN.
+4.  **Cải thiện UX/UI của tab Only GCN**:
+    *   Tổ chức kết quả theo từng thư mục con với các tab riêng biệt.
+    *   Thay đổi giao diện từ dạng bảng (table) sang dạng lưới (grid) để hiển thị preview ảnh.
+    *   Làm gọn giao diện tổng thể (thu nhỏ nút, chữ).
+    *   Thêm các nút chức năng cho từng ảnh: thu phóng (zoom) và sửa tên (edit).
+    *   Loại bỏ toggle Pre-filter vì chức năng này phải luôn được bật.
+5.  **Tối ưu hóa Hiệu suất**:
+    *   Thêm Smart Mode (xử lý hàng loạt) và tự động resize ảnh vào tab OnlyGCN để khắc phục lỗi timeout khi xử lý các file lớn.
+    *   Thực hiện việc phân loại GCN (post-processing) ngay sau khi quét xong mỗi thư mục, thay vì chờ đến cuối.
 
 **User's preferred language**: Vietnamese
 
 **what currently exists?**
-- Một ứng dụng OCR desktop (Electron, React, Python) với nhiều chế độ quét.
-- Hệ thống xử lý lỗi tập trung đã được triển khai cho cả frontend và backend để hiển thị các thông báo lỗi API thân thiện hơn.
-- Vấn đề dung lượng ổ đĩa đã được giải quyết bằng cách xóa các file tạm.
-- Logic Smart Mode đã được cập nhật để cho phép xử lý với 2 file thay vì 3.
-- Giao diện người dùng đã được dọn dẹp (xóa các nút trùng lặp, khôi phục preview tự động).
-- Một tab chức năng mới, **Only GCN**, đã được tạo (). Tab này có giao diện để chọn thư mục hoặc danh sách file, xử lý tuần tự từng thư mục và hiển thị trạng thái chi tiết.
-- Logic pre-filter (bộ lọc sơ bộ) để nhận diện GCN dựa trên màu sắc () đã được tích hợp vào tab Only GCN.
-- Các file cấu hình và thực thi của Electron (, ) đã được cập nhật để thêm các API cần thiết cho tab Only GCN.
-- Đã tạo tài liệu  để ghi nhớ cấu trúc file quan trọng của Electron nhằm tránh lỗi trong tương lai.
+- Tab Only GCN đã được tái cấu trúc lớn để cải thiện trải nghiệm người dùng và hiệu suất.
+- Giao diện hiện tại của Only GCN sử dụng các **tab cho từng thư mục con** và hiển thị kết quả dưới dạng **lưới (grid)** thay vì bảng.
+- Logic pre-filter đã được đơn giản hóa:  giờ chỉ kiểm tra **khổ giấy A3** (dựa trên aspect ratio) và bỏ qua việc kiểm tra màu sắc.
+- Tab này đã được tích hợp **Smart Mode** và **tự động resize ảnh**, sử dụng  để xử lý nhiều file cùng lúc, giúp tránh lỗi timeout.
+- Logic **phân loại GCNC/GCNM** dựa trên ngày cấp đã được sao chép từ  sang .
+- Logic **post-processing** mới đã được thêm vào:
+    1.  Nếu AI phân loại một file (đã qua lọc A3) là loại khác (ví dụ: HSKT), nó sẽ được đổi tên thành .
+    2.  Một logic ghép cặp tuần tự (sequential pairing) được thêm vào để đảm bảo trang 2 của một tài liệu  cũng được đặt tên là .
+- Các nút và modal cho chức năng Zoom và Edit đã được thêm vào giao diện.
 
 **Last working item**:
-- **Last item agent was working**: Người dùng báo cáo rằng tab Only GCN không nhận diện được các file GCN mặc dù chúng có tồn tại trong thư mục. Agent đã xác định nguyên nhân là do script  có các ngưỡng nhận diện màu sắc quá khắt khe. Agent đã bắt đầu sửa lỗi này bằng cách nới lỏng các ngưỡng trong  và thêm một tùy chọn (toggle switch) vào giao diện người dùng của  để cho phép người dùng bật/tắt chức năng pre-filter này.
+- **Last item agent was working**: Người dùng báo cáo một lỗi nghiêm trọng sau khi agent thêm logic ghép cặp tuần tự. Toàn bộ các file GCN hợp lệ đều bị đổi tên thành . Phân tích log cho thấy logic pairing đang chạy sai, nó coi file GCN đầu tiên trong danh sách là theo sau GTLQ và sau đó chuyển đổi tất cả các file tiếp theo một cách sai lầm. Agent đã xác định đây là một lỗi logic nghiêm trọng trong hàm pairing và đang bắt đầu điều tra.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Manual testing by user. Người dùng cần pull code mới, rebuild và kiểm tra xem: 1. Các file GCN có được nhận diện chính xác hơn không. 2. Nút bật/tắt pre-filter có hoạt động như mong đợi không.
+- **Which testing method agent to use?**: Manual testing by user. Sau khi sửa lỗi, người dùng cần chạy lại quá trình quét trên một thư mục chứa cả GCN và các loại tài liệu khác để xác nhận: 1. Các file HSKT/PCT được đổi thành GTLQ. 2. Các file GCN hợp lệ KHÔNG bị đổi thành GTLQ. 3. Trang 2 của HSKT/PCT cũng được đổi thành GTLQ.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0)**:  nhận diện sai GCN.
-- **Issue 2 (P1)**: Lỗi phân loại không nhất quán của engine .
-- **Issue 3 (P2)**: Môi trường local của người dùng không đồng bộ, gây ra lỗi.
-- **Issue 4 (P3)**: Cho phép sửa kết quả ngay khi quét xong từng file.
+- **Issue 1 (P0)**: Lỗi logic Sequential Pairing khiến tất cả GCN bị đổi tên thành GTLQ.
+- **Issue 2 (P1)**: Logic ghép cặp GCN trang 1 và trang 2 chưa hoàn chỉnh.
+- **Issue 3 (P2)**: Lỗi phân loại không nhất quán của engine .
+- **Issue 4 (P3)**: Chức năng sửa kết quả trong khi quét chưa được triển khai.
 
 **Issues Detail:**
-- **Issue 1:  nhận diện sai GCN**
-  - **Attempted fixes**: Agent đã xác định rằng các ngưỡng  và các điều kiện màu sắc khác trong  là quá nghiêm ngặt, dẫn đến việc bỏ sót các file GCN có màu nhạt. Agent đã bắt đầu chỉnh sửa file này để nới lỏng các ngưỡng ( in message 488) và đồng thời thêm một state  và một toggle switch vào  để người dùng có thể tự quyết định sử dụng bộ lọc hay không ( in messages 481 & 483).
+- **Issue 1: Lỗi logic Sequential Pairing khiến tất cả GCN bị đổi tên thành GTLQ**
+  - **Attempted fixes**: Agent đã thêm một hàm để xử lý  trong  (khoảng message 395). Mục đích là để nếu trang 1 là HSKT (đã đổi thành GTLQ), thì trang 2 của nó cũng phải là GTLQ. Tuy nhiên, logic điều kiện bên trong hàm này đang bị sai. Nó dường như đang so sánh file đầu tiên với một  không tồn tại hoặc mặc định, dẫn đến việc coi file đầu tiên là GTLQ và sau đó lan truyền trạng thái này cho tất cả các file sau đó.
   - **Next debug checklist**:
-    1.  Hoàn thành việc thêm UI toggle switch vào .
-    2.  Xác nhận logic trong  sử dụng đúng state  để bỏ qua bước  khi toggle được tắt.
-    3.  Yêu cầu người dùng kiểm tra với cả hai chế độ (bật và tắt pre-filter) để xem GCN có được nhận diện đúng không.
-  - **Why fix this issue and what will be achieved with the fix?**: Đây là lỗi chặn (blocker) đối với chức năng cốt lõi của tab Only GCN. Sửa lỗi này sẽ làm cho tính năng hoạt động như mong đợi.
+    1.  Kiểm tra file .
+    2.  Tìm hàm xử lý  (được thêm vào sau message 394).
+    3.  Debug điều kiện  bên trong vòng lặp. Cần đảm bảo rằng việc chuyển đổi sang GTLQ chỉ xảy ra khi file *trước đó* (previous file) thực sự là một tài liệu không phải GCN (như HSKT, PCT) và file hiện tại là trang tiếp theo của nó.
+    4.  Đặc biệt chú ý đến cách xử lý file đầu tiên trong mỗi thư mục.
+  - **Why fix this issue and what will be achieved with the fix?**: Đây là lỗi chặn (blocker), làm cho chức năng Only GCN hoàn toàn vô dụng vì nó phá hủy tất cả kết quả chính xác.
   - **Status**: IN PROGRESS
   - **Is recurring issue?**: N
-  - **Should Test frontend/backend/both after fix?**: Both.
+  - **Should Test frontend/backend/both after fix?**: Frontend (logic trong ).
   - **Blocked on other issue**: None.
 
-- **Issue 2: Lỗi phân loại không nhất quán của **
-  - **Attempted fixes**: Agent đã thêm logic fallback vào  để xử lý trường hợp API trả về sai định dạng JSON. Tuy nhiên, vấn đề cốt lõi về độ chính xác của phân loại vẫn còn.
+- **Issue 2: Logic ghép cặp GCN trang 1 và trang 2 chưa hoàn chỉnh**
+  - **Attempted fixes**: Chưa có. Người dùng đã đề cập trang 1 GCN chưa được đặt tên theo trang 2 sau khi quét được thông tin ngày cấp GCN (message 297).
   - **Next debug checklist**:
-    1.  Sau khi Issue 1 được giải quyết, tiếp tục theo dõi phản hồi của người dùng về các trường hợp phân loại sai.
-    2.  Xem xét lại việc triển khai đầy đủ giải pháp trong  như một giải pháp dài hạn.
-  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện độ tin cậy của chức năng cốt lõi của ứng dụng.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Backend (logic Python).
+    1.  Sau khi Issue 1 được giải quyết, cần rà soát lại logic .
+    2.  Thêm logic để nếu trang 2 của một GCN có ngày cấp, thì GCN trang 1 tương ứng cũng phải được cập nhật và cả hai được nhóm lại với nhau để phân loại GCNC/GCNM.
+  - **Why fix this issue and what will be achieved with the fix?**: Tăng độ chính xác của việc phân loại GCNC/GCNM.
+  - **Status**: NOT STARTED
+  - **Is recurring issue?**: N
+  - **Should Test frontend/backend/both after fix?**: Frontend.
   - **Blocked on other issue**: Issue 1.
 
-- **Issue 3: Môi trường local của người dùng không đồng bộ**
-  - **Attempted fixes**: Agent đã mất rất nhiều thời gian để chẩn đoán các lỗi do người dùng chưa , chạy sai lệnh (yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. thay vì yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.), hoặc bị lỗi cache Electron. Agent đã tạo ra các file hướng dẫn (, ) và liên tục hướng dẫn người dùng quy trình đúng.
-  - **Next debug checklist**: Mỗi khi có thay đổi liên quan đến file Electron (, ), cần phải hướng dẫn người dùng một cách rõ ràng và chi tiết quy trình: , xóa cache Electron, và restart hoàn toàn app.
-  - **Why fix this issue and what will be achieved with the fix?**: Giảm thời gian gỡ lỗi các vấn đề không liên quan đến code và tăng tốc độ phát triển.
-  - **Status**: NOT STARTED (Đây là vấn đề về quy trình, không phải lỗi code để sửa).
+- **Issue 3: Lỗi phân loại không nhất quán của **
+  - **Attempted fixes**: Chiến lược hiện tại (chỉ lọc A3, để AI phân loại, sau đó frontend xử lý lại) là một cách giải quyết phần ngọn.
+  - **Next debug checklist**: Tiếp tục theo dõi phản hồi của người dùng về các trường hợp AI phân loại sai.
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện độ tin cậy của chức năng cốt lõi.
+  - **Status**: IN PROGRESS
   - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: NA.
+  - **Should Test frontend/backend/both after fix?**: Backend (logic AI prompt).
   - **Blocked on other issue**: None.
 
-- **Issue 4: Cho phép sửa kết quả ngay khi quét xong file (edit-while-scanning)**
+- **Issue 4: Chức năng sửa kết quả trong khi quét chưa được triển khai.**
   - **Attempted fixes**: Chưa có. Đây là yêu cầu từ fork trước.
   - **Next debug checklist**:
-    1.  Xác định các thành phần UI bị vô hiệu hóa bởi  trong  và .
+    1.  Xác định các thành phần UI bị vô hiệu hóa bởi .
     2.  Thay đổi điều kiện  từ một biến trạng thái chung thành kiểm tra trạng thái của từng mục riêng lẻ.
   - **Why fix this issue and what will be achieved with the fix?**: Cải thiện trải nghiệm người dùng, cho phép họ làm việc song song.
   - **Status**: NOT STARTED
@@ -93,112 +91,92 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
 
 **In progress Task List**:
 - **Task 1: Hoàn thiện chức năng tab Only GCN (P0)**
-  - **Where to resume**: Hoàn thành việc thêm toggle switch để bật/tắt pre-filter trong  và đảm bảo logic hoạt động đúng.
-  - **What will be achieved with this?**: Một chức năng hoàn chỉnh cho phép người dùng quét GCN một cách hiệu quả và tiết kiệm chi phí, giải quyết được blocker hiện tại.
+  - **Where to resume**: Sửa lỗi nghiêm trọng trong logic  của file .
+  - **What will be achieved with this?**: Khôi phục chức năng cốt lõi của tab Only GCN, cho phép nó phân loại chính xác giữa GCN và GTLQ.
   - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?**: Both.
+  - **Should Test frontend/backend/both after fix?**: Frontend.
   - **Blocked on something**: Issue 1.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - **(P1)** Triển khai chế độ OCR Hybrid: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API.
-  - **(P2)** Tinh chỉnh  dựa trên các lỗi phân loại mới.
+    - **(P1)** Triển khai logic ghép cặp GCN trang 1 và 2 để đồng bộ ngày cấp (Issue 2).
+    - **(P2)** Triển khai chế độ OCR Hybrid: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API.
+    - **(P3)** Tinh chỉnh  hoặc AI prompt dựa trên các lỗi phân loại mới.
 - **Future Tasks**:
-  - Thêm icon cho ứng dụng trên macOS.
-  - Triển khai hệ thống license key.
-  - Thêm cấu hình giá trong phần Cài đặt.
+    - Thêm icon cho ứng dụng trên macOS.
+    - Triển khai hệ thống license key.
+    - Thêm cấu hình giá trong phần Cài đặt.
 
 **Completed work in this session**
-- **System Maintenance**:
-  - Giải quyết cảnh báo ổ đĩa 95% bằng cách xóa thư mục .
-- **Feature Enhancement & UI/UX**:
-  - Giảm số file tối thiểu cho Smart Mode từ 3 xuống 2.
-  - Khôi phục chế độ xem trước tự động cho quét thư mục.
-  - Xóa các nút điều hướng (pagination) bị trùng lặp ở cuối trang.
-  - Thêm hiển thị trạng thái xử lý chi tiết (VD: Pre-filtering..., Scanning..., Merging...) trong tab Only GCN.
-- **Error Handling & Bug Fixing**:
-  - Triển khai hệ thống xử lý lỗi tập trung (, ) để hiển thị thông báo thân thiện cho các lỗi API (503, 429, etc).
-  - Sửa lỗi Gemini API trả về sai định dạng JSON trong chế độ batch.
-  - Phát hiện và sửa lỗi nghiêm trọng về cấu trúc file Electron: các thay đổi phải được thực hiện trong  và  thay vì .
-- **New Feature: Only GCN Tab**:
-  - Tạo component  và thêm tab mới vào .
-  - Triển khai luồng xử lý tuần tự cho từng thư mục.
-  - Thêm các IPC handler và API cần thiết (, , ) vào  và .
+- **Refactor & Feature Enhancement for Only GCN tab**:
+    - Tái cấu trúc UI để sử dụng các **tab cho mỗi thư mục** và hiển thị kết quả dạng **lưới (grid)**.
+    - Làm gọn giao diện tổng thể (nút, text, stats).
+    - Thêm **Smart Mode (batch processing)** và **tự động resize ảnh** để khắc phục lỗi timeout.
+    - Thêm các **nút và modal cho chức năng Zoom và Edit Name** trên từng ảnh.
+    - Loại bỏ toggle pre-filter để chức năng này luôn được bật.
+    - Đồng bộ hóa chức năng **gộp PDF** với các tab khác, bao gồm cả modal tùy chọn.
+- **Logic & Bug Fixing for Only GCN**:
+    - **Thay đổi hoàn toàn chiến lược pre-filter**: Chuyển từ lọc màu sang chỉ lọc khổ giấy A3.
+    - Thêm logic **post-processing** để tự động đổi tên các tài liệu không phải GCN (như HSKT) thành .
+    - Sao chép và tích hợp logic **phân loại GCNC/GCNM** dựa trên ngày cấp từ .
+    - Đã cố gắng thêm logic sequential pairing để xử lý trang 2 của các tài liệu  (nhưng đã gây ra lỗi nghiêm trọng).
 - **Documentation**:
-  - Tạo file  để hướng dẫn bảo trì hệ thống lỗi.
-  - Tạo file  để ghi nhớ cấu trúc file Electron.
-  - Tạo file batch  để giúp người dùng sửa lỗi môi trường local.
+    - Tạo  và  để ghi lại các thay đổi và quy tắc.
 
 **Earlier issues found/mentioned but not fixed**
-- Toàn bộ đã được liệt kê trong **All Pending/In progress Issue list**.
+- Logic ghép cặp GCN trang 1 & trang 2 để đồng bộ ngày cấp chưa được triển khai (đã nêu trong **All Pending/In progress Issue list** - Issue 2).
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence**: Lỗi phân loại tài liệu không chính xác và không nhất quán.
+- **Issue recurrence**: Lỗi phân loại tài liệu không nhất quán của AI.
 - **Recurrence count**: Rất cao.
-- **Status**: IN PROGRESS.
+- **Status**: IN PROGRESS (Chiến lược mới giúp giảm thiểu tác động nhưng không giải quyết gốc rễ).
 
 **Code Architecture**
 - **Frontend**: React
-  - : Component chính, quản lý các tab.
-  - : (Mới) Logic cho tab Only GCN.
-  - : Logic cho chế độ Batch.
-  - : Logic cho chế độ File/Folder.
-  - : (Mới) Cấu hình và xử lý lỗi phía frontend.
+    - : (**Thay đổi rất nhiều**) Component chính cho tab Only GCN, hiện quản lý các tab thư mục, grid view, smart mode, và tất cả logic post-processing phức tạp (GTLQ conversion, GCN pairing, GCNC/GCNM classification).
+    - : Được dùng làm nguồn tham khảo cho logic smart mode và phân loại GCN.
 - **Backend**: Python
-  - : Xử lý OCR cho từng file.
-  - : Xử lý OCR cho chế độ Smart Batch.
-  - : Script pre-filter để nhận diện GCN.
-  - : (Mới) Cấu hình và xử lý lỗi phía backend.
+    - : (**Đơn giản hóa**) Script này giờ chỉ kiểm tra aspect ratio của ảnh để xác định khổ A3.
+    - : Hiện được sử dụng bởi  để xử lý hàng loạt và resize ảnh.
 - **Main Process**: Electron
-  - : **File thực thi chính của Electron.** Nơi đăng ký IPC Handlers.
-  - : **File preload chính của Electron.** Nơi expose API cho renderer process.
-  - : Thư mục chứa code nguồn cho Electron, nhưng không phải là nơi được thực thi trực tiếp trong môi trường dev. **Đây là nguồn gây nhầm lẫn và lỗi.**
+    - : Không có thay đổi lớn trong phiên này, vẫn là nơi chứa các IPC handler.
 
 **Key Technical Concepts**
-- **Electron Main vs Renderer Process**: Hiểu rõ  (main process) và  (bridge) là rất quan trọng. **Phát hiện quan trọng nhất của phiên này là app đang chạy các file trong  chứ không phải **.
-- **Local Environment Desync**: Vấn đề lặp đi lặp lại khi môi trường local của người dùng không đồng bộ với code trên server. Cần có quy trình hướng dẫn rõ ràng (pull code, xóa cache, restart) cho người dùng mỗi khi có thay đổi quan trọng.
-- **Defensive Programming**: Thêm các câu lệnh  trước khi gọi API để tránh crash app khi môi trường người dùng chưa được cập nhật.
-- **IPC (Inter-Process Communication)**: Giao tiếp giữa React (renderer) và Electron (main) thông qua  và .
+- **Frontend-heavy Logic**: Chiến lược hiện tại đã chuyển phần lớn gánh nặng xử lý và ra quyết định từ AI/backend sang frontend (). Frontend giờ đây không chỉ hiển thị dữ liệu mà còn thực hiện các bước post-processing quan trọng để sửa lỗi của AI.
+- **Multi-stage Processing**: Luồng xử lý của tab Only GCN rất phức tạp:
+    1.  **Pre-filter (Backend)**: Lọc file A3 ().
+    2.  **AI Scan (Backend)**: Gửi các file A3 lên AI để phân loại ().
+    3.  **Post-process (Frontend)**:
+        - Đổi các loại file không phải GCN thành .
+        - Ghép cặp tuần tự để xử lý trang 2 (đang bị lỗi).
+        - Phân loại GCNC/GCNM dựa trên ngày cấp.
+- **State Management Refactor**: State  đã được thay thế bằng , một cấu trúc phức tạp hơn để quản lý kết quả theo từng thư mục.
 
 **key DB schema**
-- Không có, ứng dụng sử dụng  để lưu trữ cài đặt.
+- Không có.
 
 **changes in tech stack**
 - Không có.
 
 **All files**
-- : (Mới) Component chính cho chức năng mới.
-- : (Cập nhật) Thêm các IPC handlers cho chức năng Only GCN.
-- : (Cập nhật) Expose các API mới cho chức năng Only GCN.
-- : (Cập nhật) Nới lỏng ngưỡng nhận diện màu.
-- : (Mới) Module xử lý lỗi tập trung phía backend.
-- : (Mới) Module xử lý lỗi tập trung phía frontend.
-- : (Cập nhật) Thêm tab Only GCN.
-- : (Cập nhật) Tích hợp  và sửa lỗi JSON parsing.
-- : (Cập nhật) Dọn dẹp UI, tích hợp .
-- : (Cập nhật) Khôi phục preview, tích hợp .
-- : (Cập nhật) Sửa  value của slider.
-- : (Mới) Tài liệu ghi chú về cấu trúc file Electron.
-- : (Mới) Tài liệu hướng dẫn bảo trì hệ thống lỗi.
-- : (Mới) Script giúp người dùng sửa lỗi môi trường.
+- : (Đã được sửa đổi rất nhiều) Triển khai UI mới, smart mode, và toàn bộ logic post-processing.
+- : (Đã được sửa đổi) Đơn giản hóa để chỉ kiểm tra aspect ratio.
+- : (Đã được sửa đổi) Cập nhật để hỗ trợ logic pre-filter mới.
+- : (Mới) Tài liệu tóm tắt các thay đổi.
+- : (Mới) Tài liệu tổng hợp các quy tắc GCN.
 
 **Areas that need refactoring**:
-- Cấu trúc file của Electron đang gây nhầm lẫn. Có cả thư mục  và , . Cần thống nhất lại một nguồn code duy nhất (ví dụ: ) và có một bước build để sao chép các file cần thiết sang thư mục  để tránh lỗi code đã sửa nhưng không chạy.
+-  đang trở nên rất lớn và phức tạp. Các logic post-processing (pairing, GTLQ conversion, GCN classification) có thể được tách ra thành các hàm tiện ích (utils) riêng để dễ quản lý và kiểm thử hơn.
 
 **key api endpoints**
-- **IPC Handlers (trong )**:
-  - 
-  - 
-  - 
+- **IPC Handlers**:
+    - : Được gọi để chạy script .
+    - : (Mới được sử dụng trong OnlyGCN) Được gọi để xử lý hàng loạt file bằng .
 
 **Critical Info for New Agent**
-- **QUAN TRỌNG NHẤT**: Luồng phát triển bắt buộc phải tuân theo: **Code trên server -> Người dùng Save to GitHub -> Người dùng  trên máy -> Người dùng restart hoàn toàn app**. Rất nhiều lỗi phát sinh do người dùng không làm đúng quy trình này.
-- **CẤU TRÚC ELECTRON**: App đang thực thi các file trong thư mục  (, ). Mọi thay đổi liên quan đến Electron (thêm API, IPC handler) phải được áp dụng cho các file trong thư mục . Agent trước đã mắc sai lầm khi sửa file trong thư mục  và gây ra lỗi . Hãy đọc file .
-- **LỆNH START APP**: Người dùng chạy app trên Windows bằng lệnh yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command., không phải yarn run v1.22.22
-info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command..
-- **VẤN ĐỀ HIỆN TẠI**:  đang là blocker cho chức năng Only GCN. Cần hoàn thiện việc sửa lỗi và thêm toggle bật/tắt pre-filter.
-- **SẴN SÀNG HƯỚNG DẪN DEBUG MÔI TRƯỜNG**: Hãy chuẩn bị tinh thần hướng dẫn người dùng xóa cache Electron (), kill process (), và restart app khi họ báo lỗi không thấy thay đổi.
+- **BLOCKER HIỆN TẠI**: Lỗi nghiêm trọng nhất cần sửa ngay là logic sequential pairing trong  đang biến tất cả các file GCN thành GTLQ. Hãy bắt đầu bằng việc debug hàm này.
+- **CHIẾN LƯỢC MỚI**: Hãy nhớ rằng chiến lược đã thay đổi. Pre-filter chỉ kiểm tra khổ A3. Mọi quyết định phức tạp hơn (GCN vs GTLQ, GCNC vs GCNM) đều được thực hiện ở tầng frontend sau khi có kết quả từ AI. Đừng cố gắng thêm lại logic lọc màu vào .
+- **RỦI RO LOGIC**:  hiện chứa nhiều logic lồng nhau và phức tạp. Khi sửa lỗi, hãy cẩn thận để không phá vỡ các bước xử lý khác. Thêm nhiều console log chi tiết sẽ rất hữu ích.
 
 **documents created in this job**
 - 
@@ -206,29 +184,28 @@ info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this comm
 - 
 
 **Last 5 User Messages and any pending user messages**
-1.  **User**: Thêm nút tìm kiếm thư mục giống bên batch mode. (COMPLETED)
-2.  **User**: Hiển thị rõ quy trình app đang làm việc để người dùng biết. (COMPLETED)
-3.  **User**: Hiện tại app đang pre-filter toàn bộ số file. Giờ chỉ pre-filter theo thư mục và xử lý tuần tự. (COMPLETED)
-4.  **User**: Kiểm tra lại. Rõ ràng trong thư mục có GCN nhưng không phân loại được. (PENDING - Đây là 
-wtmp begins Mon Nov 17 09:13:30 2025)
-5.  **User**: Ý tôi là app đang pre-filter GCN nhưng không nhận diện được các GCN. (PENDING - User làm rõ 
-wtmp begins Mon Nov 17 09:13:30 2025)
+1.  **User**: Log cho thấy HSKT bị đổi thành GTLQ nhưng trang 2 của nó vẫn thành GCNM. (PENDING - Agent đã cố gắng sửa bằng cách thêm sequential pairing, nhưng gây ra lỗi còn nghiêm trọng hơn).
+2.  **User**: Tái xác nhận rằng pre-filter chỉ cần lọc A3, không cần lọc màu. (COMPLETED - Agent đã xác nhận và sửa logic).
+3.  **User**: Cung cấp log chi tiết cho thấy tất cả GCN đang bị đổi thành GTLQ và báo lỗi nữa. (PENDING - Đây là 
+wtmp begins Tue Nov 18 10:26:50 2025).
+4.  **User**: Yêu cầu kiểm tra tất cả các quy tắc GCN. (COMPLETED - Agent đã tổng hợp các quy tắc).
+5.  **User**: Yêu cầu xác nhận logic đặt tên GCNC/GCNM theo ngày cấp đã tồn tại. (COMPLETED - Agent đã xác nhận và thêm log).
 
 **Project Health Check:**
 - **Broken**:
-  - Chức năng pre-filter của  không đáng tin cậy, đang chặn tính năng Only GCN.
-  - Quy trình làm việc giữa môi trường dev (server) và môi trường của người dùng (local Windows) rất mong manh và thường xuyên gây lỗi.
+    - Chức năng Only GCN hoàn toàn bị hỏng do lỗi logic nghiêm trọng khiến tất cả kết quả GCN bị ghi đè thành GTLQ.
 - **Mocked**: Không có.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions: Không có.
+- Known regressions:
+    - Chức năng phân loại GCN trong tab Only GCN đã bị phá hỏng hoàn toàn bởi lần sửa lỗi cuối cùng.
 
 **Credentials to test flow:**
 N/A
 
 **What agent forgot to execute**
-- Agent đã phát hiện ra vấn đề cấu trúc file Electron ( vs ) nhưng chỉ sửa lỗi cục bộ (copy code sang ) mà chưa thực hiện refactor để thống nhất về một nguồn duy nhất. Điều này để lại rủi ro kỹ thuật cho agent tiếp theo.
-- Agent đã nới lỏng ngưỡng trong  nhưng chưa hoàn thành việc thêm toggle UI để người dùng có thể tắt hoàn toàn pre-filter, mặc dù đã bắt đầu làm.</analysis>
+- Agent chưa triển khai đầy đủ yêu cầu trang 1 GCN chưa được đặt tên theo trang 2 sau khi quét được thông tin ngày cấp GCN.
+- Các nút zoom/edit đã được thêm vào UI, nhưng chức năng thực tế của chúng chưa được người dùng kiểm tra hoặc xác nhận.</analysis>

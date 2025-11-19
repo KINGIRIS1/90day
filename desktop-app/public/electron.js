@@ -1413,8 +1413,8 @@ ipcMain.handle('pre-filter-gcn-files', async (event, files) => {
           });
         });
 
-        // Check result: 'red', 'pink', or 'unknown'
-        if (result === 'red' || result === 'pink') {
+        // Check result: 'pass' (A3), 'red', 'pink', or 'unknown'
+        if (result === 'pass' || result === 'red' || result === 'pink') {
           passed.push(filePath);
         } else {
           skipped.push(filePath);

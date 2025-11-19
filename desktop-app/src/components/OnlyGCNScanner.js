@@ -162,9 +162,23 @@ function OnlyGCNScanner() {
       console.log('🔄 Post-processing GCN (DATE-BASED classification)...');
       
       // Step 1: Find all GCN documents
-      const allGcnDocs = results.filter(r => 
-        r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM' || r.newShortCode === 'GCN'
-      );
+      // ⚠️ CRITICAL: Only process docs that AI classified as GCN AND passed pre-filter
+      // This prevents HSKT or other docs from being misclassified as GCN
+      const allGcnDocs = results.filter(r => {
+        const isGcnByAI = r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM' || r.newShortCode === 'GCN';
+        const passedPreFilter = r.preFiltered === false; // Only docs that were scanned (not skipped)
+        
+        // Additional validation: Check if has GCN characteristics
+        const hasGcnColor = r.color === 'red' || r.color === 'pink' || r.color === 'orange';
+        
+        // If AI says GCN but no color detected → likely false positive (e.g., HSKT)
+        if (isGcnByAI && !hasGcnColor && !r.preFiltered) {
+          console.log(`  ⚠️ Skipping ${r.fileName}: AI says GCN but no GCN color detected`);
+          return false;
+        }
+        
+        return isGcnByAI && passedPreFilter;
+      });
       
       if (allGcnDocs.length === 0) {
         console.log('✅ No GCN documents found');

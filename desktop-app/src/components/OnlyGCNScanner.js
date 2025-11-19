@@ -591,9 +591,15 @@ function OnlyGCNScanner() {
                 let newDocType = 'Giấy tờ liên quan';
                 const shortCode = result.short_code || result.classification || '';
                 
+                // Only keep if truly GCN
                 if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
                   newShortCode = 'GCN';
                   newDocType = 'Giấy chứng nhận';
+                } else if (shortCode) {
+                  // AI detected other doc type (HSKT, PCT, SDTT, etc.) → GTLQ
+                  console.log(`      ⚠️ AI says ${shortCode} → GTLQ`);
+                  newShortCode = 'GTLQ';
+                  newDocType = 'Giấy tờ liên quan';
                 }
 
                 const meta = result.metadata || {};

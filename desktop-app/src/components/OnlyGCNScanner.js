@@ -1097,10 +1097,18 @@ function OnlyGCNScanner() {
                   
                   {/* Action buttons */}
                   <div className="flex gap-1 mt-2">
-                    <button className="flex-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs">
+                    <button 
+                      onClick={() => setZoomModal({ show: true, image: result.previewUrl, fileName: result.fileName })}
+                      className="flex-1 px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs"
+                      title="Zoom"
+                    >
                       🔍
                     </button>
-                    <button className="flex-1 px-2 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded text-xs">
+                    <button 
+                      onClick={() => setEditModal({ show: true, file: result, newName: result.newShortCode })}
+                      className="flex-1 px-2 py-1 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded text-xs"
+                      title="Sửa tên"
+                    >
                       ✏️
                     </button>
                   </div>

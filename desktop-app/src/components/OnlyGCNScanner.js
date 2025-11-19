@@ -645,19 +645,26 @@ function OnlyGCNScanner() {
           }
         }
 
-        // Sequential pairing: If page 1 is GTLQ → page 2 should also be GTLQ
+        // Sequential pairing: If page 1 is a 2-page doc (HSKT/PCT) → page 2 should also be GTLQ
         console.log(`\n   🔄 Pairing sequential pages...`);
+        const twoPageDocTypes = ['HSKT', 'PCT', 'SDTT', 'GPXD', 'PLHS']; // Doc types that typically have 2 pages
+        
         for (let i = 0; i < folderResults.length - 1; i++) {
           const current = folderResults[i];
           const next = folderResults[i + 1];
           
-          // If current is GTLQ (e.g., HSKT) and next is GCN
-          // → Next is likely page 2 of HSKT, not a separate GCN
-          if (current.newShortCode === 'GTLQ' && next.newShortCode === 'GCN') {
-            console.log(`      ⚠️ Pairing: ${next.fileName} follows GTLQ → Convert to GTLQ`);
+          // Only pair if:
+          // 1. Current doc was originally classified as a 2-page doc type by AI
+          // 2. Current doc is now GTLQ (already converted)
+          // 3. Next doc was classified by AI as something OTHER than GCN (e.g., also HSKT)
+          const currentIsMultiPage = twoPageDocTypes.includes(current.originalShortCode);
+          const nextIsNotGcnByAI = !['GCNC', 'GCNM', 'GCN'].includes(next.originalShortCode);
+          
+          if (current.newShortCode === 'GTLQ' && currentIsMultiPage && next.newShortCode === 'GCN' && nextIsNotGcnByAI) {
+            console.log(`      ⚠️ Pairing: ${next.fileName} is page 2 of ${current.originalShortCode} → Convert to GTLQ`);
             next.newShortCode = 'GTLQ';
             next.newDocType = 'Giấy tờ liên quan';
-            next.reasoning = `Page 2 of ${current.originalShortCode || 'previous doc'}`;
+            next.reasoning = `Page 2 of ${current.originalShortCode}`;
           }
         }
 

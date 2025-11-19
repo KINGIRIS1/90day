@@ -64,18 +64,30 @@ def detect_gcn_border_color(image_path):
             right_border.reshape(-1, 3)
         ])
         
-        # Filter out white/gray pixels (background)
+        # Filter out white/gray/black pixels (background)
         # Only keep colored pixels (where at least one channel is significantly different)
         max_vals = all_borders.max(axis=1)
         min_vals = all_borders.min(axis=1)
         color_diff = max_vals - min_vals
         
-        # LOWERED threshold to catch more colored pixels
-        colored_pixels = all_borders[color_diff > 20]  # Lowered from 30 to 20
+        # Filter colored pixels
+        colored_pixels = all_borders[color_diff > 20]
         
-        if len(colored_pixels) < 50:  # Lowered from 100 to 50
-            print(f"⚠️ Not enough colored border pixels found ({len(colored_pixels)})", file=sys.stderr)
-            print(f"   → Skipping (A3 size but no colored border)", file=sys.stderr)
+        total_border_pixels = len(all_borders)
+        colored_ratio = len(colored_pixels) / total_border_pixels if total_border_pixels > 0 else 0
+        
+        print(f"   📊 Border analysis: {len(colored_pixels)}/{total_border_pixels} colored ({colored_ratio*100:.1f}%)", file=sys.stderr)
+        
+        # ⚠️ CRITICAL: Require MAJORITY of border to have color
+        # GCN has colored border around entire edge (>40% colored pixels)
+        # HSKT with red stamp inside has mostly black border (<10% colored)
+        if colored_ratio < 0.40:  # Less than 40% colored
+            print(f"❌ Not enough colored border ({colored_ratio*100:.1f}% < 40%)", file=sys.stderr)
+            print(f"   → Likely black border with red stamp inside (HSKT)", file=sys.stderr)
+            return 'unknown'
+        
+        if len(colored_pixels) < 50:
+            print(f"⚠️ Too few colored pixels ({len(colored_pixels)})", file=sys.stderr)
             return 'unknown'
         
         # Calculate average RGB of colored pixels

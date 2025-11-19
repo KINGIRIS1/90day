@@ -65,6 +65,13 @@ function OnlyGCNScanner() {
     try {
       const engine = await window.electronAPI.getConfig('ocrEngine');
       setOcrEngine(engine || 'gemini-flash-lite');
+      
+      // Load batch mode (giống BatchScanner)
+      const savedBatchMode = await window.electronAPI.getConfig('batchMode');
+      if (savedBatchMode) {
+        setBatchMode(savedBatchMode);
+        console.log(`📦 OnlyGCN - Loaded batch mode: ${savedBatchMode}`);
+      }
     } catch (err) {
       console.error('Failed to load config:', err);
     }

@@ -37,6 +37,7 @@ function OnlyGCNScanner() {
 
   // Load OCR engine config
   const [ocrEngine, setOcrEngine] = useState('gemini-flash-lite');
+  const [batchMode, setBatchMode] = useState('sequential'); // 'sequential', 'fixed', 'smart'
 
   // Merge modal states (giống BatchScanner & DesktopScanner)
   const [showMergeModal, setShowMergeModal] = useState(false);

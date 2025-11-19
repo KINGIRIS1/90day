@@ -10,17 +10,20 @@ import sys
 
 def detect_gcn_border_color(image_path):
     """
-    Detect GCN A3 based on TWO criteria:
-    1. Border color: Red or Pink
-    2. Paper size: A3 (aspect ratio > 1.35, landscape)
+    NEW STRATEGY: Only check A3 size, let AI classify the document type
     
-    Returns: 'red', 'pink', or 'unknown'
+    Returns: 'pass' or 'unknown'
     
-    CRITICAL: Only returns 'red' or 'pink' if BOTH conditions met!
-    - Has red/pink border
-    - AND is A3 size (aspect ratio > 1.35)
+    Pre-filter only checks:
+    - A3 size (aspect ratio > 1.35)
     
-    This prevents false positives from A4 documents with red stamps/seals.
+    AI will classify:
+    - GCN → Keep as GCN
+    - HSKT/PCT/SDTT/etc → Convert to GTLQ in post-processing
+    
+    This prevents:
+    - Missing faded GCN (loose color check)
+    - Still filters out A4 documents
     """
     try:
         img = Image.open(image_path)
@@ -32,108 +35,20 @@ def detect_gcn_border_color(image_path):
         
         print(f"📏 Dimensions: {width}x{height}, Aspect ratio: {aspect_ratio:.2f}", file=sys.stderr)
         
-        # ⚠️ CRITICAL CHECK #1: Must be A3 size (landscape)
+        # ONLY CHECK: Must be A3 size (landscape)
         # GCN A3 has aspect ratio > 1.35 (example: 4443×3135 = 1.42)
         if aspect_ratio <= 1.35:
             print(f"❌ NOT A3 format (aspect ratio {aspect_ratio:.2f} <= 1.35)", file=sys.stderr)
-            print(f"   → Skipping (even if has red color, not GCN A3)", file=sys.stderr)
             return 'unknown'
         
-        print(f"✅ A3 format detected (landscape, aspect ratio > 1.35)", file=sys.stderr)
+        print(f"✅ A3 format detected → PASS to AI", file=sys.stderr)
+        print(f"   AI will classify: GCN, HSKT, PCT, etc.", file=sys.stderr)
         
-        # ✅ CRITICAL CHECK #2: Must have red/pink border
-        # Sample ONLY outer edge (very thin border to avoid red stamps inside)
-        # GCN has colored border on the outer edge, HSKT has black border
-        border_thickness = int(min(width, height) * 0.005)  # 0.5% - Much thinner to avoid stamps
-        border_thickness = max(border_thickness, 5)  # At least 5 pixels
-        border_thickness = min(border_thickness, 20)  # Max 20 pixels
-        
-        print(f"   🔍 Sampling border: {border_thickness}px (outer edge only)", file=sys.stderr)
-        
-        # Extract OUTER EDGE only (very thin border)
-        top_border = img_array[:border_thickness, :, :]
-        bottom_border = img_array[-border_thickness:, :, :]
-        left_border = img_array[:, :border_thickness, :]
-        right_border = img_array[:, -border_thickness:, :]
-        
-        # Combine all borders
-        all_borders = np.vstack([
-            top_border.reshape(-1, 3),
-            bottom_border.reshape(-1, 3),
-            left_border.reshape(-1, 3),
-            right_border.reshape(-1, 3)
-        ])
-        
-        # Filter out white/gray/black pixels (background)
-        # Only keep colored pixels (where at least one channel is significantly different)
-        max_vals = all_borders.max(axis=1)
-        min_vals = all_borders.min(axis=1)
-        color_diff = max_vals - min_vals
-        
-        # Filter colored pixels
-        colored_pixels = all_borders[color_diff > 20]
-        
-        total_border_pixels = len(all_borders)
-        colored_ratio = len(colored_pixels) / total_border_pixels if total_border_pixels > 0 else 0
-        
-        print(f"   📊 Border analysis: {len(colored_pixels)}/{total_border_pixels} colored ({colored_ratio*100:.1f}%)", file=sys.stderr)
-        
-        # ⚠️ CRITICAL: Require MAJORITY of border to have color
-        # GCN has colored border around entire edge (>40% colored pixels)
-        # HSKT with red stamp inside has mostly black border (<10% colored)
-        if colored_ratio < 0.40:  # Less than 40% colored
-            print(f"❌ Not enough colored border ({colored_ratio*100:.1f}% < 40%)", file=sys.stderr)
-            print(f"   → Likely black border with red stamp inside (HSKT)", file=sys.stderr)
-            return 'unknown'
-        
-        if len(colored_pixels) < 50:
-            print(f"⚠️ Too few colored pixels ({len(colored_pixels)})", file=sys.stderr)
-            return 'unknown'
-        
-        # Calculate average RGB of colored pixels
-        avg_r = np.mean(colored_pixels[:, 0])
-        avg_g = np.mean(colored_pixels[:, 1])
-        avg_b = np.mean(colored_pixels[:, 2])
-        
-        print(f"🎨 Border color RGB: ({avg_r:.0f}, {avg_g:.0f}, {avg_b:.0f})", file=sys.stderr)
-        
-        # Classify based on RGB values
-        # Red GCN: High R, Low G, Low B
-        # Pink GCN: High R, High G, High B (but R > G,B)
-        
-        # VERY RELAXED THRESHOLDS - Catch all potential GCN
-        # Better to have false positives than miss real GCN
-        if avg_r > 80:  # Red component present (lowered from 100)
-            if avg_g > 80 and avg_b > 80:
-                # Pink-ish: All channels relatively high
-                # Be more lenient with pink detection
-                if avg_r >= avg_g * 0.9:  # R should be at least 90% of G
-                    color = 'pink'
-                else:
-                    # Still could be faded pink, be conservative
-                    color = 'pink'
-            elif avg_r > avg_g + 20 and avg_r > avg_b + 20:  # Lowered from 30
-                # Red: R significantly higher than G and B
-                color = 'red'
-            else:
-                # Could be orange, light red, faded pink - PASS to be safe
-                color = 'red'  # Conservative: consider as potential GCN
-        else:
-            color = 'unknown'
-            print(f"❌ No red/pink color detected (R={avg_r:.0f} too low)", file=sys.stderr)
-        
-        print(f"🎨 Detected color: {color}", file=sys.stderr)
-        
-        # Final result
-        if color in ['red', 'pink']:
-            print(f"✅ GCN A3 CANDIDATE: A3 size + {color} border", file=sys.stderr)
-        else:
-            print(f"❌ NOT GCN: A3 size but no red/pink border", file=sys.stderr)
-        
-        return color
+        # Return 'pass' to indicate this A3 should be scanned by AI
+        return 'pass'
         
     except Exception as e:
-        print(f"❌ Color detection error: {e}", file=sys.stderr)
+        print(f"❌ Detection error: {e}", file=sys.stderr)
         return 'unknown'
 
 

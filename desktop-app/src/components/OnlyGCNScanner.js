@@ -654,6 +654,22 @@ function OnlyGCNScanner() {
           }
         }
 
+        // Sequential pairing: If page 1 is GTLQ → page 2 should also be GTLQ
+        console.log(`\n   🔄 Pairing sequential pages...`);
+        for (let i = 0; i < folderResults.length - 1; i++) {
+          const current = folderResults[i];
+          const next = folderResults[i + 1];
+          
+          // If current is GTLQ (e.g., HSKT) and next is GCN
+          // → Next is likely page 2 of HSKT, not a separate GCN
+          if (current.newShortCode === 'GTLQ' && next.newShortCode === 'GCN') {
+            console.log(`      ⚠️ Pairing: ${next.fileName} follows GTLQ → Convert to GTLQ`);
+            next.newShortCode = 'GTLQ';
+            next.newDocType = 'Giấy tờ liên quan';
+            next.reasoning = `Page 2 of ${current.originalShortCode || 'previous doc'}`;
+          }
+        }
+
         // Post-process GCN for THIS FOLDER immediately (giống BatchScanner)
         console.log(`\n   🔄 Post-processing GCN for folder: ${folderName}...`);
         const processedFolderResults = postProcessGCN(folderResults);

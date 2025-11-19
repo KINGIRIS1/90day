@@ -645,8 +645,8 @@ function OnlyGCNScanner() {
 
         const gcncCount = processedFolderResults.filter(r => r.newShortCode === 'GCNC').length;
         const gcnmCount = processedFolderResults.filter(r => r.newShortCode === 'GCNM').length;
-        const gtlqCount = processedFolderResults.filter(r => r.newShortCode === 'GTLQ').length;
-        console.log(`   ✅ Folder ${folderName} complete: ${gcncCount} GCNC, ${gcnmCount} GCNM, ${gtlqCount} GTLQ`);
+        const otherCount = processedFolderResults.filter(r => r.newShortCode !== 'GCNC' && r.newShortCode !== 'GCNM').length;
+        console.log(`   ✅ Folder ${folderName} complete: ${gcncCount} GCNC, ${gcnmCount} GCNM, ${otherCount} other docs`);
       }
 
       setCurrentPhase('complete');

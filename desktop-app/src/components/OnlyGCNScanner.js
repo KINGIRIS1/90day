@@ -502,14 +502,20 @@ function OnlyGCNScanner() {
                     console.warn('Preview error:', fileName);
                   }
 
-                  // Normalize
+                  // Classify: Keep GCN, convert others to GTLQ
                   let newShortCode = 'GTLQ';
                   let newDocType = 'Giấy tờ liên quan';
                   const shortCode = batchItem.short_code || '';
                   
+                  // Only keep if truly GCN
                   if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
                     newShortCode = 'GCN';
                     newDocType = 'Giấy chứng nhận';
+                  } else if (shortCode) {
+                    // AI detected other doc type (HSKT, PCT, SDTT, etc.) → GTLQ
+                    console.log(`      ⚠️ ${fileName}: AI says ${shortCode} → Converting to GTLQ`);
+                    newShortCode = 'GTLQ';
+                    newDocType = 'Giấy tờ liên quan';
                   }
 
                   // Extract metadata

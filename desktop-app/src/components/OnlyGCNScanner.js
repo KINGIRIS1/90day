@@ -648,6 +648,7 @@ function OnlyGCNScanner() {
         // Sequential pairing: If page 1 is a 2-page doc (HSKT/PCT) → page 2 should also be GTLQ
         console.log(`\n   🔄 Pairing sequential pages...`);
         const twoPageDocTypes = ['HSKT', 'PCT', 'SDTT', 'GPXD', 'PLHS']; // Doc types that typically have 2 pages
+        let pairingCount = 0;
         
         for (let i = 0; i < folderResults.length - 1; i++) {
           const current = folderResults[i];
@@ -661,12 +662,16 @@ function OnlyGCNScanner() {
           const nextIsNotGcnByAI = !['GCNC', 'GCNM', 'GCN'].includes(next.originalShortCode);
           
           if (current.newShortCode === 'GTLQ' && currentIsMultiPage && next.newShortCode === 'GCN' && nextIsNotGcnByAI) {
-            console.log(`      ⚠️ Pairing: ${next.fileName} is page 2 of ${current.originalShortCode} → Convert to GTLQ`);
+            console.log(`      ⚠️ Pairing: ${next.fileName} (AI: ${next.originalShortCode}) is page 2 of ${current.originalShortCode} → Convert to GTLQ`);
             next.newShortCode = 'GTLQ';
             next.newDocType = 'Giấy tờ liên quan';
             next.reasoning = `Page 2 of ${current.originalShortCode}`;
+            pairingCount++;
           }
         }
+        
+        console.log(`      ✅ Paired ${pairingCount} page(s)`);
+        console.log(`      📊 After pairing: ${folderResults.filter(r => r.newShortCode === 'GCN').length} GCN, ${folderResults.filter(r => r.newShortCode === 'GTLQ').length} GTLQ`);
 
         // Post-process GCN for THIS FOLDER immediately (giống BatchScanner)
         console.log(`\n   🔄 Post-processing GCN for folder: ${folderName}...`);

@@ -466,19 +466,23 @@ function OnlyGCNScanner() {
           console.log(`   🤖 AI scanning ${gcnCandidates.length} GCN candidates...`);
           setProgress({ current: 0, total: gcnCandidates.length });
 
-          // Check if should use Smart Mode (batch processing)
+          // Check if should use Batch Mode (giống BatchScanner)
           const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text'].includes(ocrEngine);
-          const shouldUseBatch = isGeminiEngine && gcnCandidates.length >= 2;
+          const shouldUseBatch = (
+            isGeminiEngine && 
+            (batchMode === 'fixed' || batchMode === 'smart') &&
+            gcnCandidates.length >= 2
+          );
 
           if (shouldUseBatch) {
-            // SMART MODE: Batch processing with resize
-            console.log(`   🚀 SMART MODE: Batch processing ${gcnCandidates.length} files`);
+            // BATCH MODE: Use settings from OCR config
+            console.log(`   🚀 BATCH MODE (${batchMode}): Processing ${gcnCandidates.length} files`);
             console.log(`   📐 Auto-resize enabled for large images`);
             
             try {
-              // Call batch processor (includes auto-resize)
+              // Call batch processor with mode from settings
               const batchResult = await window.electronAPI.batchProcessDocuments({
-                mode: 'smart',
+                mode: batchMode, // Use batchMode from settings (not hardcoded)
                 imagePaths: gcnCandidates,
                 ocrEngine: ocrEngine
               });

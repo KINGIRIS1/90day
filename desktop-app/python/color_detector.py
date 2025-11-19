@@ -42,10 +42,15 @@ def detect_gcn_border_color(image_path):
         print(f"✅ A3 format detected (landscape, aspect ratio > 1.35)", file=sys.stderr)
         
         # ✅ CRITICAL CHECK #2: Must have red/pink border
-        # Sample border regions (top, bottom, left, right)
-        border_thickness = int(min(width, height) * 0.02)  # 2% of smaller dimension
+        # Sample ONLY outer edge (very thin border to avoid red stamps inside)
+        # GCN has colored border on the outer edge, HSKT has black border
+        border_thickness = int(min(width, height) * 0.005)  # 0.5% - Much thinner to avoid stamps
+        border_thickness = max(border_thickness, 5)  # At least 5 pixels
+        border_thickness = min(border_thickness, 20)  # Max 20 pixels
         
-        # Extract border pixels
+        print(f"   🔍 Sampling border: {border_thickness}px (outer edge only)", file=sys.stderr)
+        
+        # Extract OUTER EDGE only (very thin border)
         top_border = img_array[:border_thickness, :, :]
         bottom_border = img_array[-border_thickness:, :, :]
         left_border = img_array[:, :border_thickness, :]

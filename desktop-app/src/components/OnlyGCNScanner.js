@@ -785,7 +785,7 @@ function OnlyGCNScanner() {
           📋 Only GCN - Chế độ đặc biệt
         </h1>
         <p className="text-gray-600">
-          Quét và phân loại: GCN A3 → Đặt tên GCN | File khác → Đặt tên GTLQ (giữ nguyên thứ tự)
+          Pre-filter file A3 trước khi quét → Phân loại tự động (giống Batch Mode)
         </p>
       </div>
 

@@ -1266,6 +1266,95 @@ function OnlyGCNScanner() {
           </div>
         </div>
       )}
+
+      {/* Zoom Modal */}
+      {zoomModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" onClick={() => setZoomModal({ show: false, image: null, fileName: '' })}>
+          <div className="relative max-w-6xl max-h-[90vh] p-4">
+            <button
+              onClick={() => setZoomModal({ show: false, image: null, fileName: '' })}
+              className="absolute top-2 right-2 bg-white rounded-full p-2 hover:bg-gray-100 shadow-lg z-10"
+            >
+              ✕
+            </button>
+            <div className="bg-white rounded-lg p-2">
+              <div className="text-sm font-medium text-gray-700 mb-2 px-2">{zoomModal.fileName}</div>
+              <img
+                src={zoomModal.image}
+                alt={zoomModal.fileName}
+                className="max-w-full max-h-[80vh] object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Name Modal */}
+      {editModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Sửa phân loại</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">File:</label>
+              <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                {editModal.file?.fileName}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Phân loại mới:</label>
+              <select
+                value={editModal.newName}
+                onChange={(e) => setEditModal({ ...editModal, newName: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="GCNC">GCNC - Giấy chứng nhận (Chung)</option>
+                <option value="GCNM">GCNM - Giấy chứng nhận (Mẫu)</option>
+                <option value="GTLQ">GTLQ - Giấy tờ liên quan</option>
+              </select>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setEditModal({ show: false, file: null, newName: '' })}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => {
+                  // Update the file classification in folderTabs
+                  setFolderTabs(prev => prev.map(tab => {
+                    if (tab.path === activeFolder) {
+                      return {
+                        ...tab,
+                        files: tab.files.map(f => 
+                          f.fileName === editModal.file.fileName
+                            ? { 
+                                ...f, 
+                                newShortCode: editModal.newName,
+                                newDocType: editModal.newName === 'GCNC' ? 'Giấy chứng nhận (Chung)' :
+                                           editModal.newName === 'GCNM' ? 'Giấy chứng nhận (Mẫu)' :
+                                           'Giấy tờ liên quan'
+                              }
+                            : f
+                        )
+                      };
+                    }
+                    return tab;
+                  }));
+                  setEditModal({ show: false, file: null, newName: '' });
+                }}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

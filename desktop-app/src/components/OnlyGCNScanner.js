@@ -567,20 +567,10 @@ function OnlyGCNScanner() {
                   console.warn('Preview error:', fileName);
                 }
 
-                let newShortCode = 'GTLQ';
-                let newDocType = 'Giấy tờ liên quan';
-                const shortCode = result.short_code || result.classification || '';
-                
-                // Only keep if truly GCN
-                if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-                  newShortCode = 'GCN';
-                  newDocType = 'Giấy chứng nhận';
-                } else if (shortCode) {
-                  // AI detected other doc type (HSKT, PCT, SDTT, etc.) → GTLQ
-                  console.log(`      ⚠️ AI says ${shortCode} → GTLQ`);
-                  newShortCode = 'GTLQ';
-                  newDocType = 'Giấy tờ liên quan';
-                }
+                // Use AI classification directly (same as BatchScanner)
+                const shortCode = result.short_code || result.classification || 'UNKNOWN';
+                let newShortCode = shortCode;
+                let newDocType = result.doc_type || shortCode;
 
                 const meta = result.metadata || {};
                 const color = meta.color || result.color || null;

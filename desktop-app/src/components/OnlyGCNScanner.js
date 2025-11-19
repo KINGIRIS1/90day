@@ -52,6 +52,10 @@ function OnlyGCNScanner() {
     return tab ? tab.files : [];
   }, [folderTabs, activeFolder]);
 
+  // Modal states
+  const [zoomModal, setZoomModal] = useState({ show: false, image: null, fileName: '' });
+  const [editModal, setEditModal] = useState({ show: false, file: null, newName: '' });
+
   React.useEffect(() => {
     loadConfig();
   }, []);

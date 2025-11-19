@@ -2676,3 +2676,87 @@ User should test with a folder containing:
 Build: ✅ Successful (106.72 kB, +125 B)
 Status: ⏳ Awaiting User Testing
 
+
+================================================================================
+🔧 MAJOR FIX - OnlyGCN Logic Alignment with BatchScanner
+================================================================================
+DATE: $(date '+%Y-%m-%d %H:%M:%S')
+ISSUE: OnlyGCN tab was using different classification logic than BatchScanner
+
+ROOT CAUSE:
+-----------
+OnlyGCNScanner had custom "convert to GTLQ" logic that:
+1. Assumed all files passing A3 pre-filter should be GCN
+2. Converted ALL non-GCN classifications to GTLQ
+3. This caused:
+   - Real GCN files (AI says HSKT) → Lost as GTLQ
+   - Non-GCN files (AI says GCN wrongly) → Kept as GCN
+   - Inconsistency with BatchScanner behavior
+
+USER REPORT:
+------------
+File: S00001 (1).jpg
+- Reality: GCN page 1 (pink color)
+- AI classification: HSKT ❌
+- OnlyGCN result: GTLQ ❌ (WRONG - lost GCN info)
+
+File: 20221026-102061.jpg  
+- Reality: "Land Parcel Map Extract" (NOT GCN)
+- AI classification: GCN ❌
+- OnlyGCN result: GCNM ❌ (WRONG - not a GCN)
+
+SOLUTION:
+---------
+Removed ALL "convert to GTLQ" logic from OnlyGCNScanner:
+
+BEFORE (WRONG):
+```javascript
+let newShortCode = 'GTLQ';  // Default
+if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
+  newShortCode = 'GCN';
+} else {
+  newShortCode = 'GTLQ';  // Force convert
+}
+```
+
+AFTER (CORRECT):
+```javascript
+const shortCode = batchItem.short_code || 'UNKNOWN';
+let newShortCode = shortCode;  // Accept AI result directly
+let newDocType = batchItem.doc_type || shortCode;
+```
+
+CHANGES:
+--------
+1. Removed "convert to GTLQ" logic from batch processing
+2. Removed "convert to GTLQ" logic from single-file processing  
+3. Removed sequential pairing logic (no longer needed)
+4. Updated UI header description
+5. Updated console logging (other docs instead of GTLQ count)
+
+NOW OnlyGCN works EXACTLY like BatchScanner:
+- Pre-filter A3 files → Send to AI → Accept AI result as-is
+- User can see original AI classification
+- User can manually edit if AI is wrong (via Edit button)
+
+BENEFITS:
+---------
+✅ Consistency: Same behavior as BatchScanner
+✅ Transparency: Shows actual AI classification
+✅ Flexibility: User can fix AI mistakes manually
+✅ Simplicity: Less code, easier to maintain
+
+FILES MODIFIED:
+---------------
+- /app/desktop-app/src/components/OnlyGCNScanner.js
+
+DOCUMENTATION:
+--------------
+- /app/desktop-app/ONLYGCN_LOGIC_FIX.md (detailed explanation)
+
+BUILD: ✅ Successful (106.41 kB, -319 B smaller)
+STATUS: ✅ Fixed | ⏳ Awaiting User Testing
+
+NOTE: This is the REAL fix for the classification issues reported by user.
+      The previous "sequential pairing" fix was addressing a symptom, not root cause.
+

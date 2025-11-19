@@ -269,9 +269,21 @@ PCTSVC = VB phân chia tài sản chung vợ chồng
    DDKBD: Form có blank fields, "ĐƠN ĐĂNG KÝ BIẾN ĐỘNG"
    GCNM: Certificate đã fill, có quốc huy
 
-2. HSKT vs GCNM:
-   HSKT: Bản vẽ, map với sơ đồ/tọa độ
-   GCNM: Text document
+2. HSKT vs GCN (QUAN TRỌNG - DỄ NHẦM):
+   ✅ GCN (Giấy chứng nhận):
+   - CÓ QUỐC HUY ở top center (hình tròn/oval với ngôi sao, búa liềm)
+   - HOẶC có 3 dòng: "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM" + "Độc lập - Tự do - Hạnh phúc" + "GIẤY CHỨNG NHẬN..."
+   - Màu nền: HỒNG (pink) hoặc ĐỎ/CAM (red/orange)
+   - Nội dung: Thông tin người sử dụng đất, thửa đất
+   - Layout: Certificate format (text-based, formal sections)
+   
+   ❌ HSKT (Bản vẽ/Trích lục):
+   - KHÔNG có quốc huy ở top center
+   - Có title "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH" hoặc "BẢN ĐỒ ĐỊA CHÍNH"
+   - Nội dung: BẢN ĐỒ với sơ đồ thửa, tọa độ, đường ranh giới
+   - Layout: Map-based (visual diagram với boundaries)
+   
+   🚨 RULE CỨNG: Nếu có QUỐC HUY → TUYỆT ĐỐI là GCN, KHÔNG BAO GIỜ là HSKT!
 
 3. HDCQ vs HDUQ:
    HDCQ: "CHUYỂN NHƯỢNG" (chuyển quyền sở hữu)

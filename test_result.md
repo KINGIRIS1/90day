@@ -2622,3 +2622,57 @@ agent_communication:
       
       📦 BUILD: ✅ Successful (106.06 kB, +293 B)
       🎯 STATUS: ✅ Feature Complete | ⏳ User Testing Required
+
+================================================================================
+🔧 BUG FIX - Sequential Pairing Logic (Issue #1 - P0)
+================================================================================
+DATE: $(date '+%Y-%m-%d %H:%M:%S')
+ISSUE: All valid GCN files were being renamed to GTLQ due to faulty pairing logic
+
+ROOT CAUSE:
+-----------
+The sequential pairing logic in OnlyGCNScanner.js (lines 648-662) had a critical flaw:
+
+1. It checked: if (current.newShortCode === 'GTLQ' && next.newShortCode === 'GCN')
+2. Without verifying what AI originally classified these files as
+3. If file #1 was HSKT (correctly converted to GTLQ), and file #2 was a valid GCN:
+   - Logic saw: current=GTLQ, next=GCN → Converted GCN to GTLQ (WRONG!)
+   - File #3 also GCN → Logic saw: current=GTLQ, next=GCN → Converted to GTLQ
+   - This cascaded through all subsequent GCN files!
+
+SOLUTION:
+---------
+Updated pairing logic to only pair when:
+1. Current doc was originally classified by AI as a 2-page doc type (HSKT, PCT, SDTT, GPXD, PLHS)
+2. Current doc is now GTLQ (already converted from non-GCN type)
+3. Next doc was classified by AI as something OTHER than GCN
+4. This ensures genuine GCN files are NEVER converted to GTLQ by pairing logic
+
+CODE CHANGES:
+-------------
+File: /app/desktop-app/src/components/OnlyGCNScanner.js
+Lines: 648-676
+
+Added:
+- twoPageDocTypes array to identify multi-page documents
+- Check currentIsMultiPage: only pair if original was HSKT/PCT/etc
+- Check nextIsNotGcnByAI: preserve files that AI classified as GCN
+- Enhanced logging with pairing count and before/after stats
+
+EXPECTED BEHAVIOR NOW:
+----------------------
+✅ HSKT/PCT files → Converted to GTLQ (correct)
+✅ Page 2 of HSKT/PCT → Also converted to GTLQ (correct)
+✅ Valid GCN files → Stay as GCN, get classified as GCNC/GCNM (correct)
+✅ Files that AI misclassified → Still converted to GTLQ as before
+
+TESTING REQUIRED:
+-----------------
+User should test with a folder containing:
+1. Multiple valid GCN documents (should remain GCNC/GCNM)
+2. HSKT or PCT documents (should become GTLQ for both pages)
+3. Mixed documents to verify pairing only applies to multi-page docs
+
+Build: ✅ Successful (106.72 kB, +125 B)
+Status: ⏳ Awaiting User Testing
+

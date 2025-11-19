@@ -140,6 +140,7 @@ HSKT = Bản vẽ (trích lục, đo tách, chỉnh lý)
   • Nội dung: BẢN ĐỒ địa chính với tọa độ, sơ đồ thửa
   • Keyword: "TRÍCH LỤC", "BẢN ĐỒ ĐỊA CHÍNH", "ĐO TÁCH", "CHỈNH LÝ"
   • ⚠️ "TRÍCH LỤC BẢN ĐỒ ĐỊA CHÍNH" → HSKT (KHÔNG phải BMT!)
+  • 🚨 QUAN TRỌNG: HSKT KHÔNG BAO GIỜ có QUỐC HUY ở top! Nếu có quốc huy → là GCN!
 SDTT = Sơ đồ dự kiến tách thửa
 
 📋 NHÓM 2: BIÊN BẢN (10 loại)

@@ -656,8 +656,8 @@ function OnlyGCNScanner() {
       
       const finalGcncCount = allResults.filter(r => r.newShortCode === 'GCNC').length;
       const finalGcnmCount = allResults.filter(r => r.newShortCode === 'GCNM').length;
-      const finalGtlqCount = allResults.filter(r => r.newShortCode === 'GTLQ').length;
-      console.log(`📊 Total stats: ${finalGcncCount} GCNC, ${finalGcnmCount} GCNM, ${finalGtlqCount} GTLQ`);
+      const finalOtherCount = allResults.filter(r => r.newShortCode !== 'GCNC' && r.newShortCode !== 'GCNM').length;
+      console.log(`📊 Total stats: ${finalGcncCount} GCNC, ${finalGcnmCount} GCNM, ${finalOtherCount} other docs`);
     } catch (err) {
       console.error('Scan error:', err);
       alert('Lỗi quét: ' + err.message);

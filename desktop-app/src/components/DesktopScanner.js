@@ -1528,23 +1528,28 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     }
     
     try {
-      // Filter ONLY image files (skip PDFs)
-      const imageFiles = filesToProcess.filter(f => 
-        /\.(png|jpg|jpeg|gif|bmp)$/i.test(f.path || f.name || f)
+      // Accept both images AND PDFs (Gemini supports PDF directly)
+      const validFiles = filesToProcess.filter(f => 
+        /\.(png|jpg|jpeg|gif|bmp|pdf)$/i.test(f.path || f.name || f)
       );
       
-      if (imageFiles.length === 0) {
-        console.error('❌ No image files found (all PDFs or unsupported)');
+      if (validFiles.length === 0) {
+        console.error('❌ No valid files found');
         return null;
       }
       
-      if (imageFiles.length < filesToProcess.length) {
-        const skipped = filesToProcess.length - imageFiles.length;
-        console.log(`⏭️ Skipped ${skipped} PDF/unsupported files, processing ${imageFiles.length} images`);
+      // Count file types
+      const imageFiles = validFiles.filter(f => /\.(png|jpg|jpeg|gif|bmp)$/i.test(f.path || f.name || f));
+      const pdfFiles = validFiles.filter(f => /\.pdf$/i.test(f.path || f.name || f));
+      console.log(`📊 Processing: ${imageFiles.length} images, ${pdfFiles.length} PDFs`);
+      
+      if (validFiles.length < filesToProcess.length) {
+        const skipped = filesToProcess.length - validFiles.length;
+        console.log(`⏭️ Skipped ${skipped} unsupported files`);
       }
       
-      // Get image paths only
-      const imagePaths = imageFiles.map(f => f.path || f);
+      // Get all valid file paths (images + PDFs)
+      const filePaths = validFiles.map(f => f.path || f);
       
       // Call batch processor via IPC
       const batchResult = await window.electronAPI.batchProcessDocuments({

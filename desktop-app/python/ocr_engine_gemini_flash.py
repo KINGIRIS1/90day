@@ -104,9 +104,28 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
         
         # Determine model name
         model_name = 'gemini-2.5-flash-lite' if model_type == 'gemini-flash-lite' else 'gemini-2.5-flash'
-        # Read full image for position-aware analysis
+        
+        # Check if input is PDF or image
+        is_pdf = image_path.lower().endswith('.pdf')
         resize_info = {}
-        with Image.open(image_path) as img:
+        
+        if is_pdf:
+            # Handle PDF directly (Gemini supports PDF input)
+            print(f"📄 Processing PDF: {image_path}", file=sys.stderr)
+            with open(image_path, 'rb') as pdf_file:
+                pdf_content = pdf_file.read()
+            
+            # Encode PDF to base64
+            encoded_data = base64.b64encode(pdf_content).decode('utf-8')
+            mime_type = "application/pdf"
+            
+            # No resize for PDF
+            resize_info = {'resized': False, 'original_size': len(pdf_content)}
+            
+        else:
+            # Handle image file
+            # Read full image for position-aware analysis
+            with Image.open(image_path) as img:
             width, height = img.size
             
             # Process full image or crop if specified

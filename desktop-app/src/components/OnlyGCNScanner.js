@@ -601,13 +601,29 @@ function OnlyGCNScanner() {
           setCurrentFile(`Đang phân tích màu sắc thư mục ${folderName}...`);
           
           const preFilterStart = Date.now();
-          const preFilterResults = await window.electronAPI.preFilterGCNFiles(folderFiles);
+          
+          // Separate PDF and image files
+          const pdfFiles = folderFiles.filter(f => /\.pdf$/i.test(f));
+          const imageFiles = folderFiles.filter(f => /\.(jpg|jpeg|png|gif|bmp)$/i.test(f));
+          
+          console.log(`   📊 Files: ${imageFiles.length} images, ${pdfFiles.length} PDFs`);
+          
+          // Pre-filter image files only
+          let preFilteredImages = [];
+          let skippedImages = [];
+          
+          if (imageFiles.length > 0) {
+            const preFilterResults = await window.electronAPI.preFilterGCNFiles(imageFiles);
+            preFilteredImages = preFilterResults.passed || [];
+            skippedImages = preFilterResults.skipped || [];
+          }
+          
+          // PDF files always pass pre-filter (will be scanned)
+          gcnCandidates = [...preFilteredImages, ...pdfFiles];
+          skipped = skippedImages;
+          
           const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
-          
-          gcnCandidates = preFilterResults.passed || [];
-          skipped = preFilterResults.skipped || [];
-          
-          console.log(`   🎨 Pre-filter: ${gcnCandidates.length} GCN, ${skipped.length} skipped (${preFilterTime}s)`);
+          console.log(`   🎨 Pre-filter: ${gcnCandidates.length} files (${preFilteredImages.length} images + ${pdfFiles.length} PDFs), ${skipped.length} skipped (${preFilterTime}s)`);
         } else {
           console.log(`   ⚡ Pre-filter OFF: Scanning all ${folderFiles.length} files`);
           gcnCandidates = folderFiles;

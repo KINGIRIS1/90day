@@ -279,15 +279,20 @@ function OnlyGCNScanner() {
     try {
       console.log('🔄 Post-processing GCN (DATE-BASED classification)...');
       
-      // Step 1: Find all GCN documents
-      // Take all docs that AI classified as GCN
-      // Color is ONLY used for GCNC/GCNM classification, NOT for filtering
-      const allGcnDocs = results.filter(r => {
-        const isGcnByAI = r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM' || r.newShortCode === 'GCN';
-        const passedPreFilter = r.preFiltered === false; // Only docs that were scanned (not skipped)
-        
-        return isGcnByAI && passedPreFilter;
+      // Step 1: Normalize GCNM/GCNC → GCN (GIỐNG BatchScanner)
+      const normalizedResults = results.map(r => {
+        if (r.short_code === 'GCNM' || r.short_code === 'GCNC' || r.newShortCode === 'GCNM' || r.newShortCode === 'GCNC') {
+          console.log(`🔄 Converting ${r.short_code || r.newShortCode} → GCN for file: ${r.fileName}`);
+          return { ...r, short_code: 'GCN', newShortCode: 'GCN', original_short_code: r.short_code || r.newShortCode };
+        }
+        // Sync short_code and newShortCode
+        if (!r.short_code) r.short_code = r.newShortCode;
+        if (!r.newShortCode) r.newShortCode = r.short_code;
+        return r;
       });
+      
+      // Step 2: Find all GCN documents
+      const allGcnDocs = normalizedResults.filter(r => r.short_code === 'GCN');
       
       if (allGcnDocs.length === 0) {
         console.log('✅ No GCN documents found');

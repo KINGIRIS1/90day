@@ -466,90 +466,35 @@ function OnlyGCNScanner() {
           console.log(`   🤖 AI scanning ${gcnCandidates.length} GCN candidates...`);
           setProgress({ current: 0, total: gcnCandidates.length });
 
-          // Check if should use Batch Mode (giống BatchScanner)
+          // 🚀 CHECK IF BATCH PROCESSING SHOULD BE USED (COPY từ BatchScanner)
           const isGeminiEngine = ['gemini-flash', 'gemini-flash-lite', 'gemini-flash-hybrid', 'gemini-flash-text'].includes(ocrEngine);
           const shouldUseBatch = (
-            isGeminiEngine && 
+            isGeminiEngine &&
             (batchMode === 'fixed' || batchMode === 'smart') &&
             gcnCandidates.length >= 2
           );
 
           if (shouldUseBatch) {
-            // BATCH MODE: Use settings from OCR config
-            console.log(`   🚀 BATCH MODE (${batchMode}): Processing ${gcnCandidates.length} files`);
-            console.log(`   📐 Auto-resize enabled for large images`);
+            console.log(`\n🚀 BATCH MODE for folder: ${folderName}`);
+            console.log(`   Files: ${gcnCandidates.length}, Mode: ${batchMode}`);
             
-            try {
-              // Call batch processor with mode from settings
-              const batchResult = await window.electronAPI.batchProcessDocuments({
-                mode: batchMode, // Use batchMode from settings (not hardcoded)
-                imagePaths: gcnCandidates,
-                ocrEngine: ocrEngine
-              });
-
-              if (batchResult.success && batchResult.results) {
-                console.log(`   ✅ Batch complete: ${batchResult.results.length} results`);
-
-                // Map batch results
-                for (const batchItem of batchResult.results) {
-                  const filePath = batchItem.file_path;
-                  const fileName = batchItem.file_name;
-
-                  // Generate preview
-                  let previewUrl = null;
-                  try {
-                    if (filePath && /\.(png|jpg|jpeg|gif|bmp)$/i.test(fileName)) {
-                      previewUrl = await window.electronAPI.readImageDataUrl(filePath);
-                    }
-                  } catch (e) {
-                    console.warn('Preview error:', fileName);
-                  }
-
-                  // Use AI classification directly (same as BatchScanner)
-                  const shortCode = batchItem.short_code || 'UNKNOWN';
-                  let newShortCode = shortCode;
-                  let newDocType = batchItem.doc_type || shortCode;
-
-                  // Extract metadata
-                  const meta = batchItem.metadata || {};
-                  const color = meta.color || null;
-                  const issueDate = meta.issue_date || null;
-                  const issueDateConf = meta.issue_date_confidence || null;
-
-                  if (shortCode === 'GCNC' || shortCode === 'GCNM' || shortCode === 'GCN') {
-                    console.log(`      📊 ${fileName}: color=${color || 'null'}, date=${issueDate || 'null'}`);
-                  }
-
-                  folderResults.push({
-                    fileName,
-                    filePath,
-                    folderName,
-                    previewUrl,
-                    originalShortCode: shortCode,
-                    originalDocType: batchItem.doc_type || shortCode,
-                    newShortCode,
-                    newDocType,
-                    confidence: batchItem.confidence || 0,
-                    reasoning: batchItem.reasoning || '',
-                    metadata: meta,
-                    color: color,
-                    issue_date: issueDate,
-                    issue_date_confidence: issueDateConf,
-                    success: true,
-                    preFiltered: false,
-                    method: 'batch_smart'
-                  });
-                }
-
-                setProgress({ current: gcnCandidates.length, total: gcnCandidates.length });
-              } else {
-                console.error('   ❌ Batch processing failed:', batchResult.error);
-                // Fallback to single-file processing if batch fails
-                throw new Error(batchResult.error || 'Batch processing failed');
-              }
-            } catch (batchErr) {
-              console.error('   ❌ Batch error, falling back to single-file:', batchErr);
-              // Fall through to single-file processing
+            // Use batch processing (COPY Y NGUYÊN từ BatchScanner)
+            const batchResults = await processFolderBatch(gcnCandidates, batchMode, ocrEngine, folderName);
+            
+            if (batchResults && batchResults.length > 0) {
+              console.log(`✅ Folder batch success: ${batchResults.length} files`);
+              
+              // Add all batch results
+              folderResults.push(...batchResults);
+              
+              // Update progress
+              setProgress({ current: gcnCandidates.length, total: gcnCandidates.length });
+            } else {
+              const errorMsg = batchResults?.error || 'Batch returned no results';
+              console.error(`⚠️ BATCH FAILED for folder ${folderName}:`, errorMsg);
+              console.warn('🔄 FALLBACK: Switching to sequential processing for this folder...');
+              console.log(`📋 Files in this folder will be scanned one by one (slower but reliable)`);
+              // Fall through to sequential
             }
           }
 

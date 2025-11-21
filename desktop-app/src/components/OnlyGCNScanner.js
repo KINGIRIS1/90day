@@ -268,6 +268,63 @@ function OnlyGCNScanner() {
         });
       }
       
+      // Process PDF files separately (single-file mode)
+      if (pdfFiles.length > 0) {
+        console.log(`\n📄 Processing ${pdfFiles.length} PDF files...`);
+        
+        for (const pdfPath of pdfFiles) {
+          try {
+            const fileName = pdfPath.split(/[/\\]/).pop();
+            console.log(`   Processing PDF: ${fileName}`);
+            
+            // Call single-file OCR for PDF
+            const result = await window.electronAPI.scanDocument({
+              filePath: pdfPath,
+              ocrEngine: engineType
+            });
+            
+            if (result.success) {
+              // Generate preview for PDF
+              let previewUrl = null;
+              try {
+                previewUrl = await window.electronAPI.readImageDataUrl(pdfPath);
+              } catch (e) {
+                console.warn(`Preview error for PDF ${fileName}`);
+              }
+              
+              mappedResults.push({
+                filePath: pdfPath,
+                fileName: fileName,
+                folderName: folderName,
+                short_code: result.short_code || 'UNKNOWN',
+                doc_type: result.doc_type || result.short_code || 'UNKNOWN',
+                confidence: result.confidence || 0.5,
+                previewUrl: previewUrl,
+                success: true,
+                method: 'single_pdf',
+                metadata: result.metadata || {},
+                color: result.metadata?.color || result.color || null,
+                issue_date: result.metadata?.issue_date || result.issue_date || null,
+                issue_date_confidence: result.metadata?.issue_date_confidence || null,
+                newShortCode: result.short_code || 'UNKNOWN',
+                newDocType: result.doc_type || result.short_code || 'UNKNOWN',
+                originalShortCode: result.short_code || 'UNKNOWN',
+                originalDocType: result.doc_type || result.short_code || 'UNKNOWN',
+                reasoning: result.reasoning || '',
+                preFiltered: false,
+                isPdf: true
+              });
+              
+              console.log(`      ✅ ${fileName}: ${result.short_code}`);
+            } else {
+              console.error(`      ❌ ${fileName}: ${result.error}`);
+            }
+          } catch (pdfError) {
+            console.error(`   ❌ Error processing PDF:`, pdfError);
+          }
+        }
+      }
+      
       return mappedResults;
       
     } catch (error) {

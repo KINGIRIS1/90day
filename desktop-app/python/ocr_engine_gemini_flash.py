@@ -141,16 +141,17 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
             if enable_resize:
                 processed_img, resize_info = resize_image_smart(processed_img, max_width, max_height)
             
-            # Convert to base64 (use JPEG with quality 85 for better compression)
-            img_byte_arr = io.BytesIO()
-            # Convert to RGB if needed (for JPEG)
-            if processed_img.mode in ('RGBA', 'LA', 'P'):
-                processed_img = processed_img.convert('RGB')
-            processed_img.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
-            image_content = img_byte_arr.getvalue()
-        
-        # Encode to base64
-        encoded_image = base64.b64encode(image_content).decode('utf-8')
+                # Convert to base64 (use JPEG with quality 85 for better compression)
+                img_byte_arr = io.BytesIO()
+                # Convert to RGB if needed (for JPEG)
+                if processed_img.mode in ('RGBA', 'LA', 'P'):
+                    processed_img = processed_img.convert('RGB')
+                processed_img.save(img_byte_arr, format='JPEG', quality=85, optimize=True)
+                image_content = img_byte_arr.getvalue()
+            
+            # Encode to base64
+            encoded_data = base64.b64encode(image_content).decode('utf-8')
+            mime_type = "image/jpeg"
         
         # Use direct REST API - v1beta is the standard API version
         # Model: gemini-2.5-flash or gemini-2.5-flash-lite

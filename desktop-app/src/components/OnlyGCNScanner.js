@@ -394,10 +394,12 @@ function OnlyGCNScanner() {
           
           if (groupsArray.length === 1) {
             groupsArray[0].files.forEach(file => {
-              const idx = processedResults.findIndex(r => r.fileName === file.fileName);
+              const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (idx >= 0) {
-                processedResults[idx].newShortCode = 'GCNC';
-                processedResults[idx].newDocType = 'Giấy chứng nhận (Chung)';
+                normalizedResults[idx].short_code = 'GCNC';
+                normalizedResults[idx].newShortCode = 'GCNC';
+                normalizedResults[idx].doc_type = 'GCNC';
+                normalizedResults[idx].newDocType = 'Giấy chứng nhận (Chung)';
                 console.log(`      ✅ ${file.fileName} → GCNC (fallback)`);
               }
             });

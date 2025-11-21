@@ -442,26 +442,46 @@ def get_multi_image_prompt_lite(batch_size):
 
 
 def encode_image_base64(image_path, max_width=1500, max_height=2100):
-    """Encode image to base64 with smart resize"""
+    """Encode image OR PDF to base64 with smart resize (for images only)"""
     try:
-        img = Image.open(image_path)
+        # Check if PDF
+        is_pdf = image_path.lower().endswith('.pdf')
         
-        # Convert to RGB if needed
-        if img.mode in ('RGBA', 'LA', 'P'):
-            img = img.convert('RGB')
-        
-        # Resize
-        resized_img, resize_info = resize_image_smart(img, max_width, max_height)
-        
-        # Encode to base64 with quality 85 (balance between size and OCR accuracy)
-        buffer = io.BytesIO()
-        resized_img.save(buffer, format='JPEG', quality=85, optimize=True)
-        img_bytes = buffer.getvalue()
-        encoded = base64.b64encode(img_bytes).decode('utf-8')
-        
-        return encoded, resize_info
+        if is_pdf:
+            # Handle PDF: Read directly without processing
+            with open(image_path, 'rb') as f:
+                pdf_bytes = f.read()
+            
+            encoded = base64.b64encode(pdf_bytes).decode('utf-8')
+            resize_info = {
+                'resized': False,
+                'original_size': f"{len(pdf_bytes) / 1024:.0f} KB",
+                'new_size': f"{len(pdf_bytes) / 1024:.0f} KB",
+                'reduction_percent': 0,
+                'is_pdf': True
+            }
+            return encoded, resize_info
+        else:
+            # Handle image file
+            img = Image.open(image_path)
+            
+            # Convert to RGB if needed
+            if img.mode in ('RGBA', 'LA', 'P'):
+                img = img.convert('RGB')
+            
+            # Resize
+            resized_img, resize_info = resize_image_smart(img, max_width, max_height)
+            resize_info['is_pdf'] = False
+            
+            # Encode to base64 with quality 85 (balance between size and OCR accuracy)
+            buffer = io.BytesIO()
+            resized_img.save(buffer, format='JPEG', quality=85, optimize=True)
+            img_bytes = buffer.getvalue()
+            encoded = base64.b64encode(img_bytes).decode('utf-8')
+            
+            return encoded, resize_info
     except Exception as e:
-        print(f"Error encoding image {image_path}: {e}", file=sys.stderr)
+        print(f"Error encoding file {image_path}: {e}", file=sys.stderr)
         return None, None
 
 

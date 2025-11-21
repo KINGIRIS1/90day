@@ -182,18 +182,20 @@ function OnlyGCNScanner() {
       return null;
     }
     
-    // Filter ONLY image files (skip PDFs)
-    const imageOnly = imagePaths.filter(path => 
+    // Separate image and PDF files
+    const imageFiles = imagePaths.filter(path => 
       /\.(jpg|jpeg|png|gif|bmp)$/i.test(path)
     );
+    const pdfFiles = imagePaths.filter(path => 
+      /\.pdf$/i.test(path)
+    );
     
-    if (imageOnly.length === 0) {
-      console.error('❌ No image files found (all PDFs)');
+    console.log(`📊 Files breakdown: ${imageFiles.length} images, ${pdfFiles.length} PDFs`);
+    
+    // Process images first (batch mode supports images only)
+    if (imageFiles.length === 0 && pdfFiles.length === 0) {
+      console.error('❌ No valid files found');
       return null;
-    }
-    
-    if (imageOnly.length < imagePaths.length) {
-      console.log(`⏭️ Skipped ${imagePaths.length - imageOnly.length} PDF files, processing ${imageOnly.length} images`);
     }
     
     try {

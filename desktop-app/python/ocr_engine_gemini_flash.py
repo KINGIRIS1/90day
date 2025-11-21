@@ -171,8 +171,8 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
                     {"text": prompt_text},
                     {
                         "inline_data": {
-                            "mime_type": "image/jpeg",
-                            "data": encoded_image
+                            "mime_type": mime_type,
+                            "data": encoded_data
                         }
                     }
                 ]

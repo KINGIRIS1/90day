@@ -348,17 +348,17 @@ function OnlyGCNScanner() {
       
       console.log(`🎨 Color analysis: ${uniqueColors.join(', ') || 'none'}, hasRedAndPink=${hasRedAndPink}`);
       
-      const processedResults = [...results];
-      
       if (hasRedAndPink) {
         console.log(`  🎨 Mixed colors → Classify by color`);
         groupsArray.forEach(group => {
           const classification = (group.color === 'red' || group.color === 'orange') ? 'GCNC' : 'GCNM';
           group.files.forEach(file => {
-            const idx = processedResults.findIndex(r => r.fileName === file.fileName);
+            const idx = normalizedResults.findIndex(r => r.fileName === file.fileName);
             if (idx >= 0) {
-              processedResults[idx].newShortCode = classification;
-              processedResults[idx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
+              normalizedResults[idx].short_code = classification;
+              normalizedResults[idx].newShortCode = classification;
+              normalizedResults[idx].doc_type = classification;
+              normalizedResults[idx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
             }
           });
         });

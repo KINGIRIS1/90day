@@ -377,10 +377,12 @@ function OnlyGCNScanner() {
             console.log(`    Group ${idx + 1}: ${group.issueDate} (${group.parsedDate.comparable}) → ${classification}`);
             
             group.files.forEach(file => {
-              const resIdx = processedResults.findIndex(r => r.fileName === file.fileName);
+              const resIdx = normalizedResults.findIndex(r => r.fileName === file.fileName);
               if (resIdx >= 0) {
-                processedResults[resIdx].newShortCode = classification;
-                processedResults[resIdx].newDocType = classification === 'GCNC' ? 'Giấy chứng nhận (Chung)' : 'Giấy chứng nhận (Mẫu)';
+                normalizedResults[resIdx].short_code = classification;
+                normalizedResults[resIdx].newShortCode = classification;
+                normalizedResults[resIdx].doc_type = classification;
+                normalizedResults[resIdx].newDocType = classification;
                 console.log(`      ✅ ${file.fileName} → ${classification}`);
               }
             });

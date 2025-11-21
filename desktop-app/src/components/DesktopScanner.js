@@ -1551,10 +1551,10 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       // Get all valid file paths (images + PDFs)
       const filePaths = validFiles.map(f => f.path || f);
       
-      // Call batch processor via IPC
+      // Call batch processor via IPC (now supports both images and PDFs)
       const batchResult = await window.electronAPI.batchProcessDocuments({
         mode: mode,
-        imagePaths: imagePaths,
+        imagePaths: filePaths,  // Changed from imagePaths to filePaths (includes PDFs)
         ocrEngine: currentOcrEngine
       });
       

@@ -126,21 +126,21 @@ def classify_document_gemini_flash(image_path, api_key, crop_top_percent=1.0, mo
             # Handle image file
             # Read full image for position-aware analysis
             with Image.open(image_path) as img:
-            width, height = img.size
-            
-            # Process full image or crop if specified
-            if crop_top_percent < 1.0:
-                crop_height = int(height * crop_top_percent)
-                processed_img = img.crop((0, 0, width, crop_height))
-                print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
-            else:
-                processed_img = img
-                print(f"🖼️ Processing full image: {width}x{height} (position-aware mode)", file=sys.stderr)
-            
-            # Apply smart resize if enabled
-            if enable_resize:
-                processed_img, resize_info = resize_image_smart(processed_img, max_width, max_height)
-            
+                width, height = img.size
+                
+                # Process full image or crop if specified
+                if crop_top_percent < 1.0:
+                    crop_height = int(height * crop_top_percent)
+                    processed_img = img.crop((0, 0, width, crop_height))
+                    print(f"🖼️ Image cropped: {width}x{height} → {width}x{crop_height} (top {int(crop_top_percent*100)}%)", file=sys.stderr)
+                else:
+                    processed_img = img
+                    print(f"🖼️ Processing full image: {width}x{height} (position-aware mode)", file=sys.stderr)
+                
+                # Apply smart resize if enabled
+                if enable_resize:
+                    processed_img, resize_info = resize_image_smart(processed_img, max_width, max_height)
+                
                 # Convert to base64 (use JPEG with quality 85 for better compression)
                 img_byte_arr = io.BytesIO()
                 # Convert to RGB if needed (for JPEG)

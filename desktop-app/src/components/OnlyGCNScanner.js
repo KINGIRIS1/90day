@@ -410,7 +410,7 @@ function OnlyGCNScanner() {
       }
       
       console.log('✅ Post-processing complete');
-      return processedResults;
+      return normalizedResults;
     } catch (err) {
       console.error('❌ Post-processing error:', err);
       return results; // Return original on error

@@ -199,10 +199,10 @@ function OnlyGCNScanner() {
     }
     
     try {
-      // Call batch processor via IPC
+      // Call batch processor via IPC (images only)
       const batchResult = await window.electronAPI.batchProcessDocuments({
         mode: mode,
-        imagePaths: imageOnly,
+        imagePaths: imageFiles,
         ocrEngine: engineType
       });
       

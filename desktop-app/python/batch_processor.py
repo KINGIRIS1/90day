@@ -641,12 +641,16 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
             print(f"❌ No valid images in batch {batch_num}", file=sys.stderr)
             continue
         
-        # Build multi-image payload
+        # Build multi-file payload (images + PDFs)
         parts = [{"text": prompt_getter(len(batch_paths))}]
-        for img_data in encoded_images:
+        for idx, (path, img_data) in enumerate(zip(batch_paths, encoded_images)):
+            # Determine mime type based on file extension
+            is_pdf = path.lower().endswith('.pdf')
+            mime_type = "application/pdf" if is_pdf else "image/jpeg"
+            
             parts.append({
                 "inline_data": {
-                    "mime_type": "image/jpeg",
+                    "mime_type": mime_type,
                     "data": img_data
                 }
             })

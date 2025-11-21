@@ -168,7 +168,113 @@ function OnlyGCNScanner() {
     }
   };
 
-  // Post-process GCN: Classify into GCNC/GCNM (giống BatchScanner)
+  // Process folder batch (COPY Y NGUYÊN từ BatchScanner)
+  const processFolderBatch = async (imagePaths, mode, engineType, folderName) => {
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`🚀 FOLDER BATCH PROCESSING: ${imagePaths.length} files`);
+    console.log(`   Folder: ${folderName}`);
+    console.log(`   Mode: ${mode}`);
+    console.log(`   Engine: ${engineType}`);
+    console.log(`${'='.repeat(80)}\n`);
+    
+    if (!window.electronAPI) {
+      console.error('❌ Electron API not available');
+      return null;
+    }
+    
+    // Filter ONLY image files (skip PDFs)
+    const imageOnly = imagePaths.filter(path => 
+      /\.(jpg|jpeg|png|gif|bmp)$/i.test(path)
+    );
+    
+    if (imageOnly.length === 0) {
+      console.error('❌ No image files found (all PDFs)');
+      return null;
+    }
+    
+    if (imageOnly.length < imagePaths.length) {
+      console.log(`⏭️ Skipped ${imagePaths.length - imageOnly.length} PDF files, processing ${imageOnly.length} images`);
+    }
+    
+    try {
+      // Call batch processor via IPC
+      const batchResult = await window.electronAPI.batchProcessDocuments({
+        mode: mode,
+        imagePaths: imageOnly,
+        ocrEngine: engineType
+      });
+      
+      if (!batchResult.success) {
+        console.error('❌ Folder batch failed:', batchResult.error);
+        return null;
+      }
+      
+      console.log(`✅ Folder batch complete: ${batchResult.results.length} results`);
+      
+      // DEBUG: Log first result structure
+      if (batchResult.results.length > 0) {
+        console.log(`🔍 DEBUG - First batch result:`, batchResult.results[0]);
+      }
+      
+      // Map batch results to OnlyGCNScanner format (GIỐNG BatchScanner)
+      const mappedResults = [];
+      for (const batchItem of batchResult.results) {
+        const fileName = batchItem.file_name;
+        const filePath = batchItem.file_path;
+        
+        // DEBUG: Log item structure
+        console.log(`🔍 Mapping item: fileName=${fileName}, filePath=${filePath ? 'OK' : 'UNDEFINED'}`);
+        
+        // Validate filePath
+        if (!filePath) {
+          console.error(`⚠️ Missing file_path for item:`, batchItem);
+          continue;
+        }
+        
+        // Generate preview (with validation)
+        let previewUrl = null;
+        try {
+          if (filePath && typeof filePath === 'string') {
+            previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+          }
+        } catch (e) {
+          console.error(`Preview error for ${fileName}:`, e);
+        }
+        
+        mappedResults.push({
+          filePath: filePath,
+          fileName: fileName,
+          folderName: folderName,
+          short_code: batchItem.short_code || 'UNKNOWN',
+          doc_type: batchItem.short_code || 'UNKNOWN',
+          confidence: batchItem.confidence || 0.5,
+          previewUrl: previewUrl,
+          success: true,
+          method: `batch_${mode}`,
+          metadata: batchItem.metadata || {},
+          // GCN fields
+          color: batchItem.metadata?.color || null,
+          issue_date: batchItem.metadata?.issue_date || null,
+          issue_date_confidence: batchItem.metadata?.issue_date_confidence || null,
+          // For compatibility
+          newShortCode: batchItem.short_code || 'UNKNOWN',
+          newDocType: batchItem.short_code || 'UNKNOWN',
+          originalShortCode: batchItem.short_code || 'UNKNOWN',
+          originalDocType: batchItem.short_code || 'UNKNOWN',
+          reasoning: batchItem.reasoning || '',
+          preFiltered: false
+        });
+      }
+      
+      return mappedResults;
+      
+    } catch (error) {
+      console.error('❌ Folder batch error:', error);
+      return null;
+    }
+  };
+
+  // Post-process GCN: Classify into GCNC/GCNM (COPY Y NGUYÊN từ BatchScanner)
   const postProcessGCN = (results) => {
     try {
       console.log('🔄 Post-processing GCN (DATE-BASED classification)...');

@@ -108,18 +108,44 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             
             # Process all pages using BATCH MODE (much faster!)
             try:
+                # Determine batch mode from settings
+                # For Desktop Scanner single-file mode, we don't have direct access to settings
+                # So we'll use Smart mode by default (auto batch size)
+                # This is optimal for PDF processing
+                
                 print(f"\n🚀 Processing {num_pages} pages using BATCH MODE...", file=sys.stderr)
                 
                 # Use batch processor instead of sequential processing
-                from batch_processor import batch_classify_smart
+                from batch_processor import batch_classify_smart, batch_classify_fixed
                 
-                batch_result = batch_classify_smart(
-                    image_paths=image_pages,
-                    api_key=cloud_api_key,
-                    engine_type=ocr_engine_type,
-                    last_known_type=None,
-                    max_batch_size=8
-                )
+                # Check if we should use fixed mode based on engine type
+                # If engine has 'lite' or specific batch size preference, use fixed
+                # Otherwise use smart mode for automatic optimization
+                use_fixed_mode = False  # Default to smart for PDF processing
+                
+                if use_fixed_mode:
+                    # Fixed mode with batch size 8
+                    print(f"   Mode: Fixed (batch size 8)", file=sys.stderr)
+                    from batch_processor import batch_classify_fixed
+                    batch_result = batch_classify_fixed(
+                        image_paths=image_pages,
+                        api_key=cloud_api_key,
+                        engine_type=ocr_engine_type,
+                        batch_size=8,
+                        last_known_type=None,
+                        skip_pdf_conversion=True  # Already converted
+                    )
+                else:
+                    # Smart mode (auto batch size)
+                    print(f"   Mode: Smart (auto batch size)", file=sys.stderr)
+                    from batch_processor import batch_classify_smart
+                    batch_result = batch_classify_smart(
+                        image_paths=image_pages,
+                        api_key=cloud_api_key,
+                        engine_type=ocr_engine_type,
+                        last_known_type=None,
+                        max_batch_size=8
+                    )
                 
                 if not batch_result or 'results' not in batch_result:
                     return {

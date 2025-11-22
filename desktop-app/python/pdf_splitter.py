@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-PDF Splitter - Split multi-page PDF into separate single-page PDFs
+PDF to Image Converter - Convert PDF pages to images for OCR
 """
 
 import sys
 import os
-from pypdf import PdfReader, PdfWriter
 import tempfile
+from pdf2image import convert_from_path
+from PIL import Image
 
 def split_pdf_to_pages(pdf_path):
     """

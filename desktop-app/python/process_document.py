@@ -84,8 +84,66 @@ def extract_document_title_from_text(text: str) -> str:
 def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_api_key: str = None, cloud_endpoint: str = None) -> dict:
     """
     Process a document using OCR + Rules with font height detection
+    Supports both images and PDFs (PDFs will be converted to images per page)
     """
     try:
+        # Check if input is PDF - convert to images first
+        if file_path.lower().endswith('.pdf'):
+            print(f"📄 PDF detected: {os.path.basename(file_path)}", file=sys.stderr)
+            
+            from pdf_splitter import split_pdf_to_images, cleanup_split_pages
+            
+            # Convert PDF pages to images
+            image_pages = split_pdf_to_images(file_path, dpi=200)
+            
+            if not image_pages:
+                return {
+                    "success": False,
+                    "error": "Failed to convert PDF to images. Make sure poppler-utils is installed.",
+                    "method": "pdf_conversion_error"
+                }
+            
+            num_pages = len(image_pages)
+            print(f"✅ PDF converted: {num_pages} page(s)", file=sys.stderr)
+            
+            # Process each page separately
+            try:
+                results = []
+                for page_num, page_path in enumerate(image_pages, 1):
+                    print(f"\n📄 Processing page {page_num}/{num_pages}...", file=sys.stderr)
+                    
+                    # Recursively call process_document for each page image
+                    page_result = process_document(
+                        file_path=page_path,
+                        ocr_engine_type=ocr_engine_type,
+                        cloud_api_key=cloud_api_key,
+                        cloud_endpoint=cloud_endpoint
+                    )
+                    
+                    # Add page info
+                    page_result['pdf_page'] = page_num
+                    page_result['total_pages'] = num_pages
+                    page_result['original_pdf'] = file_path
+                    
+                    results.append(page_result)
+                    
+                    print(f"   ✅ Page {page_num}: {page_result.get('short_code', 'UNKNOWN')}", file=sys.stderr)
+                
+                # Return results for all pages
+                print(f"\n✅ PDF processing complete: {num_pages} page(s)", file=sys.stderr)
+                
+                # Return first page result with all_pages info
+                first_result = results[0] if results else {}
+                first_result['all_pages'] = results
+                first_result['is_multi_page_pdf'] = True
+                
+                return first_result
+                
+            finally:
+                # Cleanup temporary image files
+                cleanup_split_pages(image_pages)
+        
+        # Continue with normal image processing
         # Handle Gemini Flash Hybrid (Two-Tier AI classification)
         if ocr_engine_type == 'gemini-flash-hybrid':
             if not cloud_api_key:

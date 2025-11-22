@@ -216,14 +216,22 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 # Return first page result with all_pages info
                 # Use copy to avoid circular reference
                 first_result = results[0].copy() if results else {}
+                
+                # Add preview paths to each page result
+                for i, page_result in enumerate(results):
+                    if i < len(image_pages):
+                        page_result['previewPath'] = image_pages[i]
+                
                 first_result['all_pages'] = results
                 first_result['is_multi_page_pdf'] = True
                 
                 return first_result
                 
             finally:
-                # Cleanup temporary image files
-                cleanup_split_pages(image_pages)
+                # NOTE: Keep temporary image files for preview
+                # They will be cleaned up by OS or manually later
+                # cleanup_split_pages(image_pages)
+                pass
         
         # Continue with normal image processing
         # Handle Gemini Flash Hybrid (Two-Tier AI classification)

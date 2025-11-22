@@ -317,6 +317,17 @@ ipcMain.handle('select-txt-file', async () => {
   return result.canceled ? null : (result.filePaths[0] || null);
 });
 
+// Open file in external application
+ipcMain.handle('open-external', async (event, filePath) => {
+  try {
+    await shell.openPath(filePath);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to open file:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 ipcMain.handle('validate-batch-folders', async (event, txtPath) => {
   try {
     console.log('Validating folders from:', txtPath);

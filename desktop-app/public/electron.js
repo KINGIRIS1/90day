@@ -787,7 +787,13 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
   console.log('='.repeat(80));
   
   const { PDFDocument } = require('pdf-lib');
-  const groups = items.reduce((acc, it) => { const key = it.short_code || 'UNKNOWN'; if (!acc[key]) acc[key] = []; acc[key].push(it.filePath); return acc; }, {});
+  // Group items (not just filePaths) to preserve pdfPage info
+  const groups = items.reduce((acc, it) => { 
+    const key = it.short_code || 'UNKNOWN'; 
+    if (!acc[key]) acc[key] = []; 
+    acc[key].push(it); // Push entire item, not just filePath
+    return acc; 
+  }, {});
   
   console.log('📊 Groups created:', Object.keys(groups).join(', '));
   console.log('📊 Group details:', Object.entries(groups).map(([k, v]) => `${k}: ${v.length} files`).join(', '));

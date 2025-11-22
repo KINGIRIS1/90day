@@ -121,8 +121,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 
                 if use_fixed_mode:
                     # Fixed mode - Use configured batch size from settings
-                    # Get batch size from store (default 8)
-                    batch_size = 8  # Could be made configurable via env var
+                    batch_size = int(os.environ.get('BATCH_SIZE', '8'))
                     print(f"   Mode: Fixed (batch size {batch_size})", file=sys.stderr)
                     
                     batch_result = batch_classify_fixed(

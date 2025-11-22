@@ -1861,10 +1861,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
           const pageNum = pageResult.pdf_page || 1;
           const totalPages = pageResult.total_pages || processedResult.all_pages.length;
           
+          // Load preview for PDF page if available
+          let pagePreview = null;
+          if (pageResult.previewPath) {
+            try {
+              pagePreview = await window.electronAPI.readImageDataUrl(pageResult.previewPath);
+            } catch (e) {
+              console.warn(`Failed to load PDF page preview: ${pageResult.previewPath}`);
+            }
+          }
+          
           newResults.push({
             fileName: `${file.name} - Trang ${pageNum}/${totalPages}`,
             filePath: file.path,
-            previewUrl: null, // PDF pages don't have individual previews
+            previewUrl: pagePreview, // Now has preview!
             isPdf: true,
             isPdfPage: true,
             pdfPage: pageNum,

@@ -2717,12 +2717,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">Không có preview</div>
                   )}
                 </div>
-                <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
-                {result.is_multi_page_pdf && result.all_pages && (
-                  <div className="text-xs text-purple-600 font-medium mt-1">
-                    📄 PDF {result.all_pages.length} trang
-                  </div>
-                )}
+                <div className="text-sm font-medium truncate" title={result.fileName}>
+                  {result.fileName}
+                  {result.isPdfPage && (
+                    <span className="ml-2 text-xs text-blue-600 font-normal">
+                      (PDF)
+                    </span>
+                  )}
+                </div>
                 
                 {/* Document Info */}
                 <div className="mt-2 space-y-1">

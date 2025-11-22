@@ -284,38 +284,85 @@ function OnlyGCNScanner() {
             });
             
             if (result.success) {
-              // Generate preview for PDF
-              let previewUrl = null;
-              try {
-                previewUrl = await window.electronAPI.readImageDataUrl(pdfPath);
-              } catch (e) {
-                console.warn(`Preview error for PDF ${fileName}`);
+              // Check if this is a multi-page PDF
+              if (result.is_multi_page_pdf && result.all_pages) {
+                console.log(`      📄 Multi-page PDF: ${result.all_pages.length} pages`);
+                
+                // Process each page separately
+                for (const pageResult of result.all_pages) {
+                  const pageFileName = `${fileName} (Page ${pageResult.pdf_page})`;
+                  
+                  // Generate preview for PDF
+                  let previewUrl = null;
+                  try {
+                    previewUrl = await window.electronAPI.readImageDataUrl(pdfPath);
+                  } catch (e) {
+                    console.warn(`Preview error for PDF ${pageFileName}`);
+                  }
+                  
+                  mappedResults.push({
+                    filePath: pdfPath,
+                    fileName: pageFileName,
+                    folderName: folderName,
+                    short_code: pageResult.short_code || 'UNKNOWN',
+                    doc_type: pageResult.doc_type || pageResult.short_code || 'UNKNOWN',
+                    confidence: pageResult.confidence || 0.5,
+                    previewUrl: previewUrl,
+                    success: true,
+                    method: 'single_pdf_page',
+                    metadata: pageResult.metadata || {},
+                    color: pageResult.metadata?.color || pageResult.color || null,
+                    issue_date: pageResult.metadata?.issue_date || pageResult.issue_date || null,
+                    issue_date_confidence: pageResult.metadata?.issue_date_confidence || null,
+                    newShortCode: pageResult.short_code || 'UNKNOWN',
+                    newDocType: pageResult.doc_type || pageResult.short_code || 'UNKNOWN',
+                    originalShortCode: pageResult.short_code || 'UNKNOWN',
+                    originalDocType: pageResult.doc_type || pageResult.short_code || 'UNKNOWN',
+                    reasoning: pageResult.reasoning || '',
+                    preFiltered: false,
+                    isPdf: true,
+                    pdfPage: pageResult.pdf_page,
+                    totalPages: pageResult.total_pages,
+                    originalPdf: pdfPath
+                  });
+                  
+                  console.log(`      ✅ Page ${pageResult.pdf_page}/${pageResult.total_pages}: ${pageResult.short_code}`);
+                }
+              } else {
+                // Single page or non-PDF result
+                // Generate preview for PDF
+                let previewUrl = null;
+                try {
+                  previewUrl = await window.electronAPI.readImageDataUrl(pdfPath);
+                } catch (e) {
+                  console.warn(`Preview error for PDF ${fileName}`);
+                }
+                
+                mappedResults.push({
+                  filePath: pdfPath,
+                  fileName: fileName,
+                  folderName: folderName,
+                  short_code: result.short_code || 'UNKNOWN',
+                  doc_type: result.doc_type || result.short_code || 'UNKNOWN',
+                  confidence: result.confidence || 0.5,
+                  previewUrl: previewUrl,
+                  success: true,
+                  method: 'single_pdf',
+                  metadata: result.metadata || {},
+                  color: result.metadata?.color || result.color || null,
+                  issue_date: result.metadata?.issue_date || result.issue_date || null,
+                  issue_date_confidence: result.metadata?.issue_date_confidence || null,
+                  newShortCode: result.short_code || 'UNKNOWN',
+                  newDocType: result.doc_type || result.short_code || 'UNKNOWN',
+                  originalShortCode: result.short_code || 'UNKNOWN',
+                  originalDocType: result.doc_type || result.short_code || 'UNKNOWN',
+                  reasoning: result.reasoning || '',
+                  preFiltered: false,
+                  isPdf: true
+                });
+                
+                console.log(`      ✅ ${fileName}: ${result.short_code}`);
               }
-              
-              mappedResults.push({
-                filePath: pdfPath,
-                fileName: fileName,
-                folderName: folderName,
-                short_code: result.short_code || 'UNKNOWN',
-                doc_type: result.doc_type || result.short_code || 'UNKNOWN',
-                confidence: result.confidence || 0.5,
-                previewUrl: previewUrl,
-                success: true,
-                method: 'single_pdf',
-                metadata: result.metadata || {},
-                color: result.metadata?.color || result.color || null,
-                issue_date: result.metadata?.issue_date || result.issue_date || null,
-                issue_date_confidence: result.metadata?.issue_date_confidence || null,
-                newShortCode: result.short_code || 'UNKNOWN',
-                newDocType: result.doc_type || result.short_code || 'UNKNOWN',
-                originalShortCode: result.short_code || 'UNKNOWN',
-                originalDocType: result.doc_type || result.short_code || 'UNKNOWN',
-                reasoning: result.reasoning || '',
-                preFiltered: false,
-                isPdf: true
-              });
-              
-              console.log(`      ✅ ${fileName}: ${result.short_code}`);
             } else {
               console.error(`      ❌ ${fileName}: ${result.error}`);
             }

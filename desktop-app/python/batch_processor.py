@@ -603,12 +603,19 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         print("   Metadata: Sequential naming from previous batch", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     
-    # Step 1: Convert PDF files to images (same as smart mode)
-    expanded_paths = []
-    pdf_page_map = {}  # Track which images came from which PDF
+    # Step 1: Convert PDF files to images (unless already done)
+    pdf_page_map = {}
     
-    for path in image_paths:
-        if path.lower().endswith('.pdf'):
+    if skip_pdf_conversion:
+        # PDFs already converted by caller (e.g., batch_classify_smart)
+        print(f"📊 Using pre-processed files: {len(image_paths)} images", file=sys.stderr)
+        expanded_paths = image_paths
+    else:
+        # Convert PDFs to images first
+        expanded_paths = []
+        
+        for path in image_paths:
+            if path.lower().endswith('.pdf'):
             print(f"\n📄 PDF detected: {os.path.basename(path)}", file=sys.stderr)
             print(f"   Converting PDF pages to images...", file=sys.stderr)
             

@@ -3316,3 +3316,105 @@ CONSIDERATIONS:
 STATUS: ✅ Implemented, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 FIX - PDF Batch Processing Not Using User Settings
+================================================================================
+DATE: 2025-01-XX
+ISSUE: PDF vẫn chưa sử dụng chia batch theo cài đặt
+
+ROOT CAUSE:
+-----------
+Khi quét PDF, process_document.py đọc batch_mode từ env nhưng batch_size bị HARDCODE = 8.
+
+Code cũ:
+```python
+batch_size = 8  # Could be made configurable via env var
+```
+
+User settings trong UI (Settings page):
+- Batch Mode: sequential / fixed / smart
+- Batch Size: 5, 8, 10, 15, 20
+→ Nhưng batch_size không được truyền vào process_document.py
+
+SOLUTION:
+---------
+
+1. **Pass batch_size from Electron to Python**:
+   File: /app/desktop-app/public/electron.js
+   ```javascript
+   const batchSize = store.get('batchSize', 8);
+   
+   env: {
+     BATCH_MODE: batchMode,
+     BATCH_SIZE: String(batchSize)  // NEW
+   }
+   ```
+
+2. **Read batch_size from environment in Python**:
+   File: /app/desktop-app/python/process_document.py
+   
+   Fixed mode:
+   ```python
+   batch_size = int(os.environ.get('BATCH_SIZE', '8'))
+   print(f"   Mode: Fixed (batch size {batch_size})")
+   ```
+   
+   Smart mode:
+   ```python
+   max_batch_size = int(os.environ.get('BATCH_SIZE', '8'))
+   print(f"   Mode: Smart (max batch size {max_batch_size})")
+   ```
+
+3. **Add logging to confirm settings**:
+   ```python
+   print(f"   User settings: mode={batch_mode}, batch_size={batch_size_setting}")
+   ```
+
+CHANGES:
+--------
+1. electron.js (lines 716-727):
+   - Added: `const batchSize = store.get('batchSize', 8)`
+   - Added: `BATCH_SIZE: String(batchSize)` to env
+
+2. process_document.py (lines 122-125):
+   - Changed: `batch_size = 8` → `batch_size = int(os.environ.get('BATCH_SIZE', '8'))`
+
+3. process_document.py (lines 138-140):
+   - Changed: `max_batch_size=8` → `max_batch_size = int(os.environ.get('BATCH_SIZE', '8'))`
+
+4. process_document.py (lines 112-115):
+   - Added logging to show user settings
+
+EXPECTED BEHAVIOR:
+------------------
+Bây giờ khi user thay đổi settings:
+
+Settings UI:
+- Batch Mode: Fixed
+- Batch Size: 5
+
+PDF 34 trang sẽ được xử lý:
+- Batch 1: Pages 0-4 (5 pages)
+- Batch 2: Pages 5-9 (5 pages)
+- ...
+- Batch 7: Pages 30-33 (4 pages)
+
+Log sẽ hiển thị:
+```
+🚀 Processing 34 pages using BATCH MODE (fixed)...
+   User settings: mode=fixed, batch_size=5
+   Mode: Fixed (batch size 5)
+```
+
+TESTING:
+--------
+1. Vào Settings → OCR Settings
+2. Đổi Batch Size: 5 (hoặc 10, 15, 20)
+3. Đổi Batch Mode: Fixed (hoặc Smart)
+4. Quét file PDF 34 trang
+5. Xem log terminal để confirm batch size đúng
+
+STATUS: ✅ Fixed, frontend restarted, awaiting user test
+================================================================================
+

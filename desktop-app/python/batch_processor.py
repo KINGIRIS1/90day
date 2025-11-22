@@ -559,7 +559,7 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
     Phương án 1: Fixed Batch Size với SEQUENTIAL METADATA
     
     Args:
-        image_paths: List of file paths
+        image_paths: List of file paths (can include PDFs - will be split automatically)
         api_key: Google API key
         engine_type: 'gemini-flash', 'gemini-flash-lite', or 'gemini-flash-hybrid'
         batch_size: Files per batch

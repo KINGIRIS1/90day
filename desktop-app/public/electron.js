@@ -920,7 +920,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         if (!savePath.canceled && savePath.filePath) {
           fs.writeFileSync(savePath.filePath, pdfBytes);
           outputPath = savePath.filePath;
-          results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true });
+          results.push({ short_code: shortCode, path: outputPath, count: itemsInGroup.length, success: true });
         } else {
           results.push({ short_code: shortCode, canceled: true, success: false });
         }

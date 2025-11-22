@@ -3748,3 +3748,83 @@ AFTER:
 STATUS: ✅ Implemented, frontend restarted, ready to test
 ================================================================================
 
+
+================================================================================
+🔧 FIX - "Mở PDF" Button Now Working
+================================================================================
+DATE: 2025-01-XX
+ISSUE: "bấm mở pdf không dc"
+
+ROOT CAUSE:
+-----------
+Button "📄 Mở PDF" gọi `window.electronAPI.openExternal(filePath)`
+NHƯNG API này CHƯA ĐƯỢC EXPOSE trong preload.js!
+
+Error (trong console):
+```
+TypeError: window.electronAPI.openExternal is not a function
+```
+
+SOLUTION:
+---------
+
+1. **Add openExternal to preload.js**:
+```javascript
+openExternal: (filePath) => ipcRenderer.invoke('open-external', filePath),
+```
+
+2. **Add shell to electron.js imports**:
+```javascript
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+```
+
+3. **Add handler in electron.js**:
+```javascript
+ipcMain.handle('open-external', async (event, filePath) => {
+  try {
+    await shell.openPath(filePath);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to open file:', error);
+    return { success: false, error: error.message };
+  }
+});
+```
+
+CHANGES:
+--------
+1. /app/desktop-app/public/preload.js (line 52-53):
+   - Added: openExternal API exposure
+
+2. /app/desktop-app/public/electron.js (line 1):
+   - Added: shell to imports
+
+3. /app/desktop-app/public/electron.js (lines 320-329):
+   - Added: open-external handler
+
+HOW IT WORKS:
+-------------
+1. User clicks "📄 Mở PDF" button
+2. Frontend calls: window.electronAPI.openExternal(filePath)
+3. Electron receives IPC call
+4. shell.openPath(filePath) mở file trong app mặc định
+5. PDF opens in default PDF viewer (Adobe, Edge, Preview, etc.)
+
+EXPECTED BEHAVIOR:
+------------------
+Click "📄 Mở PDF" on any PDF page result:
+→ PDF file opens in system's default PDF viewer
+→ User can view full PDF with all features
+→ Navigate, zoom, search, highlight, etc.
+
+TESTING:
+--------
+1. Quét file PDF 34 trang
+2. Kết quả hiển thị 34 pages
+3. Click nút "📄 Mở PDF" trên bất kỳ page nào
+4. PDF sẽ mở trong viewer mặc định (Adobe Reader, Edge, etc.)
+5. Verify PDF mở đúng
+
+STATUS: ✅ Fixed, frontend restarted, ready to test
+================================================================================
+

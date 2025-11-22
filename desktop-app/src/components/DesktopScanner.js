@@ -2755,20 +2755,29 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 
                 {/* Action Buttons */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {/* Preview/Zoom Button - Show for images only (not PDF pages) */}
-                  {!result.isPdf && !result.isPdfPage && (
+                  {/* Preview/Zoom Button - Show for images */}
+                  {!result.isPdf && !result.isPdfPage && result.previewUrl && (
                     <button
-                      onClick={() => {
-                        if (result.previewUrl) {
-                          setSelectedPreview(result.previewUrl);
-                        } else {
-                          alert('Preview chưa được load. Vui lòng bật Preview ON để xem ảnh.');
-                        }
-                      }}
+                      onClick={() => setSelectedPreview(result.previewUrl)}
                       className="flex-1 min-w-[100px] text-xs text-blue-600 hover:bg-blue-50 py-1.5 px-3 rounded border border-blue-200 font-medium"
-                      disabled={!result.previewUrl}
                     >
                       🔍 Phóng to
+                    </button>
+                  )}
+                  
+                  {/* Open PDF Button - For PDF pages */}
+                  {result.isPdfPage && result.filePath && (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await window.electronAPI.openExternal(result.filePath);
+                        } catch (e) {
+                          alert('Không thể mở PDF. Vui lòng kiểm tra file còn tồn tại.');
+                        }
+                      }}
+                      className="flex-1 min-w-[100px] text-xs text-purple-600 hover:bg-purple-50 py-1.5 px-3 rounded border border-purple-200 font-medium"
+                    >
+                      📄 Mở PDF
                     </button>
                   )}
                   

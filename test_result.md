@@ -4108,3 +4108,85 @@ Temporary image files sẽ được giữ lại trong /tmp hoặc %TEMP%
 STATUS: ✅ Both fixes applied, frontend restarted, ready to test
 ================================================================================
 
+
+================================================================================
+🔧 ROOT CAUSE FOUND - Frontend Not Sending PDF Page Info
+================================================================================
+DATE: 2025-01-XX
+ISSUE: isPdfPage, pdfPage, totalPdfPages all undefined
+
+ROOT CAUSE:
+-----------
+Frontend chỉ gửi { filePath, short_code } khi merge, KHÔNG gửi PDF page info!
+
+File: /app/desktop-app/src/components/DesktopScanner.js
+
+Line 2285:
+```javascript
+const payload = results
+  .filter(r => r.success && r.short_code)
+  .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+  // ↑ MISSING: isPdfPage, pdfPage, totalPdfPages
+```
+
+Line 3501 (same issue):
+```javascript
+.map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+// ↑ MISSING PDF page info
+```
+
+SOLUTION:
+---------
+Include all necessary fields when creating payload:
+
+Line 2285-2290:
+```javascript
+const payload = results
+  .filter(r => r.success && r.short_code)
+  .map(r => ({ 
+    filePath: r.filePath, 
+    short_code: r.short_code,
+    isPdfPage: r.isPdfPage,      // ← Added
+    pdfPage: r.pdfPage,          // ← Added
+    totalPdfPages: r.totalPdfPages  // ← Added
+  }));
+```
+
+Line 3501-3508 (same fix):
+```javascript
+.map(r => ({ 
+  filePath: r.filePath, 
+  short_code: r.short_code,
+  isPdfPage: r.isPdfPage,
+  pdfPage: r.pdfPage,
+  totalPdfPages: r.totalPdfPages
+}));
+```
+
+EXPECTED LOG AFTER FIX:
+-----------------------
+```
+📦 Processing group: GCN
+   Items in group: 7
+   📄 Item: batda.pdf
+      isPdfPage: true        ← Now defined!
+      pdfPage: 1             ← Now has value!
+      totalPdfPages: 34      ← Now has value!
+   ✅ Copied page 1 from batda.pdf
+   📄 Item: batda.pdf
+      isPdfPage: true
+      pdfPage: 2
+      totalPdfPages: 34
+   ✅ Copied page 2 from batda.pdf
+   ...
+```
+
+EXPECTED RESULT:
+----------------
+- GCN.pdf: Only pages with GCN classification (e.g., pages 1, 2, 29-34)
+- HDCQ.pdf: Only pages with HDCQ classification (e.g., pages 3-6)
+- Each merged PDF contains ONLY the specific pages, not all 34 pages
+
+STATUS: ✅ Fixed in 2 places, frontend restarted, awaiting user test
+================================================================================
+

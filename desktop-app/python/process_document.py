@@ -110,8 +110,10 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             try:
                 # Read batch mode from environment variable (set by Electron from user settings)
                 batch_mode = os.environ.get('BATCH_MODE', 'sequential')
+                batch_size_setting = os.environ.get('BATCH_SIZE', '8')
                 
                 print(f"\n🚀 Processing {num_pages} pages using BATCH MODE ({batch_mode})...", file=sys.stderr)
+                print(f"   User settings: mode={batch_mode}, batch_size={batch_size_setting}", file=sys.stderr)
                 
                 # Use batch processor instead of sequential processing
                 from batch_processor import batch_classify_smart, batch_classify_fixed

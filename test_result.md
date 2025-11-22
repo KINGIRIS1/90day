@@ -3200,3 +3200,119 @@ BENEFITS:
 STATUS: ✅ Implemented, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 FINAL UPDATE - Display All PDF Pages as Individual Results
+================================================================================
+DATE: 2025-01-XX
+ISSUE: User muốn xem tất cả trang PDF như kết quả riêng biệt
+
+USER REQUEST:
+-------------
+"sửa lại phần này. để preview hiển thị tất cả các trang kết quả"
+
+CLARIFICATION:
+--------------
+User muốn PDF 34 trang hiển thị như 34 KẾT QUẢ RIÊNG BIỆT, mỗi trang có thông tin riêng.
+
+SOLUTION:
+---------
+Revert back to page splitting logic:
+- PDF 34 trang → 34 results
+- Mỗi trang có tên: "file.pdf - Trang 1/34", "file.pdf - Trang 2/34", ...
+- Mỗi trang có classification riêng: DDKBD, HDCQ, GCN, etc.
+- Preview hiển thị icon 📄 với số trang
+
+IMPLEMENTATION:
+---------------
+
+1. **Expand PDF Pages (lines 1855-1920)**:
+```javascript
+if (result.is_multi_page_pdf && result.all_pages) {
+  // Add each page as separate result
+  for (const pageResult of result.all_pages) {
+    newResults.push({
+      fileName: `${file.name} - Trang ${pageNum}/${totalPages}`,
+      isPdfPage: true,
+      pdfPage: pageNum,
+      totalPdfPages: totalPages,
+      originalPdfName: file.name,
+      short_code: pageResult.short_code,
+      confidence: pageResult.confidence,
+      // ... all page-specific data
+    });
+  }
+}
+```
+
+2. **Update Preview Display (lines 2685-2702)**:
+```javascript
+{result.isPdfPage ? (
+  <div className="bg-blue-50">
+    📄
+    <div>Trang {pdfPage}/{totalPages}</div>
+    <div>{originalPdfName}</div>
+  </div>
+) : ...}
+```
+
+3. **Update File Name Display (lines 2704-2710)**:
+```javascript
+{result.fileName}
+{result.isPdfPage && <span>(PDF)</span>}
+```
+
+4. **Remove "Chi tiết" Button**:
+   - Not needed anymore since all pages are visible
+   - Only keep "🔍 Phóng to" (for images) and "🗑️ Xóa"
+
+RESULT:
+-------
+PDF 34 trang giờ hiển thị như:
+
+[Result 1]
+┌─────────────────────────────┐
+│         📄                  │
+│    Trang 1/34               │
+│    batda.pdf                │
+├─────────────────────────────┤
+│ batda.pdf - Trang 1/34 (PDF)│
+│ Method: batch | 95%         │
+│ Loại: DDKBD                 │
+│ Short code: DDKBD ✏️        │
+│ [🗑️ Xóa]                    │
+└─────────────────────────────┘
+
+[Result 2]
+┌─────────────────────────────┐
+│         📄                  │
+│    Trang 2/34               │
+│    batda.pdf                │
+├─────────────────────────────┤
+│ batda.pdf - Trang 2/34 (PDF)│
+│ Method: batch | 93%         │
+│ Loại: DDKBD                 │
+│ Short code: DDKBD ✏️        │
+│ [🗑️ Xóa]                    │
+└─────────────────────────────┘
+
+... (32 more pages)
+
+BENEFITS:
+---------
+✅ Xem tất cả 34 trang cùng lúc (scroll down)
+✅ Mỗi trang có thông tin riêng rõ ràng
+✅ Dễ so sánh classification giữa các trang
+✅ Dễ tìm trang cụ thể (Ctrl+F "Trang 15")
+✅ Có thể edit short_code từng trang riêng biệt
+✅ Có thể xóa từng trang không cần thiết
+
+CONSIDERATIONS:
+---------------
+- 34 kết quả sẽ làm danh sách dài hơn
+- Scroll nhiều hơn để xem hết
+- Nhưng dễ kiểm tra và quản lý hơn
+
+STATUS: ✅ Implemented, frontend restarted, awaiting user test
+================================================================================
+

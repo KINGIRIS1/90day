@@ -228,7 +228,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 print(f"\n✅ PDF processing complete: {num_pages} page(s)", file=sys.stderr)
                 
                 # Return first page result with all_pages info
-                first_result = results[0] if results else {}
+                # Use copy to avoid circular reference
+                first_result = results[0].copy() if results else {}
                 first_result['all_pages'] = results
                 first_result['is_multi_page_pdf'] = True
                 

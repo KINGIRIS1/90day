@@ -10,6 +10,13 @@ requests>=2.31.0
 # PDF merging for batch scanner
 pypdf>=3.0.0
 
+# PDF to image conversion
+pdf2image>=1.16.0
+# Note: pdf2image requires poppler-utils to be installed separately:
+# Windows: Download from https://github.com/oschwartz10612/poppler-windows/releases
+# Mac: brew install poppler
+# Linux: sudo apt-get install poppler-utils
+
 # VietOCR - Optional Vietnamese OCR Engine (Transformer-based)
 # Chỉ cài nếu cần độ chính xác cao hơn cho tiếng Việt (90-95%)
 # Uncomment dòng dưới để cài:

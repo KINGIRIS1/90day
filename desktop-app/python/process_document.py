@@ -120,21 +120,23 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 use_fixed_mode = (batch_mode == 'fixed')
                 
                 if use_fixed_mode:
-                    # Fixed mode with batch size 8
-                    print(f"   Mode: Fixed (batch size 8)", file=sys.stderr)
-                    from batch_processor import batch_classify_fixed
+                    # Fixed mode - Use configured batch size from settings
+                    # Get batch size from store (default 8)
+                    batch_size = 8  # Could be made configurable via env var
+                    print(f"   Mode: Fixed (batch size {batch_size})", file=sys.stderr)
+                    
                     batch_result = batch_classify_fixed(
                         image_paths=image_pages,
                         api_key=cloud_api_key,
                         engine_type=ocr_engine_type,
-                        batch_size=8,
+                        batch_size=batch_size,
                         last_known_type=None,
                         skip_pdf_conversion=True  # Already converted
                     )
-                else:
-                    # Smart mode (auto batch size)
+                elif batch_mode == 'smart':
+                    # Smart mode - Auto batch size optimization
                     print(f"   Mode: Smart (auto batch size)", file=sys.stderr)
-                    from batch_processor import batch_classify_smart
+                    
                     batch_result = batch_classify_smart(
                         image_paths=image_pages,
                         api_key=cloud_api_key,
@@ -142,6 +144,44 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                         last_known_type=None,
                         max_batch_size=8
                     )
+                else:
+                    # Sequential mode - Process one by one (slowest but most accurate)
+                    print(f"   Mode: Sequential (one by one)", file=sys.stderr)
+                    
+                    # Fallback to sequential processing for each page
+                    results = []
+                    for page_num, page_path in enumerate(image_pages, 1):
+                        print(f"\n📄 Processing page {page_num}/{num_pages}...", file=sys.stderr)
+                        
+                        # Call single-file OCR
+                        page_result_dict = process_document(
+                            file_path=page_path,
+                            ocr_engine_type=ocr_engine_type,
+                            cloud_api_key=cloud_api_key,
+                            cloud_endpoint=cloud_endpoint
+                        )
+                        
+                        # Convert to page result format
+                        page_result = {
+                            'success': page_result_dict.get('success', True),
+                            'short_code': page_result_dict.get('short_code', 'UNKNOWN'),
+                            'doc_type': page_result_dict.get('doc_type', 'UNKNOWN'),
+                            'confidence': page_result_dict.get('confidence', 0.5),
+                            'reasoning': page_result_dict.get('reasoning', ''),
+                            'metadata': page_result_dict.get('metadata', {}),
+                            'color': page_result_dict.get('color'),
+                            'issue_date': page_result_dict.get('issue_date'),
+                            'issue_date_confidence': page_result_dict.get('issue_date_confidence'),
+                            'method': f"sequential_pdf_page_{page_num}",
+                            'pdf_page': page_num,
+                            'total_pages': num_pages,
+                            'original_pdf': file_path
+                        }
+                        results.append(page_result)
+                        print(f"   ✅ Page {page_num}/{num_pages}: {page_result['short_code']}", file=sys.stderr)
+                    
+                    # Skip batch result processing
+                    batch_result = None
                 
                 if not batch_result or 'results' not in batch_result:
                     return {

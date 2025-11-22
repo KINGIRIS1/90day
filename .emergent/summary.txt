@@ -1,211 +1,153 @@
 <analysis>**original_problem_statement:**
 Ban đầu, người dùng yêu cầu sửa lỗi phân loại tài liệu của engine OCR, tối ưu hóa giao diện người dùng và cải thiện hiệu suất.
 
-Các yêu cầu được thêm vào trong phiên làm việc này bao gồm:
-1.  **Đồng bộ hóa Chức năng Gộp (Merge)**: Làm cho chức năng gộp PDF trong tab Only GCN hoạt động giống hệt các tab khác, bao gồm cả việc hiển thị modal tùy chọn.
-2.  **Sửa lỗi Pre-filter**:
-    *   Ban đầu,  quá khắt khe, bỏ sót GCN màu nhạt.
-    *   Sau đó, nó lại quá lỏng lẻo, nhận nhầm HSKT có dấu đỏ là GCN.
-    *   Cuối cùng, chiến lược được thay đổi hoàn toàn: chỉ lọc các file khổ A3, sau đó để AI phân loại, và logic frontend sẽ xử lý các trường hợp AI phân loại sai (ví dụ: đổi HSKT thành GTLQ).
-3.  **Đồng bộ hóa Quy tắc GCN**: Áp dụng các quy tắc phân loại GCNC/GCNM (dựa trên ngày cấp) và ghép cặp trang 1/trang 2 từ các tab khác vào tab Only GCN.
-4.  **Cải thiện UX/UI của tab Only GCN**:
-    *   Tổ chức kết quả theo từng thư mục con với các tab riêng biệt.
-    *   Thay đổi giao diện từ dạng bảng (table) sang dạng lưới (grid) để hiển thị preview ảnh.
-    *   Làm gọn giao diện tổng thể (thu nhỏ nút, chữ).
-    *   Thêm các nút chức năng cho từng ảnh: thu phóng (zoom) và sửa tên (edit).
-    *   Loại bỏ toggle Pre-filter vì chức năng này phải luôn được bật.
-5.  **Tối ưu hóa Hiệu suất**:
-    *   Thêm Smart Mode (xử lý hàng loạt) và tự động resize ảnh vào tab OnlyGCN để khắc phục lỗi timeout khi xử lý các file lớn.
-    *   Thực hiện việc phân loại GCN (post-processing) ngay sau khi quét xong mỗi thư mục, thay vì chờ đến cuối.
+Các yêu cầu chính trong phiên làm việc này bao gồm:
+1.  **Sửa lỗi nghiêm trọng**: Khắc phục lỗi logic khiến tất cả tài liệu GCN bị đổi tên thành .
+2.  **Cải thiện độ chính xác AI**: Cập nhật AI prompt để phân biệt chính xác giữa GCN trang 1 và HSKT.
+3.  **Đồng bộ cài đặt**: Đảm bảo tab Only GCN sử dụng chế độ OCR (batch/sequential) từ trang Cài đặt chung, thay vì hardcode.
+4.  **Thêm tính năng quét PDF**: Triển khai khả năng quét file PDF trên toàn bộ ứng dụng.
+5.  **Tối ưu quét PDF**: Tách các file PDF nhiều trang thành các ảnh riêng lẻ và xử lý chúng ở chế độ hàng loạt (batch mode) để tăng tốc độ.
+6.  **Sửa lỗi quét PDF**: Khắc phục sự cố quá trình quét PDF bị dừng giữa chừng và trả về kết quả không đầy đủ.
+7.  **Tiện ích**: Tạo các file  để khởi động ứng dụng dễ dàng hơn trên Windows.
 
 **User's preferred language**: Vietnamese
 
 **what currently exists?**
-- Tab Only GCN đã được tái cấu trúc lớn để cải thiện trải nghiệm người dùng và hiệu suất.
-- Giao diện hiện tại của Only GCN sử dụng các **tab cho từng thư mục con** và hiển thị kết quả dưới dạng **lưới (grid)** thay vì bảng.
-- Logic pre-filter đã được đơn giản hóa:  giờ chỉ kiểm tra **khổ giấy A3** (dựa trên aspect ratio) và bỏ qua việc kiểm tra màu sắc.
-- Tab này đã được tích hợp **Smart Mode** và **tự động resize ảnh**, sử dụng  để xử lý nhiều file cùng lúc, giúp tránh lỗi timeout.
-- Logic **phân loại GCNC/GCNM** dựa trên ngày cấp đã được sao chép từ  sang .
-- Logic **post-processing** mới đã được thêm vào:
-    1.  Nếu AI phân loại một file (đã qua lọc A3) là loại khác (ví dụ: HSKT), nó sẽ được đổi tên thành .
-    2.  Một logic ghép cặp tuần tự (sequential pairing) được thêm vào để đảm bảo trang 2 của một tài liệu  cũng được đặt tên là .
-- Các nút và modal cho chức năng Zoom và Edit đã được thêm vào giao diện.
+- Lỗi nghiêm trọng GTLQ đã được khắc phục bằng cách loại bỏ hoàn toàn logic chuyển đổi sai trong .
+- AI prompt () đã được cải thiện để phân biệt rõ hơn giữa GCN và HSKT.
+- Tab Only GCN hiện đã đồng bộ với cài đặt OCR toàn cục.
+- Tính năng quét PDF đã được triển khai trên toàn bộ ứng dụng. Logic này bao gồm việc chuyển đổi các trang PDF thành ảnh bằng thư viện  và .
+- Logic đã được thêm vào  và  để tự động phát hiện file PDF, tách trang thành ảnh, và đưa các ảnh này vào quy trình xử lý hàng loạt (batch mode) theo cài đặt của người dùng.
+- Một số lỗi phát sinh trong quá trình triển khai (lỗi , , và hardcode chế độ batch) đã được sửa.
 
 **Last working item**:
-- **Last item agent was working**: Người dùng báo cáo một lỗi nghiêm trọng sau khi agent thêm logic ghép cặp tuần tự. Toàn bộ các file GCN hợp lệ đều bị đổi tên thành . Phân tích log cho thấy logic pairing đang chạy sai, nó coi file GCN đầu tiên trong danh sách là theo sau GTLQ và sau đó chuyển đổi tất cả các file tiếp theo một cách sai lầm. Agent đã xác định đây là một lỗi logic nghiêm trọng trong hàm pairing và đang bắt đầu điều tra.
+- **Last item agent was working**: Người dùng báo cáo rằng khi quét một file PDF có nhiều trang (ví dụ: 34 trang), quá trình quét dừng lại sớm (ví dụ: sau khi xử lý 1-2 batch) và giao diện người dùng (UI) hiển thị kết quả không đầy đủ, mặc dù log backend cho thấy nó đang bắt đầu xử lý batch tiếp theo. Agent đã xác định rằng tiến trình Python () đang kết thúc trước khi tất cả các batch được xử lý xong, gây ra việc UI nhận tín hiệu hoàn thành một cách sai lầm.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Manual testing by user. Sau khi sửa lỗi, người dùng cần chạy lại quá trình quét trên một thư mục chứa cả GCN và các loại tài liệu khác để xác nhận: 1. Các file HSKT/PCT được đổi thành GTLQ. 2. Các file GCN hợp lệ KHÔNG bị đổi thành GTLQ. 3. Trang 2 của HSKT/PCT cũng được đổi thành GTLQ.
+- **Which testing method agent to use?**: backend testing agent. Tác nhân cần phân tích luồng tương tác giữa Electron và tiến trình con Python. Cụ thể là kiểm tra các file  (handler ) và  để tìm ra tại sao tiến trình con lại kết thúc sớm khi xử lý nhiều batch.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0)**: Lỗi logic Sequential Pairing khiến tất cả GCN bị đổi tên thành GTLQ.
-- **Issue 2 (P1)**: Logic ghép cặp GCN trang 1 và trang 2 chưa hoàn chỉnh.
-- **Issue 3 (P2)**: Lỗi phân loại không nhất quán của engine .
+- **Issue 1 (P0)**: Quá trình quét PDF theo batch kết thúc sớm, trả về kết quả không đầy đủ.
+- **Issue 2 (P1)**: Độ chính xác của AI vẫn chưa nhất quán.
+- **Issue 3 (P2)**: Logic ghép cặp GCN trang 1 và trang 2 để đồng bộ ngày cấp chưa hoàn thiện.
 - **Issue 4 (P3)**: Chức năng sửa kết quả trong khi quét chưa được triển khai.
 
 **Issues Detail:**
-- **Issue 1: Lỗi logic Sequential Pairing khiến tất cả GCN bị đổi tên thành GTLQ**
-  - **Attempted fixes**: Agent đã thêm một hàm để xử lý  trong  (khoảng message 395). Mục đích là để nếu trang 1 là HSKT (đã đổi thành GTLQ), thì trang 2 của nó cũng phải là GTLQ. Tuy nhiên, logic điều kiện bên trong hàm này đang bị sai. Nó dường như đang so sánh file đầu tiên với một  không tồn tại hoặc mặc định, dẫn đến việc coi file đầu tiên là GTLQ và sau đó lan truyền trạng thái này cho tất cả các file sau đó.
+- **Issue 1: Quá trình quét PDF theo batch kết thúc sớm, trả về kết quả không đầy đủ**
+  - **Attempted fixes**: Agent đã triển khai logic tách PDF thành ảnh và xử lý theo batch. Tuy nhiên, kiến trúc hiện tại nơi Electron chờ tiến trình Python kết thúc ( event) không hoạt động đúng với các tác vụ dài hơi có nhiều batch. Tiến trình Python () dường như trả về quyền điều khiển và thoát sau khi khởi chạy batch đầu tiên, thay vì chờ tất cả các batch hoàn thành.
   - **Next debug checklist**:
-    1.  Kiểm tra file .
-    2.  Tìm hàm xử lý  (được thêm vào sau message 394).
-    3.  Debug điều kiện  bên trong vòng lặp. Cần đảm bảo rằng việc chuyển đổi sang GTLQ chỉ xảy ra khi file *trước đó* (previous file) thực sự là một tài liệu không phải GCN (như HSKT, PCT) và file hiện tại là trang tiếp theo của nó.
-    4.  Đặc biệt chú ý đến cách xử lý file đầu tiên trong mỗi thư mục.
-  - **Why fix this issue and what will be achieved with the fix?**: Đây là lỗi chặn (blocker), làm cho chức năng Only GCN hoàn toàn vô dụng vì nó phá hủy tất cả kết quả chính xác.
+    1.  Kiểm tra file : Đảm bảo rằng hàm  phải  hoặc chờ cho đến khi hàm xử lý batch (ví dụ ) thực sự hoàn thành tất cả các batch trước khi script in ra JSON cuối cùng và thoát.
+    2.  Kiểm tra file : Xem xét lại cách nó quản lý tiến trình con. Liệu có cách nào để nhận các kết quả trung gian (streaming) thay vì chỉ chờ tiến trình kết thúc không? Tuy nhiên, giải pháp khả thi hơn là sửa logic ở backend.
+    3.  **Giả thuyết**: Hàm gọi xử lý batch trong  đang không blocking (non-blocking), khiến cho phần còn lại của script thực thi và thoát ngay lập tức.
+  - **Why fix this issue and what will be achieved with the fix?**: Đây là lỗi chặn (blocker) đối với tính năng quét PDF. Sửa lỗi này sẽ giúp người dùng có thể quét các file PDF lớn một cách đáng tin cậy.
   - **Status**: IN PROGRESS
   - **Is recurring issue?**: N
-  - **Should Test frontend/backend/both after fix?**: Frontend (logic trong ).
+  - **Should Test frontend/backend/both after fix?**: Backend.
   - **Blocked on other issue**: None.
 
-- **Issue 2: Logic ghép cặp GCN trang 1 và trang 2 chưa hoàn chỉnh**
-  - **Attempted fixes**: Chưa có. Người dùng đã đề cập trang 1 GCN chưa được đặt tên theo trang 2 sau khi quét được thông tin ngày cấp GCN (message 297).
-  - **Next debug checklist**:
-    1.  Sau khi Issue 1 được giải quyết, cần rà soát lại logic .
-    2.  Thêm logic để nếu trang 2 của một GCN có ngày cấp, thì GCN trang 1 tương ứng cũng phải được cập nhật và cả hai được nhóm lại với nhau để phân loại GCNC/GCNM.
+- **Issue 2: Độ chính xác của AI vẫn chưa nhất quán**
+  - **Attempted fixes**: Cập nhật prompt trong  với các quy tắc rõ ràng hơn để phân biệt GCN và HSKT.
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện độ tin cậy và chính xác của chức năng cốt lõi.
+  - **Status**: USER VERIFICATION PENDING
+  - **Is recurring issue?**: Y
+  - **Should Test frontend/backend/both after fix?**: Backend (AI prompt).
+  - **Blocked on other issue**: None.
+
+- **Issue 3: Logic ghép cặp GCN trang 1 và trang 2 chưa hoàn thiện**
+  - **Attempted fixes**: Chưa có. Yêu cầu này đã có từ các phiên trước.
   - **Why fix this issue and what will be achieved with the fix?**: Tăng độ chính xác của việc phân loại GCNC/GCNM.
   - **Status**: NOT STARTED
   - **Is recurring issue?**: N
   - **Should Test frontend/backend/both after fix?**: Frontend.
-  - **Blocked on other issue**: Issue 1.
+  - **Blocked on other issue**: Issue 1, Issue 2.
 
-- **Issue 3: Lỗi phân loại không nhất quán của **
-  - **Attempted fixes**: Chiến lược hiện tại (chỉ lọc A3, để AI phân loại, sau đó frontend xử lý lại) là một cách giải quyết phần ngọn.
-  - **Next debug checklist**: Tiếp tục theo dõi phản hồi của người dùng về các trường hợp AI phân loại sai.
-  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện độ tin cậy của chức năng cốt lõi.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Backend (logic AI prompt).
-  - **Blocked on other issue**: None.
-
-- **Issue 4: Chức năng sửa kết quả trong khi quét chưa được triển khai.**
-  - **Attempted fixes**: Chưa có. Đây là yêu cầu từ fork trước.
-  - **Next debug checklist**:
-    1.  Xác định các thành phần UI bị vô hiệu hóa bởi .
-    2.  Thay đổi điều kiện  từ một biến trạng thái chung thành kiểm tra trạng thái của từng mục riêng lẻ.
-  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện trải nghiệm người dùng, cho phép họ làm việc song song.
+- **Issue 4: Chức năng sửa kết quả trong khi quét chưa được triển khai**
+  - **Attempted fixes**: Chưa có.
+  - **Why fix this issue and what will be achieved with the fix?**: Cải thiện trải nghiệm người dùng, cho phép họ làm việc song song mà không phải chờ quét xong.
   - **Status**: NOT STARTED
   - **Is recurring issue?**: N
   - **Should Test frontend/backend/both after fix?**: Frontend.
   - **Blocked on other issue**: None.
 
 **In progress Task List**:
-- **Task 1: Hoàn thiện chức năng tab Only GCN (P0)**
-  - **Where to resume**: Sửa lỗi nghiêm trọng trong logic  của file .
-  - **What will be achieved with this?**: Khôi phục chức năng cốt lõi của tab Only GCN, cho phép nó phân loại chính xác giữa GCN và GTLQ.
+- **Task 1: Hoàn thiện tính năng quét PDF (P0)**
+  - **Where to resume**: Debug và sửa lỗi tiến trình Python () kết thúc sớm khi xử lý PDF nhiều trang ở chế độ batch.
+  - **What will be achieved with this?**: Một tính năng quét PDF hoạt động ổn định và hiệu quả trên toàn bộ ứng dụng.
   - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?**: Frontend.
+  - **Should Test frontend/backend/both after fix?**: Backend.
   - **Blocked on something**: Issue 1.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **(P1)** Triển khai logic ghép cặp GCN trang 1 và 2 để đồng bộ ngày cấp (Issue 2).
-    - **(P2)** Triển khai chế độ OCR Hybrid: Tự động sử dụng Tesseract cho ảnh chất lượng cao và fallback về Vision API.
-    - **(P3)** Tinh chỉnh  hoặc AI prompt dựa trên các lỗi phân loại mới.
+    - **(P1)** Triển khai logic ghép cặp GCN trang 1 và 2 để đồng bộ ngày cấp (Issue 3).
+    - **(P2)** Triển khai chế độ OCR Hybrid.
 - **Future Tasks**:
     - Thêm icon cho ứng dụng trên macOS.
     - Triển khai hệ thống license key.
     - Thêm cấu hình giá trong phần Cài đặt.
 
 **Completed work in this session**
-- **Refactor & Feature Enhancement for Only GCN tab**:
-    - Tái cấu trúc UI để sử dụng các **tab cho mỗi thư mục** và hiển thị kết quả dạng **lưới (grid)**.
-    - Làm gọn giao diện tổng thể (nút, text, stats).
-    - Thêm **Smart Mode (batch processing)** và **tự động resize ảnh** để khắc phục lỗi timeout.
-    - Thêm các **nút và modal cho chức năng Zoom và Edit Name** trên từng ảnh.
-    - Loại bỏ toggle pre-filter để chức năng này luôn được bật.
-    - Đồng bộ hóa chức năng **gộp PDF** với các tab khác, bao gồm cả modal tùy chọn.
-- **Logic & Bug Fixing for Only GCN**:
-    - **Thay đổi hoàn toàn chiến lược pre-filter**: Chuyển từ lọc màu sang chỉ lọc khổ giấy A3.
-    - Thêm logic **post-processing** để tự động đổi tên các tài liệu không phải GCN (như HSKT) thành .
-    - Sao chép và tích hợp logic **phân loại GCNC/GCNM** dựa trên ngày cấp từ .
-    - Đã cố gắng thêm logic sequential pairing để xử lý trang 2 của các tài liệu  (nhưng đã gây ra lỗi nghiêm trọng).
-- **Documentation**:
-    - Tạo  và  để ghi lại các thay đổi và quy tắc.
-
-**Earlier issues found/mentioned but not fixed**
-- Logic ghép cặp GCN trang 1 & trang 2 để đồng bộ ngày cấp chưa được triển khai (đã nêu trong **All Pending/In progress Issue list** - Issue 2).
+- **Sửa lỗi nghiêm trọng**:
+  - Đã loại bỏ hoàn toàn logic convert to GTLQ sai lầm trong .
+  - Đã sửa lỗi  của Gemini API bằng cách tăng .
+  - Đã sửa lỗi  và  trong các script Python.
+- **Cải tiến & Đồng bộ**:
+  - Cải thiện AI prompt để phân biệt GCN và HSKT tốt hơn.
+  - Đồng bộ hóa tab Only GCN để tuân theo cài đặt OCR toàn cục.
+- **Tính năng mới: Quét PDF**:
+  - Thêm khả năng quét file PDF vào tất cả các chế độ quét (Single file, Batch, OnlyGCN).
+  - Triển khai logic tách các trang của file PDF thành các file ảnh riêng lẻ bằng  và .
+  - Tối ưu hóa quá trình xử lý các trang PDF đã tách bằng cách đưa chúng vào chế độ xử lý hàng loạt (batch).
+- **Tiện ích**: Tạo các file  để giúp người dùng chạy ứng dụng dễ dàng hơn.
 
 **Known issue recurrence from previous fork**
 - **Issue recurrence**: Lỗi phân loại tài liệu không nhất quán của AI.
-- **Recurrence count**: Rất cao.
-- **Status**: IN PROGRESS (Chiến lược mới giúp giảm thiểu tác động nhưng không giải quyết gốc rễ).
+- **Recurrence count**: Cao.
+- **Status**: IN PROGRESS (Các bản sửa lỗi prompt đã được áp dụng, cần theo dõi thêm).
 
 **Code Architecture**
 - **Frontend**: React
-    - : (**Thay đổi rất nhiều**) Component chính cho tab Only GCN, hiện quản lý các tab thư mục, grid view, smart mode, và tất cả logic post-processing phức tạp (GTLQ conversion, GCN pairing, GCNC/GCNM classification).
-    - : Được dùng làm nguồn tham khảo cho logic smart mode và phân loại GCN.
 - **Backend**: Python
-    - : (**Đơn giản hóa**) Script này giờ chỉ kiểm tra aspect ratio của ảnh để xác định khổ A3.
-    - : Hiện được sử dụng bởi  để xử lý hàng loạt và resize ảnh.
 - **Main Process**: Electron
-    - : Không có thay đổi lớn trong phiên này, vẫn là nơi chứa các IPC handler.
+- **Tương tác chính gây lỗi**:  ->  -> . Luồng điều khiển và chờ kết quả đang bị lỗi đối với các tác vụ dài hơi.
 
 **Key Technical Concepts**
-- **Frontend-heavy Logic**: Chiến lược hiện tại đã chuyển phần lớn gánh nặng xử lý và ra quyết định từ AI/backend sang frontend (). Frontend giờ đây không chỉ hiển thị dữ liệu mà còn thực hiện các bước post-processing quan trọng để sửa lỗi của AI.
-- **Multi-stage Processing**: Luồng xử lý của tab Only GCN rất phức tạp:
-    1.  **Pre-filter (Backend)**: Lọc file A3 ().
-    2.  **AI Scan (Backend)**: Gửi các file A3 lên AI để phân loại ().
-    3.  **Post-process (Frontend)**:
-        - Đổi các loại file không phải GCN thành .
-        - Ghép cặp tuần tự để xử lý trang 2 (đang bị lỗi).
-        - Phân loại GCNC/GCNM dựa trên ngày cấp.
-- **State Management Refactor**: State  đã được thay thế bằng , một cấu trúc phức tạp hơn để quản lý kết quả theo từng thư mục.
-
-**key DB schema**
-- Không có.
+- **Quản lý tiến trình con (Child Process Management)**: Electron sử dụng  để chạy các script Python và chờ sự kiện  để lấy kết quả. Kiến trúc này đang gặp vấn đề với các tác vụ xử lý hàng loạt kéo dài.
+- **Quy trình xử lý PDF**: Một quy trình mới đã được thiết lập: Nhận diện PDF -> Tách PDF thành ảnh () -> Đưa ảnh vào quy trình xử lý hàng loạt () -> Xóa file ảnh tạm.
 
 **changes in tech stack**
-- Không có.
+- Thêm  vào . Điều này yêu cầu người dùng phải cài đặt  trên hệ thống của họ.
 
 **All files**
-- : (Đã được sửa đổi rất nhiều) Triển khai UI mới, smart mode, và toàn bộ logic post-processing.
-- : (Đã được sửa đổi) Đơn giản hóa để chỉ kiểm tra aspect ratio.
-- : (Đã được sửa đổi) Cập nhật để hỗ trợ logic pre-filter mới.
-- : (Mới) Tài liệu tóm tắt các thay đổi.
-- : (Mới) Tài liệu tổng hợp các quy tắc GCN.
-
-**Areas that need refactoring**:
--  đang trở nên rất lớn và phức tạp. Các logic post-processing (pairing, GTLQ conversion, GCN classification) có thể được tách ra thành các hàm tiện ích (utils) riêng để dễ quản lý và kiểm thử hơn.
-
-**key api endpoints**
-- **IPC Handlers**:
-    - : Được gọi để chạy script .
-    - : (Mới được sử dụng trong OnlyGCN) Được gọi để xử lý hàng loạt file bằng .
+- **Tạo mới**:
+  - : Module để chuyển đổi các trang PDF thành ảnh.
+  -  (và các file .bat khác): Scripts để chạy ứng dụng.
+  - Nhiều file tài liệu .
+- **Cập nhật nhiều**:
+  - : **File quan trọng cho lỗi hiện tại**. Đã thêm logic xử lý PDF và gọi các chế độ batch.
+  - : Cập nhật để xử lý các luồng ảnh từ PDF.
+  - : **File quan trọng cho lỗi hiện tại**. Cập nhật để truyền cài đặt batch mode.
+  - , : Cập nhật để hỗ trợ PDF.
+  - , , .
 
 **Critical Info for New Agent**
-- **BLOCKER HIỆN TẠI**: Lỗi nghiêm trọng nhất cần sửa ngay là logic sequential pairing trong  đang biến tất cả các file GCN thành GTLQ. Hãy bắt đầu bằng việc debug hàm này.
-- **CHIẾN LƯỢC MỚI**: Hãy nhớ rằng chiến lược đã thay đổi. Pre-filter chỉ kiểm tra khổ A3. Mọi quyết định phức tạp hơn (GCN vs GTLQ, GCNC vs GCNM) đều được thực hiện ở tầng frontend sau khi có kết quả từ AI. Đừng cố gắng thêm lại logic lọc màu vào .
-- **RỦI RO LOGIC**:  hiện chứa nhiều logic lồng nhau và phức tạp. Khi sửa lỗi, hãy cẩn thận để không phá vỡ các bước xử lý khác. Thêm nhiều console log chi tiết sẽ rất hữu ích.
-
-**documents created in this job**
-- 
-- 
-- 
+- **BLOCKER HIỆN TẠI**: Vấn đề cốt lõi là  kết thúc và trả về cho Electron quá sớm khi xử lý một file PDF lớn có nhiều batch. Hãy tập trung vào việc đảm bảo script Python chỉ thoát sau khi *tất cả* các batch đã được xử lý xong.
+- **PHỤ THUỘC MÔI TRƯỜNG**: Tính năng quét PDF yêu cầu người dùng phải cài đặt . Hãy ghi nhớ điều này nếu có vấn đề liên quan đến việc convert PDF.
+- **LUỒNG LOGIC**: Luồng xử lý PDF phức tạp và đi qua nhiều file:  ->  ->  -> . Khi debug, cần theo dõi log trên tất cả các file này.
 
 **Last 5 User Messages and any pending user messages**
-1.  **User**: Log cho thấy HSKT bị đổi thành GTLQ nhưng trang 2 của nó vẫn thành GCNM. (PENDING - Agent đã cố gắng sửa bằng cách thêm sequential pairing, nhưng gây ra lỗi còn nghiêm trọng hơn).
-2.  **User**: Tái xác nhận rằng pre-filter chỉ cần lọc A3, không cần lọc màu. (COMPLETED - Agent đã xác nhận và sửa logic).
-3.  **User**: Cung cấp log chi tiết cho thấy tất cả GCN đang bị đổi thành GTLQ và báo lỗi nữa. (PENDING - Đây là 
-wtmp begins Tue Nov 18 10:26:50 2025).
-4.  **User**: Yêu cầu kiểm tra tất cả các quy tắc GCN. (COMPLETED - Agent đã tổng hợp các quy tắc).
-5.  **User**: Yêu cầu xác nhận logic đặt tên GCNC/GCNM theo ngày cấp đã tồn tại. (COMPLETED - Agent đã xác nhận và thêm log).
+1.  **User**: Kết quả trả về sớm khi chưa quét hết các file và chỉ có 1 trang. (PENDING - Đây là lỗi P0 hiện tại).
+2.  **User**: Đến batch 2 thì dừng và trả kết quả luôn. (PENDING - Chi tiết thêm của lỗi P0).
+3.  **User**: Vẫn chưa sử dụng cài đặt, đang chạy batch theo hardcode. (COMPLETED - Agent đã sửa).
+4.  **User**: Batch 5 và smart phải sử dụng *sau khi* chia file pdf. (COMPLETED - Agent đã sửa).
+5.  **User**: Lỗi  và batch mode phải theo cài đặt. (COMPLETED - Agent đã sửa).
 
 **Project Health Check:**
-- **Broken**:
-    - Chức năng Only GCN hoàn toàn bị hỏng do lỗi logic nghiêm trọng khiến tất cả kết quả GCN bị ghi đè thành GTLQ.
-- **Mocked**: Không có.
+- **Broken**: Tính năng quét PDF cho các file nhiều trang ở chế độ batch đang bị hỏng nặng. Nó không thể hoàn thành và trả về kết quả sai, làm cho tính năng này không thể sử dụng được.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: None
-- Known regressions:
-    - Chức năng phân loại GCN trong tab Only GCN đã bị phá hỏng hoàn toàn bởi lần sửa lỗi cuối cùng.
-
-**Credentials to test flow:**
-N/A
-
-**What agent forgot to execute**
-- Agent chưa triển khai đầy đủ yêu cầu trang 1 GCN chưa được đặt tên theo trang 2 sau khi quét được thông tin ngày cấp GCN.
-- Các nút zoom/edit đã được thêm vào UI, nhưng chức năng thực tế của chúng chưa được người dùng kiểm tra hoặc xác nhận.</analysis>
+- Known regressions: Tính năng quét PDF mới được thêm vào không hoạt động như mong đợi.</analysis>

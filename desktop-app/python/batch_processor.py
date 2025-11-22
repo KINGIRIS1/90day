@@ -616,23 +616,23 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         
         for path in image_paths:
             if path.lower().endswith('.pdf'):
-            print(f"\n📄 PDF detected: {os.path.basename(path)}", file=sys.stderr)
-            print(f"   Converting PDF pages to images...", file=sys.stderr)
-            
-            # Convert PDF pages to images (JPEG format)
-            image_pages = split_pdf_to_pages(path)
-            
-            if image_pages:
-                print(f"   ✅ Converted {len(image_pages)} page(s) to images", file=sys.stderr)
-                expanded_paths.extend(image_pages)
-                # Track image pages for cleanup later
-                for img_path in image_pages:
-                    pdf_page_map[img_path] = path
+                print(f"\n📄 PDF detected: {os.path.basename(path)}", file=sys.stderr)
+                print(f"   Converting PDF pages to images...", file=sys.stderr)
+                
+                # Convert PDF pages to images (JPEG format)
+                image_pages = split_pdf_to_pages(path)
+                
+                if image_pages:
+                    print(f"   ✅ Converted {len(image_pages)} page(s) to images", file=sys.stderr)
+                    expanded_paths.extend(image_pages)
+                    # Track image pages for cleanup later
+                    for img_path in image_pages:
+                        pdf_page_map[img_path] = path
+                else:
+                    print(f"   ⚠️ Failed to convert PDF, skipping: {path}", file=sys.stderr)
             else:
-                print(f"   ⚠️ Failed to convert PDF, skipping: {path}", file=sys.stderr)
-        else:
-            # Regular image file - add as-is
-            expanded_paths.append(path)
+                # Regular image file - add as-is
+                expanded_paths.append(path)
     
     # Update image_paths to use expanded paths
     original_image_paths = image_paths

@@ -893,69 +893,14 @@ function CloudSettings() {
                     <span>🔄 Tuần Tự (Mặc định)</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    • Xử lý từng file một (cách cũ)<br />
+                    • Xử lý từng file một<br />
                     • Thời gian: Bình thường<br />
                     • Phù hợp: Scan ít files (1-10 files)
                   </div>
                 </div>
               </label>
               
-              <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-blue-50 transition border-blue-300 bg-blue-50/30">
-                <input
-                  type="radio"
-                  name="batchMode"
-                  value="fixed"
-                  checked={batchMode === 'fixed'}
-                  onChange={(e) => setBatchMode(e.target.value)}
-                  className="mt-1 mr-3"
-                />
-                <div className="flex-1">
-                  <div className="font-medium flex items-center gap-2">
-                    <span>📦 Gom Cố Định ({fixedBatchSize} Files)</span>
-                    <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">ĐỀ XUẤT</span>
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    • Gom mỗi {fixedBatchSize} files và xử lý cùng lúc<br />
-                    • <strong>⚡ Nhanh hơn 4-5 lần</strong><br />
-                    • <strong>💰 Tiết kiệm 80% chi phí</strong><br />
-                    • Phù hợp: Hầu hết trường hợp (10-200 files)
-                  </div>
-                </div>
-              </label>
-              
-              {/* Fixed Mode Batch Size Setting */}
-              {batchMode === 'fixed' && (
-                <div className="ml-11 mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-900 mb-3">
-                    ⚙️ Số file mỗi batch: <span className="text-blue-700 font-bold">{fixedBatchSize}</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="3"
-                    max="20"
-                    step="1"
-                    value={fixedBatchSize}
-                    onChange={(e) => setFixedBatchSize(parseInt(e.target.value))}
-                    className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-gray-600 mt-1">
-                    <span>3 (An toàn)</span>
-                    <span>8 (Đề xuất)</span>
-                    <span>20 (Nhanh nhất)</span>
-                  </div>
-                  <div className="mt-3 p-3 bg-white rounded border border-blue-300">
-                    <div className="text-xs text-gray-700">
-                      <strong>💡 Gợi ý:</strong><br />
-                      • <strong>3-5 files</strong>: An toàn cho API chậm hoặc mạng yếu<br />
-                      • <strong>8 files</strong>: Cân bằng tốc độ và độ tin cậy (đề xuất)<br />
-                      • <strong>10-15 files</strong>: Nhanh hơn nhưng có thể gặp lỗi 503<br />
-                      • <strong>16-20 files</strong>: Nhanh nhất nhưng rủi ro cao
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition border-green-300">
+              <label className="flex items-start p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition border-green-300 bg-green-50/30">
                 <input
                   type="radio"
                   name="batchMode"

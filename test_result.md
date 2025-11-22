@@ -3828,3 +3828,149 @@ TESTING:
 STATUS: ✅ Fixed, frontend restarted, ready to test
 ================================================================================
 
+
+================================================================================
+🔧 CRITICAL FIX - PDF Merge Including All Pages Instead of Filtered Pages
+================================================================================
+DATE: 2025-01-XX
+ISSUE: "gộp pdf bị lỗi đặt tên đúng nhưng các file lại chứa toàn bộ các trang"
+
+PROBLEM DESCRIPTION:
+--------------------
+Khi gộp PDF theo short_code:
+- Tên file đúng: GCN.pdf, HDCQ.pdf, etc. ✅
+- Nội dung SAI: Mỗi file chứa TẤT CẢ các trang ❌
+
+Example:
+PDF 34 trang với classification:
+- Trang 1, 2: GCN
+- Trang 3, 4: HDCQ
+- Trang 5, 6: GCN
+
+EXPECTED:
+- GCN.pdf: Pages 1, 2, 5, 6 (4 pages)
+- HDCQ.pdf: Pages 3, 4 (2 pages)
+
+ACTUAL (BUG):
+- GCN.pdf: Pages 1-34 (all 34 pages) ❌
+- HDCQ.pdf: Pages 1-34 (all 34 pages) ❌
+
+ROOT CAUSE:
+-----------
+File: /app/desktop-app/public/electron.js (lines 790-814)
+
+Code nhóm items theo short_code:
+```javascript
+const groups = items.reduce((acc, it) => {
+  const key = it.short_code || 'UNKNOWN';
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(it.filePath);  // ← ONLY PUSHED filePath!
+  return acc;
+}, {});
+```
+
+Khi quét PDF 34 trang:
+```javascript
+items = [
+  { short_code: 'GCN', filePath: 'batda.pdf', pdfPage: 1 },
+  { short_code: 'GCN', filePath: 'batda.pdf', pdfPage: 2 },
+  { short_code: 'HDCQ', filePath: 'batda.pdf', pdfPage: 3 },
+  ...
+]
+
+// After grouping:
+groups = {
+  'GCN': ['batda.pdf', 'batda.pdf'],    // ← Lost pdfPage info!
+  'HDCQ': ['batda.pdf']                 // ← Lost pdfPage info!
+}
+```
+
+Khi merge (lines 799-805):
+```javascript
+for (const fp of filePaths) {
+  const srcPdf = await PDFDocument.load(bytes);
+  const copiedPages = await outPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+  // ↑ Copy ALL pages from PDF!
+}
+```
+
+→ Vì `pdfPage` info bị mất, code copy toàn bộ PDF thay vì chỉ specific pages!
+
+SOLUTION:
+---------
+
+1. **Preserve full item in groups (not just filePath)**:
+```javascript
+const groups = items.reduce((acc, it) => {
+  const key = it.short_code || 'UNKNOWN';
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(it);  // Push entire item (includes pdfPage, isPdfPage)
+  return acc;
+}, {});
+```
+
+2. **Check isPdfPage and copy only specific page**:
+```javascript
+for (const item of itemsInGroup) {
+  const fp = item.filePath;
+  const bytes = fs.readFileSync(fp);
+  const srcPdf = await PDFDocument.load(bytes);
+  
+  if (item.isPdfPage && item.pdfPage !== undefined) {
+    // Copy only specific page
+    const pageIndex = item.pdfPage - 1;  // 1-based to 0-based
+    const [copiedPage] = await outPdf.copyPages(srcPdf, [pageIndex]);
+    outPdf.addPage(copiedPage);
+  } else {
+    // Regular PDF - copy all pages
+    const copiedPages = await outPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+    copiedPages.forEach(p => outPdf.addPage(p));
+  }
+}
+```
+
+CHANGES:
+--------
+File: /app/desktop-app/public/electron.js
+
+1. Line 792-797: Changed grouping to preserve full item
+2. Lines 799-838: Updated merge logic to handle PDF pages
+3. Added logging to show which page is copied
+
+EXPECTED BEHAVIOR AFTER FIX:
+-----------------------------
+PDF 34 trang:
+- Trang 1, 2, 29-32, 34: GCN (7 pages)
+- Trang 3-6: HDCQ (4 pages)
+- Trang 7: GXN (1 page)
+- etc.
+
+After merge:
+- GCN.pdf: 7 pages (chỉ pages 1, 2, 29-32, 34) ✅
+- HDCQ.pdf: 4 pages (chỉ pages 3-6) ✅
+- GXN.pdf: 1 page (chỉ page 7) ✅
+
+Log sẽ hiển thị:
+```
+📂 Merge processing for GCN:
+   ✅ Copied page 1 from batda.pdf
+   ✅ Copied page 2 from batda.pdf
+   ✅ Copied page 29 from batda.pdf
+   ✅ Copied page 30 from batda.pdf
+   ...
+```
+
+TESTING:
+--------
+1. Quét PDF 34 trang
+2. Edit một số pages để có nhiều short_code khác nhau
+3. Click "📚 Gộp PDF"
+4. Chọn mode và output folder
+5. Check merged PDFs:
+   - Mở GCN.pdf → Chỉ thấy pages có short_code = GCN
+   - Mở HDCQ.pdf → Chỉ thấy pages có short_code = HDCQ
+   - Etc.
+
+STATUS: ✅ Fixed, frontend restarted, awaiting user test
+================================================================================
+

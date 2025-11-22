@@ -298,8 +298,9 @@ ipcMain.handle('select-files', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile', 'multiSelections'],
     filters: [
-      { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff'] },
-      { name: 'PDFs', extensions: ['pdf'] }
+      { name: 'Tất cả file hỗ trợ', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'pdf'] },
+      { name: 'Ảnh', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff'] },
+      { name: 'PDF', extensions: ['pdf'] }
     ]
   });
   return result.filePaths;

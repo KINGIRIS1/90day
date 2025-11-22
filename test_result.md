@@ -3974,3 +3974,137 @@ TESTING:
 STATUS: ✅ Fixed, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 DOUBLE FIX - PDF Merge + PDF Page Preview
+================================================================================
+DATE: 2025-01-XX
+
+ISSUE 1: PDF Merge Error "filePaths is not defined"
+----------------------------------------------------
+ERROR: filePaths is not defined at line 916
+
+ROOT CAUSE:
+Changed `filePaths` to `itemsInGroup` but missed 2 places at lines 913 and 923
+
+SOLUTION:
+Fixed both occurrences:
+- Line 913: `filePaths.length` → `itemsInGroup.length`
+- Line 923: `filePaths.length` → `itemsInGroup.length`
+
+ISSUE 2: PDF Page Preview Not Working
+--------------------------------------
+USER REQUEST: "preview cái tôi cần là preview trang quét được chứ không phải mở file pdf"
+
+PROBLEM:
+- PDF pages chỉ có icon 📄
+- Không có preview ảnh
+- Không có nút "🔍 Phóng to"
+- Phải mở PDF gốc để xem (không tiện)
+
+ROOT CAUSE:
+Khi split PDF, các file ảnh tạm được tạo ra nhưng BỊ XÓA ngay sau khi xử lý (line 226)
+
+SOLUTION:
+1. **Keep temporary image files** (không xóa nữa)
+2. **Add previewPath to each page result**
+3. **Load preview in frontend**
+4. **Enable zoom button** cho PDF pages
+
+CHANGES:
+--------
+
+1. **process_document.py (lines 218-231)**:
+```python
+# Add preview paths to each page result
+for i, page_result in enumerate(results):
+    if i < len(image_pages):
+        page_result['previewPath'] = image_pages[i]
+
+# DON'T cleanup - keep for preview
+# cleanup_split_pages(image_pages)
+pass
+```
+
+2. **DesktopScanner.js (lines 1860-1878)**:
+```javascript
+// Load preview for PDF page
+let pagePreview = null;
+if (pageResult.previewPath) {
+  pagePreview = await window.electronAPI.readImageDataUrl(pageResult.previewPath);
+}
+
+newResults.push({
+  ...
+  previewUrl: pagePreview,  // Now has preview!
+  ...
+});
+```
+
+3. **DesktopScanner.js (preview display)**:
+```javascript
+{previewsEnabled && result.previewUrl ? (
+  <img src={result.previewUrl} />  // Show PDF page preview!
+) : ...}
+```
+
+4. **DesktopScanner.js (zoom button)**:
+```javascript
+{result.previewUrl && (
+  <button onClick={() => setSelectedPreview(result.previewUrl)}>
+    🔍 Phóng to
+  </button>
+)}
+```
+
+EXPECTED BEHAVIOR AFTER FIX:
+-----------------------------
+
+**PDF Merge:**
+```
+✅ GCN.pdf created with 7 pages (pages 1,2,29-34)
+✅ HDCQ.pdf created with 4 pages (pages 3-6)
+✅ All merged successfully
+```
+
+**PDF Preview:**
+```
+[PDF Page Card]
+┌─────────────────────────────┐
+│ [Preview Image of Page]    │  ← Ảnh thật của trang!
+├─────────────────────────────┤
+│ batda.pdf - Trang 1/34 (PDF)│
+│ Method: batch | 95%         │
+│ Loại: GCN                   │
+├─────────────────────────────┤
+│ [🔍 Phóng to] [📄 Mở PDF gốc]│  ← Both buttons!
+│ [🗑️ Xóa]                    │
+└─────────────────────────────┘
+```
+
+**Click "🔍 Phóng to":**
+- Modal hiện ra với ảnh full size của trang
+- Có thể zoom, xem chi tiết
+- Không cần mở PDF viewer
+
+**Click "📄 Mở PDF gốc":**
+- Mở PDF trong viewer mặc định (backup option)
+
+BENEFITS:
+---------
+✅ Preview ảnh thật của từng trang PDF
+✅ Nút phóng lớn để xem chi tiết
+✅ Không cần mở PDF viewer để xem từng trang
+✅ Workflow nhanh hơn
+✅ Dễ review và edit classification
+
+NOTE:
+-----
+Temporary image files sẽ được giữ lại trong /tmp hoặc %TEMP%
+- Không ảnh hưởng nhiều đến disk space (DPI 200, file nhỏ)
+- OS sẽ tự cleanup khi reboot
+- Hoặc có thể thêm manual cleanup sau
+
+STATUS: ✅ Both fixes applied, frontend restarted, ready to test
+================================================================================
+

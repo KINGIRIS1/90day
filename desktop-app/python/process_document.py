@@ -133,6 +133,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                         last_known_type=None,
                         skip_pdf_conversion=True  # Already converted
                     )
+                    print(f"   ✅ batch_classify_fixed completed, processing {len(batch_result.get('results', []))} results", file=sys.stderr)
                 elif batch_mode == 'smart':
                     # Smart mode - Auto batch size optimization
                     print(f"   Mode: Smart (auto batch size)", file=sys.stderr)

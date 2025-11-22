@@ -2694,6 +2694,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   )}
                 </div>
                 <div className="text-sm font-medium truncate" title={result.fileName}>{result.fileName}</div>
+                {result.is_multi_page_pdf && result.all_pages && (
+                  <div className="text-xs text-purple-600 font-medium mt-1">
+                    📄 PDF {result.all_pages.length} trang
+                  </div>
+                )}
                 <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">{getMethodBadge(result.method)}<span className="ml-auto font-semibold">{formatConfidence(result.confidence)}%</span></div>
                 <div className="mt-2 text-xs text-gray-600">Loại: {result.doc_type} | Mã: <span className="text-blue-600">{result.short_code}</span></div>
                 {/* Timing Info */}

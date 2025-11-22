@@ -108,20 +108,16 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             
             # Process all pages using BATCH MODE (much faster!)
             try:
-                # Determine batch mode from settings
-                # For Desktop Scanner single-file mode, we don't have direct access to settings
-                # So we'll use Smart mode by default (auto batch size)
-                # This is optimal for PDF processing
+                # Read batch mode from environment variable (set by Electron from user settings)
+                batch_mode = os.environ.get('BATCH_MODE', 'sequential')
                 
-                print(f"\n🚀 Processing {num_pages} pages using BATCH MODE...", file=sys.stderr)
+                print(f"\n🚀 Processing {num_pages} pages using BATCH MODE ({batch_mode})...", file=sys.stderr)
                 
                 # Use batch processor instead of sequential processing
                 from batch_processor import batch_classify_smart, batch_classify_fixed
                 
-                # Check if we should use fixed mode based on engine type
-                # If engine has 'lite' or specific batch size preference, use fixed
-                # Otherwise use smart mode for automatic optimization
-                use_fixed_mode = False  # Default to smart for PDF processing
+                # Determine which mode to use based on settings
+                use_fixed_mode = (batch_mode == 'fixed')
                 
                 if use_fixed_mode:
                     # Fixed mode with batch size 8

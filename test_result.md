@@ -3098,3 +3098,105 @@ CONSIDERATIONS:
 STATUS: ✅ Implemented, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 UI IMPROVEMENT - Enhanced Result Card Display
+================================================================================
+DATE: 2025-01-XX
+ISSUE: Phần chỉnh sửa short code và nút phóng lớn cần cải thiện
+
+USER REQUEST:
+-------------
+"chỉnh lại phần chỉnh sai phía trên. để kết quả hiển thị đầy đủ. và có nút phóng lớn để xem preview"
+
+IMPROVEMENTS MADE:
+------------------
+
+1. **Better Layout for Document Info**:
+   BEFORE: Thông tin bị chen chúc, khó đọc
+   AFTER: 
+   - Spacing tốt hơn với `space-y-1`
+   - Loại tài liệu hiển thị rõ ràng
+   - Timing info dễ nhìn hơn
+
+2. **Enhanced Short Code Editor Display**:
+   BEFORE: Editor bị ẩn trong div nhỏ `bg-gray-50`
+   AFTER:
+   - Riêng biệt trong section riêng
+   - Không còn background xám che mất
+   - Dễ click và chỉnh sửa hơn
+
+3. **Improved Action Buttons**:
+   BEFORE:
+   - Nút phóng lớn chỉ hiển thị khi có previewUrl
+   - Buttons nhỏ, khó bấm
+   
+   AFTER:
+   - Nút "🔍 Phóng to" LUÔN hiển thị cho ảnh (không phải PDF)
+   - Nếu preview chưa load → button disabled + tooltip
+   - Buttons lớn hơn với padding `py-1.5 px-3`
+   - Font medium để dễ đọc
+   - Flex-wrap để responsive tốt hơn
+   - Min-width để buttons không bị quá nhỏ
+
+CHANGES:
+--------
+File: /app/desktop-app/src/components/DesktopScanner.js
+Lines: 2688-2740
+
+1. Document Info Section (lines 2688-2708):
+```javascript
+// Better spacing and organization
+<div className="mt-2 space-y-1">
+  <div>Method badge + Confidence</div>
+  <div>Document type (clearer)</div>
+  <div>Duration (if available)</div>
+</div>
+```
+
+2. Short Code Editor (lines 2710-2717):
+```javascript
+// Separate section, no background
+<div className="mt-2">
+  <InlineShortCodeEditor ... />
+</div>
+```
+
+3. Action Buttons (lines 2719-2754):
+```javascript
+// Always show zoom for images
+{!result.isPdf && (
+  <button disabled={!result.previewUrl}>
+    🔍 Phóng to
+  </button>
+)}
+```
+
+RESULT CARD STRUCTURE:
+-----------------------
+┌─────────────────────────────┐
+│      [Preview Image]        │
+├─────────────────────────────┤
+│ filename.jpg                │
+│                             │
+│ Method: batch | 95%         │  ← Better spacing
+│ Loại: Giấy chứng nhận       │  ← Clearer
+│ ⏱️ 2.5s                     │
+├─────────────────────────────┤
+│ Short code: GCN ✏️          │  ← Separate, clear
+│ (Click to edit)             │
+├─────────────────────────────┤
+│ [🔍 Phóng to] [🗑️ Xóa]     │  ← Bigger buttons
+└─────────────────────────────┘
+
+BENEFITS:
+---------
+✅ Thông tin rõ ràng, dễ đọc hơn
+✅ Short code editor dễ click và sửa
+✅ Nút phóng lớn LUÔN có (không bị mất)
+✅ Buttons lớn hơn, dễ bấm trên mobile/tablet
+✅ Layout responsive tốt hơn
+
+STATUS: ✅ Implemented, frontend restarted, awaiting user test
+================================================================================
+

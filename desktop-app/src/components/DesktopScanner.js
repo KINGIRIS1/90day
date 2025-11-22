@@ -2712,7 +2712,20 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 
                 {/* Action Buttons */}
                 <div className="mt-2 flex gap-2">
-                  {result.previewUrl && (
+                  {result.is_multi_page_pdf && result.all_pages && (
+                    <button
+                      onClick={() => {
+                        const pageList = result.all_pages.map((p, i) => 
+                          `Trang ${p.pdf_page || i+1}: ${p.short_code} (${(p.confidence * 100).toFixed(0)}%)`
+                        ).join('\n');
+                        alert(`📄 Chi tiết PDF (${result.all_pages.length} trang):\n\n${pageList}`);
+                      }}
+                      className="flex-1 text-xs text-purple-600 hover:bg-purple-50 py-1 px-2 rounded border border-purple-200"
+                    >
+                      📋 Chi tiết
+                    </button>
+                  )}
+                  {result.previewUrl && !result.isPdf && (
                     <button
                       onClick={() => setSelectedPreview(result.previewUrl)}
                       className="flex-1 text-xs text-blue-600 hover:bg-blue-50 py-1 px-2 rounded border border-blue-200"

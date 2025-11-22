@@ -203,7 +203,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 if batch_result and 'results' in batch_result:
                     batch_results = batch_result['results']
                 
-                for page_num, batch_item in enumerate(batch_results, 1):
+                    for page_num, batch_item in enumerate(batch_results, 1):
                     page_result = {
                         'success': batch_item.get('success', True),
                         'short_code': batch_item.get('short_code', 'UNKNOWN'),

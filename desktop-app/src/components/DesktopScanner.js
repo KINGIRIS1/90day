@@ -2702,13 +2702,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
                       🖼️ Preview disabled<br/>(tiết kiệm RAM)
                     </div>
+                  ) : result.isPdfPage ? (
+                    <div className="w-full h-40 flex flex-col items-center justify-center border rounded text-gray-600 bg-blue-50">
+                      <div className="text-4xl mb-2">📄</div>
+                      <div className="text-xs font-medium">Trang {result.pdfPage}/{result.totalPdfPages}</div>
+                      <div className="text-xs text-gray-500 mt-1">{result.originalPdfName}</div>
+                    </div>
                   ) : result.isPdf ? (
                     <div className="w-full h-40 flex flex-col items-center justify-center border rounded text-gray-600 bg-red-50">
                       <div className="text-5xl mb-2">📄</div>
                       <div className="text-xs font-medium">PDF Document</div>
-                      {result.is_multi_page_pdf && result.all_pages && (
-                        <div className="text-xs text-purple-600 mt-1">{result.all_pages.length} trang</div>
-                      )}
                     </div>
                   ) : (
                     <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">Không có preview</div>

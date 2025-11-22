@@ -1275,8 +1275,16 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_
     print("   Sequential metadata: Pass lastKnown between batches (0% overhead)", file=sys.stderr)
     
     # Use fixed batch with smart size + sequential metadata
+    # NOTE: Pass skip_pdf_conversion=True because we already converted PDFs above
     try:
-        results = batch_classify_fixed(expanded_paths, api_key, engine_type=engine_type, batch_size=batch_size, last_known_type=last_known_type)
+        results = batch_classify_fixed(
+            expanded_paths, 
+            api_key, 
+            engine_type=engine_type, 
+            batch_size=batch_size, 
+            last_known_type=last_known_type,
+            skip_pdf_conversion=True  # Already converted PDFs to images
+        )
         
         # Map results back to original PDF names
         if results and pdf_page_map:

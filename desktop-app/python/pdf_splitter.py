@@ -80,16 +80,22 @@ def split_pdf_to_pages(pdf_path):
 
 def cleanup_split_pages(page_paths):
     """
-    Clean up temporary split page files
+    Clean up temporary image files
     
     Args:
-        page_paths: List of paths to split pages
+        page_paths: List of paths to temporary image files
     """
+    if not page_paths:
+        return
+        
     try:
+        cleaned = 0
         for page_path in page_paths:
             if os.path.exists(page_path):
                 os.remove(page_path)
-        print(f"🧹 Cleaned up {len(page_paths)} temporary files", file=sys.stderr)
+                cleaned += 1
+        if cleaned > 0:
+            print(f"🧹 Cleaned up {cleaned} temporary image file(s)", file=sys.stderr)
     except Exception as e:
         print(f"⚠️ Cleanup warning: {e}", file=sys.stderr)
 

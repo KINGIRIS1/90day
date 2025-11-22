@@ -2816,3 +2816,53 @@ TESTING RECOMMENDATION:
 STATUS: ✅ Fixed, awaiting user testing
 ================================================================================
 
+
+================================================================================
+🔧 FOLLOW-UP FIX - Circular Reference in JSON Serialization
+================================================================================
+DATE: 2025-01-XX
+ISSUE: After timeout fix, all 34 pages processed but got "Circular reference detected" error
+
+ROOT CAUSE:
+-----------
+In process_document.py line 231-233:
+```python
+first_result = results[0]  # Reference to results[0]
+first_result['all_pages'] = results  # results contains results[0]
+# → first_result['all_pages'][0] = first_result ← CIRCULAR!
+```
+
+This created a circular reference that json.dumps() cannot serialize.
+
+SOLUTION:
+---------
+Use .copy() to create a shallow copy instead of reference:
+```python
+first_result = results[0].copy() if results else {}
+first_result['all_pages'] = results
+```
+
+File: /app/desktop-app/python/process_document.py
+Line 231: Changed from `results[0]` to `results[0].copy()`
+
+TESTING RESULT FROM USER:
+--------------------------
+✅ All 34 pages processed successfully:
+   - Pages 1-2: DDKBD
+   - Pages 3-6: HDCQ
+   - Page 7: GXN
+   - Pages 8-11: GUQ
+   - Pages 12-13: PCT
+   - Pages 14-19: TBT
+   - Pages 20-21: GNT
+   - Pages 22-28: GTLQ
+   - Pages 29-32, 34: GCN
+   - Page 33: UNKNOWN
+
+✅ Batch processing completed (no timeout)
+✅ Temporary files cleaned up
+❌ JSON serialization failed due to circular reference
+
+STATUS: ✅ Fixed, awaiting user re-test
+================================================================================
+

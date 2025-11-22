@@ -3019,3 +3019,82 @@ Trang 34: GCN (96%)"
 STATUS: ✅ Implemented, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 UI IMPROVEMENT - Remove Results Pagination
+================================================================================
+DATE: 2025-01-XX
+ISSUE: User có phải bấm nút "Trước/Sau" để xem kết quả, khó kiểm tra
+
+USER REQUEST:
+-------------
+"bỏ phân trang để kiểm tra kết quả tốt hơn"
+
+CLARIFICATION:
+--------------
+User muốn bỏ PAGINATION trong UI (nút Trước/Sau), KHÔNG phải việc tách PDF thành nhiều kết quả.
+
+BEFORE:
+-------
+- Results hiển thị 10 items per page
+- Phải bấm "Trước/Sau" để xem các kết quả khác
+- Có indicator: "Hiển thị 10/34 files (giới hạn 10/trang)"
+- Có navigation: "← Trước | Trang 1/4 | Sau →"
+
+AFTER:
+------
+- Hiển thị TẤT CẢ kết quả trên 1 trang
+- Không cần pagination
+- Indicator mới: "📊 Hiển thị tất cả 34 kết quả"
+- Vẫn giữ toggle Preview ON/OFF
+
+CHANGES:
+--------
+File: /app/desktop-app/src/components/DesktopScanner.js
+Lines: 2643-2683
+
+BEFORE:
+```javascript
+{results.length > ITEMS_PER_PAGE && (
+  <div>
+    ⚠️ Hiển thị {currentPage * ITEMS_PER_PAGE}/{results.length} files
+    <button>← Trước</button>
+    <span>Trang {currentPage}/{totalPages}</span>
+    <button>Sau →</button>
+  </div>
+)}
+
+{results
+  .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+  .map(...)}
+```
+
+AFTER:
+```javascript
+{results.length > 0 && (
+  <div>
+    📊 Hiển thị tất cả {results.length} kết quả
+    <button>🖼️ Preview ON/OFF</button>
+  </div>
+)}
+
+{results
+  .map(...)}  // No .slice()
+```
+
+BENEFITS:
+---------
+✅ Dễ kiểm tra kết quả (scroll xuống thay vì bấm nút)
+✅ Xem được toàn bộ kết quả cùng lúc
+✅ Dễ so sánh các kết quả với nhau
+✅ Nhanh hơn khi cần tìm kết quả cụ thể
+
+CONSIDERATIONS:
+---------------
+⚠️ Với file lớn (100+ results), scroll sẽ dài
+⚠️ Preview nhiều ảnh cùng lúc tốn RAM (user có thể tắt preview)
+💡 Nếu cần, user có thể tắt preview để giảm RAM
+
+STATUS: ✅ Implemented, frontend restarted, awaiting user test
+================================================================================
+

@@ -3560,3 +3560,98 @@ ACTION REQUIRED:
 4. Test lại quét PDF
 ================================================================================
 
+
+================================================================================
+🔧 SIMPLIFICATION - Remove Fixed Mode, Keep Smart Mode Only
+================================================================================
+DATE: 2025-01-XX
+USER REQUEST: "Như vậy thì 2 cái này giống nhau. bỏ 1 cái. để lại gom thông minh"
+
+ANALYSIS:
+---------
+User nhận ra Fixed và Smart mode về cơ bản giống nhau:
+- Fixed: Gom X files cố định mỗi batch
+- Smart: Gom tối đa X files, tự động adjust
+
+→ Smart mode linh hoạt hơn, bao gồm cả Fixed mode
+
+SOLUTION:
+---------
+**Removed Fixed Mode, kept only 2 modes:**
+
+1. **🔄 Sequential (Tuần Tự)**:
+   - Process 1 file at a time
+   - Slow but simple
+   - For 1-10 files
+
+2. **🧠 Smart (Gom Thông Minh)** - RECOMMENDED:
+   - AI automatically groups files
+   - Process up to X files per batch
+   - 5-10x faster
+   - 80-90% cost savings
+   - For 10-200+ files
+
+CHANGES:
+--------
+
+1. **CloudSettings.js (lines 880-960)**:
+   - Removed: Fixed mode radio button
+   - Removed: Fixed batch size slider
+   - Updated: Smart mode label to show batch size
+   - Simplified: Only 2 choices now
+
+2. **electron.js (line 718)**:
+   - Changed: `batchSize = store.get('smartMaxBatchSize', 8)`
+   - Now uses smartMaxBatchSize for all batch operations
+
+3. **process_document.py (lines 122-136)**:
+   - Removed: Fixed mode handling code
+   - Simplified: Only Sequential and Smart modes
+
+4. **DesktopScanner.js (lines 2722-2748)**:
+   - Added: "📄 Mở PDF" button for PDF pages
+   - Opens PDF in external viewer
+   - Better than trying to preview individual pages
+
+UI BEFORE:
+----------
+Settings:
+○ 🔄 Tuần Tự
+○ 📦 Gom Cố Định (8 Files) [ĐỀ XUẤT]
+   └─ Slider: 3-20
+○ 🧠 Gom Thông Minh [CHÍNH XÁC NHẤT]
+   └─ Slider: 2-20
+
+UI AFTER:
+---------
+Settings:
+○ 🔄 Tuần Tự (Mặc định)
+● 🧠 Gom Thông Minh (10 Files) [ĐỀ XUẤT]
+   └─ Slider: 2-20
+
+PDF PREVIEW FIX:
+----------------
+Added "📄 Mở PDF" button for PDF pages:
+- Click để mở PDF trong PDF viewer mặc định
+- Navigate đến trang cụ thể (nếu viewer hỗ trợ)
+- Better UX than trying to show PDF preview in browser
+
+BENEFITS:
+---------
+✅ Simpler UI - 2 choices thay vì 3
+✅ Dễ hiểu hơn cho user
+✅ Smart mode covers all batch use cases
+✅ PDF có button để mở và xem
+✅ Giảm confusion
+
+STATUS: ✅ Implemented, frontend restarted, awaiting user test
+
+ACTION REQUIRED:
+----------------
+User cần vào Settings và chọn lại mode:
+1. Vào Settings → OCR Settings
+2. Chọn "🧠 Gom Thông Minh"
+3. Kéo slider để chọn batch size (5-15 đề xuất)
+4. Click "💾 Lưu cài đặt"
+================================================================================
+

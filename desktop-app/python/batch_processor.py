@@ -602,6 +602,44 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         print("   Metadata: Sequential naming from previous batch", file=sys.stderr)
         print(f"{'='*80}", file=sys.stderr)
     
+    # Step 1: Convert PDF files to images (same as smart mode)
+    expanded_paths = []
+    pdf_page_map = {}  # Track which images came from which PDF
+    
+    for path in image_paths:
+        if path.lower().endswith('.pdf'):
+            print(f"\n📄 PDF detected: {os.path.basename(path)}", file=sys.stderr)
+            print(f"   Converting PDF pages to images...", file=sys.stderr)
+            
+            # Convert PDF pages to images (JPEG format)
+            image_pages = split_pdf_to_pages(path)
+            
+            if image_pages:
+                print(f"   ✅ Converted {len(image_pages)} page(s) to images", file=sys.stderr)
+                expanded_paths.extend(image_pages)
+                # Track image pages for cleanup later
+                for img_path in image_pages:
+                    pdf_page_map[img_path] = path
+            else:
+                print(f"   ⚠️ Failed to convert PDF, skipping: {path}", file=sys.stderr)
+        else:
+            # Regular image file - add as-is
+            expanded_paths.append(path)
+    
+    # Update image_paths to use expanded paths
+    original_image_paths = image_paths
+    image_paths = expanded_paths
+    
+    total_files = len(expanded_paths)
+    original_count = len(original_image_paths)
+    pdf_count = len([p for p in original_image_paths if p.lower().endswith('.pdf')])
+    
+    if pdf_count > 0:
+        print(f"\n📊 File expansion: {original_count} files → {total_files} images", file=sys.stderr)
+        print(f"   ({pdf_count} PDF(s) converted to {len(pdf_page_map)} image page(s))", file=sys.stderr)
+    else:
+        print(f"\n📊 Total files: {total_files} images", file=sys.stderr)
+    
     if last_known_type:
         print(f"\n📌 Received lastKnown from previous batch:", file=sys.stderr)
         print(f"   Type: {last_known_type.get('short_code')}", file=sys.stderr)

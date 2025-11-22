@@ -1203,7 +1203,24 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_
     print("   Sequential metadata: Pass lastKnown between batches (0% overhead)", file=sys.stderr)
     
     # Use fixed batch with smart size + sequential metadata
-    return batch_classify_fixed(image_paths, api_key, engine_type=engine_type, batch_size=batch_size, last_known_type=last_known_type)
+    try:
+        results = batch_classify_fixed(expanded_paths, api_key, engine_type=engine_type, batch_size=batch_size, last_known_type=last_known_type)
+        
+        # Map results back to original PDF names
+        if results and pdf_page_map:
+            for result in results:
+                file_path = result.get('file_path', '')
+                if file_path in pdf_page_map:
+                    # This was a split PDF page - update file_path to original PDF
+                    original_pdf = pdf_page_map[file_path]
+                    result['original_pdf'] = original_pdf
+                    result['is_pdf_page'] = True
+        
+        return results
+    finally:
+        # Cleanup temporary PDF pages
+        if pdf_page_map:
+            cleanup_split_pages(list(pdf_page_map.keys()))
 
 
 # CLI interface for testing

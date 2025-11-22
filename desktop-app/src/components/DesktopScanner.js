@@ -1852,38 +1852,71 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`📌 Updated lastKnown: ${processedResult.short_code} (${formatConfidence(processedResult.confidence)}%)`);
       }
 
-      // Generate preview URL (works for images, PDFs show icon)
-      let previewUrl = null;
-      try {
-        const toFileUrl = (p) => (/^[A-Za-z]:\\\\/.test(p) ? 'file:///' + p.replace(/\\\\/g, '/') : 'file://' + p);
-        if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
-          previewUrl = await window.electronAPI.readImageDataUrl(file.path);
-          if (!previewUrl) previewUrl = toFileUrl(file.path);
-        } else if (/\.pdf$/i.test(file.name)) {
-          // For PDF, use file URL (will show as PDF icon in UI)
-          previewUrl = toFileUrl(file.path);
-        }
-      } catch (e) {
-        console.warn(`Failed to generate preview for ${file.name}:`, e);
-      }
-
-      // For multi-page PDF, keep as single result with all_pages info
+      // Check if this is a multi-page PDF result
       if (processedResult.is_multi_page_pdf && processedResult.all_pages && Array.isArray(processedResult.all_pages)) {
-        console.log(`📄 Multi-page PDF: ${file.name} (${processedResult.all_pages.length} pages) - keeping as single result`);
-      }
+        console.log(`📄 Multi-page PDF detected: ${file.name} (${processedResult.all_pages.length} pages) - expanding to individual results`);
+        
+        // Add each page as a separate result
+        for (const pageResult of processedResult.all_pages) {
+          const pageNum = pageResult.pdf_page || 1;
+          const totalPages = pageResult.total_pages || processedResult.all_pages.length;
+          
+          newResults.push({
+            fileName: `${file.name} - Trang ${pageNum}/${totalPages}`,
+            filePath: file.path,
+            previewUrl: null, // PDF pages don't have individual previews
+            isPdf: true,
+            isPdfPage: true,
+            pdfPage: pageNum,
+            totalPdfPages: totalPages,
+            originalPdfName: file.name,
+            // Timing data (shared across all pages)
+            startTime: fileStartTime,
+            endTime: fileEndTime,
+            durationMs: fileDurationMs,
+            durationSeconds: (fileDurationMs / 1000).toFixed(2),
+            // Page-specific data
+            success: pageResult.success,
+            short_code: pageResult.short_code,
+            doc_type: pageResult.doc_type,
+            confidence: pageResult.confidence,
+            reasoning: pageResult.reasoning,
+            metadata: pageResult.metadata,
+            color: pageResult.color,
+            issue_date: pageResult.issue_date,
+            issue_date_confidence: pageResult.issue_date_confidence,
+            method: pageResult.method
+          });
+        }
+        
+        console.log(`✅ Added ${processedResult.all_pages.length} pages from PDF to results`);
+      } else {
+        // Single file or single-page PDF
+        let previewUrl = null;
+        try {
+          const toFileUrl = (p) => (/^[A-Za-z]:\\\\/.test(p) ? 'file:///' + p.replace(/\\\\/g, '/') : 'file://' + p);
+          if (/\.(png|jpg|jpeg|gif|bmp)$/i.test(file.name)) {
+            previewUrl = await window.electronAPI.readImageDataUrl(file.path);
+            if (!previewUrl) previewUrl = toFileUrl(file.path);
+          }
+        } catch (e) {
+          console.warn(`Failed to generate preview for ${file.name}:`, e);
+        }
 
-      newResults.push({
-        fileName: file.name,
-        filePath: file.path,
-        previewUrl,
-        isPdf: /\.pdf$/i.test(file.name),
-        // Timing data
-        startTime: fileStartTime,
-        endTime: fileEndTime,
-        durationMs: fileDurationMs,
-        durationSeconds: (fileDurationMs / 1000).toFixed(2),
-        ...processedResult
-      });
+        newResults.push({
+          fileName: file.name,
+          filePath: file.path,
+          previewUrl,
+          isPdf: /\.pdf$/i.test(file.name),
+          // Timing data
+          startTime: fileStartTime,
+          endTime: fileEndTime,
+          durationMs: fileDurationMs,
+          durationSeconds: (fileDurationMs / 1000).toFixed(2),
+          ...processedResult
+        });
+      }
+      
       setResults([...newResults]);
     }
 

@@ -755,7 +755,8 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
       }
     });
 
-    setTimeout(() => { try { child.kill(); } catch {} reject(new Error('OCR processing timeout (60s)')); }, 60000);
+    // Increased timeout for PDF batch processing (large PDFs may take longer)
+    setTimeout(() => { try { child.kill(); } catch {} reject(new Error('OCR processing timeout (5 minutes)')); }, 300000);
   });
 });
 

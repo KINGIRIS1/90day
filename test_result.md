@@ -2934,3 +2934,88 @@ EXPECTED BEHAVIOR AFTER FIX:
 STATUS: ✅ Fixed, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 USER FEEDBACK - Revert PDF Page Splitting + Add PDF Preview
+================================================================================
+DATE: 2025-01-XX
+FEEDBACK: User không muốn PDF bị tách thành nhiều kết quả riêng lẻ
+
+USER REQUEST:
+-------------
+1. Bỏ phân trang kết quả ở quét file (giữ PDF như 1 kết quả)
+2. Không preview được PDF (cần fix)
+
+SOLUTION IMPLEMENTED:
+---------------------
+1. **Reverted page splitting logic**:
+   - PDF nhiều trang giờ hiển thị như 1 kết quả duy nhất
+   - Thông tin all_pages vẫn được giữ trong result object
+   - User có thể xem chi tiết tất cả trang qua button "📋 Chi tiết"
+
+2. **Added PDF preview handling**:
+   - PDF hiển thị icon 📄 thay vì "không có preview"
+   - Hiển thị số trang PDF
+   - Preview icon màu đỏ nhạt để phân biệt với image
+
+3. **Enhanced UI for PDF**:
+   - Badge "📄 PDF X trang" dưới tên file
+   - Button "📋 Chi tiết" để xem danh sách tất cả pages
+   - Alert popup hiển thị: "Trang 1: DDKBD (95%)", "Trang 2: HDCQ (90%)", etc.
+
+CHANGES:
+--------
+File: /app/desktop-app/src/components/DesktopScanner.js
+
+1. Lines 1855-1890: Reverted to single result
+   - Removed for loop splitting pages
+   - Keep result.all_pages for reference
+   - Added PDF preview URL handling
+
+2. Lines 2685-2700: Enhanced PDF display
+   - Added PDF icon (📄) in preview area
+   - Show "PDF Document" label
+   - Display page count
+
+3. Lines 2696-2701: Added page count badge
+   - Shows "📄 PDF 34 trang" below filename
+
+4. Lines 2708-2735: Added detail button
+   - "📋 Chi tiết" button for multi-page PDFs
+   - Shows all pages with classification in alert
+
+EXPECTED BEHAVIOR:
+------------------
+✅ PDF file shows as 1 result (not 34)
+✅ PDF icon displayed instead of empty preview
+✅ Badge shows "📄 PDF 34 trang"
+✅ Button "📋 Chi tiết" shows all 34 pages with classifications
+✅ Alert format: "Trang 1: DDKBD (95%)\nTrang 2: HDCQ (90%)..."
+
+EXAMPLE OUTPUT:
+---------------
+Result card:
+┌─────────────────────────────┐
+│      📄 PDF Document        │
+│        34 trang             │
+├─────────────────────────────┤
+│ batda.pdf                   │
+│ 📄 PDF 34 trang             │
+│ Method: batch | 95%         │
+│ Loại: Mixed | Mã: MIXED     │
+├─────────────────────────────┤
+│ [📋 Chi tiết] [🗑️ Xóa]      │
+└─────────────────────────────┘
+
+Click "Chi tiết" shows:
+"📄 Chi tiết PDF (34 trang):
+
+Trang 1: DDKBD (95%)
+Trang 2: DDKBD (93%)
+Trang 3: HDCQ (98%)
+...
+Trang 34: GCN (96%)"
+
+STATUS: ✅ Implemented, frontend restarted, awaiting user test
+================================================================================
+

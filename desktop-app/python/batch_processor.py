@@ -15,6 +15,7 @@ import re
 import requests
 from PIL import Image
 import io
+from pdf_splitter import split_pdf_to_pages, cleanup_split_pages
 
 # Import centralized error handler
 try:

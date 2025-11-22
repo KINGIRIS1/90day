@@ -1170,7 +1170,27 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_
     print("🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
-    total_files = len(image_paths)
+    # Step 1: Split any PDF files into individual pages
+    expanded_paths = []
+    pdf_page_map = {}  # Track which pages came from which PDF
+    
+    for path in image_paths:
+        if path.lower().endswith('.pdf'):
+            print(f"📄 Detected PDF: {os.path.basename(path)}", file=sys.stderr)
+            split_pages = split_pdf_to_pages(path)
+            if split_pages:
+                expanded_paths.extend(split_pages)
+                # Track PDF pages for cleanup
+                for page_path in split_pages:
+                    pdf_page_map[page_path] = path
+            else:
+                print(f"⚠️ Failed to split PDF, skipping: {path}", file=sys.stderr)
+        else:
+            # Regular image file
+            expanded_paths.append(path)
+    
+    total_files = len(expanded_paths)
+    print(f"📊 Total files after PDF split: {total_files} ({len(image_paths)} original)", file=sys.stderr)
     
     # Smart batch size strategy WITH user-configurable max
     if total_files <= max_batch_size:

@@ -1861,18 +1861,57 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         }
       } catch {}
 
-      newResults.push({
-        fileName: file.name,
-        filePath: file.path,
-        previewUrl,
-        isPdf: /\.pdf$/i.test(file.name),
-        // Timing data
-        startTime: fileStartTime,
-        endTime: fileEndTime,
-        durationMs: fileDurationMs,
-        durationSeconds: (fileDurationMs / 1000).toFixed(2),
-        ...processedResult
-      });
+      // Check if this is a multi-page PDF result
+      if (processedResult.is_multi_page_pdf && processedResult.all_pages && Array.isArray(processedResult.all_pages)) {
+        console.log(`📄 Multi-page PDF detected: ${file.name} (${processedResult.all_pages.length} pages)`);
+        
+        // Add each page as a separate result
+        for (const pageResult of processedResult.all_pages) {
+          newResults.push({
+            fileName: `${file.name}_page_${pageResult.pdf_page || 'unknown'}`,
+            filePath: file.path,
+            previewUrl,
+            isPdf: true,
+            isPartOfMultiPagePdf: true,
+            originalPdfName: file.name,
+            pdfPage: pageResult.pdf_page,
+            totalPages: pageResult.total_pages,
+            // Timing data (shared across all pages)
+            startTime: fileStartTime,
+            endTime: fileEndTime,
+            durationMs: fileDurationMs,
+            durationSeconds: (fileDurationMs / 1000).toFixed(2),
+            // Page-specific data
+            success: pageResult.success,
+            short_code: pageResult.short_code,
+            doc_type: pageResult.doc_type,
+            confidence: pageResult.confidence,
+            reasoning: pageResult.reasoning,
+            metadata: pageResult.metadata,
+            color: pageResult.color,
+            issue_date: pageResult.issue_date,
+            issue_date_confidence: pageResult.issue_date_confidence,
+            method: pageResult.method
+          });
+        }
+        
+        console.log(`✅ Added ${processedResult.all_pages.length} pages from PDF to results`);
+      } else {
+        // Single file or single-page PDF
+        newResults.push({
+          fileName: file.name,
+          filePath: file.path,
+          previewUrl,
+          isPdf: /\.pdf$/i.test(file.name),
+          // Timing data
+          startTime: fileStartTime,
+          endTime: fileEndTime,
+          durationMs: fileDurationMs,
+          durationSeconds: (fileDurationMs / 1000).toFixed(2),
+          ...processedResult
+        });
+      }
+      
       setResults([...newResults]);
     }
 

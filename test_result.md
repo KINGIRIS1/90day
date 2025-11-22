@@ -3655,3 +3655,96 @@ User cần vào Settings và chọn lại mode:
 4. Click "💾 Lưu cài đặt"
 ================================================================================
 
+
+================================================================================
+🔧 UI IMPROVEMENT - File Picker Shows Both Images AND PDFs
+================================================================================
+DATE: 2025-01-XX
+USER REQUEST: "cho phép chọn cả ảnh và pdf hiện tại đang chia thành 2 loại"
+
+PROBLEM:
+--------
+File picker có 2 filters riêng biệt:
+- Filter 1: Images (jpg, png, gif, bmp, tiff)
+- Filter 2: PDFs (pdf)
+
+User phải:
+1. Mở file picker
+2. Chỉ thấy Images HOẶC PDFs (tùy filter đang chọn)
+3. Phải bấm dropdown đổi filter để thấy loại khác
+4. Không thể chọn cả ảnh và PDF cùng lúc
+
+BAD UX:
+→ Muốn chọn 5 ảnh + 2 PDF → Phải mở picker 2 lần
+
+SOLUTION:
+---------
+Thêm filter "Tất cả file hỗ trợ" làm DEFAULT:
+
+File: /app/desktop-app/public/electron.js (lines 297-306)
+
+BEFORE:
+```javascript
+filters: [
+  { name: 'Images', extensions: ['jpg', 'jpeg', 'png', ...] },
+  { name: 'PDFs', extensions: ['pdf'] }
+]
+```
+
+AFTER:
+```javascript
+filters: [
+  { name: 'Tất cả file hỗ trợ', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'pdf'] },
+  { name: 'Ảnh', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff'] },
+  { name: 'PDF', extensions: ['pdf'] }
+]
+```
+
+HOW IT WORKS:
+-------------
+File picker dropdown giờ có 3 options:
+
+┌─────────────────────────────────┐
+│ File type: [▼ Tất cả file hỗ trợ]│  ← DEFAULT
+├─────────────────────────────────┤
+│ ○ Tất cả file hỗ trợ (jpg, pdf) │  ← Show tất cả
+│ ○ Ảnh (jpg, png, gif, bmp...)   │  ← Only images
+│ ○ PDF (pdf)                      │  ← Only PDFs
+└─────────────────────────────────┘
+
+DEFAULT = "Tất cả file hỗ trợ"
+→ User thấy NGAY cả ảnh và PDF
+→ Có thể chọn nhiều files cùng lúc (images + PDFs)
+
+BENEFITS:
+---------
+✅ Chọn cả ảnh và PDF cùng lúc
+✅ Không phải đổi filter
+✅ Không phải mở picker nhiều lần
+✅ Faster workflow
+✅ Vẫn có option filter riêng nếu cần (Ảnh / PDF)
+
+EXAMPLE USE CASE:
+-----------------
+User có folder:
+- 1.jpg
+- 2.png
+- document.pdf
+- 3.jpg
+- contract.pdf
+
+BEFORE:
+1. Chọn filter "Images" → Chọn 1.jpg, 2.png, 3.jpg
+2. Đóng picker, mở lại
+3. Chọn filter "PDFs" → Chọn document.pdf, contract.pdf
+4. Tổng: 2 lần mở picker
+
+AFTER:
+1. Mở picker (default "Tất cả file hỗ trợ")
+2. Thấy tất cả 5 files
+3. Chọn tất cả hoặc chọn lọc
+4. Done! → 1 lần mở picker
+
+STATUS: ✅ Implemented, frontend restarted, ready to test
+================================================================================
+

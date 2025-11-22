@@ -11,6 +11,7 @@ function CloudSettings() {
   
   // Batch processing mode
   const [batchMode, setBatchMode] = useState('sequential');
+  const [fixedBatchSize, setFixedBatchSize] = useState(8);
   const [smartMaxBatchSize, setSmartMaxBatchSize] = useState(10);
 
   useEffect(() => {

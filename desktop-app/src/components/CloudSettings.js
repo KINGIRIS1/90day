@@ -911,20 +911,20 @@ function CloudSettings() {
                 />
                 <div className="flex-1">
                   <div className="font-medium flex items-center gap-2">
-                    <span>🧠 Gom Thông Minh</span>
-                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">CHÍNH XÁC NHẤT</span>
+                    <span>🧠 Gom Thông Minh ({smartMaxBatchSize} Files)</span>
+                    <span className="bg-green-600 text-white text-xs px-2 py-1 rounded font-bold">ĐỀ XUẤT</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
-                    • AI tự detect ranh giới documents<br />
-                    • <strong>🎯 Chính xác nhất (97%+)</strong> - AI hiểu full context<br />
-                    • <strong>⚡ Nhanh hơn 7-9 lần</strong><br />
-                    • <strong>💰 Tiết kiệm 85-90% chi phí</strong><br />
-                    • Phù hợp: Multi-page documents khác nhau (20-100 files)
+                    • AI tự động gom files và detect ranh giới<br />
+                    • <strong>🎯 Chính xác cao (95%+)</strong> - AI hiểu full context<br />
+                    • <strong>⚡ Nhanh hơn 5-10 lần</strong><br />
+                    • <strong>💰 Tiết kiệm 80-90% chi phí</strong><br />
+                    • Phù hợp: Hầu hết trường hợp (10-200 files)
                   </div>
                 </div>
               </label>
               
-              {/* Smart Mode Max Batch Size Setting */}
+              {/* Smart Mode Batch Size Setting */}
               {batchMode === 'smart' && (
                 <div className="ml-11 mt-3 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <label className="block text-sm font-medium text-gray-900 mb-3">

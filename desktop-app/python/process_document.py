@@ -135,14 +135,15 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     print(f"   ✅ batch_classify_fixed completed, processing {len(batch_result.get('results', []))} results", file=sys.stderr)
                 elif batch_mode == 'smart':
                     # Smart mode - Auto batch size optimization
-                    print(f"   Mode: Smart (auto batch size)", file=sys.stderr)
+                    max_batch_size = int(os.environ.get('BATCH_SIZE', '8'))
+                    print(f"   Mode: Smart (max batch size {max_batch_size})", file=sys.stderr)
                     
                     batch_result = batch_classify_smart(
                         image_paths=image_pages,
                         api_key=cloud_api_key,
                         engine_type=ocr_engine_type,
                         last_known_type=None,
-                        max_batch_size=8
+                        max_batch_size=max_batch_size
                     )
                     print(f"   ✅ batch_classify_smart completed, processing {len(batch_result.get('results', []))} results", file=sys.stderr)
                 else:

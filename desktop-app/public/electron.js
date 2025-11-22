@@ -799,16 +799,35 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
   console.log('📊 Group details:', Object.entries(groups).map(([k, v]) => `${k}: ${v.length} files`).join(', '));
   
   const results = [];
-  for (const [shortCode, filePaths] of Object.entries(groups)) {
+  for (const [shortCode, itemsInGroup] of Object.entries(groups)) {
     try {
       const outPdf = await PDFDocument.create();
-      for (const fp of filePaths) {
+      
+      for (const item of itemsInGroup) {
+        const fp = item.filePath;
         const ext = path.extname(fp).toLowerCase();
         const bytes = fs.readFileSync(fp);
+        
         if (ext === '.pdf') {
           const srcPdf = await PDFDocument.load(bytes);
-          const copiedPages = await outPdf.copyPages(srcPdf, srcPdf.getPageIndices());
-          copiedPages.forEach((p) => outPdf.addPage(p));
+          
+          // Check if this is a specific PDF page (from multi-page PDF scan)
+          if (item.isPdfPage && item.pdfPage !== undefined) {
+            // Copy only the specific page (pdfPage is 1-based, array is 0-based)
+            const pageIndex = item.pdfPage - 1;
+            if (pageIndex >= 0 && pageIndex < srcPdf.getPageCount()) {
+              const [copiedPage] = await outPdf.copyPages(srcPdf, [pageIndex]);
+              outPdf.addPage(copiedPage);
+              console.log(`   ✅ Copied page ${item.pdfPage} from ${path.basename(fp)}`);
+            } else {
+              console.warn(`   ⚠️ Invalid page index ${item.pdfPage} for ${fp}`);
+            }
+          } else {
+            // Regular PDF file - copy all pages
+            const copiedPages = await outPdf.copyPages(srcPdf, srcPdf.getPageIndices());
+            copiedPages.forEach((p) => outPdf.addPage(p));
+            console.log(`   ✅ Copied all ${srcPdf.getPageCount()} pages from ${path.basename(fp)}`);
+          }
         } else if (['.jpg', '.jpeg', '.png', '.bmp', '.gif'].includes(ext)) {
           const img = ext === '.png' ? await outPdf.embedPng(bytes) : await outPdf.embedJpg(bytes);
           const { width, height } = img.size();

@@ -803,10 +803,18 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
     try {
       const outPdf = await PDFDocument.create();
       
+      console.log(`\n📦 Processing group: ${shortCode}`);
+      console.log(`   Items in group: ${itemsInGroup.length}`);
+      
       for (const item of itemsInGroup) {
         const fp = item.filePath;
         const ext = path.extname(fp).toLowerCase();
         const bytes = fs.readFileSync(fp);
+        
+        console.log(`   📄 Item: ${path.basename(fp)}`);
+        console.log(`      isPdfPage: ${item.isPdfPage}`);
+        console.log(`      pdfPage: ${item.pdfPage}`);
+        console.log(`      totalPdfPages: ${item.totalPdfPages}`);
         
         if (ext === '.pdf') {
           const srcPdf = await PDFDocument.load(bytes);

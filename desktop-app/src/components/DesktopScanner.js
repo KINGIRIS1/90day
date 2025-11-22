@@ -2755,23 +2755,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 
                 {/* Action Buttons */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {/* PDF Detail Button */}
-                  {result.is_multi_page_pdf && result.all_pages && (
-                    <button
-                      onClick={() => {
-                        const pageList = result.all_pages.map((p, i) => 
-                          `Trang ${p.pdf_page || i+1}: ${p.short_code} (${(p.confidence * 100).toFixed(0)}%)`
-                        ).join('\n');
-                        alert(`📄 Chi tiết PDF (${result.all_pages.length} trang):\n\n${pageList}`);
-                      }}
-                      className="flex-1 min-w-[100px] text-xs text-purple-600 hover:bg-purple-50 py-1.5 px-3 rounded border border-purple-200 font-medium"
-                    >
-                      📋 Chi tiết
-                    </button>
-                  )}
-                  
-                  {/* Preview/Zoom Button - Always show for images */}
-                  {!result.isPdf && (
+                  {/* Preview/Zoom Button - Show for images only (not PDF pages) */}
+                  {!result.isPdf && !result.isPdfPage && (
                     <button
                       onClick={() => {
                         if (result.previewUrl) {
@@ -2790,11 +2775,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   {/* Delete Button */}
                   <button
                     onClick={() => {
-                      if (window.confirm(`Xóa file "${result.fileName}"?`)) {
+                      if (window.confirm(`Xóa "${result.fileName}"?`)) {
                         setResults(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
-                    className="flex-1 min-w-[80px] text-xs text-red-600 hover:bg-red-50 py-1.5 px-3 rounded border border-red-200 font-medium"
+                    className="flex-1 min-w-[100px] text-xs text-red-600 hover:bg-red-50 py-1.5 px-3 rounded border border-red-200 font-medium"
                   >
                     🗑️ Xóa
                   </button>

@@ -106,28 +106,50 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
             num_pages = len(image_pages)
             print(f"✅ PDF converted: {num_pages} page(s)", file=sys.stderr)
             
-            # Process each page separately
+            # Process all pages using BATCH MODE (much faster!)
             try:
+                print(f"\n🚀 Processing {num_pages} pages using BATCH MODE...", file=sys.stderr)
+                
+                # Use batch processor instead of sequential processing
+                from batch_processor import batch_classify_smart
+                
+                batch_result = batch_classify_smart(
+                    image_paths=image_pages,
+                    api_key=cloud_api_key,
+                    engine_type=ocr_engine_type,
+                    last_known_type=None,
+                    max_batch_size=8
+                )
+                
+                if not batch_result or 'results' not in batch_result:
+                    return {
+                        "success": False,
+                        "error": "Batch processing failed",
+                        "method": "batch_error"
+                    }
+                
+                # Map batch results to page results
                 results = []
-                for page_num, page_path in enumerate(image_pages, 1):
-                    print(f"\n📄 Processing page {page_num}/{num_pages}...", file=sys.stderr)
-                    
-                    # Recursively call process_document for each page image
-                    page_result = process_document(
-                        file_path=page_path,
-                        ocr_engine_type=ocr_engine_type,
-                        cloud_api_key=cloud_api_key,
-                        cloud_endpoint=cloud_endpoint
-                    )
-                    
-                    # Add page info
-                    page_result['pdf_page'] = page_num
-                    page_result['total_pages'] = num_pages
-                    page_result['original_pdf'] = file_path
-                    
+                batch_results = batch_result['results']
+                
+                for page_num, batch_item in enumerate(batch_results, 1):
+                    page_result = {
+                        'success': batch_item.get('success', True),
+                        'short_code': batch_item.get('short_code', 'UNKNOWN'),
+                        'doc_type': batch_item.get('doc_type', 'UNKNOWN'),
+                        'confidence': batch_item.get('confidence', 0.5),
+                        'reasoning': batch_item.get('reasoning', ''),
+                        'metadata': batch_item.get('metadata', {}),
+                        'color': batch_item.get('metadata', {}).get('color'),
+                        'issue_date': batch_item.get('metadata', {}).get('issue_date'),
+                        'issue_date_confidence': batch_item.get('metadata', {}).get('issue_date_confidence'),
+                        'method': f"batch_pdf_page_{page_num}",
+                        'pdf_page': page_num,
+                        'total_pages': num_pages,
+                        'original_pdf': file_path
+                    }
                     results.append(page_result)
-                    
-                    print(f"   ✅ Page {page_num}: {page_result.get('short_code', 'UNKNOWN')}", file=sys.stderr)
+                    print(f"   ✅ Page {page_num}/{num_pages}: {page_result['short_code']}", file=sys.stderr)
                 
                 # Return results for all pages
                 print(f"\n✅ PDF processing complete: {num_pages} page(s)", file=sys.stderr)

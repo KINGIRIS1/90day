@@ -2760,3 +2760,59 @@ STATUS: ✅ Fixed | ⏳ Awaiting User Testing
 NOTE: This is the REAL fix for the classification issues reported by user.
       The previous "sequential pairing" fix was addressing a symptom, not root cause.
 
+
+================================================================================
+🔧 CRITICAL FIX - PDF Batch Processing Timeout Issue
+================================================================================
+DATE: 2025-01-XX
+ISSUE: PDF batch processing stops early, returns incomplete results
+
+ROOT CAUSE:
+-----------
+Electron's 60-second timeout in electron.js (line 758) was killing the Python 
+process before it could complete processing all batches of large PDF files.
+
+Timeline of issue:
+- User scans 34-page PDF
+- PDF split into 34 images (~3 seconds)
+- Batch 1 (pages 0-7) processes successfully (~15 seconds)
+- Batch 2 (pages 8-15) starts processing (~15 seconds)
+- **At 60 seconds**: Timeout triggers, kills Python process
+- Electron receives INCOMPLETE results (only batch 1)
+- Log shows "starting batch 2" but process killed before completion
+
+SOLUTION:
+---------
+Increased timeout from 60 seconds to 300 seconds (5 minutes)
+
+File: /app/desktop-app/public/electron.js
+Line 758 (now 759):
+BEFORE: setTimeout(() => { ... }, 60000);  // 60 seconds
+AFTER:  setTimeout(() => { ... }, 300000); // 300 seconds (5 minutes)
+
+IMPACT:
+-------
+✅ Large PDFs (up to 100+ pages) can now be fully processed
+✅ No more early termination mid-batch
+✅ Better user experience with complete results
+
+ADDITIONAL IMPROVEMENTS:
+------------------------
+Added progress logging in process_document.py to track batch completion:
+- Line 136: Log after batch_classify_fixed completes
+- Line 147: Log after batch_classify_smart completes
+
+This helps with debugging and gives visibility into batch processing status.
+
+TESTING RECOMMENDATION:
+-----------------------
+1. Test with PDF files of varying sizes:
+   - Small: 5-10 pages (should complete in <30s)
+   - Medium: 20-30 pages (should complete in 60-90s)
+   - Large: 50-100 pages (should complete in 150-250s)
+2. Monitor logs to ensure all batches complete
+3. Verify all pages appear in results
+
+STATUS: ✅ Fixed, awaiting user testing
+================================================================================
+

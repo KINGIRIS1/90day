@@ -1082,6 +1082,20 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
     
     print(f"{'='*80}", file=sys.stderr)
     
+    # Map results back to original PDF names and cleanup
+    if pdf_page_map:
+        for result in all_results:
+            file_path = result.get('file_path', '')
+            if file_path in pdf_page_map:
+                # This was a split PDF page - update file_path to original PDF
+                original_pdf = pdf_page_map[file_path]
+                result['original_pdf'] = original_pdf
+                result['is_pdf_page'] = True
+        
+        # Cleanup temporary PDF pages
+        cleanup_split_pages(list(pdf_page_map.keys()))
+        print(f"🧹 Cleaned up {len(pdf_page_map)} temporary PDF page images", file=sys.stderr)
+    
     # Return results AND lastKnown for next batch
     return {
         'results': all_results,

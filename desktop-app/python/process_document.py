@@ -183,16 +183,25 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     # Skip batch result processing
                     batch_result = None
                 
-                if not batch_result or 'results' not in batch_result:
+                # Check if batch processing was used (not sequential mode)
+                if batch_result and 'results' in batch_result:
+                    # Map batch results to page results
+                    results = []
+                    batch_results = batch_result['results']
+                elif batch_result is None and results:
+                    # Sequential mode - results already populated above
+                    pass
+                else:
+                    # Batch processing failed
                     return {
                         "success": False,
                         "error": "Batch processing failed",
                         "method": "batch_error"
                     }
                 
-                # Map batch results to page results
-                results = []
-                batch_results = batch_result['results']
+                # Process batch results (if not sequential mode)
+                if batch_result and 'results' in batch_result:
+                    batch_results = batch_result['results']
                 
                 for page_num, batch_item in enumerate(batch_results, 1):
                     page_result = {

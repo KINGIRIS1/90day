@@ -554,7 +554,7 @@ def batch_classify_tesseract_text(image_paths, api_key, last_known_type=None):
 
 
 
-def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=8, last_known_type=None):
+def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch_size=8, last_known_type=None, skip_pdf_conversion=False):
     """
     Phương án 1: Fixed Batch Size với SEQUENTIAL METADATA
     
@@ -564,6 +564,7 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
         engine_type: 'gemini-flash', 'gemini-flash-lite', or 'gemini-flash-hybrid'
         batch_size: Files per batch
         last_known_type: Metadata từ file cuối batch trước {short_code, confidence, has_title}
+        skip_pdf_conversion: If True, skip PDF conversion (already done by caller)
     
     Strategy:
         - Batch 1: Process files 0-4, return lastKnown từ file 4

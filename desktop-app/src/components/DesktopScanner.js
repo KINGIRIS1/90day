@@ -2282,7 +2282,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
     try {
       const payload = results
         .filter(r => r.success && r.short_code)
-        .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+        .map(r => ({ 
+          filePath: r.filePath, 
+          short_code: r.short_code,
+          isPdfPage: r.isPdfPage,
+          pdfPage: r.pdfPage,
+          totalPdfPages: r.totalPdfPages
+        }));
 
       if (payload.length === 0) {
         alert('Không có trang hợp lệ để gộp.');

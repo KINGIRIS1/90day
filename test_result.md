@@ -3418,3 +3418,145 @@ TESTING:
 STATUS: ✅ Fixed, frontend restarted, awaiting user test
 ================================================================================
 
+
+================================================================================
+🔧 CRITICAL FIX - Fixed Batch Size Setting Was Missing
+================================================================================
+DATE: 2025-01-XX
+ISSUE: Đang ở cài đặt fixed 5 nhưng khi quét vẫn quét 8
+
+ROOT CAUSE:
+-----------
+Settings UI KHÔNG CÓ option để chỉnh Fixed Batch Size!
+
+CloudSettings.js chỉ có:
+- batchMode: sequential / fixed / smart ✅
+- smartMaxBatchSize: For smart mode only ✅
+- fixedBatchSize: MISSING ❌
+
+Result: Fixed mode luôn dùng batch size = 8 (hardcoded default)
+
+USER EXPERIENCE ISSUE:
+----------------------
+User vào Settings → OCR Settings → Chọn "Fixed mode"
+→ KHÔNG CÓ slider để chọn batch size cho Fixed mode
+→ Chỉ có slider cho Smart mode
+→ User không thể thay đổi Fixed batch size
+
+SOLUTION:
+---------
+
+1. **Add fixedBatchSize state** (CloudSettings.js):
+```javascript
+const [fixedBatchSize, setFixedBatchSize] = useState(8);
+```
+
+2. **Load fixedBatchSize from config**:
+```javascript
+const fixedBatchSizeConfig = await window.electronAPI.getConfig('batchSize');
+setFixedBatchSize(fixedBatchSizeConfig || 8);
+```
+
+3. **Save fixedBatchSize to config**:
+```javascript
+await window.electronAPI.setConfig('batchSize', fixedBatchSize);
+```
+
+4. **Add UI slider for Fixed mode**:
+```jsx
+{batchMode === 'fixed' && (
+  <div className="ml-11 mt-3 p-4 bg-blue-50">
+    <label>
+      ⚙️ Số file mỗi batch: <span>{fixedBatchSize}</span>
+    </label>
+    <input
+      type="range"
+      min="3"
+      max="20"
+      value={fixedBatchSize}
+      onChange={(e) => setFixedBatchSize(parseInt(e.target.value))}
+    />
+    <div>3 (An toàn) | 8 (Đề xuất) | 20 (Nhanh nhất)</div>
+  </div>
+)}
+```
+
+5. **Update radio button label**:
+```jsx
+<span>📦 Gom Cố Định ({fixedBatchSize} Files)</span>
+```
+
+CHANGES:
+--------
+File: /app/desktop-app/src/components/CloudSettings.js
+
+1. Line 14: Added `const [fixedBatchSize, setFixedBatchSize] = useState(8);`
+2. Lines 42-43: Load fixedBatchSize from config
+3. Line 51: Set fixedBatchSize state
+4. Line 93: Save fixedBatchSize to config
+5. Lines 914-918: Updated label to show dynamic batch size
+6. Lines 925-946: Added slider UI for Fixed batch size
+
+UI BEFORE:
+----------
+Fixed Mode:
+┌─────────────────────────────────┐
+│ ○ 📦 Gom Cố Định (5 Files)      │
+│   • Gom mỗi 5 files...          │
+└─────────────────────────────────┘
+(No slider, always 8)
+
+UI AFTER:
+---------
+Fixed Mode:
+┌─────────────────────────────────┐
+│ ● 📦 Gom Cố Định (5 Files)      │
+│   • Gom mỗi 5 files...          │
+│                                 │
+│ ⚙️ Số file mỗi batch: 5         │
+│ [===|--------] 3 → 8 → 20       │
+│                                 │
+│ 💡 Gợi ý:                       │
+│ • 3-5: An toàn                  │
+│ • 8: Cân bằng (đề xuất)         │
+│ • 10-15: Nhanh hơn              │
+│ • 16-20: Nhanh nhất             │
+└─────────────────────────────────┘
+
+HOW TO USE:
+-----------
+1. Vào Settings → OCR Settings
+2. Chọn "📦 Gom Cố Định"
+3. Kéo slider để chọn batch size (3-20)
+4. Click "💾 Lưu cài đặt"
+5. Quét PDF hoặc folder → batch size sẽ đúng
+
+EXPECTED BEHAVIOR:
+------------------
+Settings: Fixed mode, batch size = 5
+Log khi quét:
+```
+🚀 Processing 34 pages using BATCH MODE (fixed)...
+   User settings: mode=fixed, batch_size=5
+   Mode: Fixed (batch size 5)
+🤖 BATCH MODE: Fixed (5 files, NO overlap) + Flash FULL
+📦 Batch 1: Files 0-4 (5 images)
+📦 Batch 2: Files 5-9 (5 images)
+...
+```
+
+STATUS: ✅ Fixed, frontend restarted, awaiting user test
+
+IMPORTANT NOTE:
+---------------
+User PHẢI vào Settings và SAVE lại settings sau khi update này!
+Vì lần đầu tiên có setting mới, cần save để lưu vào config store.
+
+ACTION REQUIRED:
+----------------
+1. Vào Settings → OCR Settings
+2. Kéo slider Fixed batch size về 5
+3. Click "💾 Lưu cài đặt"
+4. Test lại quét PDF
+================================================================================
+

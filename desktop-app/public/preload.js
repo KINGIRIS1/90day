@@ -48,6 +48,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getImagesInFolder: (folderPath) => ipcRenderer.invoke('get-images-in-folder', folderPath),
   preFilterGCNFiles: (files) => ipcRenderer.invoke('pre-filter-gcn-files', files),
   mergeFolderPdfs: (mergeData) => ipcRenderer.invoke('merge-folder-pdfs', mergeData),
+  
+  // Open external files
+  openExternal: (filePath) => ipcRenderer.invoke('open-external', filePath),
 
   setBackendUrl: (url) => ipcRenderer.invoke('set-backend-url', url),
   

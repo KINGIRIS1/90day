@@ -2706,7 +2706,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
               .map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white">
                 <div className="mb-2">
-                  {previewsEnabled && result.previewUrl && !result.isPdf ? (
+                  {previewsEnabled && result.previewUrl ? (
                     <img src={result.previewUrl} alt={result.fileName} className="w-full h-40 object-contain border rounded bg-gray-50" />
                   ) : !previewsEnabled ? (
                     <div className="w-full h-40 flex items-center justify-center border rounded text-xs text-gray-500 bg-gray-50">
@@ -2717,6 +2717,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                       <div className="text-4xl mb-2">📄</div>
                       <div className="text-xs font-medium">Trang {result.pdfPage}/{result.totalPdfPages}</div>
                       <div className="text-xs text-gray-500 mt-1">{result.originalPdfName}</div>
+                      <div className="text-xs text-orange-600 mt-1">Bật preview để xem</div>
                     </div>
                   ) : result.isPdf ? (
                     <div className="w-full h-40 flex flex-col items-center justify-center border rounded text-gray-600 bg-red-50">

@@ -118,24 +118,8 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                 # Use batch processor instead of sequential processing
                 from batch_processor import batch_classify_smart, batch_classify_fixed
                 
-                # Determine which mode to use based on settings
-                use_fixed_mode = (batch_mode == 'fixed')
-                
-                if use_fixed_mode:
-                    # Fixed mode - Use configured batch size from settings
-                    batch_size = int(os.environ.get('BATCH_SIZE', '8'))
-                    print(f"   Mode: Fixed (batch size {batch_size})", file=sys.stderr)
-                    
-                    batch_result = batch_classify_fixed(
-                        image_paths=image_pages,
-                        api_key=cloud_api_key,
-                        engine_type=ocr_engine_type,
-                        batch_size=batch_size,
-                        last_known_type=None,
-                        skip_pdf_conversion=True  # Already converted
-                    )
-                    print(f"   ✅ batch_classify_fixed completed, processing {len(batch_result.get('results', []))} results", file=sys.stderr)
-                elif batch_mode == 'smart':
+                # Use smart mode for batch processing
+                if batch_mode == 'smart':
                     # Smart mode - Auto batch size optimization
                     max_batch_size = int(os.environ.get('BATCH_SIZE', '8'))
                     print(f"   Mode: Smart (max batch size {max_batch_size})", file=sys.stderr)

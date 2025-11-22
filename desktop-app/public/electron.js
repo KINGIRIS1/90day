@@ -910,7 +910,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         try {
           fs.writeFileSync(outputPath, Buffer.from(pdfBytes));
           console.log(`   ✅ PDF written successfully: ${outputPath}`);
-          results.push({ short_code: shortCode, path: outputPath, count: filePaths.length, success: true, autoSaved: true });
+          results.push({ short_code: shortCode, path: outputPath, count: itemsInGroup.length, success: true, autoSaved: true });
         } catch (writeErr) {
           console.error(`   ❌ Failed to write PDF: ${writeErr.message}`);
           throw new Error(`Cannot write PDF to: ${outputPath} - ${writeErr.message}`);

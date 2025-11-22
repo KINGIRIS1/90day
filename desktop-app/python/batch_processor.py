@@ -1099,6 +1099,13 @@ def batch_classify_fixed(image_paths, api_key, engine_type='gemini-flash', batch
                 original_pdf = pdf_page_map[file_path]
                 result['original_pdf'] = original_pdf
                 result['is_pdf_page'] = True
+                
+                # Extract page number from filename (e.g., "doc_page2.jpg" → 2)
+                file_name = result.get('file_name', '')
+                import re
+                page_match = re.search(r'_page(\d+)', file_name)
+                if page_match:
+                    result['pdf_page'] = int(page_match.group(1))
         
         # Cleanup temporary PDF pages
         cleanup_split_pages(list(pdf_page_map.keys()))

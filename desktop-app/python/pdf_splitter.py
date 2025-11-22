@@ -112,17 +112,27 @@ if __name__ == "__main__":
         print(f"Error: File not found: {pdf_file}")
         sys.exit(1)
     
-    # Split PDF
-    pages = split_pdf_to_pages(pdf_file)
+    # Convert PDF to images
+    print("\n" + "="*60)
+    print("Testing PDF to Image Conversion")
+    print("="*60)
     
-    if pages:
-        print(f"\nSplit pages:")
-        for page in pages:
-            print(f"  - {page}")
+    images = split_pdf_to_images(pdf_file, dpi=200)
+    
+    if images:
+        print(f"\n✅ Conversion successful!")
+        print(f"\nConverted images:")
+        total_size = 0
+        for img_path in images:
+            size = os.path.getsize(img_path) / 1024
+            total_size += size
+            print(f"  - {os.path.basename(img_path)} ({size:.1f} KB)")
+        print(f"\nTotal size: {total_size:.1f} KB")
         
         # Optional: Clean up
         input("\nPress Enter to clean up temporary files...")
-        cleanup_split_pages(pages)
+        cleanup_split_pages(images)
+        print("✅ Cleanup complete")
     else:
-        print("Failed to split PDF")
+        print("❌ Failed to convert PDF")
         sys.exit(1)

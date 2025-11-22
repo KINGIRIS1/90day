@@ -3498,7 +3498,13 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   for (const ct of tabsToMerge) {
                     const payload = (ct.results || [])
                       .filter(r => r.success && r.short_code)
-                      .map(r => ({ filePath: r.filePath, short_code: r.short_code }));
+                      .map(r => ({ 
+                        filePath: r.filePath, 
+                        short_code: r.short_code,
+                        isPdfPage: r.isPdfPage,
+                        pdfPage: r.pdfPage,
+                        totalPdfPages: r.totalPdfPages
+                      }));
                     if (payload.length === 0) continue;
                     
                     // Each folder has its own parentFolder (ct.path)

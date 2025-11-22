@@ -145,6 +145,7 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                         last_known_type=None,
                         max_batch_size=8
                     )
+                    print(f"   ✅ batch_classify_smart completed, processing {len(batch_result.get('results', []))} results", file=sys.stderr)
                 else:
                     # Sequential mode - Process one by one (slowest but most accurate)
                     print(f"   Mode: Sequential (one by one)", file=sys.stderr)

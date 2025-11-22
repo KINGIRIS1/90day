@@ -2640,12 +2640,12 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             </div>
           )}
           
-          {/* Pagination controls */}
-          {results.length > ITEMS_PER_PAGE && (
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between">
+          {/* Preview toggle (pagination removed per user request) */}
+          {results.length > 0 && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="text-sm text-gray-700">
-                  ⚠️ Hiển thị {Math.min(currentPage * ITEMS_PER_PAGE, results.length)}/{results.length} files (giới hạn {ITEMS_PER_PAGE}/trang)
+                  📊 Hiển thị tất cả {results.length} kết quả
                 </div>
                 <button
                   onClick={() => setPreviewsEnabled(!previewsEnabled)}
@@ -2655,31 +2655,11 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                   {previewsEnabled ? '🖼️ Preview ON' : '🖼️ Preview OFF'}
                 </button>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 text-sm bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
-                >
-                  ← Trước
-                </button>
-                <span className="text-sm text-gray-600">
-                  Trang {currentPage}/{Math.ceil(results.length / ITEMS_PER_PAGE)}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(p => Math.min(Math.ceil(results.length / ITEMS_PER_PAGE), p + 1))}
-                  disabled={currentPage >= Math.ceil(results.length / ITEMS_PER_PAGE)}
-                  className="px-3 py-1 text-sm bg-white border rounded hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Sau →
-                </button>
-              </div>
             </div>
           )}
           
           <div className={`grid gap-3 ${gridColsClass}`}>
             {results
-              .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
               .map((result, idx) => (
               <div key={idx} className="p-3 border rounded-lg bg-white">
                 <div className="mb-2">

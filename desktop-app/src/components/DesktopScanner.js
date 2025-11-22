@@ -2716,7 +2716,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="mt-2 flex gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {/* PDF Detail Button */}
                   {result.is_multi_page_pdf && result.all_pages && (
                     <button
                       onClick={() => {
@@ -2725,26 +2726,37 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                         ).join('\n');
                         alert(`📄 Chi tiết PDF (${result.all_pages.length} trang):\n\n${pageList}`);
                       }}
-                      className="flex-1 text-xs text-purple-600 hover:bg-purple-50 py-1 px-2 rounded border border-purple-200"
+                      className="flex-1 min-w-[100px] text-xs text-purple-600 hover:bg-purple-50 py-1.5 px-3 rounded border border-purple-200 font-medium"
                     >
                       📋 Chi tiết
                     </button>
                   )}
-                  {result.previewUrl && !result.isPdf && (
+                  
+                  {/* Preview/Zoom Button - Always show for images */}
+                  {!result.isPdf && (
                     <button
-                      onClick={() => setSelectedPreview(result.previewUrl)}
-                      className="flex-1 text-xs text-blue-600 hover:bg-blue-50 py-1 px-2 rounded border border-blue-200"
+                      onClick={() => {
+                        if (result.previewUrl) {
+                          setSelectedPreview(result.previewUrl);
+                        } else {
+                          alert('Preview chưa được load. Vui lòng bật Preview ON để xem ảnh.');
+                        }
+                      }}
+                      className="flex-1 min-w-[100px] text-xs text-blue-600 hover:bg-blue-50 py-1.5 px-3 rounded border border-blue-200 font-medium"
+                      disabled={!result.previewUrl}
                     >
                       🔍 Phóng to
                     </button>
                   )}
+                  
+                  {/* Delete Button */}
                   <button
                     onClick={() => {
                       if (window.confirm(`Xóa file "${result.fileName}"?`)) {
                         setResults(prev => prev.filter((_, i) => i !== idx));
                       }
                     }}
-                    className="flex-1 text-xs text-red-600 hover:bg-red-50 py-1 px-2 rounded border border-red-200"
+                    className="flex-1 min-w-[80px] text-xs text-red-600 hover:bg-red-50 py-1.5 px-3 rounded border border-red-200 font-medium"
                   >
                     🗑️ Xóa
                   </button>

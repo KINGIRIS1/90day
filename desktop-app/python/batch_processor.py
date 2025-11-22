@@ -1170,27 +1170,39 @@ def batch_classify_smart(image_paths, api_key, engine_type='gemini-flash', last_
     print("🧠 BATCH MODE 2: Smart Batching (AI Document Detection)", file=sys.stderr)
     print(f"{'='*80}", file=sys.stderr)
     
-    # Step 1: Split any PDF files into individual pages
+    # Step 1: Convert PDF files to images
     expanded_paths = []
-    pdf_page_map = {}  # Track which pages came from which PDF
+    pdf_page_map = {}  # Track which images came from which PDF
     
     for path in image_paths:
         if path.lower().endswith('.pdf'):
-            print(f"📄 Detected PDF: {os.path.basename(path)}", file=sys.stderr)
-            split_pages = split_pdf_to_pages(path)
-            if split_pages:
-                expanded_paths.extend(split_pages)
-                # Track PDF pages for cleanup
-                for page_path in split_pages:
-                    pdf_page_map[page_path] = path
+            print(f"\n📄 PDF detected: {os.path.basename(path)}", file=sys.stderr)
+            print(f"   Converting PDF pages to images...", file=sys.stderr)
+            
+            # Convert PDF pages to images (JPEG format)
+            image_pages = split_pdf_to_pages(path)
+            
+            if image_pages:
+                print(f"   ✅ Converted {len(image_pages)} page(s) to images", file=sys.stderr)
+                expanded_paths.extend(image_pages)
+                # Track image pages for cleanup later
+                for img_path in image_pages:
+                    pdf_page_map[img_path] = path
             else:
-                print(f"⚠️ Failed to split PDF, skipping: {path}", file=sys.stderr)
+                print(f"   ⚠️ Failed to convert PDF, skipping: {path}", file=sys.stderr)
         else:
-            # Regular image file
+            # Regular image file - add as-is
             expanded_paths.append(path)
     
     total_files = len(expanded_paths)
-    print(f"📊 Total files after PDF split: {total_files} ({len(image_paths)} original)", file=sys.stderr)
+    original_count = len(image_paths)
+    pdf_count = len([p for p in image_paths if p.lower().endswith('.pdf')])
+    
+    if pdf_count > 0:
+        print(f"\n📊 File expansion: {original_count} files → {total_files} images", file=sys.stderr)
+        print(f"   ({pdf_count} PDF(s) converted to {len(pdf_page_map)} image page(s))", file=sys.stderr)
+    else:
+        print(f"\n📊 Total files: {total_files} images", file=sys.stderr)
     
     # Smart batch size strategy WITH user-configurable max
     if total_files <= max_batch_size:

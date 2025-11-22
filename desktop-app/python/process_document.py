@@ -204,23 +204,23 @@ def process_document(file_path: str, ocr_engine_type: str = 'tesseract', cloud_a
                     batch_results = batch_result['results']
                 
                     for page_num, batch_item in enumerate(batch_results, 1):
-                    page_result = {
-                        'success': batch_item.get('success', True),
-                        'short_code': batch_item.get('short_code', 'UNKNOWN'),
-                        'doc_type': batch_item.get('doc_type', 'UNKNOWN'),
-                        'confidence': batch_item.get('confidence', 0.5),
-                        'reasoning': batch_item.get('reasoning', ''),
-                        'metadata': batch_item.get('metadata', {}),
-                        'color': batch_item.get('metadata', {}).get('color'),
-                        'issue_date': batch_item.get('metadata', {}).get('issue_date'),
-                        'issue_date_confidence': batch_item.get('metadata', {}).get('issue_date_confidence'),
-                        'method': f"batch_pdf_page_{page_num}",
-                        'pdf_page': page_num,
-                        'total_pages': num_pages,
-                        'original_pdf': file_path
-                    }
-                    results.append(page_result)
-                    print(f"   ✅ Page {page_num}/{num_pages}: {page_result['short_code']}", file=sys.stderr)
+                        page_result = {
+                            'success': batch_item.get('success', True),
+                            'short_code': batch_item.get('short_code', 'UNKNOWN'),
+                            'doc_type': batch_item.get('doc_type', 'UNKNOWN'),
+                            'confidence': batch_item.get('confidence', 0.5),
+                            'reasoning': batch_item.get('reasoning', ''),
+                            'metadata': batch_item.get('metadata', {}),
+                            'color': batch_item.get('metadata', {}).get('color'),
+                            'issue_date': batch_item.get('metadata', {}).get('issue_date'),
+                            'issue_date_confidence': batch_item.get('metadata', {}).get('issue_date_confidence'),
+                            'method': f"batch_pdf_page_{page_num}",
+                            'pdf_page': page_num,
+                            'total_pages': num_pages,
+                            'original_pdf': file_path
+                        }
+                        results.append(page_result)
+                        print(f"   ✅ Page {page_num}/{num_pages}: {page_result['short_code']}", file=sys.stderr)
                 
                 # Return results for all pages
                 print(f"\n✅ PDF processing complete: {num_pages} page(s)", file=sys.stderr)

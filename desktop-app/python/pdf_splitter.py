@@ -9,56 +9,73 @@ import tempfile
 from pdf2image import convert_from_path
 from PIL import Image
 
-def split_pdf_to_pages(pdf_path):
+def split_pdf_to_images(pdf_path, dpi=200):
     """
-    Split a multi-page PDF into separate single-page PDF files
+    Convert PDF pages to JPEG images
     
     Args:
         pdf_path: Path to the input PDF file
+        dpi: Resolution for conversion (default 200, good balance between quality and size)
         
     Returns:
-        List of paths to the split PDF pages
+        List of paths to the converted image files
         
     Example:
-        input.pdf (3 pages) → [input_page1.pdf, input_page2.pdf, input_page3.pdf]
+        input.pdf (3 pages) → [input_page1.jpg, input_page2.jpg, input_page3.jpg]
     """
     try:
-        print(f"📄 Splitting PDF: {pdf_path}", file=sys.stderr)
+        print(f"📄 Converting PDF to images: {pdf_path}", file=sys.stderr)
+        print(f"   DPI: {dpi} (higher = better quality but larger files)", file=sys.stderr)
         
-        # Read the PDF
-        reader = PdfReader(pdf_path)
-        num_pages = len(reader.pages)
+        # Convert PDF pages to PIL images
+        images = convert_from_path(pdf_path, dpi=dpi)
+        num_pages = len(images)
         
         print(f"   Pages: {num_pages}", file=sys.stderr)
         
-        # Create temp directory for split pages
+        # Create temp directory for images
         temp_dir = tempfile.gettempdir()
         base_name = os.path.splitext(os.path.basename(pdf_path))[0]
         
-        split_pages = []
+        image_paths = []
         
-        # Extract each page as a separate PDF
-        for page_num in range(num_pages):
-            # Create a new PDF writer for this page
-            writer = PdfWriter()
-            writer.add_page(reader.pages[page_num])
-            
+        # Save each page as JPEG
+        for page_num, image in enumerate(images):
             # Generate output path
-            output_path = os.path.join(temp_dir, f"{base_name}_page{page_num + 1}.pdf")
+            output_path = os.path.join(temp_dir, f"{base_name}_page{page_num + 1}.jpg")
             
-            # Write the single-page PDF
-            with open(output_path, 'wb') as output_file:
-                writer.write(output_file)
+            # Convert to RGB if needed (for JPEG)
+            if image.mode in ('RGBA', 'LA', 'P'):
+                image = image.convert('RGB')
             
-            split_pages.append(output_path)
-            print(f"   ✅ Page {page_num + 1}/{num_pages} → {os.path.basename(output_path)}", file=sys.stderr)
+            # Save as JPEG with quality 85 (good balance)
+            image.save(output_path, 'JPEG', quality=85, optimize=True)
+            
+            # Get file size for logging
+            file_size = os.path.getsize(output_path) / 1024  # KB
+            
+            image_paths.append(output_path)
+            print(f"   ✅ Page {page_num + 1}/{num_pages} → {os.path.basename(output_path)} ({file_size:.1f} KB)", file=sys.stderr)
         
-        print(f"✅ PDF split complete: {num_pages} pages", file=sys.stderr)
-        return split_pages
+        print(f"✅ PDF conversion complete: {num_pages} images", file=sys.stderr)
+        return image_paths
         
     except Exception as e:
-        print(f"❌ Error splitting PDF: {e}", file=sys.stderr)
+        print(f"❌ Error converting PDF: {e}", file=sys.stderr)
+        print(f"   Make sure poppler-utils is installed:", file=sys.stderr)
+        print(f"   - Windows: Download from https://github.com/oschwartz10612/poppler-windows/releases", file=sys.stderr)
+        print(f"   - Mac: brew install poppler", file=sys.stderr)
+        print(f"   - Linux: sudo apt-get install poppler-utils", file=sys.stderr)
         return None
+
+
+# Backward compatibility - keep old function name
+def split_pdf_to_pages(pdf_path):
+    """
+    Backward compatibility wrapper
+    Converts PDF to images instead of splitting to PDFs
+    """
+    return split_pdf_to_images(pdf_path)
 
 
 def cleanup_split_pages(page_paths):

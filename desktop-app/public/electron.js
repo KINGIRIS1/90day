@@ -713,13 +713,17 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     const maxWidth = store.get('maxWidth', 2000);
     const maxHeight = store.get('maxHeight', 2800);
     
+    // Get batch mode settings
+    const batchMode = store.get('batchMode', 'sequential');
+    
     const child = spawn(pyInfo.executable, args, {
       cwd: pythonScriptDir,
       env: buildPythonEnv({ 
         GOOGLE_API_KEY: cloudApiKey || process.env.GOOGLE_API_KEY || '',
         ENABLE_RESIZE: enableResize ? 'true' : 'false',
         MAX_WIDTH: String(maxWidth),
-        MAX_HEIGHT: String(maxHeight)
+        MAX_HEIGHT: String(maxHeight),
+        BATCH_MODE: batchMode
       }, pyInfo, pythonScriptDir)
     });
 

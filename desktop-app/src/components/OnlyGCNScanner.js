@@ -243,9 +243,21 @@ function OnlyGCNScanner() {
           console.error(`Preview error for ${fileName}:`, e);
         }
         
+        // Check if this is a PDF page (from batch processor)
+        const isPdfPage = batchItem.is_pdf_page === true;
+        const pdfPage = batchItem.pdf_page || null;
+        const originalPdf = batchItem.original_pdf || null;
+        
+        // Update fileName for PDF pages
+        let displayFileName = fileName;
+        if (isPdfPage && pdfPage && originalPdf) {
+          const pdfName = originalPdf.split(/[/\\]/).pop();
+          displayFileName = `${pdfName} (Page ${pdfPage})`;
+        }
+        
         mappedResults.push({
-          filePath: filePath,
-          fileName: fileName,
+          filePath: originalPdf || filePath,
+          fileName: displayFileName,
           folderName: folderName,
           short_code: batchItem.short_code || 'UNKNOWN',
           doc_type: batchItem.short_code || 'UNKNOWN',
@@ -264,7 +276,11 @@ function OnlyGCNScanner() {
           originalShortCode: batchItem.short_code || 'UNKNOWN',
           originalDocType: batchItem.short_code || 'UNKNOWN',
           reasoning: batchItem.reasoning || '',
-          preFiltered: false
+          preFiltered: false,
+          // PDF info
+          isPdfPage: isPdfPage,
+          pdfPage: pdfPage,
+          originalPdf: originalPdf
         });
       }
       

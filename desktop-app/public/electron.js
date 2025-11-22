@@ -715,6 +715,7 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
     
     // Get batch mode settings
     const batchMode = store.get('batchMode', 'sequential');
+    const batchSize = store.get('batchSize', 8); // Get batch size from settings
     
     const child = spawn(pyInfo.executable, args, {
       cwd: pythonScriptDir,
@@ -723,7 +724,8 @@ ipcMain.handle('process-document-offline', async (event, filePath) => {
         ENABLE_RESIZE: enableResize ? 'true' : 'false',
         MAX_WIDTH: String(maxWidth),
         MAX_HEIGHT: String(maxHeight),
-        BATCH_MODE: batchMode
+        BATCH_MODE: batchMode,
+        BATCH_SIZE: String(batchSize)
       }, pyInfo, pythonScriptDir)
     });
 

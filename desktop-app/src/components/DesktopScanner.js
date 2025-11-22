@@ -2766,8 +2766,8 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                 
                 {/* Action Buttons */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {/* Preview/Zoom Button - Show for images */}
-                  {!result.isPdf && !result.isPdfPage && result.previewUrl && (
+                  {/* Preview/Zoom Button - Show for all items with preview */}
+                  {result.previewUrl && (
                     <button
                       onClick={() => setSelectedPreview(result.previewUrl)}
                       className="flex-1 min-w-[100px] text-xs text-blue-600 hover:bg-blue-50 py-1.5 px-3 rounded border border-blue-200 font-medium"
@@ -2776,7 +2776,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                     </button>
                   )}
                   
-                  {/* Open PDF Button - For PDF pages */}
+                  {/* Open PDF Button - For PDF pages (secondary option) */}
                   {result.isPdfPage && result.filePath && (
                     <button
                       onClick={async () => {
@@ -2788,7 +2788,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
                       }}
                       className="flex-1 min-w-[100px] text-xs text-purple-600 hover:bg-purple-50 py-1.5 px-3 rounded border border-purple-200 font-medium"
                     >
-                      📄 Mở PDF
+                      📄 Mở PDF gốc
                     </button>
                   )}
                   

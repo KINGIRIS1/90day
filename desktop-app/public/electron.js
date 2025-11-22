@@ -841,7 +841,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
       let outputPath;
       if (options.autoSave) {
         // Use parentFolder from options if provided, otherwise get from filePath
-        const childFolder = options.parentFolder || path.dirname(filePaths[0]);
+        const childFolder = options.parentFolder || path.dirname(itemsInGroup[0].filePath);
         let targetDir;
         
         console.log(`📂 Merge processing for ${shortCode}:`);
@@ -849,7 +849,7 @@ ipcMain.handle('merge-by-short-code', async (event, items, options = {}) => {
         console.log(`   parentFolder (from options): ${options.parentFolder || 'null'}`);
         console.log(`   mergeMode: ${options.mergeMode}`);
         console.log(`   customOutputFolder: ${options.customOutputFolder || 'null'}`);
-        console.log(`   Files to merge: ${filePaths.length}`);
+        console.log(`   Items to merge: ${itemsInGroup.length}`);
         
         if (options.mergeMode === 'new') {
           const parentOfChild = path.dirname(childFolder);

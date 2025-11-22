@@ -2866,3 +2866,71 @@ TESTING RESULT FROM USER:
 STATUS: ✅ Fixed, awaiting user re-test
 ================================================================================
 
+
+================================================================================
+🔧 CRITICAL FIX #3 - Frontend Not Displaying All PDF Pages
+================================================================================
+DATE: 2025-01-XX
+ISSUE: All 34 pages processed but UI only shows 1 result
+
+ROOT CAUSE:
+-----------
+Backend returns multi-page PDF result in format:
+```json
+{
+  ...first_page_data,
+  all_pages: [page1, page2, ..., page34],
+  is_multi_page_pdf: true
+}
+```
+
+Frontend (DesktopScanner.js line 1864-1876) was pushing this as a SINGLE result:
+```javascript
+newResults.push({
+  fileName: file.name,
+  ...processedResult  // ← Contains all_pages but treated as 1 result
+});
+```
+
+Result: UI displays 1 item instead of 34 items
+
+SOLUTION:
+---------
+Check if result has `is_multi_page_pdf` and `all_pages`, then extract each page:
+
+```javascript
+if (processedResult.is_multi_page_pdf && processedResult.all_pages) {
+  // Add each page as a separate result
+  for (const pageResult of processedResult.all_pages) {
+    newResults.push({
+      fileName: `${file.name}_page_${pageResult.pdf_page}`,
+      // ... page-specific data
+    });
+  }
+} else {
+  // Single file result (existing logic)
+  newResults.push({ fileName: file.name, ...processedResult });
+}
+```
+
+CHANGES:
+--------
+File: /app/desktop-app/src/components/DesktopScanner.js
+Lines: 1855-1876
+- Added check for is_multi_page_pdf
+- Loop through all_pages array
+- Create separate result for each page with proper metadata
+- Added fields: pdfPage, totalPages, originalPdfName, isPartOfMultiPagePdf
+
+EXPECTED BEHAVIOR AFTER FIX:
+-----------------------------
+✅ PDF 34 pages → UI displays 34 results
+✅ Each page has:
+   - Unique filename: "file.pdf_page_1", "file.pdf_page_2", etc.
+   - Individual classification (DDKBD, HDCQ, GCN, etc.)
+   - Page number indicator (Page 1/34, Page 2/34, etc.)
+   - Shared PDF file path (can merge back if needed)
+
+STATUS: ✅ Fixed, frontend restarted, awaiting user test
+================================================================================
+

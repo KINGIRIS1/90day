@@ -1235,12 +1235,13 @@ function OnlyGCNScanner() {
         </div>
       )}
 
-      {/* GCN Grid View - Chỉ hiển thị A3 GCN */}
+      {/* Results Grid View - Hiển thị TẤT CẢ (bao gồm GTLQ) */}
       {fileResults.length > 0 && (() => {
-        const gcnOnly = fileResults.filter(r => r.newShortCode === 'GCNC' || r.newShortCode === 'GCNM');
-        return gcnOnly.length > 0 ? (
+        // KHÔNG filter, hiển thị tất cả để user có thể sửa lại
+        const allResults = fileResults;
+        return allResults.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {gcnOnly.map((result, idx) => (
+            {allResults.map((result, idx) => (
               <div key={idx} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                 {/* Preview Image */}
                 <div className="relative aspect-[3/4] bg-gray-100">

@@ -1,36 +1,21 @@
 #!/usr/bin/env python3
 """
 PDF to Image Converter - Convert PDF pages to images for OCR
+Uses PyMuPDF (fitz) - No Poppler required!
 """
 
 import sys
 import os
 import tempfile
-import subprocess
 from PIL import Image
-from pypdf import PdfReader
 
-# Poppler path for Windows
-POPPLER_PATH = r"C:\Program Files\poppler\Library\bin"
-
-def find_pdftoppm():
-    """Find pdftoppm executable"""
-    # Try common locations
-    possible_paths = [
-        os.path.join(POPPLER_PATH, 'pdftoppm.exe'),
-        'pdftoppm.exe',  # In PATH
-        'pdftoppm',  # Linux/Mac
-    ]
-    
-    for path in possible_paths:
-        try:
-            # Test if command exists
-            subprocess.run([path, '-h'], capture_output=True, timeout=5)
-            return path
-        except:
-            continue
-    
-    return None
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    print("❌ PyMuPDF not found. Installing...", file=sys.stderr)
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'PyMuPDF'])
+    import fitz
 
 def split_pdf_to_images(pdf_path, dpi=200):
     """

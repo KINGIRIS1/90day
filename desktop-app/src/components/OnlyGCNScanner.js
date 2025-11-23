@@ -1262,7 +1262,11 @@ function OnlyGCNScanner() {
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       result.newShortCode === 'GCNC'
                         ? 'bg-red-500 text-white'
-                        : 'bg-pink-500 text-white'
+                        : result.newShortCode === 'GCNM'
+                        ? 'bg-pink-500 text-white'
+                        : result.newShortCode === 'GTLQ'
+                        ? 'bg-gray-500 text-white'
+                        : 'bg-blue-500 text-white'
                     }`}>
                       {result.newShortCode}
                     </span>

@@ -955,8 +955,13 @@ function OnlyGCNScanner() {
           customOutputFolder: outputOption === 'custom_folder' ? outputFolder : null
         };
         
-        console.log('Merge options:', mergeOptions);
-        console.log('Items to merge:', items.length, 'files');
+        console.log('🔍 DEBUG Merge Options:');
+        console.log('   outputOption:', outputOption);
+        console.log('   outputFolder:', outputFolder);
+        console.log('   mergeMode:', mergeOptions.mergeMode);
+        console.log('   customOutputFolder:', mergeOptions.customOutputFolder);
+        console.log('   parentFolder:', mergeOptions.parentFolder);
+        console.log('   Items to merge:', items.length, 'files');
         
         try {
           const merged = await window.electronAPI.mergeByShortCode(items, mergeOptions);

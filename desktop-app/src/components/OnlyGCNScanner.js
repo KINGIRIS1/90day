@@ -696,11 +696,20 @@ function OnlyGCNScanner() {
         console.log(`   💡 Adding ${skipped.length} pre-filtered files as GTLQ (vẫn hiển thị để có thể sửa)`);
         for (const filePath of skipped) {
           const fileName = filePath.split(/[/\\]/).pop();
+          
+          // Load preview for GTLQ files
+          let previewUrl = null;
+          try {
+            previewUrl = await window.electronAPI.readImageDataUrl(filePath);
+          } catch (e) {
+            console.warn(`Failed to load preview for GTLQ file: ${fileName}`);
+          }
+          
           folderResults.push({
             fileName,
             filePath,
             folderName,
-            previewUrl: null,
+            previewUrl,  // Now has preview!
             originalShortCode: 'SKIPPED',
             originalDocType: 'Bỏ qua (không phải GCN)',
             newShortCode: 'GTLQ',

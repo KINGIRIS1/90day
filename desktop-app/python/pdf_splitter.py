@@ -19,7 +19,8 @@ except ImportError:
 
 def split_pdf_to_images(pdf_path, dpi=200):
     """
-    Convert PDF pages to JPEG images using pdftoppm directly
+    Convert PDF pages to JPEG images using PyMuPDF (fitz)
+    No Poppler required!
     
     Args:
         pdf_path: Path to the input PDF file
@@ -34,129 +35,63 @@ def split_pdf_to_images(pdf_path, dpi=200):
     try:
         print(f"📄 Converting PDF to images: {pdf_path}", file=sys.stderr)
         print(f"   DPI: {dpi} (higher = better quality but larger files)", file=sys.stderr)
+        print(f"   Using: PyMuPDF (fitz)", file=sys.stderr)
         
-        # Get page count using pypdf
-        try:
-            reader = PdfReader(pdf_path)
-            num_pages = len(reader.pages)
-            print(f"   Pages detected: {num_pages}", file=sys.stderr)
-        except Exception as e:
-            print(f"❌ Could not read PDF: {e}", file=sys.stderr)
-            return None
+        # Open PDF with PyMuPDF
+        pdf_document = fitz.open(pdf_path)
+        num_pages = len(pdf_document)
         
-        # Find pdftoppm executable
-        pdftoppm_path = find_pdftoppm()
-        if not pdftoppm_path:
-            print(f"❌ pdftoppm not found. Please install Poppler.", file=sys.stderr)
-            return None
-        
-        print(f"   Using: {pdftoppm_path}", file=sys.stderr)
+        print(f"   Pages detected: {num_pages}", file=sys.stderr)
         
         # Create temp directory
         temp_dir = tempfile.gettempdir()
-        
-        # Copy PDF to temp with safe name (no spaces, no accents)
-        import time
-        import shutil
-        temp_pdf_name = f"temp_pdf_{int(time.time())}.pdf"
-        temp_pdf_path = os.path.join(temp_dir, temp_pdf_name)
-        
-        print(f"   Copying to temp: {temp_pdf_name}", file=sys.stderr)
-        shutil.copy2(pdf_path, temp_pdf_path)
-        
-        # Generate output prefix (simple, no spaces)
-        output_prefix = os.path.join(temp_dir, f"page_{int(time.time())}")
-        
-        # Call pdftoppm directly: pdftoppm -jpeg -r <dpi> input.pdf output_prefix
-        # This will create: output_prefix-1.jpg, output_prefix-2.jpg, etc.
-        cmd = [
-            pdftoppm_path,
-            '-jpeg',
-            '-r', str(dpi),
-            temp_pdf_path,
-            output_prefix
-        ]
-        
-        print(f"   Running pdftoppm...", file=sys.stderr)
-        
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=300  # 5 minutes timeout
-        )
-        
-        # Clean up temp PDF
-        try:
-            os.remove(temp_pdf_path)
-        except:
-            pass
-        
-        if result.returncode != 0:
-            print(f"❌ pdftoppm failed (exit code {result.returncode}):", file=sys.stderr)
-            if result.stdout:
-                print(f"   stdout: {result.stdout}", file=sys.stderr)
-            if result.stderr:
-                print(f"   stderr: {result.stderr}", file=sys.stderr)
-            return None
-        
-        print(f"   ✅ pdftoppm completed", file=sys.stderr)
-        
-        # Find generated images
-        image_paths = []
         base_name = os.path.splitext(os.path.basename(pdf_path))[0]
         
-        for page_num in range(1, num_pages + 1):
-            # pdftoppm generates files like: prefix-1.jpg, prefix-2.jpg, ...
-            # Format depends on number of pages (more pages = more leading zeros)
-            # Try different formats
-            possible_formats = [
-                f"{output_prefix}-{page_num}.jpg",
-                f"{output_prefix}-{page_num:02d}.jpg",
-                f"{output_prefix}-{page_num:03d}.jpg",
-                f"{output_prefix}-{page_num:04d}.jpg",
-            ]
-            
-            found_path = None
-            for possible_path in possible_formats:
-                if os.path.exists(possible_path):
-                    found_path = possible_path
-                    break
-            
-            if found_path:
-                # Rename to friendly name with original PDF name
-                friendly_name = f"{base_name}_page{page_num}.jpg"
-                friendly_path = os.path.join(temp_dir, friendly_name)
-                
-                # If friendly_path already exists, use unique name
-                if os.path.exists(friendly_path):
-                    friendly_name = f"{base_name}_{int(time.time())}_page{page_num}.jpg"
-                    friendly_path = os.path.join(temp_dir, friendly_name)
-                
-                try:
-                    os.rename(found_path, friendly_path)
-                    image_paths.append(friendly_path)
-                    file_size = os.path.getsize(friendly_path) / 1024
-                    print(f"   ✅ Page {page_num}/{num_pages} → {friendly_name} ({file_size:.1f} KB)", file=sys.stderr)
-                except Exception as e:
-                    print(f"   ⚠️ Could not rename page {page_num}: {e}", file=sys.stderr)
-                    image_paths.append(found_path)
-            else:
-                print(f"   ⚠️ Page {page_num} not found", file=sys.stderr)
+        image_paths = []
         
-        if len(image_paths) != num_pages:
-            print(f"   ⚠️ Warning: Expected {num_pages} pages, found {len(image_paths)}", file=sys.stderr)
+        # Calculate zoom factor for desired DPI
+        # PyMuPDF default is 72 DPI, so zoom = target_dpi / 72
+        zoom = dpi / 72.0
+        mat = fitz.Matrix(zoom, zoom)
         
-        if not image_paths:
-            print(f"❌ No images generated", file=sys.stderr)
-            return None
+        # Convert each page
+        for page_num in range(num_pages):
+            # Get page
+            page = pdf_document[page_num]
+            
+            # Render page to pixmap (image)
+            pix = page.get_pixmap(matrix=mat)
+            
+            # Generate output path
+            import time
+            friendly_name = f"{base_name}_page{page_num + 1}.jpg"
+            output_path = os.path.join(temp_dir, friendly_name)
+            
+            # If file exists, use unique name
+            if os.path.exists(output_path):
+                friendly_name = f"{base_name}_{int(time.time())}_page{page_num + 1}.jpg"
+                output_path = os.path.join(temp_dir, friendly_name)
+            
+            # Save as JPEG
+            # PyMuPDF can save directly, but we use PIL for consistency
+            # Convert pixmap to PIL Image
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            
+            # Save as JPEG with quality 85
+            img.save(output_path, 'JPEG', quality=85, optimize=True)
+            
+            image_paths.append(output_path)
+            
+            # Get file size
+            file_size = os.path.getsize(output_path) / 1024
+            print(f"   ✅ Page {page_num + 1}/{num_pages} → {friendly_name} ({file_size:.1f} KB)", file=sys.stderr)
+        
+        # Close PDF
+        pdf_document.close()
         
         print(f"✅ PDF conversion complete: {len(image_paths)} images", file=sys.stderr)
         return image_paths
         
-    except subprocess.TimeoutExpired:
-        print(f"❌ PDF conversion timeout (5 minutes)", file=sys.stderr)
-        return None
     except Exception as e:
         print(f"❌ Error converting PDF: {e}", file=sys.stderr)
         import traceback

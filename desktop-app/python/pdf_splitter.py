@@ -101,37 +101,62 @@ def split_pdf_to_images(pdf_path, dpi=200):
             timeout=300  # 5 minutes timeout
         )
         
+        # Clean up temp PDF
+        try:
+            os.remove(temp_pdf_path)
+        except:
+            pass
+        
         if result.returncode != 0:
-            print(f"❌ pdftoppm failed:", file=sys.stderr)
-            print(f"   stdout: {result.stdout}", file=sys.stderr)
-            print(f"   stderr: {result.stderr}", file=sys.stderr)
+            print(f"❌ pdftoppm failed (exit code {result.returncode}):", file=sys.stderr)
+            if result.stdout:
+                print(f"   stdout: {result.stdout}", file=sys.stderr)
+            if result.stderr:
+                print(f"   stderr: {result.stderr}", file=sys.stderr)
             return None
         
         print(f"   ✅ pdftoppm completed", file=sys.stderr)
         
         # Find generated images
         image_paths = []
+        base_name = os.path.splitext(os.path.basename(pdf_path))[0]
+        
         for page_num in range(1, num_pages + 1):
             # pdftoppm generates files like: prefix-1.jpg, prefix-2.jpg, ...
             # Format depends on number of pages (more pages = more leading zeros)
             # Try different formats
             possible_formats = [
-                f"{temp_prefix}-{page_num}.jpg",
-                f"{temp_prefix}-{page_num:02d}.jpg",
-                f"{temp_prefix}-{page_num:03d}.jpg",
-                f"{temp_prefix}-{page_num:04d}.jpg",
+                f"{output_prefix}-{page_num}.jpg",
+                f"{output_prefix}-{page_num:02d}.jpg",
+                f"{output_prefix}-{page_num:03d}.jpg",
+                f"{output_prefix}-{page_num:04d}.jpg",
             ]
             
-            found = False
+            found_path = None
             for possible_path in possible_formats:
                 if os.path.exists(possible_path):
-                    image_paths.append(possible_path)
-                    file_size = os.path.getsize(possible_path) / 1024
-                    print(f"   ✅ Page {page_num}/{num_pages} → {os.path.basename(possible_path)} ({file_size:.1f} KB)", file=sys.stderr)
-                    found = True
+                    found_path = possible_path
                     break
             
-            if not found:
+            if found_path:
+                # Rename to friendly name with original PDF name
+                friendly_name = f"{base_name}_page{page_num}.jpg"
+                friendly_path = os.path.join(temp_dir, friendly_name)
+                
+                # If friendly_path already exists, use unique name
+                if os.path.exists(friendly_path):
+                    friendly_name = f"{base_name}_{int(time.time())}_page{page_num}.jpg"
+                    friendly_path = os.path.join(temp_dir, friendly_name)
+                
+                try:
+                    os.rename(found_path, friendly_path)
+                    image_paths.append(friendly_path)
+                    file_size = os.path.getsize(friendly_path) / 1024
+                    print(f"   ✅ Page {page_num}/{num_pages} → {friendly_name} ({file_size:.1f} KB)", file=sys.stderr)
+                except Exception as e:
+                    print(f"   ⚠️ Could not rename page {page_num}: {e}", file=sys.stderr)
+                    image_paths.append(found_path)
+            else:
                 print(f"   ⚠️ Page {page_num} not found", file=sys.stderr)
         
         if len(image_paths) != num_pages:

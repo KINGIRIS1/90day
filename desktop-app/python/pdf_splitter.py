@@ -31,7 +31,16 @@ def split_pdf_to_images(pdf_path, dpi=200):
         print(f"   DPI: {dpi} (higher = better quality but larger files)", file=sys.stderr)
         
         # Convert PDF pages to PIL images
-        images = convert_from_path(pdf_path, dpi=dpi)
+        # Try with poppler_path first (Windows), fallback to system PATH
+        try:
+            if os.path.exists(POPPLER_PATH):
+                images = convert_from_path(pdf_path, dpi=dpi, poppler_path=POPPLER_PATH)
+            else:
+                images = convert_from_path(pdf_path, dpi=dpi)
+        except:
+            # Fallback: try without poppler_path
+            images = convert_from_path(pdf_path, dpi=dpi)
+        
         num_pages = len(images)
         
         print(f"   Pages: {num_pages}", file=sys.stderr)

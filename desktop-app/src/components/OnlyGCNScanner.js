@@ -918,7 +918,11 @@ function OnlyGCNScanner() {
         .map(r => ({ 
           filePath: r.filePath, 
           short_code: r.newShortCode,
-          folder: r.folderName || path.dirname(r.filePath)
+          folder: r.folderName || path.dirname(r.filePath),
+          // Add PDF page info for proper merging
+          isPdfPage: r.isPdfPage,
+          pdfPage: r.pdfPage,
+          totalPdfPages: r.totalPdfPages
         }));
 
       if (payload.length === 0) {

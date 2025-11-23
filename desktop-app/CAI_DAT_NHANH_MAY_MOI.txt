@@ -1,0 +1,156 @@
+═══════════════════════════════════════════════════════════════
+  🚀 HƯỚNG DẪN CÀI ĐẶT NHANH - 90dayChonThanh Desktop App
+═══════════════════════════════════════════════════════════════
+
+⏱️ Tổng thời gian: 15-20 phút
+📦 Dung lượng: ~500MB
+
+───────────────────────────────────────────────────────────────
+ BƯỚC 1: CÀI PYTHON (5 phút)
+───────────────────────────────────────────────────────────────
+
+1. Download Python:
+   → https://www.python.org/downloads/
+   → Click "Download Python 3.12.X"
+
+2. Cài đặt:
+   → Chạy file .exe
+   → ⚠️ QUAN TRỌNG: Tick ✅ "Add Python to PATH"
+   → Click "Install Now"
+
+3. Kiểm tra:
+   → Mở CMD (Win + R → gõ "cmd")
+   → Gõ: python --version
+   → Thấy "Python 3.12.X" = OK ✅
+
+───────────────────────────────────────────────────────────────
+ BƯỚC 2: CÀI PYTHON LIBRARIES (2 phút)
+───────────────────────────────────────────────────────────────
+
+1. Mở CMD (Win + R → gõ "cmd")
+
+2. Copy paste lệnh này:
+   pip install pdf2image pypdf Pillow
+
+3. Đợi cài xong (30 giây)
+
+4. Kiểm tra:
+   python -c "import pdf2image; print('OK')"
+   → Thấy "OK" = Thành công ✅
+
+───────────────────────────────────────────────────────────────
+ BƯỚC 3: CÀI POPPLER - ĐỂ QUÉT PDF (5 phút)
+───────────────────────────────────────────────────────────────
+
+1. Download Poppler:
+   → https://github.com/oschwartz10612/poppler-windows/releases
+   → Tải file "Release-XX.XX.X-X.zip"
+
+2. Extract:
+   → Extract vào: C:\Program Files\poppler
+   → Nhớ đường dẫn này!
+
+3. Thêm vào PATH:
+   → Win + R → gõ "sysdm.cpl" → Enter
+   → Tab "Advanced" → "Environment Variables"
+   → Phần "System variables" → Chọn "Path" → "Edit"
+   → Click "New"
+   → Thêm: C:\Program Files\poppler\Library\bin
+   → OK → OK → OK
+
+4. Kiểm tra:
+   → ĐÓNG CMD cũ (quan trọng!)
+   → Mở CMD mới
+   → Gõ: pdftoppm -h
+   → Thấy help text = OK ✅
+
+───────────────────────────────────────────────────────────────
+ BƯỚC 4: CÀI APP (3 phút)
+───────────────────────────────────────────────────────────────
+
+1. Chạy: 90dayChonThanh-Setup-1.1.0.exe
+
+2. Click "Next" → "Install"
+
+3. Desktop shortcut sẽ được tạo tự động
+
+4. Khởi động app!
+
+───────────────────────────────────────────────────────────────
+ CẤU HÌNH LẦN ĐẦU
+───────────────────────────────────────────────────────────────
+
+Nếu dùng Cloud OCR:
+
+1. Vào Settings → Cloud Settings
+2. Nhập Gemini API Key
+3. Lấy key tại: https://makersuite.google.com/app/apikey
+
+───────────────────────────────────────────────────────────────
+ TEST APP
+───────────────────────────────────────────────────────────────
+
+Test 1: Quét ảnh
+→ Chọn Files → Chọn ảnh → Click "Quét"
+→ Thấy kết quả = OK ✅
+
+Test 2: Quét PDF
+→ Chọn Files → Chọn PDF → Click "Quét"
+→ Thấy từng trang = OK ✅
+
+───────────────────────────────────────────────────────────────
+ ❌ LỖI THƯỜNG GẶP
+───────────────────────────────────────────────────────────────
+
+Lỗi: "python not found"
+→ Cài lại Python, nhớ tick "Add to PATH"
+→ Khởi động lại máy
+
+Lỗi: "pdftoppm not found"
+→ Kiểm tra Poppler đã add vào PATH đúng chưa
+→ Khởi động lại máy
+
+Lỗi: "ModuleNotFoundError"
+→ Chạy lại: pip install pdf2image pypdf Pillow
+
+Quét ảnh OK, quét PDF lỗi
+→ 99% do thiếu Poppler
+→ Làm lại BƯỚC 3
+
+───────────────────────────────────────────────────────────────
+ ✅ CHECKLIST HOÀN CHỈNH
+───────────────────────────────────────────────────────────────
+
+Trước khi dùng app:
+
+[ ] Python 3.12 đã cài (test: python --version)
+[ ] Libraries đã cài (test: python -c "import pdf2image; print('OK')")
+[ ] Poppler đã cài (test: pdftoppm -h)
+[ ] App đã cài và chạy được
+[ ] API Key đã nhập (nếu dùng Cloud)
+
+Test functions:
+
+[ ] Quét 1 ảnh OK
+[ ] Quét nhiều ảnh OK
+[ ] Quét PDF OK
+
+───────────────────────────────────────────────────────────────
+ 💡 TÓM TẮT
+───────────────────────────────────────────────────────────────
+
+CÀI TRÊN MÁY MỚI CẦN:
+
+1. Python 3.12 (tick "Add to PATH")
+2. pip install pdf2image pypdf Pillow
+3. Poppler (extract + add to PATH)
+4. App installer
+
+═══════════════════════════════════════════════════════════════
+🎉 Chúc bạn sử dụng thành công!
+═══════════════════════════════════════════════════════════════
+
+Version: 1.1.0
+Platform: Windows 10/11 64-bit
+
+Chi tiết đầy đủ: Xem file HUONG_DAN_CAI_DAT_MAY_MOI.md

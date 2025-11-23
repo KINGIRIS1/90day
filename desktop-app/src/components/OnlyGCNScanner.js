@@ -655,12 +655,63 @@ function OnlyGCNScanner() {
         // Results for THIS FOLDER only
         const folderResults = [];
 
-        // Phase 1: Scan ALL files (không filter)
-        // User yêu cầu: Không loại bỏ bất kỳ file nào, scan tất cả để có thể sửa lại
-        let gcnCandidates = folderFiles;
+        // Phase 1: Pre-filter THIS FOLDER (if enabled)
+        let gcnCandidates = [];
+        let skipped = [];
+        if (usePreFilter && hasPreFilter) {
+          setCurrentPhase('prefilter');
+          setCurrentFile(`Đang phân tích màu sắc thư mục ${folderName}...`);
+          
+          const preFilterStart = Date.now();
+          
+          // Separate PDF and image files
+          const pdfFiles = folderFiles.filter(f => /\.pdf$/i.test(f));
+          const imageFiles = folderFiles.filter(f => /\.(jpg|jpeg|png|gif|bmp)$/i.test(f));
+          
+          console.log(`   📊 Files: ${imageFiles.length} images, ${pdfFiles.length} PDFs`);
+          
+          // Pre-filter image files only
+          let preFilteredImages = [];
+          let skippedImages = [];
+          
+          if (imageFiles.length > 0) {
+            const preFilterResults = await window.electronAPI.preFilterGCNFiles(imageFiles);
+            preFilteredImages = preFilterResults.passed || [];
+            skippedImages = preFilterResults.skipped || [];
+          }
+          
+          // PDF files always pass pre-filter (will be scanned)
+          gcnCandidates = [...preFilteredImages, ...pdfFiles];
+          skipped = skippedImages;
+          
+          const preFilterTime = ((Date.now() - preFilterStart) / 1000).toFixed(1);
+          console.log(`   🎨 Pre-filter: ${gcnCandidates.length} files (${preFilteredImages.length} images + ${pdfFiles.length} PDFs), ${skipped.length} skipped (${preFilterTime}s)`);
+        } else {
+          console.log(`   ⚡ Pre-filter OFF: Scanning all ${folderFiles.length} files`);
+          gcnCandidates = folderFiles;
+          skipped = [];
+        }
         
-        console.log(`   📋 Scanning ALL ${gcnCandidates.length} files (no pre-filter)`);
-        console.log(`   💡 Lý do: Giữ tất cả kết quả để user có thể sửa lại nếu AI nhận diện sai`);
+        // Add skipped files as GTLQ - VẪN HIỂN THỊ để user có thể sửa lại
+        console.log(`   💡 Adding ${skipped.length} pre-filtered files as GTLQ (vẫn hiển thị để có thể sửa)`);
+        for (const filePath of skipped) {
+          const fileName = filePath.split(/[/\\]/).pop();
+          folderResults.push({
+            fileName,
+            filePath,
+            folderName,
+            previewUrl: null,
+            originalShortCode: 'SKIPPED',
+            originalDocType: 'Bỏ qua (không phải GCN)',
+            newShortCode: 'GTLQ',
+            newDocType: 'Giấy tờ liên quan',
+            confidence: 0,
+            reasoning: 'Pre-filter: Không có màu GCN (red/pink)',
+            metadata: {},
+            success: true,
+            preFiltered: true
+          });
+        }
 
         // Phase 2: AI scan GCN candidates OF THIS FOLDER
         if (gcnCandidates.length > 0) {

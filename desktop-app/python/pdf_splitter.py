@@ -9,6 +9,9 @@ import tempfile
 from pdf2image import convert_from_path
 from PIL import Image
 
+# Poppler path for Windows
+POPPLER_PATH = r"C:\Program Files\poppler\Library\bin"
+
 def split_pdf_to_images(pdf_path, dpi=200):
     """
     Convert PDF pages to JPEG images

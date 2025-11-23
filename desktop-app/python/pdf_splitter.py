@@ -8,6 +8,7 @@ import os
 import tempfile
 from pdf2image import convert_from_path
 from PIL import Image
+from pypdf import PdfReader
 
 # Poppler path for Windows
 POPPLER_PATH = r"C:\Program Files\poppler\Library\bin"

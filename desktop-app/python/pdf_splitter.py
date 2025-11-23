@@ -67,14 +67,20 @@ def split_pdf_to_images(pdf_path, dpi=200):
         
         print(f"   Using: {pdftoppm_path}", file=sys.stderr)
         
-        # Create temp directory for images
+        # Create temp directory
         temp_dir = tempfile.gettempdir()
-        base_name = os.path.splitext(os.path.basename(pdf_path))[0]
         
-        # Generate unique prefix to avoid conflicts
+        # Copy PDF to temp with safe name (no spaces, no accents)
         import time
-        prefix = f"pdf_{int(time.time())}_{base_name}"
-        temp_prefix = os.path.join(temp_dir, prefix)
+        import shutil
+        temp_pdf_name = f"temp_pdf_{int(time.time())}.pdf"
+        temp_pdf_path = os.path.join(temp_dir, temp_pdf_name)
+        
+        print(f"   Copying to temp: {temp_pdf_name}", file=sys.stderr)
+        shutil.copy2(pdf_path, temp_pdf_path)
+        
+        # Generate output prefix (simple, no spaces)
+        output_prefix = os.path.join(temp_dir, f"page_{int(time.time())}")
         
         # Call pdftoppm directly: pdftoppm -jpeg -r <dpi> input.pdf output_prefix
         # This will create: output_prefix-1.jpg, output_prefix-2.jpg, etc.
@@ -82,11 +88,11 @@ def split_pdf_to_images(pdf_path, dpi=200):
             pdftoppm_path,
             '-jpeg',
             '-r', str(dpi),
-            pdf_path,
-            temp_prefix
+            temp_pdf_path,
+            output_prefix
         ]
         
-        print(f"   Running: {' '.join(cmd)}", file=sys.stderr)
+        print(f"   Running pdftoppm...", file=sys.stderr)
         
         result = subprocess.run(
             cmd,

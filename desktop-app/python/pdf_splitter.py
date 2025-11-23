@@ -34,7 +34,7 @@ def find_pdftoppm():
 
 def split_pdf_to_images(pdf_path, dpi=200):
     """
-    Convert PDF pages to JPEG images
+    Convert PDF pages to JPEG images using pdftoppm directly
     
     Args:
         pdf_path: Path to the input PDF file
@@ -50,90 +50,101 @@ def split_pdf_to_images(pdf_path, dpi=200):
         print(f"📄 Converting PDF to images: {pdf_path}", file=sys.stderr)
         print(f"   DPI: {dpi} (higher = better quality but larger files)", file=sys.stderr)
         
-        # First, get page count using pypdf (more reliable than pdfinfo)
+        # Get page count using pypdf
         try:
             reader = PdfReader(pdf_path)
             num_pages = len(reader.pages)
             print(f"   Pages detected: {num_pages}", file=sys.stderr)
         except Exception as e:
-            print(f"   Warning: Could not read PDF with pypdf: {e}", file=sys.stderr)
-            num_pages = None
+            print(f"❌ Could not read PDF: {e}", file=sys.stderr)
+            return None
         
-        # Convert PDF pages to PIL images
-        # Try with poppler_path first (Windows), fallback to system PATH
-        try:
-            if os.path.exists(POPPLER_PATH):
-                # Pass page count to avoid pdfinfo call
-                if num_pages:
-                    images = convert_from_path(
-                        pdf_path, 
-                        dpi=dpi, 
-                        poppler_path=POPPLER_PATH,
-                        first_page=1,
-                        last_page=num_pages
-                    )
-                else:
-                    images = convert_from_path(pdf_path, dpi=dpi, poppler_path=POPPLER_PATH)
-            else:
-                if num_pages:
-                    images = convert_from_path(
-                        pdf_path, 
-                        dpi=dpi,
-                        first_page=1,
-                        last_page=num_pages
-                    )
-                else:
-                    images = convert_from_path(pdf_path, dpi=dpi)
-        except Exception as e:
-            print(f"   Error with specified poppler_path: {e}", file=sys.stderr)
-            # Fallback: try without poppler_path
-            if num_pages:
-                images = convert_from_path(
-                    pdf_path, 
-                    dpi=dpi,
-                    first_page=1,
-                    last_page=num_pages
-                )
-            else:
-                images = convert_from_path(pdf_path, dpi=dpi)
+        # Find pdftoppm executable
+        pdftoppm_path = find_pdftoppm()
+        if not pdftoppm_path:
+            print(f"❌ pdftoppm not found. Please install Poppler.", file=sys.stderr)
+            return None
         
-        num_pages = len(images)
-        
-        print(f"   Pages: {num_pages}", file=sys.stderr)
+        print(f"   Using: {pdftoppm_path}", file=sys.stderr)
         
         # Create temp directory for images
         temp_dir = tempfile.gettempdir()
         base_name = os.path.splitext(os.path.basename(pdf_path))[0]
         
+        # Generate unique prefix to avoid conflicts
+        import time
+        prefix = f"pdf_{int(time.time())}_{base_name}"
+        temp_prefix = os.path.join(temp_dir, prefix)
+        
+        # Call pdftoppm directly: pdftoppm -jpeg -r <dpi> input.pdf output_prefix
+        # This will create: output_prefix-1.jpg, output_prefix-2.jpg, etc.
+        cmd = [
+            pdftoppm_path,
+            '-jpeg',
+            '-r', str(dpi),
+            pdf_path,
+            temp_prefix
+        ]
+        
+        print(f"   Running: {' '.join(cmd)}", file=sys.stderr)
+        
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minutes timeout
+        )
+        
+        if result.returncode != 0:
+            print(f"❌ pdftoppm failed:", file=sys.stderr)
+            print(f"   stdout: {result.stdout}", file=sys.stderr)
+            print(f"   stderr: {result.stderr}", file=sys.stderr)
+            return None
+        
+        print(f"   ✅ pdftoppm completed", file=sys.stderr)
+        
+        # Find generated images
         image_paths = []
+        for page_num in range(1, num_pages + 1):
+            # pdftoppm generates files like: prefix-1.jpg, prefix-2.jpg, ...
+            # Format depends on number of pages (more pages = more leading zeros)
+            # Try different formats
+            possible_formats = [
+                f"{temp_prefix}-{page_num}.jpg",
+                f"{temp_prefix}-{page_num:02d}.jpg",
+                f"{temp_prefix}-{page_num:03d}.jpg",
+                f"{temp_prefix}-{page_num:04d}.jpg",
+            ]
+            
+            found = False
+            for possible_path in possible_formats:
+                if os.path.exists(possible_path):
+                    image_paths.append(possible_path)
+                    file_size = os.path.getsize(possible_path) / 1024
+                    print(f"   ✅ Page {page_num}/{num_pages} → {os.path.basename(possible_path)} ({file_size:.1f} KB)", file=sys.stderr)
+                    found = True
+                    break
+            
+            if not found:
+                print(f"   ⚠️ Page {page_num} not found", file=sys.stderr)
         
-        # Save each page as JPEG
-        for page_num, image in enumerate(images):
-            # Generate output path
-            output_path = os.path.join(temp_dir, f"{base_name}_page{page_num + 1}.jpg")
-            
-            # Convert to RGB if needed (for JPEG)
-            if image.mode in ('RGBA', 'LA', 'P'):
-                image = image.convert('RGB')
-            
-            # Save as JPEG with quality 85 (good balance)
-            image.save(output_path, 'JPEG', quality=85, optimize=True)
-            
-            # Get file size for logging
-            file_size = os.path.getsize(output_path) / 1024  # KB
-            
-            image_paths.append(output_path)
-            print(f"   ✅ Page {page_num + 1}/{num_pages} → {os.path.basename(output_path)} ({file_size:.1f} KB)", file=sys.stderr)
+        if len(image_paths) != num_pages:
+            print(f"   ⚠️ Warning: Expected {num_pages} pages, found {len(image_paths)}", file=sys.stderr)
         
-        print(f"✅ PDF conversion complete: {num_pages} images", file=sys.stderr)
+        if not image_paths:
+            print(f"❌ No images generated", file=sys.stderr)
+            return None
+        
+        print(f"✅ PDF conversion complete: {len(image_paths)} images", file=sys.stderr)
         return image_paths
         
+    except subprocess.TimeoutExpired:
+        print(f"❌ PDF conversion timeout (5 minutes)", file=sys.stderr)
+        return None
     except Exception as e:
         print(f"❌ Error converting PDF: {e}", file=sys.stderr)
-        print(f"   Make sure poppler-utils is installed:", file=sys.stderr)
-        print(f"   - Windows: Download from https://github.com/oschwartz10612/poppler-windows/releases", file=sys.stderr)
-        print(f"   - Mac: brew install poppler", file=sys.stderr)
-        print(f"   - Linux: sudo apt-get install poppler-utils", file=sys.stderr)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
         return None
 
 

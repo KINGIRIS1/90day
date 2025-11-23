@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 
 class RulesManagementAPITester:
-    def __init__(self, base_url="https://doc-classifier-2.preview.emergentagent.com/api"):
+    def __init__(self, base_url="https://docscanfix.preview.emergentagent.com/api"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

@@ -31,16 +31,52 @@ def split_pdf_to_images(pdf_path, dpi=200):
         print(f"📄 Converting PDF to images: {pdf_path}", file=sys.stderr)
         print(f"   DPI: {dpi} (higher = better quality but larger files)", file=sys.stderr)
         
+        # First, get page count using pypdf (more reliable than pdfinfo)
+        try:
+            reader = PdfReader(pdf_path)
+            num_pages = len(reader.pages)
+            print(f"   Pages detected: {num_pages}", file=sys.stderr)
+        except Exception as e:
+            print(f"   Warning: Could not read PDF with pypdf: {e}", file=sys.stderr)
+            num_pages = None
+        
         # Convert PDF pages to PIL images
         # Try with poppler_path first (Windows), fallback to system PATH
         try:
             if os.path.exists(POPPLER_PATH):
-                images = convert_from_path(pdf_path, dpi=dpi, poppler_path=POPPLER_PATH)
+                # Pass page count to avoid pdfinfo call
+                if num_pages:
+                    images = convert_from_path(
+                        pdf_path, 
+                        dpi=dpi, 
+                        poppler_path=POPPLER_PATH,
+                        first_page=1,
+                        last_page=num_pages
+                    )
+                else:
+                    images = convert_from_path(pdf_path, dpi=dpi, poppler_path=POPPLER_PATH)
+            else:
+                if num_pages:
+                    images = convert_from_path(
+                        pdf_path, 
+                        dpi=dpi,
+                        first_page=1,
+                        last_page=num_pages
+                    )
+                else:
+                    images = convert_from_path(pdf_path, dpi=dpi)
+        except Exception as e:
+            print(f"   Error with specified poppler_path: {e}", file=sys.stderr)
+            # Fallback: try without poppler_path
+            if num_pages:
+                images = convert_from_path(
+                    pdf_path, 
+                    dpi=dpi,
+                    first_page=1,
+                    last_page=num_pages
+                )
             else:
                 images = convert_from_path(pdf_path, dpi=dpi)
-        except:
-            # Fallback: try without poppler_path
-            images = convert_from_path(pdf_path, dpi=dpi)
         
         num_pages = len(images)
         

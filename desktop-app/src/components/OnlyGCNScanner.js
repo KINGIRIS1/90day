@@ -337,8 +337,10 @@ function OnlyGCNScanner() {
                     reasoning: pageResult.reasoning || '',
                     preFiltered: false,
                     isPdf: true,
+                    isPdfPage: true,  // Added - important for merge!
                     pdfPage: pageResult.pdf_page,
                     totalPages: pageResult.total_pages,
+                    totalPdfPages: pageResult.total_pages,  // Added - for consistency
                     originalPdf: pdfPath
                   });
                   

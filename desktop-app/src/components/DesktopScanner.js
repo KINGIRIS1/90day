@@ -2131,6 +2131,7 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             fileName: `${f.name} - Trang ${pageNum}/${totalPages}`,
             filePath: f.path,
             previewUrl: pagePreview,
+            previewPath: pageResult.previewPath, // Save temp path for reload
             isPdf: true,
             isPdfPage: true,
             pdfPage: pageNum,

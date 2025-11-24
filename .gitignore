@@ -1953,3 +1953,7 @@ desktop-app/dist/win-arm64-unpacked/90dayChonThanh.exe
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*

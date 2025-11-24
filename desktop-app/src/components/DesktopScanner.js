@@ -313,8 +313,14 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
       
       // Determine which results need preview loading based on mode
       const shouldLoadPreview = (result) => {
-        if (!result.filePath || !/\.(png|jpg|jpeg|gif|bmp)$/i.test(result.fileName)) return false;
-        if (result.previewUrl) return false; // Already has preview
+        // Skip if already has preview
+        if (result.previewUrl) return false;
+        
+        // Check if is image file OR PDF page with previewPath
+        const isImageFile = result.filePath && /\.(png|jpg|jpeg|gif|bmp)$/i.test(result.fileName);
+        const isPdfPageWithPreview = result.isPdfPage && result.previewPath;
+        
+        if (!isImageFile && !isPdfPageWithPreview) return false;
         
         // Mode: 'gcn-only' - only load GCN documents
         if (previewLoadMode === 'gcn-only') {

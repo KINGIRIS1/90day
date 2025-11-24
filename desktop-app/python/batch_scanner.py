@@ -185,7 +185,7 @@ def validate_folder(folder_path: str) -> dict:
         return {"valid": False, "image_files": [], "error": f"Lỗi đọc thư mục: {str(e)}"}
     
     if not image_files:
-        return {"valid": False, "image_files": [], "error": "Không có file ảnh (JPG, JPEG, PNG)"}
+        return {"valid": False, "image_files": [], "error": "Không có file ảnh/PDF (JPG, JPEG, PNG, PDF)"}
     
     return {"valid": True, "image_files": sorted(image_files), "error": None}
 

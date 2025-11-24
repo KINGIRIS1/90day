@@ -170,8 +170,8 @@ def validate_folder(folder_path: str) -> dict:
     if not os.path.isdir(folder_path):
         return {"valid": False, "image_files": [], "error": "Đường dẫn không phải là thư mục"}
     
-    # List all image files (JPG, JPEG, PNG only, NO sub-folders)
-    image_extensions = ['.jpg', '.jpeg', '.png']
+    # List all image files and PDFs (NO sub-folders)
+    image_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
     image_files = []
     
     try:

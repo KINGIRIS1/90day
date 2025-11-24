@@ -356,11 +356,16 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
             }
             
             try {
-              const previewUrl = await window.electronAPI.readImageDataUrl(result.filePath);
+              // For PDF pages, use previewPath; for images, use filePath
+              const pathToLoad = result.isPdfPage && result.previewPath 
+                ? result.previewPath 
+                : result.filePath;
+              
+              const previewUrl = await window.electronAPI.readImageDataUrl(pathToLoad);
               if (previewUrl) loadedCount++;
               return { ...result, previewUrl: previewUrl || null };
             } catch (err) {
-              console.warn(`⚠️ Failed to load preview for: ${result.fileName}`);
+              console.warn(`⚠️ Failed to load preview for: ${result.fileName}`, err);
               return result;
             }
           })

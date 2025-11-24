@@ -2108,15 +2108,59 @@ const DesktopScanner = ({ initialFolder, onDisplayFolder, onSwitchTab, disableRe
         console.log(`📌 Updated lastKnown (folder): ${processedResult.short_code} (${formatConfidence(processedResult.confidence)}%)`);
       }
       
-      // DO NOT load preview immediately - will be lazy-loaded on-demand
-      // This prevents memory overflow when scanning folders with many images
-      childResults.push({ 
-        fileName: f.name, 
-        filePath: f.path, 
-        previewUrl: null, // Will be lazy-loaded when user switches to this tab
-        isPdf: /\.pdf$/i.test(f.name), 
-        ...processedResult 
-      });
+      // Check if this is a multi-page PDF result (same logic as file scan)
+      if (processedResult.is_multi_page_pdf && processedResult.all_pages && Array.isArray(processedResult.all_pages)) {
+        console.log(`📄 Multi-page PDF detected in folder: ${f.name} (${processedResult.all_pages.length} pages) - expanding to individual results`);
+        
+        // Add each page as a separate result
+        for (const pageResult of processedResult.all_pages) {
+          const pageNum = pageResult.pdf_page || 1;
+          const totalPages = pageResult.total_pages || processedResult.all_pages.length;
+          
+          // Load preview for PDF page if available
+          let pagePreview = null;
+          if (pageResult.previewPath) {
+            try {
+              pagePreview = await window.electronAPI.readImageDataUrl(pageResult.previewPath);
+            } catch (e) {
+              console.warn(`Failed to load PDF page preview: ${pageResult.previewPath}`);
+            }
+          }
+          
+          childResults.push({
+            fileName: `${f.name} - Trang ${pageNum}/${totalPages}`,
+            filePath: f.path,
+            previewUrl: pagePreview,
+            isPdf: true,
+            isPdfPage: true,
+            pdfPage: pageNum,
+            totalPdfPages: totalPages,
+            originalPdfName: f.name,
+            // Page-specific data
+            success: pageResult.success,
+            short_code: pageResult.short_code,
+            doc_type: pageResult.doc_type,
+            confidence: pageResult.confidence,
+            reasoning: pageResult.reasoning,
+            metadata: pageResult.metadata,
+            color: pageResult.color,
+            issue_date: pageResult.issue_date,
+            issue_date_confidence: pageResult.issue_date_confidence,
+            method: pageResult.method
+          });
+        }
+      } else {
+        // Regular single file result
+        // DO NOT load preview immediately - will be lazy-loaded on-demand
+        // This prevents memory overflow when scanning folders with many images
+        childResults.push({ 
+          fileName: f.name, 
+          filePath: f.path, 
+          previewUrl: null, // Will be lazy-loaded when user switches to this tab
+          isPdf: /\.pdf$/i.test(f.name), 
+          ...processedResult 
+        });
+      }
       
       // IMPORTANT: Skip update if user is editing a result in this tab
       // This prevents input from jumping/resetting while user is typing
